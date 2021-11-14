@@ -14,7 +14,7 @@ namespace SharpNeedle.HedgehogEngine
     public class ArchiveList : ResourceBase, IDirectory, IStreamable
     {
         public const string ResourceType = "hh/archive-list";
-        public static uint Signature { get; } = BinaryHelper.MakeSignature("ARL2");
+        public static uint Signature { get; } = BinaryHelper.MakeSignature<uint>("ARL2");
 
         public IDirectory Parent { get; private set; }
         public bool DependsResolved { get; private set; }

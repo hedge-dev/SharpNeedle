@@ -1,19 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace SharpNeedle.Utilities
 {
     public class BinaryHelper
     {
-        public static unsafe uint MakeSignature(string sig)
+        public static unsafe TSize MakeSignature<TSize>(string sig, byte placeholder = 0) where TSize : unmanaged
         {
-            Span<byte> result = stackalloc byte[4];
-            Unsafe.AsRef<uint>(Unsafe.AsPointer(ref result[0])) = 0;
+            Span<byte> result = stackalloc byte[Unsafe.SizeOf<TSize>()];
+            result.Fill(placeholder);
 
-            for (int i = 0; i < Math.Min(sig.Length, 4); i++)
+            for (int i = 0; i < Math.Min(sig.Length, Unsafe.SizeOf<TSize>()); i++)
                 result[i] = (byte)sig[i];
 
-            return Unsafe.As<byte, uint>(ref result[0]);
+            return Unsafe.As<byte, TSize>(ref result[0]);
         }
     }
 }
