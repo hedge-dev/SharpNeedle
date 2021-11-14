@@ -1,14 +1,10 @@
-﻿using System;
-using SharpNeedle.IO;
+﻿namespace SharpNeedle;
 
-namespace SharpNeedle
+public interface IResourceManager : IDisposable
 {
-    public interface IResourceManager : IDisposable
-    {
-        IResource Open(IFile file, bool resolveDepends = true);
-        T Open<T>(IFile file, bool resolveDepends = true) where T : IResource, new();
+    IResource Open(IFile file, bool resolveDepends = true);
+    T Open<T>(IFile file, bool resolveDepends = true) where T : IResource, new();
 
-        bool IsOpen(string path);
-        void Close(IResource res);
-    }
+    bool IsOpen(string path);
+    void Close(IResource res);
 }

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31321.278
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpNeedle", "SharpNeedle\SharpNeedle.csproj", "{F0E1549B-3EC3-43F2-9F45-52831E64C3A4}"
 EndProject
@@ -11,9 +11,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencie
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Amicitia.IO", "Dependencies\Amicitia.IO\src\Amicitia.IO\Amicitia.IO.csproj", "{1EC506FE-2946-4CB5-AB1F-72D45B06C94F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpNeedle.Tests", "SharpNeedle.Tests\SharpNeedle.Tests.csproj", "{771BB70E-CF69-4CC6-B964-1EAD8BA42B28}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpNeedle.Tests", "SharpNeedle.Tests\SharpNeedle.Tests.csproj", "{771BB70E-CF69-4CC6-B964-1EAD8BA42B28}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SharpNeedle.Shared", "SharpNeedle.Shared\SharpNeedle.Shared.shproj", "{925BC477-9B22-47FB-B0B1-95EA381B3B9E}"
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		SharpNeedle.Shared\SharpNeedle.Shared.projitems*{21c70f72-a580-421d-968b-292e6a47622c}*SharedItemsImports = 5
+		SharpNeedle.Shared\SharpNeedle.Shared.projitems*{771bb70e-cf69-4cc6-b964-1ead8ba42b28}*SharedItemsImports = 5
+		SharpNeedle.Shared\SharpNeedle.Shared.projitems*{925bc477-9b22-47fb-b0b1-95ea381b3b9e}*SharedItemsImports = 13
+		SharpNeedle.Shared\SharpNeedle.Shared.projitems*{f0e1549b-3ec3-43f2-9f45-52831e64c3a4}*SharedItemsImports = 5
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU

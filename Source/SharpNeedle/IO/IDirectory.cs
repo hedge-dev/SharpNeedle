@@ -1,20 +1,17 @@
-﻿using System.Collections.Generic;
+﻿namespace SharpNeedle.IO;
 
-namespace SharpNeedle.IO
+public interface IDirectory : IEnumerable<IFile>
 {
-    public interface IDirectory : IEnumerable<IFile>
-    {
-        IDirectory Parent { get; }
+    IDirectory Parent { get; }
 
-        string Name { get; set; }
+    string Name { get; set; }
 
-        IFile this[string name] { get; }
+    IFile this[string name] { get; }
 
-        bool DeleteFile(string name);
-        bool DeleteDirectory(string name);
-        IFile Create(string name);
-        IFile Add(IFile file);
+    bool DeleteFile(string name);
+    bool DeleteDirectory(string name);
+    IFile Create(string name);
+    IFile Add(IFile file);
 
-        IEnumerable<IDirectory> GetDirectories();
-    }
+    IEnumerable<IDirectory> GetDirectories();
 }

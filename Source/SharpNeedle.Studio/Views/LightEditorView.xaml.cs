@@ -1,15 +1,13 @@
-﻿using System.Windows.Controls;
+﻿namespace SharpNeedle.Studio.Views;
+using System.Windows.Controls;
 
-namespace SharpNeedle.Studio.Views
+/// <summary>
+/// Interaction logic for LightEditorView.xaml
+/// </summary>
+public partial class LightEditorView : UserControl
 {
-    /// <summary>
-    /// Interaction logic for LightEditorView.xaml
-    /// </summary>
-    public partial class LightEditorView : UserControl
+    public LightEditorView()
     {
-        public LightEditorView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

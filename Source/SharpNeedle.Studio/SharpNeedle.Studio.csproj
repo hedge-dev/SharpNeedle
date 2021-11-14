@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
@@ -28,5 +28,7 @@
     <Resource Include="Resources\Images\Field.png" />
     <Resource Include="Resources\Images\FolderClosed.png" />
   </ItemGroup>
+
+  <Import Project="..\SharpNeedle.Shared\SharpNeedle.Shared.projitems" Label="Shared" />
 
 </Project>

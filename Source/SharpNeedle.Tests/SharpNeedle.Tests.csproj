@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -16,5 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SharpNeedle\SharpNeedle.csproj" />
   </ItemGroup>
+
+  <Import Project="..\SharpNeedle.Shared\SharpNeedle.Shared.projitems" Label="Shared" />
 
 </Project>

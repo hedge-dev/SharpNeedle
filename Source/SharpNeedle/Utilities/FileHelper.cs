@@ -1,21 +1,19 @@
-﻿using System.IO;
+﻿namespace SharpNeedle.Utilities;
+using System.IO;
 
-namespace SharpNeedle.Utilities
+public class FileHelper
 {
-    public class FileHelper
+    public static FileMode FileAccessToMode(FileAccess access)
     {
-        public static FileMode FileAccessToMode(FileAccess access)
+        switch (access)
         {
-            switch (access)
-            {
-                case FileAccess.Read:
-                    return FileMode.Open;
+            case FileAccess.Read:
+                return FileMode.Open;
 
-                case FileAccess.Write:
-                case FileAccess.ReadWrite:
-                    return FileMode.OpenOrCreate;
-            }
-            return FileMode.OpenOrCreate;
+            case FileAccess.Write:
+            case FileAccess.ReadWrite:
+                return FileMode.OpenOrCreate;
         }
+        return FileMode.OpenOrCreate;
     }
 }

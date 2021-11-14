@@ -1,7 +1,6 @@
-﻿namespace SharpNeedle
+﻿namespace SharpNeedle;
+
+public interface IStreamable
 {
-    public interface IStreamable
-    {
-        void LoadToMemory();
-    }
+    void LoadToMemory();
 }

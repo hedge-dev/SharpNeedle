@@ -1,28 +1,26 @@
-﻿using System.Windows;
+﻿namespace SharpNeedle.Studio;
+using System.Windows;
 using MahApps.Metro.Controls;
 
-namespace SharpNeedle.Studio
+/// <summary>
+/// Interaction logic for MainWindow.xaml
+/// </summary>
+public partial class MainWindow : MetroWindow
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : MetroWindow
+    public IViewModel Model { get; set; }
+
+    public MainWindow()
     {
-        public IViewModel Model { get; set; }
+        InitializeComponent();
+    }
 
-        public MainWindow()
-        {
-            InitializeComponent();
-        }
+    private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+    {
+        Model = Content as IViewModel;
+    }
 
-        private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
-        {
-            Model = Content as IViewModel;
-        }
-
-        private void MainWindow_OnUnloaded(object sender, RoutedEventArgs e)
-        {
-            Model?.Dispose();
-        }
+    private void MainWindow_OnUnloaded(object sender, RoutedEventArgs e)
+    {
+        Model?.Dispose();
     }
 }
