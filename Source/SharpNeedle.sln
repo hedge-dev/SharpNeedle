@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.31321.278
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpNeedle", "SharpNeedle\SharpNeedle.csproj", "{F0E1549B-3EC3-43F2-9F45-52831E64C3A4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpNeedle.Studio", "Hedgehog.Studio\SharpNeedle.Studio.csproj", "{21C70F72-A580-421D-968B-292E6A47622C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpNeedle.Studio", "SharpNeedle.Studio\SharpNeedle.Studio.csproj", "{21C70F72-A580-421D-968B-292E6A47622C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{D4470A79-472D-4641-AECB-C035A9101FF1}"
 EndProject
