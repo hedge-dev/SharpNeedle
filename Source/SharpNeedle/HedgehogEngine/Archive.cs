@@ -17,11 +17,43 @@ namespace SharpNeedle.HedgehogEngine
     {
         public const string ResourceType = "hh/archive";
 
-        public List<ArchiveFile> Files { get; set; } = new(8);
+        public List<IFile> Files { get; set; } = new(8);
 
         public IDirectory Parent { get; private set; }
 
         public IFile this[string name] => GetFile(Name);
+        
+        public bool DeleteFile(string name)
+        {
+            var file = Files.FirstOrDefault(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            if (file == null)
+                return false;
+
+            return Files.Remove(file);
+        }
+
+        // Format doesn't support directories
+        public bool DeleteDirectory(string name)
+        {
+            return false;
+        }
+
+        public IFile Create(string name)
+        {
+            var file = new ArchiveFile(this)
+            {
+                Name = name
+            };
+
+            return file;
+        }
+
+        public IFile Add(IFile file)
+        {
+            DeleteFile(file.Name);
+            Files.Add(file);
+            return file;
+        }
 
         public IEnumerable<IDirectory> GetDirectories() => Enumerable.Empty<IDirectory>();
 
@@ -115,7 +147,10 @@ namespace SharpNeedle.HedgehogEngine
         public void LoadToMemory()
         {
             foreach (var file in Files)
-                file.EnsureData();
+            {
+                if (file is ArchiveFile aFile)
+                    aFile.EnsureData();
+            }
 
             BaseFile?.Dispose();
         }

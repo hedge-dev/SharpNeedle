@@ -23,6 +23,53 @@ namespace SharpNeedle.HedgehogEngine
         public HashSet<string> Files { get; set; } = new();
         public IFile this[string name] => GetFile(name);
 
+        public bool DeleteFile(string name)
+        {
+            foreach (var archive in Archives)
+            {
+                if (archive.DeleteFile(name))
+                    return true;
+            }
+
+            return false;
+        }
+
+        // Format doesn't support directories
+        public bool DeleteDirectory(string name)
+        {
+            return false;
+        }
+
+        public IFile Create(string name)
+        {
+            if (Archives == null)
+            {
+                Archives = new List<Archive>
+                {
+                    new ()
+                };
+
+                return Archives.First().Create(name);
+            }
+
+            return Archives.Last().Create(name);
+        }
+
+        public IFile Add(IFile file)
+        {
+            if (Archives == null)
+            {
+                Archives = new List<Archive>
+                {
+                    new ()
+                };
+
+                return Archives.First().Add(file);
+            }
+
+            return Archives.Last().Add(file);
+        }
+
         public IEnumerable<IDirectory> GetDirectories() => Enumerable.Empty<IDirectory>();
 
         public override void Read(IFile file)

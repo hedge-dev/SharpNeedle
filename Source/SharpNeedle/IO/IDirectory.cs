@@ -10,6 +10,11 @@ namespace SharpNeedle.IO
 
         IFile this[string name] { get; }
 
+        bool DeleteFile(string name);
+        bool DeleteDirectory(string name);
+        IFile Create(string name);
+        IFile Add(IFile file);
+
         IEnumerable<IDirectory> GetDirectories();
     }
 }
