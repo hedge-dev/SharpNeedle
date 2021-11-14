@@ -55,6 +55,12 @@ namespace SharpNeedle.IO
 
         public static IFile Create(string path)
         {
+            var root = GetPathRoot(path);
+            if (mMountPoints.TryGetValue(root, out var dir))
+            {
+                return dir.Create(path);
+            }
+
             return HostFile.Create(path);
         }
     }
