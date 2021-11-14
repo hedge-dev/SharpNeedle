@@ -13,9 +13,9 @@ namespace SharpNeedle.HedgehogEngine.Mirage
 {
     public abstract class SampleChunkResource : ResourceBase
     {
-        protected uint FileSize;
-        public uint DataVersion;
-        protected uint DataSize;
+        protected uint FileSize { get; set; }
+        public uint DataVersion { get; set; }
+        protected uint DataSize { get; set; }
 
         protected abstract void Read(BinaryObjectReader reader);
         protected abstract void Write(BinaryObjectWriter reader);
@@ -27,9 +27,9 @@ namespace SharpNeedle.HedgehogEngine.Mirage
             Name = Path.GetFileNameWithoutExtension(file.Name);
 
             using var reader = new BinaryObjectReader(file.Open(), StreamOwnership.Retain, Endianness.Big);
-            reader.Read(out FileSize);
-            reader.Read(out DataVersion);
-            reader.Read(out DataSize);
+            FileSize = reader.Read<uint>();
+            DataVersion = reader.Read<uint>();
+            DataSize = reader.Read<uint>();
 
             reader.ReadOffset(() =>
             {
@@ -90,22 +90,6 @@ namespace SharpNeedle.HedgehogEngine.Mirage
             writer.Write((uint)writer.Length);
 
             dataToken.Dispose();
-
-        }
-
-        public virtual IReadOnlyList<ResourceDependency> GetDependencies()
-        {
-            return null;
-        }
-
-        public virtual void ResolveDependencies(IDirectory dir)
-        {
-            
-        }
-
-        public virtual void Dispose()
-        {
-            
         }
     }
 }
