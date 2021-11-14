@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencie
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Amicitia.IO", "Dependencies\Amicitia.IO\src\Amicitia.IO\Amicitia.IO.csproj", "{1EC506FE-2946-4CB5-AB1F-72D45B06C94F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpNeedle.Tests", "SharpNeedle.Tests\SharpNeedle.Tests.csproj", "{771BB70E-CF69-4CC6-B964-1EAD8BA42B28}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{1EC506FE-2946-4CB5-AB1F-72D45B06C94F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1EC506FE-2946-4CB5-AB1F-72D45B06C94F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1EC506FE-2946-4CB5-AB1F-72D45B06C94F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{771BB70E-CF69-4CC6-B964-1EAD8BA42B28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{771BB70E-CF69-4CC6-B964-1EAD8BA42B28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{771BB70E-CF69-4CC6-B964-1EAD8BA42B28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{771BB70E-CF69-4CC6-B964-1EAD8BA42B28}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
