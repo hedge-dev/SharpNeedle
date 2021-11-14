@@ -1,0 +1,46 @@
+﻿<UserControl x:Class="SharpNeedle.Studio.Views.FolderBrowserView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:models="clr-namespace:SharpNeedle.Studio.Models"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance models:FolderBrowserViewModel, IsDesignTimeCreatable=True}">
+    <UserControl.Resources>
+        <BitmapImage x:Key="FolderIcon" UriSource="/Resources/Images/FolderClosed.png"/>
+        <BitmapImage x:Key="ItemIcon" UriSource="/Resources/Images/Field.png"/>
+    </UserControl.Resources>
+    <Grid>
+        <ListBox SelectedItem="{Binding SelectedItem}"
+                 ItemsSource="{Binding Items}"
+                 PreviewKeyDown="OnKeyDown"
+                 Margin="10,15,0,0">
+
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <EventSetter Event="MouseDoubleClick" Handler="OnDoubleClick"/>
+                </Style>
+            </ListBox.ItemContainerStyle>
+
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="{x:Type models:FolderItem}">
+                    <StackPanel Orientation="Horizontal" Margin="0,5">
+                        <Image Source="{StaticResource FolderIcon}" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                               Width="16" Height="16"
+                               Visibility="{Binding IsDirectory, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        <Image  HorizontalAlignment="Center" VerticalAlignment="Center"
+                                Source="{StaticResource ItemIcon}" Visibility="{Binding IsFile, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        <TextBlock Margin="10,0,0,0" Text="{Binding Name}" FontSize="14" TextWrapping="Wrap" TextAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+
+            <!--<ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>-->
+        </ListBox>
+    </Grid>
+</UserControl>

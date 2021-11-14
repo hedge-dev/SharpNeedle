@@ -1,0 +1,34 @@
+﻿<Application x:Class="SharpNeedle.Studio.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:studio="clr-namespace:SharpNeedle.Studio"
+             xmlns:converters="clr-namespace:SharpNeedle.Studio.Converters"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Dark.Blue.xaml" />
+                <ResourceDictionary Source="Views/ModelBinds.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <system:String x:Key="AppName">HedgeStudio</system:String>
+            
+            <studio:Workspace x:Key="Workspace"/>
+            <BitmapImage x:Key="AppIcon" UriSource="/Resources/Images/AppIcon.png"/>
+
+            <Style x:Key="DesignStyle" TargetType="UserControl">
+                <Setter Property="Background" Value="White"/>
+            </Style>
+
+            <Style TargetType="{x:Type TextBlock}">
+                <Setter Property="Foreground" Value="White"/>
+            </Style>
+
+            <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+            <Vs2013DarkTheme x:Key="DockTheme"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

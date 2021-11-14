@@ -1,0 +1,3 @@
+[submodule "Source/Dependencies/Amicitia.IO"]
+	path = Source/Dependencies/Amicitia.IO
+	url = https://github.com/TGEnigma/Amicitia.IO

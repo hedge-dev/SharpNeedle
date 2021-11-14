@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\Images\AppIcon.png" />
+    <None Remove="Resources\Images\Field.png" />
+    <None Remove="Resources\Images\FolderClosed.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dirkster.AvalonDock" Version="4.60.0" />
+    <PackageReference Include="Dirkster.AvalonDock.Themes.VS2013" Version="4.60.0" />
+    <PackageReference Include="MahApps.Metro" Version="2.4.9" />
+    <PackageReference Include="Ookii.Dialogs.Wpf" Version="4.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SharpNeedle\SharpNeedle.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Images\AppIcon.png" />
+    <Resource Include="Resources\Images\Field.png" />
+    <Resource Include="Resources\Images\FolderClosed.png" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,53 @@
+﻿<UserControl x:Class="SharpNeedle.Studio.Views.MainView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:models="clr-namespace:SharpNeedle.Studio.Models"
+             xmlns:hs="clr-namespace:SharpNeedle.Studio"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance {x:Type models:MainViewModel}, IsDesignTimeCreatable=True}"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <WrapPanel HorizontalAlignment="Left">
+                <Menu ItemsSource="{Binding Menu.Children}">
+                    <Menu.ItemContainerStyle>
+                        <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
+                            <Setter Property="Command" Value="{Binding Command}"/>
+                        </Style>
+                    </Menu.ItemContainerStyle>
+
+                    <Menu.ItemTemplate>
+                        <HierarchicalDataTemplate DataType="{x:Type hs:MenuItem}" ItemsSource="{Binding Children}">
+                            <TextBlock Text="{Binding Header}"/>
+                        </HierarchicalDataTemplate>
+                    </Menu.ItemTemplate>
+                </Menu>
+            </WrapPanel>
+        </Grid>
+
+        <Border Grid.Row="1" DataContext="{StaticResource Workspace}">
+            <DockingManager x:Name="DockMan" DocumentsSource="{Binding Documents}" 
+                            ActiveContent="{Binding SelectedDocument, Mode=TwoWay}"
+                            Theme="{StaticResource DockTheme}"
+                            LayoutUpdated="OnDockLayoutUpdated"
+                            DocumentClosing="OnDocumentClosing">
+                <DockingManager.Resources>
+
+                </DockingManager.Resources>
+
+                <DockingManager.LayoutItemContainerStyle>
+                    <Style TargetType="LayoutDocumentItem">
+                        <Setter Property="Title" Value="{Binding View.DataContext.Title, TargetNullValue={x:Null}}"/>
+                    </Style>
+                </DockingManager.LayoutItemContainerStyle>
+            </DockingManager>
+        </Border>
+    </Grid>
+</UserControl>
