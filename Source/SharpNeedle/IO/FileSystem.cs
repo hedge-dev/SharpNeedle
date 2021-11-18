@@ -47,7 +47,7 @@ public class FileSystem
             return dir[GetPathWithoutRoot(path)];
         }
 
-        return new HostFile(path);
+        return HostFile.Open(path);
     }
 
     public static IFile Create(string path)

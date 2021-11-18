@@ -4,6 +4,7 @@ public abstract class ResourceBase : IResource
 {
     private static readonly IReadOnlyList<ResourceDependency> mEmptyDepends = new List<ResourceDependency>();
 
+    protected bool Disposed { get; private set; }
     public string Name { get; set; }
     public IFile BaseFile { get; protected set; }
 
@@ -26,8 +27,24 @@ public abstract class ResourceBase : IResource
         return Name;
     }
 
-    public virtual void Dispose()
+    protected virtual void Dispose(bool disposing)
     {
-        BaseFile?.Dispose();
+        if (disposing)
+            BaseFile?.Dispose();
+    }
+
+    public void Dispose()
+    {
+        if (Disposed)
+            return;
+
+        Dispose(true);
+        Disposed = true;
+        GC.SuppressFinalize(this);
+    }
+
+    ~ResourceBase()
+    {
+        Dispose(false);
     }
 }

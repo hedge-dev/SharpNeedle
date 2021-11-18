@@ -9,7 +9,7 @@ public enum WrapMode : byte
     Border = 4
 }
 
-[BinaryResource("hh/texture")]
+[BinaryResource("hh/texture", @"\.texture$")]
 public class Texture : SampleChunkResource
 {
     public string PictureName { get; set; }

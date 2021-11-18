@@ -2,7 +2,7 @@
 
 using System.IO;
 
-[BinaryResource(ResourceType, SharpNeedle.ResourceType.Archive)]
+[BinaryResource(ResourceType, SharpNeedle.ResourceType.Archive, @"\.ar(\.\d+)?$")]
 public class Archive : ResourceBase, IDirectory, IStreamable
 {
     public const string ResourceType = "hh/archive";
@@ -89,7 +89,7 @@ public class Archive : ResourceBase, IDirectory, IStreamable
             LoadToMemory();
 
         using var stream = file.Open(FileAccess.Write);
-        var writer = new BinaryObjectWriter(stream, StreamOwnership.Retain, Endianness.Little, Encoding.ASCII);
+        var writer = new BinaryObjectWriter(stream, StreamOwnership.Transfer, Endianness.Little, Encoding.ASCII);
 
         writer.Write(0u);
         writer.Write(0x10u);
@@ -127,13 +127,6 @@ public class Archive : ResourceBase, IDirectory, IStreamable
         }
     }
 
-    [ResourceCheckFunction]
-    public static bool IsResourceValid(IFile file)
-    {
-        var fullExtension = file.Name.Substring(file.Name.IndexOf('.') + 1);
-        return fullExtension.Equals("ar", StringComparison.OrdinalIgnoreCase) || fullExtension.StartsWith("ar.");
-    }
-
     public void LoadToMemory()
     {
         foreach (var file in Files)
@@ -145,12 +138,13 @@ public class Archive : ResourceBase, IDirectory, IStreamable
         BaseFile?.Dispose();
     }
 
-    public override void Dispose()
+    protected override void Dispose(bool disposing)
     {
+        if (!disposing)
+            return;
+
         foreach (var file in Files)
             file.Dispose();
-
-        base.Dispose();
     }
 
     public IEnumerator<IFile> GetEnumerator()

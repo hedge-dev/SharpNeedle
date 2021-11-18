@@ -91,10 +91,7 @@ public class ResourceManager : IResourceManager
     {
         foreach (var value in mResourceTypes.Values)
         {
-            if (value.CheckResourceFunc == null)
-                continue;
-
-            if (value.CheckResourceFunc(file))
+            if (value.CheckResource(file))
                 return value;
         }
         return null;

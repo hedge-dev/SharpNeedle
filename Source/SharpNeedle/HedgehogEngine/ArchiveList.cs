@@ -159,15 +159,16 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
             archive.LoadToMemory();
     }
 
-    public override void Dispose()
+    protected override void Dispose(bool disposing)
     {
+        if (!disposing)
+            return;
+
         if (Archives != null)
         {
             foreach (var archive in Archives)
                 archive.Dispose();
         }
-
-        base.Dispose();
     }
 
     public IEnumerator<IFile> GetEnumerator()

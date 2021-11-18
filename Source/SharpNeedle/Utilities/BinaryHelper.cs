@@ -1,9 +1,14 @@
-﻿namespace SharpNeedle.Utilities;
+﻿using System.IO;
+
+namespace SharpNeedle.Utilities;
 
 public static class BinaryHelper
 {
     public static unsafe TSize MakeSignature<TSize>(string sig, byte placeholder = 0) where TSize : unmanaged
     {
+        if (string.IsNullOrEmpty(sig))
+            return default;
+
         Span<byte> result = stackalloc byte[Unsafe.SizeOf<TSize>()];
         result.Fill(placeholder);
 
@@ -22,4 +27,10 @@ public static class BinaryHelper
         using var token = reader.AtOffset(offset);
         return reader.ReadString(format, fixedLength);
     }
+
+    public static SeekToken At(this BinaryValueReader reader)
+        => new SeekToken(reader.GetBaseStream(), reader.Position, SeekOrigin.Begin);
+
+    public static SeekToken At(this BinaryValueWriter reader)
+        => new SeekToken(reader.GetBaseStream(), reader.Position, SeekOrigin.Begin);
 }

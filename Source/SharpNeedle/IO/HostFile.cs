@@ -37,6 +37,11 @@ public class HostFile : IFile
     public static HostFile Create(string fullPath)
         => new HostFile(fullPath, File.Create(fullPath));
 
+    public static HostFile Open(string fullPath)
+    {
+        return !File.Exists(fullPath) ? null : new HostFile(fullPath);
+    }
+
     public Stream Open(FileAccess access = FileAccess.Read)
     {
         if (CheckDisposed())
@@ -53,7 +58,7 @@ public class HostFile : IFile
             return Open(access);
         }
 
-        BaseStream = new FileStream(FullPath, FileHelper.FileAccessToMode(access), access);
+        BaseStream = new FileStream(FullPath, FileHelper.FileAccessToMode(access), access, FileShare.ReadWrite);
         return BaseStream;
     }
 

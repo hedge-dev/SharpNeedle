@@ -1,9 +1,9 @@
 ﻿namespace SharpNeedle.HedgehogEngine.Mirage;
 
+[BinaryResource("hh/material", ResourceType.Material, @"\.material$")]
 public class Material : SampleChunkResource
 {
     public string ShaderName { get; set; }
-
     public byte AlphaThreshold { get; set; }
     public bool NoBackFaceCulling { get; set; }
     public bool UseAdditiveBlending { get; set; }
@@ -15,6 +15,9 @@ public class Material : SampleChunkResource
 
     public override void Read(BinaryObjectReader reader)
     {
+        if (Root != null)
+            DataVersion = 3;
+
         ShaderName = reader.ReadStringOffset();
         reader.Skip(4); // Unused vertex shader name (always the same as ShaderName)
 
@@ -97,7 +100,7 @@ public class Material : SampleChunkResource
             for (byte i = 0; i < count; i++)
             {
                 var param = reader.ReadObjectOffset<Parameter<T>>();
-                paramsOut.Add(param.Name, param);
+                paramsOut.TryAdd(param.Name, param);
             }
         }
     }

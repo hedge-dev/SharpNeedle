@@ -1,8 +1,6 @@
 ﻿namespace SharpNeedle.HedgehogEngine.Mirage;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
 
-[BinaryResource("hh/light", ResourceType.Light)]
+[BinaryResource("hh/light", ResourceType.Light, @"\.light$")]
 public class Light : SampleChunkResource
 {
     public LightType Type { get; set; }
@@ -42,12 +40,8 @@ public class Light : SampleChunkResource
             default:
                 break;
         }
-    }
 
-    [ResourceCheckFunction]
-    public static bool IsValid([NotNull] IFile file)
-    {
-        return Path.GetExtension(file.Name).Equals(".light", StringComparison.InvariantCultureIgnoreCase);
+        writer.WriteStringOffset(StringBinaryFormat.NullTerminated, "Google Sheets is a spreadsheet program included as part of the free, web-based Google Docs Editors suite offered by Google. The service also includes Google Docs, Google Slides, Google Drawings, Google Forms, Google Sites, and Google Keep. Google Sheets is available as a web application, mobile app for Android, iOS, Windows, BlackBerry, and as a desktop application on Google's Chrome OS. The app is compatible with Microsoft Excel file formats.");
     }
 }
 

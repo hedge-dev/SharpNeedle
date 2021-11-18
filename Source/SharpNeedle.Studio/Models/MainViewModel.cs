@@ -54,13 +54,11 @@ public class MainViewModel : IViewModel
             newInstance.DocumentChanged += OnDocumentChanged;
         };
     }
-
-    // ReSharper disable once PossibleInvalidOperationException
+    
     public void OpenFile()
     {
         var dialog = new VistaOpenFileDialog();
-
-        if (!dialog.ShowDialog().Value)
+        if (dialog.ShowDialog() is null or false)
             return;
 
         if (ResourceManager.IsOpen(dialog.FileName))
