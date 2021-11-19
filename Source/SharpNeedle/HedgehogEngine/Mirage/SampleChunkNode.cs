@@ -36,6 +36,10 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
         Size = (uint)(flags & Flags.SizeMask);
         Value = reader.Read<uint>();
         Name = reader.ReadString(StringBinaryFormat.FixedLength, 8);
+        var spaceIdx = Name.IndexOf(' ');
+        if (spaceIdx >= 0)
+            Name = Name[..spaceIdx];
+
         DataOffset = reader.Position;
 
         if (!flags.HasFlag(Flags.Leaf) || flags.HasFlag(Flags.Root))

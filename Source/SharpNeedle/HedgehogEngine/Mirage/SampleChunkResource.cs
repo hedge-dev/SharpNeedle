@@ -24,7 +24,7 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
     public void SetupNodes(string rootName)
     {
         Root = new SampleChunkNode();
-        Root.Add(rootName).Add("Contexts", this);
+        Root.Add(rootName).Add("Contexts", DataVersion, this);
     }
 
     public abstract void Read(BinaryObjectReader reader);
@@ -145,6 +145,10 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
 
     private void WriteResourceV2(IFile file, BinaryObjectWriter writer)
     {
+        var contexts = Root.Find("Contexts");
+        if (contexts != null)
+            contexts.Value = DataVersion;
+
         writer.WriteObject(Root);
     }
 }
