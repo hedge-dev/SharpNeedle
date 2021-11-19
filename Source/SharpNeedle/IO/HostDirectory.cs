@@ -93,17 +93,26 @@ public class HostDirectory : IDirectory
         return File.Exists(path) ? new HostFile(path) : null;
     }
 
-    public IFile Create(string name)
+    public IFile CreateFile(string name)
         => HostFile.Create(Path.Combine(FullPath, name));
+
+    public IDirectory CreateDirectory(string name)
+        => Create(Path.Combine(FullPath, Name));
 
     public IFile Add(IFile file)
     {
-        var destFile = Create(file.Name);
+        var destFile = CreateFile(file.Name);
         using var destStream = destFile.Open(FileAccess.Write);
         using var srcStream = file.Open();
         srcStream.CopyTo(destStream);
 
         return destFile;
+    }
+
+    public static HostDirectory Create(string path)
+    {
+        Directory.CreateDirectory(path);
+        return new HostDirectory(path);
     }
 
     public IEnumerable<IDirectory> GetDirectories()

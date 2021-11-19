@@ -1,4 +1,5 @@
 ﻿namespace SharpNeedle.IO;
+using System.IO;
 
 public class FileSystem
 {
@@ -31,6 +32,19 @@ public class FileSystem
         return null;
     }
 
+    public static IEnumerable<(string Name, IDirectory Directory)> GetMounts()
+    {
+        foreach (var mountPoint in mMountPoints)
+        {
+            yield return (mountPoint.Key, mountPoint.Value);
+        }
+
+        foreach (var drive in DriveInfo.GetDrives())
+        {
+            yield return (GetPathRoot(drive.Name.AsSpan()), new HostDirectory(drive.Name));
+        }
+    }
+
     public static void Mount(string root, IDirectory dir)
     {
         if (root.IndexOf(':', out var colonIndex))
@@ -55,9 +69,20 @@ public class FileSystem
         var root = GetPathRoot(path);
         if (mMountPoints.TryGetValue(root, out var dir))
         {
-            return dir.Create(path);
+            return dir.CreateFile(path);
         }
 
         return HostFile.Create(path);
+    }
+
+    public static IDirectory CreateDirectory(string path)
+    {
+        var root = GetPathRoot(path);
+        if (mMountPoints.TryGetValue(root, out var dir))
+        {
+            return dir.CreateDirectory(path);
+        }
+
+        return HostDirectory.Create(path);
     }
 }

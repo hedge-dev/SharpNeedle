@@ -23,12 +23,11 @@ public class Archive : ResourceBase, IDirectory, IStreamable
     }
 
     // Format doesn't support directories
-    public bool DeleteDirectory(string name)
-    {
-        return false;
-    }
+    public bool DeleteDirectory(string name) => false;
 
-    public IFile Create(string name)
+    public IDirectory CreateDirectory(string name) => null;
+
+    public IFile CreateFile(string name)
     {
         var file = new ArchiveFile(this)
         {

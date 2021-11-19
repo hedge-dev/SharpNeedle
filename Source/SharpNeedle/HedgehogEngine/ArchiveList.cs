@@ -27,12 +27,11 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
     }
 
     // Format doesn't support directories
-    public bool DeleteDirectory(string name)
-    {
-        return false;
-    }
+    public bool DeleteDirectory(string name) => false;
 
-    public IFile Create(string name)
+    public IDirectory CreateDirectory(string name) => null;
+
+    public IFile CreateFile(string name)
     {
         if (Archives == null)
         {
@@ -41,10 +40,10 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
                 new ()
             };
 
-            return Archives.First().Create(name);
+            return Archives.First().CreateFile(name);
         }
 
-        return Archives.Last().Create(name);
+        return Archives.Last().CreateFile(name);
     }
 
     public IFile Add(IFile file)
