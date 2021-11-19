@@ -43,7 +43,7 @@ public class LightList : SampleChunkResource
 
         foreach (var light in Lights)
         {
-            using var file = dir.CreateFile($"{light.Name}.light");
+            using var file = dir.CreateFile($"{light.Name}{Light.Extension}");
             light.Write(file);
             light.WriteDependencies(dir);
         }
@@ -58,7 +58,7 @@ public class LightList : SampleChunkResource
         {
             yield return new ResourceDependency()
             {
-                Name = $"{name}.light",
+                Name = $"{name}{Light.Extension}",
                 Id = Light.ResourceId
             };
         }
@@ -72,7 +72,7 @@ public class LightList : SampleChunkResource
         Lights = new List<Light>(LightNames.Count);
         foreach (var name in LightNames)
         {
-            using var file = dir[$"{name}.light"];
+            using var file = dir[$"{name}{Light.Extension}"];
             var light = new Light();
             light.Read(file);
             Lights.Add(light);

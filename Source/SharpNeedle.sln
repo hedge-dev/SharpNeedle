@@ -15,11 +15,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpNeedle.Tests", "SharpN
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SharpNeedle.Shared", "SharpNeedle.Shared\SharpNeedle.Shared.shproj", "{925BC477-9B22-47FB-B0B1-95EA381B3B9E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpNeedle.Bodge", "SharpNeedle.Bodge\SharpNeedle.Bodge.csproj", "{C7790A5E-6CF8-477A-BBA6-E8E1A141CE3C}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		SharpNeedle.Shared\SharpNeedle.Shared.projitems*{21c70f72-a580-421d-968b-292e6a47622c}*SharedItemsImports = 5
 		SharpNeedle.Shared\SharpNeedle.Shared.projitems*{771bb70e-cf69-4cc6-b964-1ead8ba42b28}*SharedItemsImports = 5
 		SharpNeedle.Shared\SharpNeedle.Shared.projitems*{925bc477-9b22-47fb-b0b1-95ea381b3b9e}*SharedItemsImports = 13
+		SharpNeedle.Shared\SharpNeedle.Shared.projitems*{c7790a5e-6cf8-477a-bba6-e8e1a141ce3c}*SharedItemsImports = 5
 		SharpNeedle.Shared\SharpNeedle.Shared.projitems*{f0e1549b-3ec3-43f2-9f45-52831e64c3a4}*SharedItemsImports = 5
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,6 +46,10 @@ Global
 		{771BB70E-CF69-4CC6-B964-1EAD8BA42B28}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{771BB70E-CF69-4CC6-B964-1EAD8BA42B28}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{771BB70E-CF69-4CC6-B964-1EAD8BA42B28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7790A5E-6CF8-477A-BBA6-E8E1A141CE3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7790A5E-6CF8-477A-BBA6-E8E1A141CE3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7790A5E-6CF8-477A-BBA6-E8E1A141CE3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7790A5E-6CF8-477A-BBA6-E8E1A141CE3C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
