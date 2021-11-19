@@ -1,8 +1,11 @@
 ﻿namespace SharpNeedle.HedgehogEngine.Mirage;
 
-[BinaryResource("hh/light", ResourceType.Light, @"\.light$")]
+[BinaryResource(ResourceId, ResourceType.Light, @"\.light$")]
 public class Light : SampleChunkResource
 {
+    public const string ResourceId = "hh/light";
+    public const string Extension = ".light";
+
     public LightType Type { get; set; }
     public int Attribute { get; set; }
     public Vector3 Position { get; set; }

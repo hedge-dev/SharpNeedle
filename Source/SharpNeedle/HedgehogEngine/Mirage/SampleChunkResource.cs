@@ -12,7 +12,7 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
     public void SetupNodes()
     {
         var attribute = GetType().GetCustomAttribute<BinaryResourceAttribute>();
-        if (attribute == null)
+        if (attribute == null || attribute.Type == ResourceType.Raw)
         {
             SetupNodes(GetType().Name);
             return;
@@ -28,7 +28,7 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
     }
 
     public abstract void Read(BinaryObjectReader reader);
-    public abstract void Write(BinaryObjectWriter reader);
+    public abstract void Write(BinaryObjectWriter writer);
 
     // ReSharper disable AccessToDisposedClosure
     // ReSharper disable once SuspiciousTypeConversion.Global
@@ -110,37 +110,58 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
 
         var dataToken = writer.At();
         writer.Write(0); // Data Size
+        long baseOffset = 0;
 
+        writer.WriteOffset(() =>
         {
-            writer.WriteOffset(() =>
-            {
-                var start = writer.Position;
-                Write(writer);
-                var size = writer.Position - start;
-                using var token = writer.At();
+            var start = writer.Position;
+            baseOffset = writer.Position;
+            writer.PushOffsetOrigin();
 
-                dataToken.Dispose();
-                writer.Write((uint)size);
-            });
-
-            writer.WriteOffset(() =>
-            {
-                var offsets = writer.OffsetHandler.OffsetPositions.Skip(1).ToArray();
-                writer.Write(offsets.Length);
-
-                foreach (var o in offsets)
-                    writer.Write((uint)o);
-            }, 4);
-
-            writer.WriteStringOffset(StringBinaryFormat.NullTerminated, file.Name, alignment: 8);
+            Write(writer);
             writer.Flush();
-        }
-        using var end = writer.At();
+            writer.Align(writer.DefaultAlignment);
+            writer.PopOffsetOrigin();
 
+            var size = writer.Position - start;
+            using var token = writer.At();
+
+            dataToken.Dispose();
+            writer.Write((uint)size);
+        });
+
+        var offsetsToken = writer.At();
+        writer.Write(0ul);
+
+        writer.Flush();
+
+        var offTableToken = writer.At();
+        offsetsToken.Dispose();
+        writer.WriteOffset(() =>
+        {
+            var offsets = writer.OffsetHandler.OffsetPositions.ToArray();
+            writer.Write(offsets.Length - 1);
+            for (int i = 0; i < offsets.Length - 1; i++)
+            {
+                writer.Write((uint)(offsets[i] - baseOffset));
+            }
+
+            writer.PopOffsetOrigin();
+        });
+        
+        writer.WriteOffset(() =>
+        {
+            writer.WriteString(StringBinaryFormat.NullTerminated, file.Name);
+            writer.Align(4);
+        }, 4);
+
+        // Ensure offset table is written at the end
+        offTableToken.Dispose();
+        writer.Flush();
+
+        using var token = writer.At();
         beginToken.Dispose();
-        writer.Write((uint)writer.Length);
-
-        dataToken.Dispose();
+        writer.Write((uint)((long)token - (long)beginToken));
     }
 
     private void WriteResourceV2(IFile file, BinaryObjectWriter writer)

@@ -22,10 +22,12 @@ public class ResourceRaw : IResource
 
     }
 
-    public IReadOnlyList<ResourceDependency> GetDependencies()
+    public void WriteDependencies(IDirectory dir)
     {
-        return new List<ResourceDependency>();
+        
     }
+
+    public IEnumerable<ResourceDependency> GetDependencies() => Enumerable.Empty<ResourceDependency>();
 
     public void ResolveDependencies(IDirectory dir)
     {

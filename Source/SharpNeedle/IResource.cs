@@ -8,5 +8,6 @@ public interface IResource : IDisposable
     void Write(IFile file);
 
     void ResolveDependencies(IDirectory dir);
-    IReadOnlyList<ResourceDependency> GetDependencies();
+    void WriteDependencies(IDirectory dir);
+    IEnumerable<ResourceDependency> GetDependencies();
 }

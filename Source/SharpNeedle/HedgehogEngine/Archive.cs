@@ -2,10 +2,10 @@
 
 using System.IO;
 
-[BinaryResource(ResourceType, SharpNeedle.ResourceType.Archive, @"\.ar(\.\d+)?$")]
+[BinaryResource(ResourceId, ResourceType.Archive, @"\.ar(\.\d+)?$")]
 public class Archive : ResourceBase, IDirectory, IStreamable
 {
-    public const string ResourceType = "hh/archive";
+    public const string ResourceId = "hh/archive";
 
     public List<IFile> Files { get; set; } = new(8);
 

@@ -2,8 +2,6 @@
 
 public abstract class ResourceBase : IResource
 {
-    private static readonly IReadOnlyList<ResourceDependency> mEmptyDepends = new List<ResourceDependency>();
-
     protected bool Disposed { get; private set; }
     public string Name { get; set; }
     public IFile BaseFile { get; protected set; }
@@ -11,8 +9,9 @@ public abstract class ResourceBase : IResource
     public abstract void Read(IFile file);
     public abstract void Write(IFile file);
 
-    public virtual IReadOnlyList<ResourceDependency> GetDependencies() => mEmptyDepends;
+    public virtual IEnumerable<ResourceDependency> GetDependencies() => Enumerable.Empty<ResourceDependency>();
     public virtual void ResolveDependencies(IDirectory dir) { }
+    public virtual void WriteDependencies(IDirectory dir) {}
 
     /// <summary>
     /// Write file to the original location it was read from

@@ -2,10 +2,10 @@
 
 using System.IO;
 
-[BinaryResource(ResourceType)]
+[BinaryResource(ResourceId)]
 public class ArchiveList : ResourceBase, IDirectory, IStreamable
 {
-    public const string ResourceType = "hh/archive-list";
+    public const string ResourceId = "hh/archive-list";
     public static uint Signature { get; } = BinaryHelper.MakeSignature<uint>("ARL2");
 
     public IDirectory Parent { get; private set; }
@@ -89,21 +89,18 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
         }
     }
 
-    public override IReadOnlyList<ResourceDependency> GetDependencies()
+    public override IEnumerable<ResourceDependency> GetDependencies()
     {
-        var result = new List<ResourceDependency>();
         var baseName = Path.GetFileNameWithoutExtension(Name);
 
         for (int i = 0; i < ArchiveSizes.Count; i++)
         {
-            result.Add(new ResourceDependency()
+            yield return new ResourceDependency()
             {
                 Name = $"{baseName}.ar.{i:00}",
-                Id = Archive.ResourceType
-            });
+                Id = Archive.ResourceId
+            };
         }
-
-        return result;
     }
 
     public override void Write(IFile file)
