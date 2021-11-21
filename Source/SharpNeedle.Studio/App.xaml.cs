@@ -7,5 +7,5 @@ namespace SharpNeedle.Studio;
 /// </summary>
 public partial class App : Application
 {
-
+    public static string Name { get; set; } = "SharpNeedle Studio";
 }

@@ -37,8 +37,8 @@ public abstract class ResourceBase : IResource
         if (Disposed)
             return;
 
-        Dispose(true);
         Disposed = true;
+        Dispose(true);
         GC.SuppressFinalize(this);
     }
 

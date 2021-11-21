@@ -1,4 +1,6 @@
-﻿namespace SharpNeedle.HedgehogEngine.Mirage;
+﻿using System.IO;
+
+namespace SharpNeedle.HedgehogEngine.Mirage;
 
 [BinaryResource("hh/light-list", @"\.light-list$")]
 public class LightList : SampleChunkResource
@@ -73,6 +75,9 @@ public class LightList : SampleChunkResource
         foreach (var name in LightNames)
         {
             using var file = dir[$"{name}{Light.Extension}"];
+            if (file == null)
+                throw new FileNotFoundException($"{name}{Light.Extension}");
+
             var light = new Light();
             light.Read(file);
             Lights.Add(light);

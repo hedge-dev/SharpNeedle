@@ -54,6 +54,11 @@ public class FolderBrowserViewModel : IViewModel
 
     public void ChangeDirectory(IDirectory dir)
     {
+        if (dir == null)
+        {
+            Items.Clear();
+            return;
+        }
         Title = $"📂 {dir.Name}";
         mCurrentDirectory = dir;
         Items.Clear();
@@ -76,10 +81,8 @@ public class FolderBrowserViewModel : IViewModel
 
     public void Dispose()
     {
-        if (mCurrentDirectory is IResource res)
-            Singleton.GetInstance<IResourceManager>()?.Close(res);
-        else if (mCurrentDirectory is IDisposable disposable)
-            disposable.Dispose();
+        mCurrentDirectory = null;
+        Items.Clear();
     }
 
     public event PropertyChangedEventHandler PropertyChanged;

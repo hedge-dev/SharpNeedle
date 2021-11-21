@@ -1,4 +1,6 @@
-﻿namespace SharpNeedle.Studio;
+﻿using System.Collections.Specialized;
+
+namespace SharpNeedle.Studio;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
@@ -19,13 +21,14 @@ public class Workspace : INotifyPropertyChanged
         }
     }
 
-    public event OnDocumentChangedDelegate DocumentChanged;
-    public ObservableCollection<IViewModel> Documents { get; set; } = new();
+    public event DocumentChangedDelegate DocumentChanged;
+    public event DocumentClosedDelegate DocumentClosed;
+    public ObservableCollection<IViewModel> Documents { get; } = new();
+    public static Workspace Instance => default(Singleton<Workspace>);
 
-    public Workspace()
+    static Workspace()
     {
-        if (!Singleton.HasInstance<Workspace>())
-            Singleton.SetInstance(this);
+        Singleton.SetInstance(new Workspace());
     }
 
     public void AddDocument(IViewModel document)
@@ -38,11 +41,20 @@ public class Workspace : INotifyPropertyChanged
     {
         Documents.Remove(document);
         document.Dispose();
+        RaiseDocumentClosed(document);
+
+        // The GC refuses to collect the unused resources on demand if i don't do it here
+        GC.Collect();
     }
 
     private void RaiseDocumentChanged(IViewModel oldDoc, IViewModel newDoc)
     {
         DocumentChanged?.Invoke(oldDoc, newDoc);
+    }
+
+    private void RaiseDocumentClosed(IViewModel document)
+    {
+        DocumentClosed?.Invoke(document);
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
@@ -54,4 +66,5 @@ public class Workspace : INotifyPropertyChanged
     }
 }
 
-public delegate void OnDocumentChangedDelegate(IViewModel oldDocument, IViewModel newDocument);
+public delegate void DocumentChangedDelegate(IViewModel oldDocument, IViewModel newDocument);
+public delegate void DocumentClosedDelegate(IViewModel document);

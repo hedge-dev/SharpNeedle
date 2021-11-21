@@ -71,7 +71,7 @@ public class LightEditorViewModel : IViewModel
         return new LightEditorViewModel((Light)resource);
     }
 
-    public event PropertyChangedEventHandler? PropertyChanged;
+    public event PropertyChangedEventHandler PropertyChanged;
 
     [NotifyPropertyChangedInvocator]
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

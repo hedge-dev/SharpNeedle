@@ -6,7 +6,8 @@ public class ResourceManager : IResourceManager
     private static readonly Dictionary<Type, string> mTypes = new();
     private static readonly Dictionary<string, BinaryResourceAttribute> mResourceTypes = new();
 
-    private readonly Dictionary<string, IResource> mResources = new();
+    // Use weak references so resources can get garbage collected and we won't have to worry about leaving them open
+    private readonly Dictionary<string, WeakReference<IResource>> mResources = new();
     private readonly ConditionalWeakTable<IResource, string> mResourceTable = new();
 
     static ResourceManager()
@@ -17,8 +18,13 @@ public class ResourceManager : IResourceManager
     private IResource OpenBase(IFile file, Type type, bool resolveDepends = true)
     {
         var path = file.Path;
-        if (mResources.ContainsKey(path))
-            return mResources[path];
+        if (mResources.TryGetValue(path, out var resRef))
+        {
+            if (resRef.TryGetTarget(out var res))
+                return res;
+
+            mResources.Remove(path);
+        }
 
         type ??= DetectType(file)?.Owner;
 
@@ -26,7 +32,7 @@ public class ResourceManager : IResourceManager
         {
             var res = (IResource)Activator.CreateInstance(type);
             res.Read(file);
-            mResources.Add(path, res);
+            mResources.Add(path, new WeakReference<IResource>(res));
             mResourceTable.Add(res, path);
             if (resolveDepends)
                 res.ResolveDependencies(file.Parent);
@@ -35,7 +41,7 @@ public class ResourceManager : IResourceManager
         }
 
         var rawResource = new ResourceRaw(file);
-        mResources.Add(path, rawResource);
+        mResources.Add(path, new WeakReference<IResource>(rawResource));
         mResourceTable.Add(rawResource, path);
         return rawResource;
     }
@@ -51,7 +57,7 @@ public class ResourceManager : IResourceManager
     }
 
     public bool IsOpen(string path)
-        => mResources.ContainsKey(path);
+        => mResources.TryGetValue(path, out var refRes) && refRes.TryGetTarget(out _);
 
     public void Close(IResource res)
     {
@@ -111,7 +117,10 @@ public class ResourceManager : IResourceManager
     public void Dispose()
     {
         foreach (var resource in mResources.Values)
-            resource.Dispose();
+        {
+            if (resource.TryGetTarget(out var res))
+                res.Dispose();
+        }
 
         mResources.Clear();
         mResourceTable.Clear();

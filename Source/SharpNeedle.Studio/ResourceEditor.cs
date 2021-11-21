@@ -4,12 +4,23 @@ using Models;
 
 public class ResourceEditor
 {
-    private static ConditionalWeakTable<IResource, IViewModel> mOpenEditors = new();
+    private static readonly ConditionalWeakTable<IResource, IViewModel> mOpenResources = new();
+    private static readonly ConditionalWeakTable<IViewModel, IResource> mOpenEditors = new();
     private static readonly Dictionary<Type, ResourceEditorAttribute> mEditorTypes = new();
 
     static ResourceEditor()
     {
         RegisterAssembly(typeof(ResourceEditor).Assembly);
+        Workspace.Instance.DocumentClosed += OnDocumentClosed;
+    }
+
+    private static void OnDocumentClosed(IViewModel document)
+    {
+        if (!mOpenEditors.TryGetValue(document, out var resource))
+            return;
+
+        mOpenResources.Remove(resource);
+        mOpenEditors.Remove(document);
     }
 
     public static void RegisterAssembly(Assembly assembly)
@@ -36,12 +47,15 @@ public class ResourceEditor
 
     public static IViewModel CreateEditor(IResource res)
     {
-        if (mOpenEditors.TryGetValue(res, out var editor))
+        if (mOpenResources.TryGetValue(res, out var editor))
             return editor;
 
         editor = GetEditorType(res)?.CreateEditor(res);
         if (editor != null)
-            mOpenEditors.Add(res, editor);
+        {
+            mOpenResources.Add(res, editor);
+            mOpenEditors.Add(editor, res);
+        }
             
         return editor;
     }
@@ -53,7 +67,7 @@ public class ResourceEditor
 
     public static IViewModel OpenEditor(IResource resource)
     {
-        if (mOpenEditors.TryGetValue(resource, out var editor))
+        if (mOpenResources.TryGetValue(resource, out var editor))
         {
             Singleton.GetInstance<Workspace>().SelectedDocument = editor;
             return editor;

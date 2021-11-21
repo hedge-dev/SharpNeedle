@@ -14,9 +14,8 @@
                 <ResourceDictionary Source="Views/ModelBinds.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <system:String x:Key="AppName">HedgeStudio</system:String>
-            
-            <studio:Workspace x:Key="Workspace"/>
+            <x:Static x:Key="AppName" MemberType="studio:App" Member="Name"/>
+            <x:Static x:Key="Workspace" MemberType="studio:Workspace" Member="Instance"/>
             <BitmapImage x:Key="AppIcon" UriSource="/Resources/Images/AppIcon.png"/>
 
             <Style x:Key="DesignStyle" TargetType="UserControl">

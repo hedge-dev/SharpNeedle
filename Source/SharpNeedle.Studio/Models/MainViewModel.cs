@@ -46,22 +46,13 @@ public class MainViewModel : IViewModel
         mBaseMenu.WithChild("File/Open", OpenFileCommand);
 
         Menu = mBaseMenu;
-        Singleton<Workspace>.InstanceChanged += (oldInstance, newInstance) =>
-        {
-            if (oldInstance != null)
-                oldInstance.DocumentChanged -= OnDocumentChanged;
-
-            newInstance.DocumentChanged += OnDocumentChanged;
-        };
+        Workspace.Instance.DocumentChanged += OnDocumentChanged;
     }
     
     public void OpenFile()
     {
         var dialog = new VistaOpenFileDialog();
         if (dialog.ShowDialog() is null or false)
-            return;
-
-        if (ResourceManager.IsOpen(dialog.FileName))
             return;
 
         var res = ResourceManager.Open(dialog.FileName);
@@ -71,7 +62,7 @@ public class MainViewModel : IViewModel
         void EndOpen()
         {
             ResourceManager.Close(res);
-            MessageBox.Show("Resource is not supported!", "HedgeStudio");
+            MessageBox.Show("Resource is not supported!", App.Name);
         }
     }
 

@@ -28,6 +28,32 @@ public static class BinaryHelper
         return reader.ReadString(format, fixedLength);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void WriteOffsetValue(this BinaryObjectWriter writer, long value)
+    {
+        if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U32)
+            writer.Write((uint)value);
+        else
+            writer.Write(value);
+    }
+
+    public static List<T> Unwind<T>(this BinaryList<BinaryPointer<T>> list) where T : IBinarySerializable, new()
+    {
+        var result = new List<T>();
+        foreach (var item in list)
+            result.Add(item);
+
+        return result;
+    }
+
+    public static unsafe T* Pointer<T>(this T[] data) where T : unmanaged
+    {
+        if (data == null || data.Length == 0)
+            return null;
+
+        return (T*)Unsafe.AsPointer(ref data[0]);
+    }
+
     public static SeekToken At(this BinaryValueReader reader)
         => new SeekToken(reader.GetBaseStream(), reader.Position, SeekOrigin.Begin);
 
