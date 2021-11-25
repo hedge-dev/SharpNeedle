@@ -16,6 +16,7 @@ public abstract class ModelBase : SampleChunkResource
             group.Dispose();
 
         Groups.Clear();
+        base.Dispose(disposing);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -47,7 +48,6 @@ public abstract class ModelBase : SampleChunkResource
         {
             if (Groups.Count == 1)
                 Groups[0].Write(writer, false);
-
             else
             {
                 var dummyMeshGroup = new MeshGroup();

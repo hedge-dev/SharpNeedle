@@ -36,7 +36,6 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
     {
         Root = null;
         BaseFile = file;
-        Name = Path.GetFileNameWithoutExtension(file.Name);
 
         using var reader = new BinaryObjectReader(file.Open(),
             this is IStreamable ? StreamOwnership.Retain : StreamOwnership.Transfer, Endianness.Big);
@@ -78,8 +77,10 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
         reader.ReadOffsetValue();
 
         var name = reader.ReadStringOffset();
-        if (!string.IsNullOrEmpty(name))
+        if (!string.IsNullOrEmpty(name) && string.IsNullOrEmpty(Name))
             Name = name;
+        else
+            Name = string.IsNullOrEmpty(Name) ? Path.GetFileNameWithoutExtension(file.Name) : Name;
     }
     
     public override void Write(IFile file)

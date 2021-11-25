@@ -129,6 +129,7 @@ public class Mesh : IBinarySerializable, IDisposable, ICloneable<Mesh>
 
     public void Dispose()
     {
+        Material?.Dispose();
         Material = null;
         Vertices = null;
         Elements = null;

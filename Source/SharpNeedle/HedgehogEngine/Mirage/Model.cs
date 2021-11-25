@@ -65,14 +65,6 @@ public class Model : ModelBase
             writer.WriteObjectOffset(Bounds);
     }
 
-    protected override void Dispose(bool disposing)
-    {
-        foreach (var group in Groups)
-            group.Dispose();
-
-        base.Dispose(disposing);
-    }
-
     public struct Node : IBinarySerializable
     {
         public string Name;
