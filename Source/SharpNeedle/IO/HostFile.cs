@@ -3,6 +3,7 @@ using System.IO;
 
 public class HostFile : IFile
 {
+    private DateTime mLastModified;
     public IDirectory Parent
         => HostDirectory.FromPath(Path.GetDirectoryName(Path.IsPathRooted(FullPath.AsSpan())
             ? FullPath
@@ -13,16 +14,19 @@ public class HostFile : IFile
     public long Length { get; }
     public string FullPath { get; }
 
-    protected FileAccess Access { get; set; }
-    protected FileStream BaseStream { get; set; }
-
-    internal HostFile(string fullPath, FileStream stream)
+    public DateTime LastModified
     {
-        BaseStream = stream;
-        FullPath = fullPath;
-        Name = Path.GetFileName(fullPath);
+        get => mLastModified;
+        set
+        {
+            mLastModified = value;
+            File.SetLastWriteTime(FullPath, value);
+        }
     }
 
+    protected FileAccess Access { get; set; }
+    protected FileStream BaseStream { get; set; }
+    
     public HostFile(string fullPath)
     {
         if (!File.Exists(fullPath))
@@ -32,10 +36,14 @@ public class HostFile : IFile
         Name = info.Name;
         FullPath = fullPath;
         Length = info.Length;
+        LastModified = info.LastWriteTime;
     }
 
     public static HostFile Create(string fullPath)
-        => new HostFile(fullPath, File.Create(fullPath));
+    {
+        File.WriteAllBytes(fullPath, Array.Empty<byte>());
+        return new HostFile(fullPath);
+    }
 
     public static HostFile Open(string fullPath)
     {

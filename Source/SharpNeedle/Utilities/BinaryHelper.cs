@@ -39,7 +39,7 @@ public static class BinaryHelper
 
     public static List<T> Unwind<T>(this BinaryList<BinaryPointer<T>> list) where T : IBinarySerializable, new()
     {
-        var result = new List<T>();
+        var result = new List<T>(list.Count);
         foreach (var item in list)
             result.Add(item);
 

@@ -3,6 +3,7 @@ using System.IO;
 
 public class HostDirectory : IDirectory
 {
+    string IDirectory.Path => FullPath;
     public string FullPath { get; set; }
 
     public IDirectory Parent
@@ -101,11 +102,13 @@ public class HostDirectory : IDirectory
 
     public IFile Add(IFile file)
     {
-        var destFile = CreateFile(file.Name);
-        using var destStream = destFile.Open(FileAccess.Write);
-        using var srcStream = file.Open();
+        var destFile = (HostFile)CreateFile(file.Name);
+        var destStream = destFile.Open(FileAccess.Write);
+        var srcStream = file.Open();
         srcStream.CopyTo(destStream);
 
+        destStream.Dispose();
+        destFile.LastModified = file.LastModified;
         return destFile;
     }
 

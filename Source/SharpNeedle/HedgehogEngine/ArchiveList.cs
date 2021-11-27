@@ -13,6 +13,7 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
     public List<Archive> Archives { get; private set; }
     public List<uint> ArchiveSizes { get; set; } = new();
     public HashSet<string> Files { get; set; } = new();
+    public string Path { get; set; }
     public IFile this[string name] => GetFile(name);
 
     public bool DeleteFile(string name)
@@ -67,6 +68,8 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
     {
         Name = file.Name;
         Parent = file.Parent;
+        Path = System.IO.Path.Combine(Parent.Path, Name);
+
         using var stream = file.Open();
         using var reader = new BinaryValueReader(stream, StreamOwnership.Retain, Endianness.Little);
 
@@ -91,7 +94,7 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
 
     public override IEnumerable<ResourceDependency> GetDependencies()
     {
-        var baseName = Path.GetFileNameWithoutExtension(Name);
+        var baseName = System.IO.Path.GetFileNameWithoutExtension(Name);
 
         for (int i = 0; i < ArchiveSizes.Count; i++)
         {
@@ -113,7 +116,7 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
         if (ArchiveSizes.Count > 0)
             Archives = new List<Archive>(ArchiveSizes.Count);
 
-        var baseName = Path.GetFileNameWithoutExtension(Name);
+        var baseName = System.IO.Path.GetFileNameWithoutExtension(Name);
         for (int i = 0; i < ArchiveSizes.Count; i++)
         {
             var name = $"{baseName}.ar.{i:00}";

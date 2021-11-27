@@ -11,6 +11,7 @@ public class Archive : ResourceBase, IDirectory, IStreamable
 
     public IDirectory Parent { get; private set; }
 
+    public string Path { get; set; }
     public IFile this[string name] => GetFile(Name);
         
     public bool DeleteFile(string name)
@@ -55,6 +56,8 @@ public class Archive : ResourceBase, IDirectory, IStreamable
     {
         Parent = file.Parent;
         Name = file.Name;
+        Path = System.IO.Path.Combine(Parent.Path, Name);
+
         BaseFile = file;
         BaseStream = file.Open();
         var reader = new BinaryValueReader(file.Open(), StreamOwnership.Retain, Endianness.Little);
@@ -64,11 +67,10 @@ public class Archive : ResourceBase, IDirectory, IStreamable
         {
             var baseOffset = reader.Position;
 
-            var dataEnd = reader.ReadUInt32();
-            var dataLength = reader.ReadUInt32();
-            var dataStart = reader.ReadUInt32();
-            var unk1 = reader.ReadUInt32();
-            var unk2 = reader.ReadUInt32();
+            var dataEnd = reader.Read<int>();
+            var dataLength = reader.Read<uint>();
+            var dataStart = reader.Read<int>();
+            var lastModified = FromFileTime(reader.Read<long>());
             var name = reader.ReadString(StringBinaryFormat.NullTerminated);
 
             reader.Seek(baseOffset + dataEnd, SeekOrigin.Begin);
@@ -77,7 +79,8 @@ public class Archive : ResourceBase, IDirectory, IStreamable
             {
                 FileOffset = baseOffset + dataStart,
                 FileLength = dataLength,
-                Name = name
+                Name = name,
+                LastModified = lastModified,
             });
         }
     }
@@ -110,7 +113,7 @@ public class Archive : ResourceBase, IDirectory, IStreamable
                 readStream.CopyTo(writer.GetBaseStream());
             });
                 
-            writer.Write<ulong>(0);
+            writer.Write(ToFileTime(arFile.LastModified));
             writer.WriteString(StringBinaryFormat.NullTerminated, arFile.Name);
             writer.Align(0x10);
 
@@ -125,6 +128,9 @@ public class Archive : ResourceBase, IDirectory, IStreamable
             writer.PopOffsetOrigin();
         }
     }
+
+    public static DateTime FromFileTime(long time) => DateTime.FromFileTime(time - 504911232000000000);
+    public static long ToFileTime(DateTime time) => time.ToFileTime() + 504911232000000000;
 
     public void LoadToMemory()
     {
@@ -160,6 +166,8 @@ public class ArchiveFile : IFile
     public string Name { get; set; }
     public string Path => $"{Parent.Name}/{Name}";
     public MemoryStream DataStream { get; private set; }
+    public DateTime LastModified { get; set; }
+
     internal long FileOffset { get; set; }
     internal long FileLength { get; set; }
 
@@ -173,6 +181,7 @@ public class ArchiveFile : IFile
             return FileLength;
         }
     }
+
 
     public ArchiveFile(Archive parent)
     {

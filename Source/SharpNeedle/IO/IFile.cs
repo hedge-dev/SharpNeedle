@@ -7,5 +7,7 @@ public interface IFile : IDisposable
     string Name { get; set; }
     string Path { get; }
     long Length { get; }
+    DateTime LastModified { get; set; }
+
     Stream Open(FileAccess access = FileAccess.Read);
 }

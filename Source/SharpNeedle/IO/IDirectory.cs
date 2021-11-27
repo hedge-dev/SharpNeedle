@@ -5,6 +5,7 @@ public interface IDirectory : IEnumerable<IFile>
     IDirectory Parent { get; }
 
     string Name { get; set; }
+    string Path { get; }
 
     IFile this[string name] { get; }
 

@@ -7,6 +7,7 @@ public class StreamFile : IFile
     public string Name { get; set; } = string.Empty;
     public string Path { get; set; }
     public long Length => BaseStream.Length;
+    public DateTime LastModified { get; set; }
     public IDirectory Parent { get; set; }
 
     private readonly bool mLeaveOpen;
