@@ -70,7 +70,8 @@ public class Archive : ResourceBase, IDirectory, IStreamable
             var dataEnd = reader.Read<int>();
             var dataLength = reader.Read<uint>();
             var dataStart = reader.Read<int>();
-            var lastModified = FromFileTime(reader.Read<long>());
+            var lastModifiedBinary = reader.Read<long>();
+            var lastModified = lastModifiedBinary != 0 ? FromFileTime(lastModifiedBinary) : DateTime.Now;
             var name = reader.ReadString(StringBinaryFormat.NullTerminated);
 
             reader.Seek(baseOffset + dataEnd, SeekOrigin.Begin);
