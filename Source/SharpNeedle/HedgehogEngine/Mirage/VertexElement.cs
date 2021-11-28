@@ -133,7 +133,7 @@ public enum VertexType : byte
     PSize = 4,
     TexCoord = 5,
     Tangent = 6,
-    BiNormal = 7,
+    Binormal = 7,
     TessFactor = 8,
     PositionT = 9,
     Color = 10,

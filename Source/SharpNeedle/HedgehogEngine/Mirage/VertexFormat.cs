@@ -1,5 +1,7 @@
 ﻿namespace SharpNeedle.HedgehogEngine.Mirage;
 
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
 public enum VertexFormat : uint
 {
     Float1 = 0x2C83A4U,

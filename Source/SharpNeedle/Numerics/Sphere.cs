@@ -17,9 +17,9 @@ public struct Sphere
         Radius = radius;
     }
 
-    public bool Intersects(Vector3 point)
+    public readonly bool Intersects(Vector3 point)
         => Vector3.DistanceSquared(point, Position) <= (Radius * Radius);
 
-    public bool Intersects(Sphere sphere)
+    public readonly bool Intersects(Sphere sphere)
         => Vector3.DistanceSquared(Position, sphere.Position) <= (Radius * Radius) + (sphere.Radius * sphere.Radius);
 }

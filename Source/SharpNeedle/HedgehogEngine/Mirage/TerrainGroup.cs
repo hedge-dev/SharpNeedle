@@ -6,19 +6,19 @@ public class TerrainGroup : SampleChunkResource
     public List<string> ModelNames { get; set; }
     public List<SubSet> Sets { get; set; }
 
-    public string GetInstance(Vector3 point)
+    public (string Name, Sphere Bounds)? GetInstance(Vector3 point)
     {
         foreach (var set in Sets)
         {
-            var name = set.GetInstance(point);
-            if (name == null) continue;
+            var instance = set.GetInstance(point);
+            if (instance == null) continue;
 
-            return name;
+            return instance;
         }
         return null;
     }
 
-    public IEnumerable<string> GetInstances(Vector3 point)
+    public IEnumerable<(string Name, Sphere Bounds)> GetInstances(Vector3 point)
     {
         foreach (var set in Sets)
         {
@@ -57,63 +57,65 @@ public class TerrainGroup : SampleChunkResource
         });
     }
 
-    public class SubSet : IBinarySerializable
+    public class SubSet : List<(string Name, Sphere Bounds)>, IBinarySerializable
     {
-        public Dictionary<string, Sphere> Instances { get; set; } = new(2);
+        public bool HasInstance(string name) => this.Any(x => x.Name == name);
 
-        public bool HasInstance(string name) => Instances.ContainsKey(name);
-
-        public string GetInstance(Vector3 point)
+        public (string Name, Sphere Bounds)? GetInstance(Vector3 point)
         {
-            foreach (var instance in Instances)
+            foreach (var instance in this)
             {
-                if (instance.Value.Intersects(point))
-                    return instance.Key;
+                if (instance.Bounds.Intersects(point))
+                    return instance;
             }
 
             return null;
         }
 
-        public IEnumerable<string> GetInstances(Vector3 point)
+        public IEnumerable<(string Name, Sphere Bounds)> GetInstances(Vector3 point)
         {
-            foreach (var instance in Instances)
-                if (instance.Value.Intersects(point))
-                    yield return instance.Key;
+            foreach (var instance in this)
+                if (instance.Bounds.Intersects(point))
+                    yield return instance;
         }
 
         public void Read(BinaryObjectReader reader)
         {
-            var instances = new(string Name, Sphere Range)[reader.Read<int>()];
+            reader.Read(out int instanceCount);
+            Clear();
+            Capacity = instanceCount;
+
             reader.ReadOffset(() =>
             {
-                for (int i = 0; i < instances.Length; i++)
-                    instances[i].Name = reader.ReadStringOffset();
+                for (int i = 0; i < instanceCount; i++)
+                    Add(new (reader.ReadStringOffset(), default));
             });
 
             reader.ReadOffset(() =>
             {
-                for (int i = 0; i < instances.Length; i++)
-                    instances[i].Range = reader.Read<Sphere>();
+                for (int i = 0; i < instanceCount; i++)
+                {
+                    var instance = this[i];
+                    instance.Bounds = reader.Read<Sphere>();
+                    this[i] = instance;
+                }
             });
-
-            foreach (var instance in instances)
-                Instances.Add(instance.Name, instance.Range);
         }
 
         public void Write(BinaryObjectWriter writer)
         {
-            writer.Write(Instances.Count);
+            writer.Write(Count);
 
             writer.WriteOffset(() =>
             {
-                foreach (var instance in Instances)
-                    writer.WriteStringOffset(StringBinaryFormat.NullTerminated, instance.Key);
+                foreach (var instance in this)
+                    writer.WriteStringOffset(StringBinaryFormat.NullTerminated, instance.Name);
             });
 
             writer.WriteOffset(() =>
             {
-                foreach (var instance in Instances)
-                    writer.Write(instance.Value);
+                foreach (var instance in this)
+                    writer.Write(instance.Bounds);
             });
         }
     }
