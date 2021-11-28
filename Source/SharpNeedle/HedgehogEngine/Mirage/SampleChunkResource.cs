@@ -90,7 +90,7 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
 
     public void Write(IFile file, bool writeNodes)
     {
-        using var writer = new BinaryObjectWriter(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness.Big);
+        using var writer = new BinaryObjectWriter(file.Open(FileAccess.Write), StreamOwnership.Retain, Endianness.Big);
         if (!writeNodes)
             WriteResourceV1(file, writer);
         else

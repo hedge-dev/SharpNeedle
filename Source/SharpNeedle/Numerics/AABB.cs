@@ -27,6 +27,16 @@ public struct AABB : IBinarySerializable
         if (point.Z > Max.Z) Max.X = point.Z;
     }
 
+    public bool Intersects(Vector3 point)
+        => point.X >= Min.X && point.X <= Max.X &&
+            point.Y >= Min.Y && point.Y <= Max.Y &&
+            point.Z >= Min.Z && point.Z <= Max.Z;
+
+    public bool Intersects(AABB aabb)
+         => aabb.Min.X <= Max.X && aabb.Max.X >= Min.X &&
+            aabb.Min.Y <= Max.Y && aabb.Max.Y >= Min.Y &&
+            aabb.Min.Z <= Max.Z && aabb.Max.Z >= Min.Z;
+
     public void Read(BinaryObjectReader reader)
     {
         Min.X = reader.Read<float>();

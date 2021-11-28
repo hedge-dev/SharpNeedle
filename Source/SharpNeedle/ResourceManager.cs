@@ -40,7 +40,8 @@ public class ResourceManager : IResourceManager
             return res;
         }
 
-        var rawResource = new ResourceRaw(file);
+        var rawResource = new ResourceRaw();
+        rawResource.Read(file);
         mResources.Add(path, new WeakReference<IResource>(rawResource));
         mResourceTable.Add(rawResource, path);
         return rawResource;

@@ -12,6 +12,11 @@ public class Light : SampleChunkResource
     public Vector3 Color { get; set; }
     public Vector4 Range { get; set; }
 
+    public Light()
+    {
+        DataVersion = 1;
+    }
+
     public override void Read(BinaryObjectReader reader)
     {
         Type = reader.Read<LightType>();
@@ -30,6 +35,9 @@ public class Light : SampleChunkResource
         writer.Write(Type);
         writer.Write(Position);
         writer.Write(Color);
+
+        if (DataVersion == 0)
+            return;
 
         switch (Type)
         {
