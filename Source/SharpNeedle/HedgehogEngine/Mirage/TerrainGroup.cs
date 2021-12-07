@@ -6,25 +6,12 @@ public class TerrainGroup : SampleChunkResource
     public List<string> ModelNames { get; set; }
     public List<SubSet> Sets { get; set; }
 
-    public (string Name, Sphere Bounds)? GetInstance(Vector3 point)
+    public SubSet GetSubSet(Vector3 point)
     {
         foreach (var set in Sets)
-        {
-            var instance = set.GetInstance(point);
-            if (instance == null) continue;
+            if (set.Bounds.Intersects(point)) return set;
 
-            return instance;
-        }
         return null;
-    }
-
-    public IEnumerable<(string Name, Sphere Bounds)> GetInstances(Vector3 point)
-    {
-        foreach (var set in Sets)
-        {
-            foreach (var instance in set.GetInstances(point))
-                yield return instance;
-        }
     }
 
     public override void Read(BinaryObjectReader reader)
@@ -57,27 +44,9 @@ public class TerrainGroup : SampleChunkResource
         });
     }
 
-    public class SubSet : List<(string Name, Sphere Bounds)>, IBinarySerializable
+    public class SubSet : List<string>, IBinarySerializable
     {
-        public bool HasInstance(string name) => this.Any(x => x.Name == name);
-
-        public (string Name, Sphere Bounds)? GetInstance(Vector3 point)
-        {
-            foreach (var instance in this)
-            {
-                if (instance.Bounds.Intersects(point))
-                    return instance;
-            }
-
-            return null;
-        }
-
-        public IEnumerable<(string Name, Sphere Bounds)> GetInstances(Vector3 point)
-        {
-            foreach (var instance in this)
-                if (instance.Bounds.Intersects(point))
-                    yield return instance;
-        }
+        public Sphere Bounds { get; set; }
 
         public void Read(BinaryObjectReader reader)
         {
@@ -88,18 +57,10 @@ public class TerrainGroup : SampleChunkResource
             reader.ReadOffset(() =>
             {
                 for (int i = 0; i < instanceCount; i++)
-                    Add(new (reader.ReadStringOffset(), default));
+                    Add(reader.ReadStringOffset());
             });
 
-            reader.ReadOffset(() =>
-            {
-                for (int i = 0; i < instanceCount; i++)
-                {
-                    var instance = this[i];
-                    instance.Bounds = reader.Read<Sphere>();
-                    this[i] = instance;
-                }
-            });
+            Bounds = reader.ReadValueOffset<Sphere>();
         }
 
         public void Write(BinaryObjectWriter writer)
@@ -109,14 +70,9 @@ public class TerrainGroup : SampleChunkResource
             writer.WriteOffset(() =>
             {
                 foreach (var instance in this)
-                    writer.WriteStringOffset(StringBinaryFormat.NullTerminated, instance.Name);
+                    writer.WriteStringOffset(StringBinaryFormat.NullTerminated, instance);
             });
-
-            writer.WriteOffset(() =>
-            {
-                foreach (var instance in this)
-                    writer.Write(instance.Bounds);
-            });
+            writer.WriteValueOffset(Bounds);
         }
     }
 }

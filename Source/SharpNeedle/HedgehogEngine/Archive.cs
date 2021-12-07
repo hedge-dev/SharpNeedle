@@ -71,7 +71,7 @@ public class Archive : ResourceBase, IDirectory, IStreamable
             var dataLength = reader.Read<uint>();
             var dataStart = reader.Read<int>();
             var lastModifiedBinary = reader.Read<long>();
-            var lastModified = lastModifiedBinary != 0 ? FromFileTime(lastModifiedBinary) : DateTime.Now;
+            var lastModified = lastModifiedBinary != 0 ? new DateTime(lastModifiedBinary) : DateTime.Now;
             var name = reader.ReadString(StringBinaryFormat.NullTerminated);
 
             reader.Seek(baseOffset + dataEnd, SeekOrigin.Begin);
@@ -114,7 +114,7 @@ public class Archive : ResourceBase, IDirectory, IStreamable
                 readStream.CopyTo(writer.GetBaseStream());
             });
                 
-            writer.Write(ToFileTime(arFile.LastModified));
+            writer.Write(arFile.LastModified.Ticks);
             writer.WriteString(StringBinaryFormat.NullTerminated, arFile.Name);
             writer.Align(0x10);
 
@@ -129,9 +129,6 @@ public class Archive : ResourceBase, IDirectory, IStreamable
             writer.PopOffsetOrigin();
         }
     }
-
-    public static DateTime FromFileTime(long time) => DateTime.FromFileTime(time - 504911232000000000);
-    public static long ToFileTime(DateTime time) => time.ToFileTime() + 504911232000000000;
 
     public void LoadToMemory()
     {
