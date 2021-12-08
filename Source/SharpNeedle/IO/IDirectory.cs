@@ -9,6 +9,7 @@ public interface IDirectory : IEnumerable<IFile>
 
     IFile this[string name] { get; }
 
+    IDirectory OpenDirectory(string name);
     bool DeleteFile(string name);
     bool DeleteDirectory(string name);
     IFile CreateFile(string name);

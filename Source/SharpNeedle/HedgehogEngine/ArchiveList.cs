@@ -29,7 +29,7 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
 
     // Format doesn't support directories
     public bool DeleteDirectory(string name) => false;
-
+    public IDirectory OpenDirectory(string name) => null;
     public IDirectory CreateDirectory(string name) => null;
 
     public IFile CreateFile(string name)

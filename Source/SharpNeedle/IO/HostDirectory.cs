@@ -26,7 +26,9 @@ public class HostDirectory : IDirectory
     }
 
     public IFile this[string name] => GetFile(name);
-        
+
+    public IDirectory OpenDirectory(string name) => FromPath(Path.Combine(FullPath, name));
+
     public bool DeleteFile(string name)
     {
         var path = Path.Combine(FullPath, name);

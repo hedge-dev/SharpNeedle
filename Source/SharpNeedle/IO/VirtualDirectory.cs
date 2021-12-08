@@ -93,6 +93,11 @@ public class VirtualDirectory : IDirectory
         return vFile;
     }
 
+    public IDirectory OpenDirectory(string name)
+    {
+        return Directories.TryGetValue(name, out var dir) ? dir : null;
+    }
+
     public bool DeleteFile(string name)
     {
         return Files.Remove(name);

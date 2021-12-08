@@ -13,7 +13,7 @@ public class Archive : ResourceBase, IDirectory, IStreamable
 
     public string Path { get; set; }
     public IFile this[string name] => GetFile(Name);
-        
+
     public bool DeleteFile(string name)
     {
         var file = Files.FirstOrDefault(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
@@ -25,7 +25,7 @@ public class Archive : ResourceBase, IDirectory, IStreamable
 
     // Format doesn't support directories
     public bool DeleteDirectory(string name) => false;
-
+    public IDirectory OpenDirectory(string name) => null;
     public IDirectory CreateDirectory(string name) => null;
 
     public IFile CreateFile(string name)
