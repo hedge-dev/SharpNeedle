@@ -7,6 +7,7 @@ public class ResourceRaw : IResource
     public IFile File { get; }
     public string Name { get; set; }
     public byte[] Data { get; set; }
+    public bool Disposed { get; private set; }
 
     public ResourceRaw()
     {
@@ -39,13 +40,20 @@ public class ResourceRaw : IResource
 
     public IEnumerable<ResourceDependency> GetDependencies() => Enumerable.Empty<ResourceDependency>();
 
-    public void ResolveDependencies(IDirectory dir)
+    public void ResolveDependencies(IResourceResolver dir)
     {
 
     }
 
     public void Dispose()
     {
+        if (Disposed)
+            return;
+
+        Disposed = true;
+        Data = null;
         File?.Dispose();
+        GC.SuppressFinalize(this);
+        ResourceManager.Instance.Close(this);
     }
 }

@@ -111,7 +111,7 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
         throw new NotImplementedException();
     }
 
-    public override void ResolveDependencies(IDirectory dir)
+    public override void ResolveDependencies(IResourceResolver resolver)
     {
         if (ArchiveSizes.Count > 0)
             Archives = new List<Archive>(ArchiveSizes.Count);
@@ -120,16 +120,9 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
         for (int i = 0; i < ArchiveSizes.Count; i++)
         {
             var name = $"{baseName}.ar.{i:00}";
-            var file = dir[name];
-            if (file == null)
-                throw new FileNotFoundException(name);
-
-            var archive = new Archive { Name = name };
-            archive.Read(file);
-            Archives.Add(archive);
+            Archives.Add(resolver.Open<Archive>(name));
         }
-
-        Parent = dir;
+        
         DependsResolved = true;
     }
 

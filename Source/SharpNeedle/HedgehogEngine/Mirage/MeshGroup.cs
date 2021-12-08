@@ -134,10 +134,10 @@ public class MeshGroup : List<Mesh>, IBinarySerializable, IDisposable, ICloneabl
         }
     }
 
-    public void ResolveDependencies(IDirectory dir)
+    public void ResolveDependencies(IResourceResolver resolver)
     {
         foreach (var mesh in this)
-            mesh.ResolveDependencies(dir);
+            mesh.ResolveDependencies(resolver);
     }
 
     public void Dispose()

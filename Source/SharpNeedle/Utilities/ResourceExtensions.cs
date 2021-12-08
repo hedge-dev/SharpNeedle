@@ -24,7 +24,7 @@ public static class ResourceExtensions
         resource.Read(file);
 
         if (resolveDepends)
-            resource.ResolveDependencies(file.Parent);
+            resource.ResolveDependencies(new DirectoryResourceResolver(file.Parent));
     }
 
     public static void Write(this IResource resource, string path, bool saveDepends = true)
@@ -54,12 +54,7 @@ public static class ResourceUtility
         if (file == null)
             return default;
 
-        var res = new TRes();
-        res.Read(file);
-        if (resolveDepends)
-            res.ResolveDependencies(file.Parent);
-
-        return res;
+        return ResourceManager.Instance.Open<TRes>(file, resolveDepends);
     }
 
     public static IResource Open(string path, bool resolveDepends = true)
@@ -68,13 +63,6 @@ public static class ResourceUtility
         if (file == null)
             return null;
 
-        var resType = ResourceManager.DetectType(file).Owner;
-        var res = (IResource)Activator.CreateInstance(resType);
-        res.Read(file);
-        
-        if (resolveDepends)
-            res.ResolveDependencies(file.Parent);
-
-        return res;
+        return ResourceManager.Instance.Open(file, resolveDepends);
     }
 }

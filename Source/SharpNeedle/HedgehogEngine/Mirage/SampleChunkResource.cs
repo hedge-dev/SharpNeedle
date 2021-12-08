@@ -43,6 +43,7 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
         var flags = reader.Read<SampleChunkNode.Flags>();
         if (flags.HasFlag(SampleChunkNode.Flags.Root))
         {
+            Name = Path.GetFileNameWithoutExtension(file.Name);
             reader.Seek(reader.Position - 4, SeekOrigin.Begin);
             Root = reader.ReadObject<SampleChunkNode>();
 
@@ -57,7 +58,6 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
             reader.OffsetHandler.PushOffsetOrigin(Root.DataOffset);
             Read(reader);
             reader.PopOffsetOrigin();
-
             return;
         }
 

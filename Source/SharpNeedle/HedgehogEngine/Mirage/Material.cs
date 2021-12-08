@@ -13,6 +13,11 @@ public class Material : SampleChunkResource
     public Dictionary<string, Parameter<bool>> BoolParameters { get; set; } = new();
     public Texset Texset { get; set; } = new();
 
+    public Material()
+    {
+        DataVersion = 3;
+    }
+
     public override void Read(BinaryObjectReader reader)
     {
         if (Root != null)
@@ -110,16 +115,15 @@ public class Material : SampleChunkResource
         throw new NotImplementedException();
     }
 
-    public override void ResolveDependencies(IDirectory dir)
+    public override void ResolveDependencies(IResourceResolver resolver)
     {
         if (DataVersion <= 1)
         {
-            using var file = dir[Texset.Name + ".texset"];
-            Texset.Read(file);
+            Texset = resolver.Open<Texset>($"{Texset.Name}.texset");
         }
 
         if (DataVersion <= 2)
-            Texset.ResolveDependencies(dir);
+            Texset.ResolveDependencies(resolver);
     }
 
     public class Parameter<T> : IBinarySerializable where T : unmanaged

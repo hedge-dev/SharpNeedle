@@ -59,15 +59,13 @@ public class TerrainInstanceInfo : SampleChunkResource
         }
     }
 
-    public override void ResolveDependencies(IDirectory dir)
+    public override void ResolveDependencies(IResourceResolver resolver)
     {
-        using var file = dir[mModelName + Extension];
-        if (file == null)
+        if (string.IsNullOrEmpty(mModelName))
             return;
 
-        Model = new TerrainModel();
-        Model.Read(file);
-        Model.ResolveDependencies(dir);
+        Model = resolver.Open<TerrainModel>($"{mModelName}.terrain-model");
+        mModelName = null;
     }
 
     protected override void Dispose(bool disposing)

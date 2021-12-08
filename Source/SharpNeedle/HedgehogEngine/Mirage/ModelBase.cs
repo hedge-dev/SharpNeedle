@@ -4,10 +4,10 @@ public abstract class ModelBase : SampleChunkResource
 {
     public List<MeshGroup> Groups { get; set; }
 
-    public override void ResolveDependencies(IDirectory dir)
+    public override void ResolveDependencies(IResourceResolver resolver)
     {
         foreach (var group in Groups)
-            group.ResolveDependencies(dir);
+            group.ResolveDependencies(resolver);
     }
 
     protected override void Dispose(bool disposing)

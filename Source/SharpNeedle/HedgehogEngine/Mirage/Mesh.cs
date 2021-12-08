@@ -89,18 +89,12 @@ public class Mesh : IBinarySerializable, IDisposable, ICloneable<Mesh>
     public ref byte GetVertexReference(int idx)
         => ref Vertices[idx * VertexSize];
 
-    public void ResolveDependencies(IDirectory dir)
+    public void ResolveDependencies(IResourceResolver resolver)
     {
         if (Material != null)
             return;
 
-        var file = dir[$"{MaterialName}.material"];
-        if (file == null)
-            return;
-
-        Material = new Material();
-        Material.Read(file);
-        Material.ResolveDependencies(dir);
+        Material = resolver.Open<Material>($"{MaterialName}.material");
     }
 
     public Mesh Clone()

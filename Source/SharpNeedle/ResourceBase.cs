@@ -10,7 +10,7 @@ public abstract class ResourceBase : IResource
     public abstract void Write(IFile file);
 
     public virtual IEnumerable<ResourceDependency> GetDependencies() => Enumerable.Empty<ResourceDependency>();
-    public virtual void ResolveDependencies(IDirectory dir) { }
+    public virtual void ResolveDependencies(IResourceResolver dir) { }
     public virtual void WriteDependencies(IDirectory dir) {}
 
     /// <summary>
@@ -40,6 +40,9 @@ public abstract class ResourceBase : IResource
         Disposed = true;
         Dispose(true);
         GC.SuppressFinalize(this);
+
+        // Stop tracking this
+        ResourceManager.Instance.Close(this);
     }
 
     ~ResourceBase()

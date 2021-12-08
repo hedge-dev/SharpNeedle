@@ -10,51 +10,49 @@ public class ResourceManager : IResourceManager
     private readonly Dictionary<string, WeakReference<IResource>> mResources = new();
     private readonly ConditionalWeakTable<IResource, string> mResourceTable = new();
 
+    public static ResourceManager Instance => Singleton.GetInstance<ResourceManager>();
+
     static ResourceManager()
     {
         RegisterResourceTypes(typeof(ResourceManager).Assembly);
+        
+        var instance = new ResourceManager();
+        Singleton.SetInstance(instance);
+        Singleton.SetInstance<IResourceManager>(instance);
     }
 
-    private IResource OpenBase(IFile file, Type type, bool resolveDepends = true)
+    private T OpenBase<T>(IFile file, ref T res, bool resolveDepends = true) where T : IResource
     {
         var path = file.Path;
         if (mResources.TryGetValue(path, out var resRef))
         {
-            if (resRef.TryGetTarget(out var res))
-                return res;
+            if (resRef.TryGetTarget(out var cacheRes))
+                return (T)cacheRes;
 
             mResources.Remove(path);
         }
 
-        type ??= DetectType(file)?.Owner;
 
-        if (type != null)
-        {
-            var res = (IResource)Activator.CreateInstance(type);
-            res.Read(file);
-            mResources.Add(path, new WeakReference<IResource>(res));
-            mResourceTable.Add(res, path);
-            if (resolveDepends)
-                res.ResolveDependencies(file.Parent);
+        res.Read(file);
+        mResources.Add(path, new WeakReference<IResource>(res));
+        mResourceTable.Add(res, path);
+        if (resolveDepends)
+            res.ResolveDependencies(new DirectoryResourceResolver(file.Parent, this));
 
-            return res;
-        }
-
-        var rawResource = new ResourceRaw();
-        rawResource.Read(file);
-        mResources.Add(path, new WeakReference<IResource>(rawResource));
-        mResourceTable.Add(rawResource, path);
-        return rawResource;
+        return res;
     }
 
     public T Open<T>(IFile file, bool resolveDepends = true) where T : IResource, new()
     {
-        return (T)OpenBase(file, typeof(T), resolveDepends);
+        var res = new T();
+        return OpenBase(file, ref res, resolveDepends);
     }
 
     public IResource Open(IFile file, bool resolveDepends = true)
     {
-        return OpenBase(file, null, resolveDepends);
+        var type = DetectType(file)?.Owner ?? typeof(ResourceRaw);
+        var res = (IResource)Activator.CreateInstance(type);
+        return OpenBase(file, ref res, resolveDepends);
     }
 
     public bool IsOpen(string path)

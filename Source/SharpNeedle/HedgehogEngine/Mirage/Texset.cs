@@ -31,12 +31,9 @@ public class Texset : SampleChunkResource
         throw new NotImplementedException();
     }
 
-    public override void ResolveDependencies(IDirectory dir)
+    public override void ResolveDependencies(IResourceResolver resolver)
     {
-        foreach (var texture in Textures)
-        {
-            var file = dir[texture.Name + ".texture"];
-            texture.Read(file);
-        }
+        for (int i = 0; i < Textures.Count; i++)
+            Textures[i] = resolver.Open<Texture>($"{Textures[i].Name}.texture");
     }
 }

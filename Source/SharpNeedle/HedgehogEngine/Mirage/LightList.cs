@@ -66,7 +66,7 @@ public class LightList : SampleChunkResource
         }
     }
 
-    public override void ResolveDependencies(IDirectory dir)
+    public override void ResolveDependencies(IResourceResolver resolver)
     {
         if (LightNames?.Count is 0 or null)
             return;
@@ -74,13 +74,7 @@ public class LightList : SampleChunkResource
         Lights = new List<Light>(LightNames.Count);
         foreach (var name in LightNames)
         {
-            using var file = dir[$"{name}{Light.Extension}"];
-            if (file == null)
-                throw new FileNotFoundException($"{name}{Light.Extension}");
-
-            var light = new Light();
-            light.Read(file);
-            Lights.Add(light);
+            Lights.Add(resolver.Open<Light>($"{name}{Light.Extension}"));
         }
 
         LightNames = null;

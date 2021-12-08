@@ -7,7 +7,7 @@ public interface IResource : IDisposable
     void Read(IFile file);
     void Write(IFile file);
 
-    void ResolveDependencies(IDirectory dir);
+    void ResolveDependencies(IResourceResolver resolver);
     void WriteDependencies(IDirectory dir);
     IEnumerable<ResourceDependency> GetDependencies();
 }
