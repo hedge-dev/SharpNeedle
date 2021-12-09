@@ -75,7 +75,7 @@ public class Material : SampleChunkResource
                 });
             }
         }
-        
+
         if (DataVersion <= 2)
         {
             using var token = reader.AtOffset(texsetNameOffset);
@@ -110,9 +110,73 @@ public class Material : SampleChunkResource
         }
     }
 
-    public override void Write(BinaryObjectWriter reader)
+    public override void Write(BinaryObjectWriter writer)
     {
-        throw new NotImplementedException();
+        // Fix texset name
+        if (string.IsNullOrEmpty(Texset.Name))
+            Texset.Name = Name;
+
+        writer.WriteStringOffset(StringBinaryFormat.NullTerminated, ShaderName);
+        writer.WriteStringOffset(StringBinaryFormat.NullTerminated, ShaderName); // Unused vertex shader name
+
+        if (DataVersion <= 1)
+        {
+            writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Texset.Name);
+            writer.Write(0); // Reserved
+        }
+        else if (DataVersion == 2)
+        {
+            writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Texset.Name);
+            WriteTextureNames();
+        }
+        else if (DataVersion >= 3)
+        {
+            WriteTextureNames();
+            writer.WriteOffset(() =>
+            {
+                foreach (var texture in Texset.Textures)
+                    writer.WriteObjectOffset(texture);
+            });
+        }
+
+        writer.Write(AlphaThreshold);
+        writer.Write(NoBackFaceCulling);
+        writer.Write(UseAdditiveBlending);
+        writer.Align(4);
+
+        writer.Write((byte)FloatParameters.Count);
+        writer.Write((byte)IntParameters.Count);
+        writer.Write((byte)BoolParameters.Count);
+        writer.Write((byte)Texset.Textures.Count);
+
+        WriteParameters(FloatParameters);
+        WriteParameters(IntParameters);
+        WriteParameters(BoolParameters);
+
+        void WriteTextureNames()
+        {
+            writer.WriteOffset(() =>
+            {
+                foreach (var texture in Texset.Textures)
+                {
+                    writer.WriteStringOffset(StringBinaryFormat.NullTerminated, texture.Name);
+                }
+            });
+        }
+
+        void WriteParameters<T>(Dictionary<string, Parameter<T>> parameters) where T : unmanaged
+        {
+            foreach (var parameter in parameters)
+                parameter.Value.Name = parameter.Key;
+
+            writer.WriteOffset(() =>
+            {
+                foreach (var parameter in parameters)
+                {
+                    writer.WriteOffset(() => writer.WriteObject(parameter.Value));
+                }
+            });
+        }
     }
 
     public override void ResolveDependencies(IResourceResolver resolver)
@@ -124,6 +188,20 @@ public class Material : SampleChunkResource
 
         if (DataVersion <= 2)
             Texset.ResolveDependencies(resolver);
+    }
+
+    public override void WriteDependencies(IDirectory dir)
+    {
+        if (DataVersion >= 3)
+            return;
+
+        if (DataVersion <= 1)
+        {
+            var texSetFile = dir.CreateFile($"{Texset.Name}.texset");
+            Texset.Write(texSetFile);
+        }
+
+        Texset.WriteDependencies(dir);
     }
 
     public class Parameter<T> : IBinarySerializable where T : unmanaged
@@ -157,7 +235,7 @@ public class Material : SampleChunkResource
             var valueCount = reader.Read<byte>();
             reader.Skip(1);
 
-            Name = reader.ReadStringOffset(StringBinaryFormat.NullTerminated);
+            Name = reader.ReadStringOffset();
             if (valueCount != 0)
             {
                 using var token = reader.ReadOffset();

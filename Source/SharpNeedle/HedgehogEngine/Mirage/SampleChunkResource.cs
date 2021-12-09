@@ -78,7 +78,7 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
 
         var name = reader.ReadStringOffset();
         if (!string.IsNullOrEmpty(name) && string.IsNullOrEmpty(Name))
-            Name = name;
+            Name = Path.GetFileNameWithoutExtension(name);
         else
             Name = string.IsNullOrEmpty(Name) ? Path.GetFileNameWithoutExtension(file.Name) : Name;
     }
@@ -90,7 +90,7 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
 
     public void Write(IFile file, bool writeNodes)
     {
-        using var writer = new BinaryObjectWriter(file.Open(FileAccess.Write), StreamOwnership.Retain, Endianness.Big);
+        using var writer = new BinaryObjectWriter(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness.Big);
         if (!writeNodes)
             WriteResourceV1(file, writer);
         else

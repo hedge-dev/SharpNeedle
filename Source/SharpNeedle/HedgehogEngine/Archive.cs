@@ -12,6 +12,8 @@ public class Archive : ResourceBase, IDirectory, IStreamable
     public IDirectory Parent { get; private set; }
 
     public string Path { get; set; }
+    public int DataAlignment { get; set; }
+
     public IFile this[string name] => GetFile(Name);
 
     public bool DeleteFile(string name)
@@ -61,7 +63,8 @@ public class Archive : ResourceBase, IDirectory, IStreamable
         BaseFile = file;
         BaseStream = file.Open();
         var reader = new BinaryValueReader(file.Open(), StreamOwnership.Retain, Endianness.Little);
-        reader.Skip(0x10);
+        reader.Skip(0xC);
+        DataAlignment = reader.Read<int>();
 
         while (reader.Position < reader.Length)
         {
@@ -97,36 +100,21 @@ public class Archive : ResourceBase, IDirectory, IStreamable
         writer.Write(0u);
         writer.Write(0x10u);
         writer.Write(0x14u);
-        writer.Write(0x10u);
+        writer.Write(DataAlignment);
 
         foreach (var arFile in this)
         {
-            writer.PushOffsetOrigin();
+            var curPos = writer.Position;
+            var dataOffset = AlignmentHelper.Align(curPos + 21 + Encoding.UTF8.GetByteCount(arFile.Name), DataAlignment);
+            var blockSize = dataOffset + arFile.Length;
 
-            var startOffset = 0L;
-            var endToken = writer.At(0, SeekOrigin.Current);
-            writer.Write(0);
+            writer.Write((uint)(blockSize - curPos));
             writer.Write((uint)arFile.Length);
-            writer.WriteOffset(() =>
-            {
-                startOffset = writer.OffsetHandler.ResolveOffset(1) - 1;
-                using var readStream = arFile.Open();
-                readStream.CopyTo(writer.GetBaseStream());
-            });
-                
+            writer.Write((uint)(dataOffset - curPos));
             writer.Write(arFile.LastModified.Ticks);
             writer.WriteString(StringBinaryFormat.NullTerminated, arFile.Name);
-            writer.Align(0x10);
-
-            writer.Flush();
-
-            using var nextToken = writer.At(0, SeekOrigin.Current);
-
-            // Write end offset
-            endToken.Dispose();
-            writer.Write((uint)(startOffset + arFile.Length));
-
-            writer.PopOffsetOrigin();
+            writer.Align(DataAlignment);
+            arFile.Open().CopyTo(writer.GetBaseStream());
         }
     }
 

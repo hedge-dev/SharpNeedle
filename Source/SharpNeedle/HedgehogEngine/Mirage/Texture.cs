@@ -18,6 +18,11 @@ public class Texture : SampleChunkResource
     public WrapMode WrapModeV { get; set; }
     public string Type { get; set; }
 
+    public Texture()
+    {
+        DataVersion = 1;
+    }
+
     public override void Read(BinaryObjectReader reader)
     {
         PictureName = reader.ReadStringOffset();

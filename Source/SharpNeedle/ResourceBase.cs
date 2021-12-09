@@ -19,6 +19,7 @@ public abstract class ResourceBase : IResource
     public void Save()
     {
         Write(BaseFile);
+        WriteDependencies(BaseFile.Parent);
     }
 
     public override string ToString()

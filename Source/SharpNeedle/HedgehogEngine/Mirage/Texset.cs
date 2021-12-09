@@ -26,14 +26,25 @@ public class Texset : SampleChunkResource
         });
     }
 
-    public override void Write(BinaryObjectWriter reader)
+    public override void Write(BinaryObjectWriter writer)
     {
-        throw new NotImplementedException();
+        writer.Write(Textures.Count);
+        writer.WriteOffset(() =>
+        {
+            foreach (var texture in Textures)
+                writer.WriteStringOffset(StringBinaryFormat.NullTerminated, texture.Name);
+        });
     }
 
     public override void ResolveDependencies(IResourceResolver resolver)
     {
         for (int i = 0; i < Textures.Count; i++)
             Textures[i] = resolver.Open<Texture>($"{Textures[i].Name}.texture");
+    }
+
+    public override void WriteDependencies(IDirectory dir)
+    {
+        foreach (var texture in Textures)
+            texture.Write(dir.CreateFile($"{texture.Name}.texture"));
     }
 }
