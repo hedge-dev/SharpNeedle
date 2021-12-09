@@ -118,6 +118,16 @@ public class Archive : ResourceBase, IDirectory, IStreamable
         }
     }
 
+    public long CalculateFileSize()
+    {
+        var size = 0x10L;
+
+        foreach (var file in this)
+            size = AlignmentHelper.Align(size + 21 + file.Name.Length, DataAlignment) + file.Length;
+
+        return size;
+    }
+
     public void LoadToMemory()
     {
         foreach (var file in Files)

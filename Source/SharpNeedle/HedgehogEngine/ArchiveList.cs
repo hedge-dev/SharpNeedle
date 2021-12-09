@@ -8,6 +8,7 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
     public const string ResourceId = "hh/archive-list";
     public static uint Signature { get; } = BinaryHelper.MakeSignature<uint>("ARL2");
 
+    public long MaxSplitSize { get; set; } = 1024 * 1024 * 1024;
     public IDirectory Parent { get; private set; }
     public bool DependsResolved { get; private set; }
     public List<Archive> Archives { get; private set; }
@@ -41,6 +42,7 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
                 new ()
             };
 
+            EnsureSplit();
             return Archives.First().CreateFile(name);
         }
 
@@ -59,10 +61,19 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
             return Archives.First().Add(file);
         }
 
+        EnsureSplit();
         return Archives.Last().Add(file);
     }
 
     public IEnumerable<IDirectory> GetDirectories() => Enumerable.Empty<IDirectory>();
+
+    private void EnsureSplit()
+    {
+        if (Archives.Last().CalculateFileSize() <= MaxSplitSize)
+            return;
+
+        Archives.Add(new Archive());
+    }
 
     public override void Read(IFile file)
     {
@@ -108,7 +119,28 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
 
     public override void Write(IFile file)
     {
-        throw new NotImplementedException();
+        Name = file.Name;
+        using var writer = new BinaryValueWriter(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness.Little);
+
+        writer.Write(Signature);
+        if (Archives == null)
+        {
+            writer.Write(ArchiveSizes.Count);
+            foreach (var size in ArchiveSizes)
+                writer.Write(size);
+
+            foreach (var name in Files)
+                writer.WriteString(StringBinaryFormat.PrefixedLength8, name);
+        }
+        else
+        {
+            writer.Write(Archives.Count);
+            foreach (var archive in Archives)
+                writer.Write((uint)archive.CalculateFileSize());
+
+            foreach (var aFile in this)
+                writer.WriteString(StringBinaryFormat.PrefixedLength8, aFile.Name);
+        }
     }
 
     public override void ResolveDependencies(IResourceResolver resolver)
@@ -124,6 +156,17 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
         }
         
         DependsResolved = true;
+    }
+
+    public override void WriteDependencies(IDirectory dir)
+    {
+        var baseName = System.IO.Path.GetFileNameWithoutExtension(Name);
+        for (var i = 0; i < Archives.Count; i++)
+        {
+            var archive = Archives[i];
+            using var file = dir.CreateFile($"{baseName}.ar.{i:00}");
+            archive.Write(file);
+        }
     }
 
     [ResourceCheckFunction]
