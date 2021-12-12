@@ -1,4 +1,4 @@
 ﻿// Program for quickly writing temporary things
 using SharpNeedle.HedgehogEngine.Mirage;
-var terrain = ResourceUtility.Open<Terrain>(@"D:\Unpacked CPK\Sonic Generations\bb\Packed\ghz200\ghz200\terrain.terrain");
-Console.Read();
+var pfi = ResourceUtility.Open<PackedFileInfo>(@"D:\Unpacked CPK\Sonic Generations\bb\Packed\ghz200\ghz200\Stage.pfi");
+pfi.Write("Stage.pfi");

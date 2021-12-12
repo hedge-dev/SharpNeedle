@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.HedgehogEngine;
-
 using System.IO;
+using Mirage;
 
 [BinaryResource(ResourceId, ResourceType.Archive, @"\.ar(\.\d+)?$")]
 public class Archive : ResourceBase, IDirectory, IStreamable
@@ -126,6 +126,25 @@ public class Archive : ResourceBase, IDirectory, IStreamable
             size = AlignmentHelper.Align(size + 21 + file.Name.Length, DataAlignment) + file.Length;
 
         return size;
+    }
+
+    public PackedFileInfo CalculatePackedInfo()
+    {
+        var size = 0x10L;
+        var pfi = new PackedFileInfo();
+
+        foreach (var file in this)
+        {
+            var pfiFile = new PackedFileInfo.File();
+            size = AlignmentHelper.Align(size + 21 + pfiFile.Name.Length, DataAlignment);
+            pfiFile.Name = file.Name;
+            pfiFile.Offset = (uint)size;
+            pfiFile.Size = (uint)file.Length;
+
+            size += file.Length;
+        }
+
+        return pfi;
     }
 
     public void LoadToMemory()
