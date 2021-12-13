@@ -80,4 +80,99 @@ public static class MathHelper
 
         return ref ((float*)&vector)[idx];
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static Vector4 GetColumn(this Matrix4x4 matrix, int idx)
+    {
+        switch (idx)
+        {
+            case 0:
+                return new Vector4(matrix.M11, matrix.M21, matrix.M31, matrix.M41);
+
+            case 1:
+                return new Vector4(matrix.M12, matrix.M22, matrix.M32, matrix.M42);
+
+            case 2:
+                return new Vector4(matrix.M13, matrix.M23, matrix.M33, matrix.M43);
+
+            case 3:
+                return new Vector4(matrix.M14, matrix.M24, matrix.M34, matrix.M44);
+        }
+
+        throw new IndexOutOfRangeException();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static void SetColumn(ref this Matrix4x4 matrix, int idx, Vector4 value)
+    {
+        switch (idx)
+        {
+            case 0:
+                matrix.M11 = value.X;
+                matrix.M21 = value.Y;
+                matrix.M31 = value.Z;
+                matrix.M41 = value.W;
+                return;
+
+            case 1:
+                matrix.M12 = value.X;
+                matrix.M22 = value.Y;
+                matrix.M32 = value.Z;
+                matrix.M42 = value.W;
+                return;
+
+            case 2:
+                matrix.M13 = value.X;
+                matrix.M23 = value.Y;
+                matrix.M33 = value.Z;
+                matrix.M43 = value.W;
+                return;
+
+            case 3:
+                matrix.M14 = value.X;
+                matrix.M24 = value.Y;
+                matrix.M34 = value.Z;
+                matrix.M44 = value.W;
+                return;
+        }
+
+        throw new IndexOutOfRangeException($"{idx} is < 0 or >= 3");
+    }
+
+    public static unsafe ref Vector4 GetRow(ref this Matrix4x4 matrix, int idx)
+    {
+        if (idx is < 0 or >= 4)
+            throw new IndexOutOfRangeException($"{idx} is < 0 or >= 4");
+
+        fixed (Matrix4x4* pMatrix = &matrix)
+        {
+            return ref ((Vector4*)pMatrix)[idx];
+        }
+    }
+
+    public static Vector3 ToEuler(this Quaternion quaternion)
+    {
+        var sqw = quaternion.W * quaternion.W;
+        var sqx = quaternion.X * quaternion.X;
+        var sqy = quaternion.Y * quaternion.Y;
+        var sqz = quaternion.Z * quaternion.Z;
+
+        var unit = sqx + sqy + sqz + sqw;
+        var test = quaternion.X * quaternion.Y + quaternion.Z * quaternion.W;
+
+        if (test > 0.499f * unit)
+        {
+            return new Vector3(2.0f * MathF.Atan2(quaternion.X, quaternion.W), MathF.PI / 2.0f, 0.0f);
+        }
+
+        if (test < -0.499f * unit)
+        {
+            return new Vector3(-2.0f * MathF.Atan2(quaternion.X, quaternion.W), -MathF.PI / 2.0f, 0.0f);
+        }
+
+        return new Vector3(
+            MathF.Atan2(2.0f * (quaternion.Y * quaternion.W - quaternion.X * quaternion.Z), sqx - sqy - sqz + sqw),
+            MathF.Asin(2.0f * test / unit),
+            MathF.Atan2(2.0f * (quaternion.X * quaternion.W + quaternion.Y * quaternion.Z), -sqx + sqy - sqz + sqw));
+    }
 }

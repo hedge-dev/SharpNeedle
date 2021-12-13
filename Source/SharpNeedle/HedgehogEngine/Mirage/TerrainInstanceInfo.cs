@@ -24,7 +24,7 @@ public class TerrainInstanceInfo : SampleChunkResource
     public override void Read(BinaryObjectReader reader)
     {
         ModelName = reader.ReadStringOffset();
-        Transform = reader.ReadValueOffset<Matrix4x4>();
+        Transform = Matrix4x4.Transpose(reader.ReadValueOffset<Matrix4x4>());
         Name = reader.ReadStringOffset();
         LightGroups = DataVersion >= 5
             ? reader.ReadObject<BinaryList<BinaryPointer<LightIndexMeshGroup>>>().Unwind()
@@ -34,7 +34,7 @@ public class TerrainInstanceInfo : SampleChunkResource
     public override void Write(BinaryObjectWriter writer)
     {
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, ModelName);
-        writer.WriteValueOffset(Transform);
+        writer.WriteValueOffset(Matrix4x4.Transpose(Transform));
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         if (DataVersion >= 5)
         {

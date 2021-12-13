@@ -26,7 +26,7 @@ public class Model : ModelBase
             for (int i = 0; i < Nodes.Count; i++)
             {
                 var node = Nodes[i];
-                node.Transform = reader.Read<Matrix4x4>();
+                node.Transform = Matrix4x4.Transpose(reader.Read<Matrix4x4>());
                 Nodes[i] = node;
             }
         });
@@ -58,7 +58,7 @@ public class Model : ModelBase
         writer.WriteOffset(() =>
         {
             foreach (var node in Nodes)
-                writer.Write(node.Transform);
+                writer.Write(Matrix4x4.Transpose(node.Transform));
         });
 
         if (DataVersion >= 2)
