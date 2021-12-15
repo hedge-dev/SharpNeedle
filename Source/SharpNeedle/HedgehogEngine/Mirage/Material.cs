@@ -241,11 +241,11 @@ public class Material : SampleChunkResource
                 using var token = reader.ReadOffset();
                 for (byte i = 0; i < valueCount; i++)
                 {
-                    // Handle bools
+                    // Handle booleans
                     if (typeof(T) == typeof(bool))
-                        ((IList)Values).Add(reader.Read<int>() != 0);
+                        Unsafe.As<List<bool>>(Values)!.Add(reader.Read<int>() != 0);
                     else 
-                        Values.Add(reader.Read<T>());
+                        Values!.Add(reader.Read<T>());
                 }
             }
         }
@@ -258,7 +258,17 @@ public class Material : SampleChunkResource
             writer.Write((byte)0);
 
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-            writer.WriteCollectionOffset(Values, 4);
+            if (typeof(T) != typeof(bool))
+                writer.WriteCollectionOffset(Values, 4);
+            else
+            {
+                var values = Unsafe.As<List<bool>>(Values);
+                writer.WriteOffset(() =>
+                {
+                    foreach (var value in values!)
+                        writer.Write(value ? 1 : 0);
+                });
+            }
         }
     }
 }
