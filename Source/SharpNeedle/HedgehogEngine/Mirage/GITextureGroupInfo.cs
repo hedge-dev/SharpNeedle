@@ -82,39 +82,39 @@ public class GITextureGroup : IBinarySerializable
 {
     public QualityLevel Quality { get; set; }
     public Sphere Bounds { get; set; }
-    public List<int> InstanceIndices { get; set; }
-    public uint FolderSize { get; set; }
+    public List<int> Indices { get; set; }
+    public uint MemorySize { get; set; }
 
     public void Read(BinaryObjectReader reader)
     {
         Quality = reader.Read<QualityLevel>();
-        reader.Read(out int instanceCount);
-        InstanceIndices = new List<int>(instanceCount);
+        reader.Read(out int indexCount);
+        Indices = new List<int>(indexCount);
         reader.ReadOffset(() =>
         {
-            for (int i = 0; i < instanceCount; i++)
-                InstanceIndices.Add(reader.Read<int>());
+            for (int i = 0; i < indexCount; i++)
+                Indices.Add(reader.Read<int>());
         });
 
         Bounds = reader.ReadValueOffset<Sphere>();
-        FolderSize = reader.Read<uint>();
+        MemorySize = reader.Read<uint>();
     }
 
     public void Write(BinaryObjectWriter writer)
     {
         writer.Write(Quality);
-        writer.Write(InstanceIndices.Count);
+        writer.Write(Indices.Count);
         writer.WriteOffset(() =>
         {
-            foreach (var index in InstanceIndices)
+            foreach (var index in Indices)
                 writer.Write(index);
         });
         writer.WriteValueOffset(Bounds);
-        writer.Write(FolderSize);
+        writer.Write(MemorySize);
     }
 
     public enum QualityLevel : int
     {
-        Highest, High, Low
+        High, Medium, Low
     }
 }

@@ -24,15 +24,15 @@ public class Terrain : SampleChunkResource
     {
         public string Name { get; set;}
         public Sphere Bounds { get; set; }
-        public uint FolderSize { get; set; }
-        public int SubSetID { get; set; }
+        public uint MemorySize { get; set; }
+        public int SubsetID { get; set; }
         public List<Sphere> Instances { get; set; }
 
         public void Read(BinaryObjectReader reader)
         {
             Bounds = reader.ReadValueOffset<Sphere>();
             Name = reader.ReadStringOffset();
-            FolderSize = reader.Read<uint>();
+            MemorySize = reader.Read<uint>();
             
             reader.Read(out int instancesCount);
             Instances = new List<Sphere>(instancesCount);
@@ -42,14 +42,14 @@ public class Terrain : SampleChunkResource
                     Instances.Add(reader.ReadValueOffset<Sphere>());
             });
 
-            SubSetID = reader.Read<int>();
+            SubsetID = reader.Read<int>();
         }
 
         public void Write(BinaryObjectWriter writer)
         {
             writer.WriteValueOffset(Bounds);
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-            writer.Write(FolderSize);
+            writer.Write(MemorySize);
             writer.Write(Instances.Count);
             writer.WriteOffset(() =>
             {
@@ -60,7 +60,7 @@ public class Terrain : SampleChunkResource
 
         public override string ToString()
         {
-            return $"{Name}:{SubSetID}";
+            return $"{Name}:{SubsetID}";
         }
     }
 }

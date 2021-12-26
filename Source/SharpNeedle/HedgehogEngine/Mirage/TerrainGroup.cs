@@ -4,11 +4,11 @@
 public class TerrainGroup : SampleChunkResource
 {
     public List<string> ModelNames { get; set; }
-    public List<SubSet> Sets { get; set; }
+    public List<Subset> Subsets { get; set; }
 
-    public SubSet GetSubSet(Vector3 point)
+    public Subset GetSubset(Vector3 point)
     {
-        foreach (var set in Sets)
+        foreach (var set in Subsets)
             if (set.Bounds.Intersects(point)) return set;
 
         return null;
@@ -16,7 +16,7 @@ public class TerrainGroup : SampleChunkResource
 
     public override void Read(BinaryObjectReader reader)
     {
-        Sets = reader.ReadObject<BinaryList<BinaryPointer<SubSet>>>().Unwind();
+        Subsets = reader.ReadObject<BinaryList<BinaryPointer<Subset>>>().Unwind();
         reader.Read(out int modelCount);
         ModelNames = new List<string>(modelCount);
 
@@ -29,10 +29,10 @@ public class TerrainGroup : SampleChunkResource
 
     public override void Write(BinaryObjectWriter writer)
     {
-        writer.Write(Sets.Count);
+        writer.Write(Subsets.Count);
         writer.WriteOffset(() =>
         {
-            foreach (var set in Sets)
+            foreach (var set in Subsets)
                 writer.WriteObjectOffset(set);
         });
 
@@ -44,7 +44,7 @@ public class TerrainGroup : SampleChunkResource
         });
     }
 
-    public class SubSet : List<string>, IBinarySerializable
+    public class Subset : List<string>, IBinarySerializable
     {
         public Sphere Bounds { get; set; }
 

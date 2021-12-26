@@ -40,9 +40,12 @@ public class Model : ModelBase
         CommonWrite(writer);
         if (DataVersion >= 4)
         {
-            writer.Write(Morphs.Count);
+            writer.Write(Morphs?.Count ?? 0);
             writer.WriteOffset(() =>
             {
+                if (Morphs == null)
+                    return;
+
                 foreach (var morph in Morphs)
                     writer.WriteObjectOffset(morph);
             });

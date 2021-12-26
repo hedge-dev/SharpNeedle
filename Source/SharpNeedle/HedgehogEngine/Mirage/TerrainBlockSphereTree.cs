@@ -12,9 +12,9 @@ public class TerrainBlockSphereTree : SampleChunkResource
         for (int groupId = 0; groupId < groups.Count; groupId++)
         {
             var group = groups[groupId];
-            for (int subsetID = 0; subsetID < group.Sets.Count; subsetID++)
+            for (int subsetID = 0; subsetID < group.Subsets.Count; subsetID++)
             {
-                var set = group.Sets[subsetID];
+                var set = group.Subsets[subsetID];
                 nodes.Add(new(set.Bounds, (groupId, subsetID)));
             }
         }
