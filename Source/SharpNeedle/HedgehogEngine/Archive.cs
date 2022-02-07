@@ -91,9 +91,6 @@ public class Archive : ResourceBase, IDirectory, IStreamable
 
     public override void Write(IFile file)
     {
-        if (file.Equals(BaseFile))
-            LoadToMemory();
-
         using var stream = file.Open(FileAccess.Write);
         var writer = new BinaryObjectWriter(stream, StreamOwnership.Transfer, Endianness.Little, Encoding.ASCII);
 
@@ -205,12 +202,13 @@ public class ArchiveFile : IFile
 
     public void EnsureData()
     {
-        if (FileOffset == 0)
+        if (DataStream != null)
             return;
 
         using var readStream = new SubStream(Parent.BaseStream, FileOffset, FileLength);
-        DataStream = new MemoryStream(readStream.ReadAllBytes(), true);
-
+        DataStream = new MemoryStream((int)FileLength);
+        DataStream.Write(readStream.ReadAllBytes().AsSpan());
+        
         FileOffset = 0;
     }
 
@@ -220,7 +218,10 @@ public class ArchiveFile : IFile
             EnsureData();
 
         if (DataStream != null)
-            return DataStream;
+        {
+            DataStream.Position = 0;
+            return new WrappedStream<MemoryStream>(DataStream);
+        }
 
         return new SubStream(Parent.BaseStream, FileOffset, FileLength);
     }

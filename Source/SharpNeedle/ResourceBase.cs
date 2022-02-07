@@ -18,6 +18,9 @@ public abstract class ResourceBase : IResource
     /// </summary>
     public void Save()
     {
+        if (this is IStreamable streamable)
+            streamable.LoadToMemory();
+
         Write(BaseFile);
         WriteDependencies(BaseFile.Parent);
     }

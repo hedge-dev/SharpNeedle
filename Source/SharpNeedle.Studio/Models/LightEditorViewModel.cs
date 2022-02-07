@@ -1,7 +1,6 @@
 ﻿namespace SharpNeedle.Studio.Models;
 using System.ComponentModel;
-using System.Windows;
-using SharpNeedle.HedgehogEngine.Mirage;
+using HedgehogEngine.Mirage;
 
 [ResourceEditor(typeof(Light))]
 public class LightEditorViewModel : IViewModel
@@ -57,18 +56,12 @@ public class LightEditorViewModel : IViewModel
 
     public void Save()
     {
-        MessageBox.Show("Not Supported!");
+        Model.Save();
     }
 
     public void Dispose()
     {
-        Singleton.GetInstance<IResourceManager>().Close(Model.BaseLight);
-    }
 
-    [ResourceEditorCreator]
-    public static IViewModel CreateEditor(IResource resource)
-    {
-        return new LightEditorViewModel((Light)resource);
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
@@ -77,6 +70,12 @@ public class LightEditorViewModel : IViewModel
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    [ResourceEditorCreator]
+    public static IViewModel CreateEditor(IResource resource)
+    {
+        return new LightEditorViewModel((Light)resource);
     }
 }
 
@@ -126,6 +125,13 @@ public class LightEditorModel : INotifyPropertyChanged
     {
         mColor = light.Color;
         mPosition = light.Position;
+    }
+
+    public void Save()
+    {
+        BaseLight.Color = Color;
+        BaseLight.Position = Position;
+        BaseLight.Save();
     }
 
     public event PropertyChangedEventHandler PropertyChanged;

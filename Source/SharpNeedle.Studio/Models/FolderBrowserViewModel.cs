@@ -41,15 +41,17 @@ public class FolderBrowserViewModel : IViewModel
         set => ChangeDirectory(value);
     }
 
-    [ResourceEditorCreator]
-    public static IViewModel Create(IResource res)
-    {
-        if (res is not IDirectory dir)
-            return null;
+    public IDirectory RootDirectory { get; set; }
 
-        var editor = new FolderBrowserViewModel();
-        editor.ChangeDirectory(dir);
-        return editor;
+    public FolderBrowserViewModel()
+    {
+        Menu = MenuItem.Create("File/Save", new RelayCommand(Save));
+    }
+
+    public FolderBrowserViewModel(IDirectory root) : this()
+    {
+        RootDirectory = root;
+        CurrentDirectory = root;
     }
 
     public void ChangeDirectory(IDirectory dir)
@@ -79,6 +81,17 @@ public class FolderBrowserViewModel : IViewModel
         SelectedItem = Items.FirstOrDefault(x => x.IsDirectory && x.Name == name);
     }
 
+    public void Save()
+    {
+        if (RootDirectory is not IResource res)
+            return;
+
+        if (res is IStreamable streamable)
+            streamable.LoadToMemory();
+
+        res.Write(RootDirectory.Path);
+    }
+
     public void Dispose()
     {
         mCurrentDirectory = null;
@@ -91,6 +104,12 @@ public class FolderBrowserViewModel : IViewModel
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    [ResourceEditorCreator]
+    public static IViewModel Create(IResource res)
+    {
+        return res is not IDirectory dir ? null : new FolderBrowserViewModel(dir);
     }
 }
 
