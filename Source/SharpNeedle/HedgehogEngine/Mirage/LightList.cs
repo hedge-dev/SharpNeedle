@@ -2,7 +2,7 @@
 
 namespace SharpNeedle.HedgehogEngine.Mirage;
 
-[BinaryResource("hh/light-list", @"\.light-list$")]
+[NeedleResource("hh/light-list", @"\.light-list$")]
 public class LightList : SampleChunkResource
 {
     public List<string> LightNames { get; set; }

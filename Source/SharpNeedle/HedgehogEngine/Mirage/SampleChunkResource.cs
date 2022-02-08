@@ -11,7 +11,7 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
 
     public void SetupNodes()
     {
-        var attribute = GetType().GetCustomAttribute<BinaryResourceAttribute>();
+        var attribute = GetType().GetCustomAttribute<NeedleResourceAttribute>();
         if (attribute == null || attribute.Type == ResourceType.Raw)
         {
             SetupNodes(GetType().Name);

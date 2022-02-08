@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.HedgehogEngine.Mirage;
 
-[BinaryResource("hh/material", ResourceType.Material, @"\.material$")]
+[NeedleResource("hh/material", ResourceType.Material, @"\.material$")]
 public class Material : SampleChunkResource
 {
     public string ShaderName { get; set; }

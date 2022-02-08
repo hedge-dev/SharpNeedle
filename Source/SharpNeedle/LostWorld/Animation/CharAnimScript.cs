@@ -1,7 +1,7 @@
 ﻿namespace SharpNeedle.LostWorld.Animation;
 using BINA;
 
-[BinaryResource("lw/anm", @"\.anm$")]
+[NeedleResource("lw/anm", @"\.anm$")]
 public class CharAnimScript : BinaryResource
 {
     public string ScriptVersion { get; set; }

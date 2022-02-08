@@ -6,7 +6,7 @@
 // i forgor i made that
 // make a texture file too
 
-[BinaryResource("hh/texset", @"\.texset$")]
+[NeedleResource("hh/texset", @"\.texset$")]
 public class Texset : SampleChunkResource
 {
     public List<Texture> Textures { get; set; } = new();

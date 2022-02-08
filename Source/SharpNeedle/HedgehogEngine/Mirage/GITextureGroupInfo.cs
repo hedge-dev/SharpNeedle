@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.HedgehogEngine.Mirage;
 
-[BinaryResource("hh/gi-texture-group-info", @"\.gi-texture-group-info$")]
+[NeedleResource("hh/gi-texture-group-info", @"\.gi-texture-group-info$")]
 public class GITextureGroupInfo : SampleChunkResource
 {
     public List<(string Name, Sphere Bounds)> Instances { get; set; }

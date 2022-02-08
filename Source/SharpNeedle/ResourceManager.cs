@@ -4,7 +4,7 @@ using System.Reflection;
 public class ResourceManager : IResourceManager
 {
     private static readonly Dictionary<Type, string> mTypes = new();
-    private static readonly Dictionary<string, BinaryResourceAttribute> mResourceTypes = new();
+    private static readonly Dictionary<string, NeedleResourceAttribute> mResourceTypes = new();
 
     // Use weak references so resources can get garbage collected and we won't have to worry about leaving them open
     private readonly Dictionary<string, WeakReference<IResource>> mResources = new();
@@ -70,9 +70,9 @@ public class ResourceManager : IResourceManager
 
     public static void RegisterResourceTypes(Assembly assembly, bool ignoreRegistered = true)
     {
-        foreach (var type in assembly.GetTypes().Where(t => t.GetCustomAttribute<BinaryResourceAttribute>() != null))
+        foreach (var type in assembly.GetTypes().Where(t => t.GetCustomAttribute<NeedleResourceAttribute>() != null))
         {
-            var attribute = type.GetCustomAttribute<BinaryResourceAttribute>();
+            var attribute = type.GetCustomAttribute<NeedleResourceAttribute>();
             attribute.Owner = type;
 
             if (mResourceTypes.ContainsKey(attribute.Id) && ignoreRegistered)
@@ -92,7 +92,7 @@ public class ResourceManager : IResourceManager
         }
     }
 
-    public static BinaryResourceAttribute DetectType(IFile file)
+    public static NeedleResourceAttribute DetectType(IFile file)
     {
         foreach (var value in mResourceTypes.Values)
         {

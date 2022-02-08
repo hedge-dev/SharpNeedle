@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.HedgehogEngine.Mirage;
 
-[BinaryResource("hh/model", ResourceType.Model, @"\.terrain-model$")]
+[NeedleResource("hh/model", ResourceType.Model, @"\.terrain-model$")]
 public class TerrainModel : ModelBase
 {
     public TerrainFlags Flags { get; set; }

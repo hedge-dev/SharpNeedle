@@ -1,7 +1,7 @@
 ﻿namespace SharpNeedle.HedgehogEngine.Mirage;
 
 // ReSharper disable once InconsistentNaming
-[BinaryResource("hh/gil", @"\.gil$")]
+[NeedleResource("hh/gil", @"\.gil$")]
 public class GIMipLevelLimitation : SampleChunkResource
 {
     public bool Level0 { get; set; }

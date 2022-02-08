@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.HedgehogEngine.Mirage;
 
-[BinaryResource("hh/tbst", @"\.tbst$")]
+[NeedleResource("hh/tbst", @"\.tbst$")]
 public class TerrainBlockSphereTree : SampleChunkResource
 {
     public new BVHNode<Sphere, (int GroupID, int SubsetID)> Root { get; set; }

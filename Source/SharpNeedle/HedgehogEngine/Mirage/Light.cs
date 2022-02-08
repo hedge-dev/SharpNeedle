@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.HedgehogEngine.Mirage;
 
-[BinaryResource(ResourceId, ResourceType.Light, @"\.light$")]
+[NeedleResource(ResourceId, ResourceType.Light, @"\.light$")]
 public class Light : SampleChunkResource
 {
     public const string ResourceId = "hh/light";

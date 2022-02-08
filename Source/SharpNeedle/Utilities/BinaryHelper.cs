@@ -1,6 +1,5 @@
-﻿using System.IO;
-
-namespace SharpNeedle.Utilities;
+﻿namespace SharpNeedle.Utilities;
+using System.IO;
 
 public static class BinaryHelper
 {
@@ -26,6 +25,40 @@ public static class BinaryHelper
 
         using var token = reader.AtOffset(offset);
         return reader.ReadString(format, fixedLength);
+    }
+
+    public static bool EnsureSignatureNative<TSignature>(this BinaryValueReader reader, 
+        TSignature expected, bool throwOnFail = true) where TSignature: unmanaged
+    {
+        var sig = reader.ReadNative<TSignature>();
+        if (sig.Equals(expected)) return true;
+        
+        if (throwOnFail)
+            throw new BadImageFormatException($"Signature mismatch. Expected: {expected}. Got: {sig}");
+
+        return false;
+    }
+
+    public static bool EnsureSignature<TSignature>(this BinaryValueReader reader,
+        TSignature expected, bool throwOnFail = true) where TSignature : unmanaged
+    {
+        var sig = reader.Read<TSignature>();
+        if (sig.Equals(expected)) return true;
+
+        if (throwOnFail)
+            throw new BadImageFormatException($"Signature mismatch. Expected: {expected}. Got: {sig}");
+
+        return false;
+    }
+
+    public static bool EnsureSignature<TSignature>(TSignature sig, bool throwOnFail, params TSignature[] expected)
+    {
+        if (expected.Any(x => x.Equals(sig))) return true;
+        
+        if (throwOnFail)
+            throw new BadImageFormatException($"Signature mismatch. Expected: {expected}. Got: {sig}");
+
+        return false;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

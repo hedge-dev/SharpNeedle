@@ -2,7 +2,7 @@
 using System.Text.RegularExpressions;
 
 [AttributeUsage(AttributeTargets.Class)]
-public class BinaryResourceAttribute : Attribute
+public class NeedleResourceAttribute : Attribute
 {
     public string Id { get; }
     public ResourceType Type { get; }
@@ -11,23 +11,23 @@ public class BinaryResourceAttribute : Attribute
 
     internal Func<IFile, bool> CheckResourceFunc { get; set; }
 
-    public BinaryResourceAttribute(string id)
+    public NeedleResourceAttribute(string id)
     {
         Id = id;
     }
 
-    public BinaryResourceAttribute(string id, string matchPattern)
+    public NeedleResourceAttribute(string id, string matchPattern)
     {
         Id = id;
         MatchPattern = matchPattern;
     }
 
-    public BinaryResourceAttribute(string id, ResourceType type) : this(id)
+    public NeedleResourceAttribute(string id, ResourceType type) : this(id)
     {
         Type = type;
     }
 
-    public BinaryResourceAttribute(string id, ResourceType type, string matchPattern) : this(id, type)
+    public NeedleResourceAttribute(string id, ResourceType type, string matchPattern) : this(id, type)
     {
         MatchPattern = matchPattern;
     }

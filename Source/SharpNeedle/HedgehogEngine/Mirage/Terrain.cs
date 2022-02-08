@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.HedgehogEngine.Mirage;
 
-[BinaryResource("hh/terrain", @"\.terrain$")]
+[NeedleResource("hh/terrain", @"\.terrain$")]
 public class Terrain : SampleChunkResource
 {
     public List<GroupInfo> Groups { get; set; }

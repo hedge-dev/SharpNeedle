@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.HedgehogEngine.Mirage;
 
-[BinaryResource("hh/model", ResourceType.Model, @"\.model$")]
+[NeedleResource("hh/model", ResourceType.Model, @"\.model$")]
 public class Model : ModelBase
 {
     public List<MorphModel> Morphs { get; set; }

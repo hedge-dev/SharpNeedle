@@ -2,7 +2,7 @@
 
 using System.IO;
 
-[BinaryResource(ResourceId)]
+[NeedleResource(ResourceId)]
 public class ArchiveList : ResourceBase, IDirectory, IStreamable
 {
     public const string ResourceId = "hh/archive-list";

@@ -2,7 +2,7 @@
 using System.IO;
 using Mirage;
 
-[BinaryResource(ResourceId, ResourceType.Archive, @"\.ar(\.\d+)?$")]
+[NeedleResource(ResourceId, ResourceType.Archive, @"\.ar(\.\d+)?$")]
 public class Archive : ResourceBase, IDirectory, IStreamable
 {
     public const string ResourceId = "hh/archive";

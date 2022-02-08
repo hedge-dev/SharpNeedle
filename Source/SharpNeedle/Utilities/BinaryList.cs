@@ -5,14 +5,24 @@ public struct BinaryList<T> : IBinarySerializable, IList<T> where T : IBinarySer
     public int Count => Items.Count;
     public bool IsReadOnly => false;
 
+    public BinaryList(List<T> items)
+    {
+        Items = items;
+    }
+
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Read(BinaryObjectReader reader)
     {
         var count = reader.ReadOffsetValue();
-        Items = new List<T>((int)count);
 
         // Use token because accessing `this` with lambda on structs is a nightmare
-        using var token = reader.ReadOffset();
+        var offset = reader.ReadOffsetValue();
+        if (offset == 0)
+            return;
+
+        Items = new List<T>((int)count);
+        using var token = reader.AtOffset(offset);
         for (long i = 0; i < count; i++)
         {
             var obj = reader.ReadObject<T>();
@@ -23,6 +33,13 @@ public struct BinaryList<T> : IBinarySerializable, IList<T> where T : IBinarySer
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Write(BinaryObjectWriter writer)
     {
+        if (Items == null)
+        {
+            writer.Write(0);
+            writer.WriteOffsetValue(0);
+            return;
+        }
+
         writer.WriteOffsetValue(Items.Count);
         writer.WriteOffset(writer.DefaultAlignment, null, Items, (_, items) =>
         {
@@ -86,4 +103,7 @@ public struct BinaryList<T> : IBinarySerializable, IList<T> where T : IBinarySer
         get => Items[index];
         set => Items[index] = value;
     }
+
+    public static implicit operator BinaryList<T>(List<T> items) => new(items);
+    public static implicit operator List<T>(BinaryList<T> self) => self.Items;
 }

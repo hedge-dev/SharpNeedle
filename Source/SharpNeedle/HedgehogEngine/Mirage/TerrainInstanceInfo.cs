@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.HedgehogEngine.Mirage;
 
-[BinaryResource("hh/terrain-instance-info", $@"\{Extension}$")]
+[NeedleResource("hh/terrain-instance-info", $@"\{Extension}$")]
 public class TerrainInstanceInfo : SampleChunkResource
 {
     public const string Extension = ".terrain-instanceinfo";

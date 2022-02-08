@@ -1,7 +1,7 @@
 ﻿namespace SharpNeedle;
 using System.IO;
 
-[BinaryResource("internal/raw", ResourceType.Raw)]
+[NeedleResource("internal/raw", ResourceType.Raw)]
 public class ResourceRaw : IResource
 {
     public IFile File { get; }
