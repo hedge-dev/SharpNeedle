@@ -1,6 +1,7 @@
 namespace SharpNeedle.LostWorld;
 using BINA;
 
+[NeedleResource("lw/shadow-model", @"\.shadow-model$")]
 public class ShadowModel : BinaryResource
 {
     public new static readonly uint Signature = BinaryHelper.MakeSignature<uint>("SVLM");
