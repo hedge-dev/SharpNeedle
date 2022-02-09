@@ -6,13 +6,13 @@ public class RawChunk : IChunk
     public uint Signature { get; set; }
     public byte[] Data { get; set; }
 
-    public void Read(BinaryObjectReader reader, ChunkHeader? type)
+    public void Read(BinaryObjectReader reader, ChunkParseOptions options)
     {
-        type ??= reader.ReadObject<ChunkHeader>();
-        Data = reader.ReadArray<byte>((int)type.Value.Size - ChunkHeader.BinarySize);
+        options.Header ??= reader.ReadObject<ChunkHeader>();
+        Data = reader.ReadArray<byte>((int)options.Header.Value.Size - ChunkHeader.BinarySize);
     }
 
-    public void Write(BinaryObjectWriter writer, ChunkHeader? header)
+    public void Write(BinaryObjectWriter writer, ChunkParseOptions options)
     {
         writer.Write(Signature);
         writer.Write(Data.Length + ChunkHeader.BinarySize);

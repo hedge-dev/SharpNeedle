@@ -7,6 +7,16 @@ public struct Version : IBinarySerializable
     public byte Revision;
     public Endianness Endianness;
 
+    public bool IsV1 => Major == 0 && Minor == 0 && Revision == 1;
+
+    public Version(byte major, byte minor, byte revision, Endianness endianness)
+    {
+        Major = major;
+        Minor = minor;
+        Revision = revision;
+        Endianness = endianness;
+    }
+
     public void Read(BinaryObjectReader reader)
     {
         var ma = reader.Read<byte>();
@@ -36,7 +46,7 @@ public struct Version : IBinarySerializable
         {
             writer.Write(Major);
             writer.Write(Minor);
-            writer.Write((byte)(Revision - 0x30));
+            writer.Write((byte)(Revision + 0x30));
         }
         else
         {

@@ -3,6 +3,9 @@ using System.IO;
 
 public static class BinaryHelper
 {
+    public static readonly Endianness PlatformEndianness =
+        BitConverter.IsLittleEndian ? Endianness.Little : Endianness.Big;
+
     public static unsafe TSize MakeSignature<TSize>(string sig, byte placeholder = 0) where TSize : unmanaged
     {
         if (string.IsNullOrEmpty(sig))

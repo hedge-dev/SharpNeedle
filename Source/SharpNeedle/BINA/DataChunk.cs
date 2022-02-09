@@ -10,11 +10,17 @@ public class DataChunk<T> : DataChunk, IChunk where T : IBinarySerializable
         Data = data;
     }
 
-    public void Read(BinaryObjectReader reader, ChunkHeader? header)
+    public void Read(BinaryObjectReader reader, ChunkParseOptions options)
     {
-        header ??= reader.ReadObject<ChunkHeader>();
+        if (options.Owner.Version.IsV1)
+        {
+            Data.Read(reader);
+            return;
+        }
 
-        Signature = header.Value.Signature;
+        options.Header ??= reader.ReadObject<ChunkHeader>();
+
+        Signature = options.Header.Value.Signature;
         BinaryHelper.EnsureSignature(Signature, true, BinSignature, AltBinSignature);
 
         var strTableOffset = reader.Read<uint>();
@@ -34,8 +40,14 @@ public class DataChunk<T> : DataChunk, IChunk where T : IBinarySerializable
         });
     }
 
-    public void Write(BinaryObjectWriter writer, ChunkHeader? header)
+    public void Write(BinaryObjectWriter writer, ChunkParseOptions options)
     {
+        if (options.Owner.Version.IsV1)
+        {
+            Data.Write(writer);
+            return;
+        }
+
         var begin = writer.Position;
         writer.Write(Signature);
         
