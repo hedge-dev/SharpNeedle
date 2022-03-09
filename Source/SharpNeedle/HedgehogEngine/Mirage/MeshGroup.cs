@@ -103,6 +103,12 @@ public class MeshGroup : List<Mesh>, IBinarySerializable, IDisposable, ICloneabl
         writer.WriteOffset(() =>
         {
             foreach (var group in specialGroups)
+                writer.WriteStringOffset(StringBinaryFormat.NullTerminated, group.Key);
+        });
+
+        writer.WriteOffset(() =>
+        {
+            foreach (var group in specialGroups)
                 writer.WriteValueOffset(group.Value.Count);
         });
 
