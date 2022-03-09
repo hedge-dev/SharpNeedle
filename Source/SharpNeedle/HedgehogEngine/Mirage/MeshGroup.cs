@@ -10,8 +10,8 @@ public class MeshGroup : List<Mesh>, IBinarySerializable, IDisposable, ICloneabl
     public void Read(BinaryObjectReader reader, bool readSpecial)
     {
         var opaqMeshes = reader.ReadObject<BinaryList<BinaryPointer<Mesh>>>();
-        var punchMeshes = reader.ReadObject<BinaryList<BinaryPointer<Mesh>>>();
         var transMeshes = reader.ReadObject<BinaryList<BinaryPointer<Mesh>>>();
+        var punchMeshes = reader.ReadObject<BinaryList<BinaryPointer<Mesh>>>();
 
         Clear();
 
@@ -81,8 +81,8 @@ public class MeshGroup : List<Mesh>, IBinarySerializable, IDisposable, ICloneabl
     public void Write(BinaryObjectWriter writer, bool writeSpecial)
     {
         WriteMeshes(this.Where(x => x.Slot == Mesh.Type.Opaque));
-        WriteMeshes(this.Where(x => x.Slot == Mesh.Type.PunchThrough));
         WriteMeshes(this.Where(x => x.Slot == Mesh.Type.Transparent));
+        WriteMeshes(this.Where(x => x.Slot == Mesh.Type.PunchThrough));
 
         if (!writeSpecial)
             return;

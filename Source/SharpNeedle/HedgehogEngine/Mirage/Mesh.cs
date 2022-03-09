@@ -116,8 +116,8 @@ public class Mesh : IBinarySerializable, IDisposable, ICloneable<Mesh>
     public enum Type
     {
         Opaque,
-        PunchThrough,
         Transparent,
+        PunchThrough,
         Special
     }
 
@@ -145,14 +145,14 @@ public struct MeshSlot
                 Type = Mesh.Type.Opaque;
                 break;
 
-            case "punch":
-            case "punchthrough":
-                Type = Mesh.Type.PunchThrough;
-                break;
-
             case "trans":
             case "transparent":
                 Type = Mesh.Type.Transparent;
+                break;
+
+            case "punch":
+            case "punchthrough":
+                Type = Mesh.Type.PunchThrough;
                 break;
 
             default:
