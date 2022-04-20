@@ -44,9 +44,15 @@ public class CharAnimScript : BinaryResource
     public int CountTriggers()
     {
         var triggerStore = new HashSet<uint>();
-        Traverse(SimpleAnimations);
-        foreach (var animation in ComplexAnimations)
-            Traverse(animation.Animations);
+        
+        if (SimpleAnimations != null)
+            Traverse(SimpleAnimations);
+
+        if (ComplexAnimations != null)
+        {
+            foreach (var animation in ComplexAnimations)
+                Traverse(animation.Animations);
+        }
 
         return triggerStore.Count;
 
@@ -71,9 +77,15 @@ public class CharAnimScript : BinaryResource
     public int CountLayers()
     {
         var maxLayer = 0;
-        Traverse(SimpleAnimations);
-        foreach (var animation in ComplexAnimations)
-            Traverse(animation.Animations);
+       
+        if (SimpleAnimations != null)
+            Traverse(SimpleAnimations);
+
+        if (ComplexAnimations != null)
+        {
+            foreach (var animation in ComplexAnimations)
+                Traverse(animation.Animations);
+        }
 
         return maxLayer + 1;
 

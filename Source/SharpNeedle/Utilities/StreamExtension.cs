@@ -130,21 +130,24 @@ public static class StreamExtension
 
         return buffer;
     }
-}
 
-public static class StreamHelper
-{
-    public static MemoryStream ReadStream(BinaryReader reader, int count)
+    public static Span<byte> AsSpan(this MemoryStream stream)
     {
-        byte[] buffer = new byte[count];
-        reader.BaseStream.Read(buffer, 0, count);
-        return new MemoryStream(buffer);
+        return new(stream.GetBuffer(), 0, (int)stream.Length);
     }
 
-    public static byte[] ReadBuffer(BinaryReader reader, int count)
+    public static Span<byte> AsSpan(this MemoryStream stream, int start, int length)
     {
-        byte[] buffer = new byte[count];
-        reader.BaseStream.Read(buffer, 0, count);
-        return buffer;
+        return new(stream.GetBuffer(), start, length);
+    }
+
+    public static ReadOnlySpan<byte> AsReadOnlySpan(this MemoryStream stream)
+    {
+        return new(stream.GetBuffer(), 0, (int)stream.Length);
+    }
+
+    public static ReadOnlySpan<byte> AsReadOnlySpan(this MemoryStream stream, int start, int length)
+    {
+        return new(stream.GetBuffer(), start, length);
     }
 }

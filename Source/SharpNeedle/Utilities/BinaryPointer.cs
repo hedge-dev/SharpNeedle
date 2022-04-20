@@ -12,7 +12,11 @@ public struct BinaryPointer<T> : IBinarySerializable where T : IBinarySerializab
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Read(BinaryObjectReader reader)
     {
-        Value = reader.ReadObjectOffset<T>();
+        var offset = reader.ReadOffsetValue();
+        if (offset == 0)
+            return;
+
+        Value = reader.ReadObjectAtOffset<T>(offset);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

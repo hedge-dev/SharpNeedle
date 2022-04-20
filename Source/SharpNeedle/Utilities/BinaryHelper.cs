@@ -6,6 +6,94 @@ public static class BinaryHelper
     public static readonly Endianness PlatformEndianness =
         BitConverter.IsLittleEndian ? Endianness.Little : Endianness.Big;
 
+    public static int GetOffsetSize(this BinaryObjectReader reader)
+    {
+        switch (reader.OffsetBinaryFormat)
+        {
+            case OffsetBinaryFormat.U32:
+                return 4;
+
+            case OffsetBinaryFormat.U64:
+                return 8;
+        }
+
+        throw new NotImplementedException();
+    }
+
+    public static T[] ReadObjectArray<T>(this BinaryObjectReader reader, int count) where T : IBinarySerializable, new()
+    {
+        var result = new T[count];
+        for (int i = 0; i < count; i++)
+            result[i] = reader.ReadObject<T>();
+
+        return result;
+    }
+
+    public static T[] ReadObjectArray<T, TContext>(this BinaryObjectReader reader, TContext context, int count) where T : IBinarySerializable<TContext>, new()
+    {
+        var result = new T[count];
+        for (int i = 0; i < count; i++)
+            result[i] = reader.ReadObject<T, TContext>(context);
+
+        return result;
+    }
+
+    public static T[] ReadObjectArrayOffset<T>(this BinaryObjectReader reader, int count) where T : IBinarySerializable, new()
+    {
+        var result = new T[count];
+
+        reader.ReadOffset(() =>
+        {
+            for (int i = 0; i < count; i++)
+                result[i] = reader.ReadObject<T>();
+        });
+
+        return result;
+    }
+
+    public static T[] ReadObjectArrayOffset<T, TContext>(this BinaryObjectReader reader, TContext context, int count) where T : IBinarySerializable<TContext>, new()
+    {
+        var result = new T[count];
+
+        reader.ReadOffset(() =>
+        {
+            for (int i = 0; i < count; i++)
+                result[i] = reader.ReadObject<T, TContext>(context);
+        });
+
+        return result;
+    }
+
+    public static void WriteObjectCollection<T>(this BinaryObjectWriter writer, IEnumerable<T> items) where T : IBinarySerializable
+    {
+        foreach (var item in items)
+            writer.WriteObject(item);
+    }
+
+    public static void WriteObjectCollection<T, TContext>(this BinaryObjectWriter writer, TContext context, IEnumerable<T> items) where T : IBinarySerializable<TContext>
+    {
+        foreach (var item in items)
+            writer.WriteObject(item, context);
+    }
+
+    public static void WriteObjectCollectionOffset<T>(this BinaryObjectWriter writer, IEnumerable<T> items) where T : IBinarySerializable
+    {
+        writer.WriteOffset(() =>
+        {
+            foreach (var item in items)
+                writer.WriteObject(item);
+        });
+    }
+
+    public static void WriteObjectCollectionOffset<T, TContext>(this BinaryObjectWriter writer, TContext context, IEnumerable<T> items) where T : IBinarySerializable<TContext>
+    {
+        writer.WriteOffset(() =>
+        {
+            foreach (var item in items)
+                writer.WriteObject(item, context);
+        });
+    }
+
     public static unsafe TSize MakeSignature<TSize>(string sig, byte placeholder = 0) where TSize : unmanaged
     {
         if (string.IsNullOrEmpty(sig))
