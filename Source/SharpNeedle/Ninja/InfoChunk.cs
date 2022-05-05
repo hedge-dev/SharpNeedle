@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.Ninja;
 using System.IO;
-using Chao;
+using Cell;
 
 public class InfoChunk : IChunk
 {

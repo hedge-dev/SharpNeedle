@@ -1,4 +1,4 @@
-﻿namespace SharpNeedle.Ninja.Chao;
+﻿namespace SharpNeedle.Ninja.Cell;
 
 public class Group : IBinarySerializable
 {

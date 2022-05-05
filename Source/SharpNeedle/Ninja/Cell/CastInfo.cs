@@ -1,4 +1,4 @@
-namespace SharpNeedle.Ninja.Chao;
+namespace SharpNeedle.Ninja.Cell;
 
 [StructLayout(LayoutKind.Sequential)]
 public struct CastInfo

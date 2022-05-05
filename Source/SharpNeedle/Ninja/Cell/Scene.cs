@@ -1,5 +1,6 @@
-﻿namespace SharpNeedle.Ninja.Chao;
-using Animation;
+﻿using SharpNeedle.Ninja.Cell.Animation;
+
+namespace SharpNeedle.Ninja.Cell;
 
 public class Scene : IBinarySerializable
 {
@@ -12,7 +13,7 @@ public class Scene : IBinarySerializable
     public List<Vector2> Data1 { get; set; }
     public List<Image> Images { get; set; }
     public List<Group> Groups { get; set; }
-    public ChaoCollection<KeyFrameData> KeyFrameData { get; set; }
+    public CellCollection<KeyFrameData> KeyFrameData { get; set; }
 
     public void Read(BinaryObjectReader reader)
     {
@@ -25,7 +26,7 @@ public class Scene : IBinarySerializable
         Images = new List<Image>(reader.ReadArrayOffset<Image>(reader.Read<int>()));
         Groups = reader.ReadObject<BinaryList<Group>>();
         var castDic = reader.ReadObject<CastDictionary>();
-        KeyFrameData = reader.ReadObject<ChaoCollection<KeyFrameData>>();
+        KeyFrameData = reader.ReadObject<CellCollection<KeyFrameData>>();
         AspectRatio = reader.Read<float>();
         var frameData = reader.ReadArrayOffset<(int Index, float AnimationLength)>(KeyFrameData.Count);
         var animCastTableOffset = reader.ReadOffsetValue();

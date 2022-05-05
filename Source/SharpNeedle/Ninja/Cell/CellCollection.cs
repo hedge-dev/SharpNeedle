@@ -1,6 +1,6 @@
-﻿namespace SharpNeedle.Ninja.Chao;
+﻿namespace SharpNeedle.Ninja.Cell;
 
-public class ChaoCollection<T> : Dictionary<string, T>, IBinarySerializable where T : IBinarySerializable, new()
+public class CellCollection<T> : Dictionary<string, T>, IBinarySerializable where T : IBinarySerializable, new()
 {
     public NameIndexPair[] IndexTable { get; private set; }
 

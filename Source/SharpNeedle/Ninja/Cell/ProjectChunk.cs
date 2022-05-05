@@ -1,5 +1,5 @@
-﻿namespace SharpNeedle.Ninja.Chao;
-using FontCollection = ChaoCollection<Font>;
+﻿namespace SharpNeedle.Ninja.Cell;
+using FontCollection = CellCollection<Font>;
 
 public class ProjectChunk : IChunk
 {

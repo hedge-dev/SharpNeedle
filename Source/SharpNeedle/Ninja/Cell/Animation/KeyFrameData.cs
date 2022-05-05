@@ -1,4 +1,4 @@
-﻿namespace SharpNeedle.Ninja.Chao.Animation;
+﻿namespace SharpNeedle.Ninja.Cell.Animation;
 
 public class KeyFrameData : IBinarySerializable
 {

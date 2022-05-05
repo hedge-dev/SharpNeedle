@@ -1,6 +1,6 @@
-﻿namespace SharpNeedle.Ninja.Chao;
-using SceneCollection = ChaoCollection<BinaryPointer<Scene>>;
-using NodeCollection = ChaoCollection<SceneNode>;
+﻿namespace SharpNeedle.Ninja.Cell;
+using SceneCollection = CellCollection<BinaryPointer<Scene>>;
+using NodeCollection = CellCollection<SceneNode>;
 
 public class SceneNode : IBinarySerializable
 {
