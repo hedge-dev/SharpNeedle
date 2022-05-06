@@ -43,7 +43,7 @@ public class CharAnimScript : BinaryResource
 
     public int CountTriggers()
     {
-        var triggerStore = new HashSet<uint>();
+        var triggerCount = 0;
         
         if (SimpleAnimations != null)
             Traverse(SimpleAnimations);
@@ -54,7 +54,7 @@ public class CharAnimScript : BinaryResource
                 Traverse(animation.Animations);
         }
 
-        return triggerStore.Count;
+        return triggerCount;
 
         void Traverse(List<SimpleAnimation> animations)
         {
@@ -65,10 +65,10 @@ public class CharAnimScript : BinaryResource
 
                 foreach (var trigger in animation.Triggers)
                 {
-                    if (triggerStore.Contains(trigger.ID))
+                    if (trigger.ID < triggerCount)
                         continue;
 
-                    triggerStore.Add(trigger.ID);
+                    triggerCount = (int)trigger.ID;
                 }
             }
         }
