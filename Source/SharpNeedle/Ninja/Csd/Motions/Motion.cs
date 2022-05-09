@@ -1,18 +1,18 @@
-﻿namespace SharpNeedle.Ninja.Csd.Animation;
+﻿namespace SharpNeedle.Ninja.Csd.Motions;
 
-public class MotionPalette : IBinarySerializable
+public class Motion : IBinarySerializable
 {
-    public float Start { get; set; }
-    public float Length { get; set; }
+    public float StartFrame { get; set; }
+    public float EndFrame { get; set; }
     public List<LayerMotion> LayerMotions { get; set; }
     public Scene Scene { get; internal set; }
 
-    public MotionPalette()
+    public Motion()
     {
 
     }
 
-    public MotionPalette(Scene scene)
+    public Motion(Scene scene)
     {
         Attach(scene);
     }
@@ -37,7 +37,7 @@ public class MotionPalette : IBinarySerializable
     public void Write(BinaryObjectWriter writer)
     {
         // Sanity checks
-        for (int i = 0; i < LayerMotions.Count; i++)
+        for (int i = 0; i < LayerMotions.Count && i < Scene.Layers.Count; i++)
         {
             if (Scene.Layers[i] == LayerMotions[i].Layer)
                 continue;

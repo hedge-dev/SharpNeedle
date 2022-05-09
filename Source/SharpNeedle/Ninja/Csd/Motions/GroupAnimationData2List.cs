@@ -1,4 +1,4 @@
-﻿namespace SharpNeedle.Ninja.Csd.Animation;
+﻿namespace SharpNeedle.Ninja.Csd.Motions;
 
 public class GroupAnimationData2List : IBinarySerializable<Layer>
 {

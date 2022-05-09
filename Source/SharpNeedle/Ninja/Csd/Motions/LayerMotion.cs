@@ -1,4 +1,4 @@
-﻿namespace SharpNeedle.Ninja.Csd.Animation;
+﻿namespace SharpNeedle.Ninja.Csd.Motions;
 
 public class LayerMotion : IBinarySerializable
 {
@@ -32,7 +32,7 @@ public class LayerMotion : IBinarySerializable
     public void Write(BinaryObjectWriter writer)
     {
         // Sanity checks
-        for (int i = 0; i < CastMotions.Count; i++)
+        for (int i = 0; i < CastMotions.Count && i < Layer.Casts.Count; i++)
         {
             if (Layer.Casts[i] == CastMotions[i].Cast)
                 continue;

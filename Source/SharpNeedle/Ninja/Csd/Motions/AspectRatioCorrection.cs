@@ -1,4 +1,4 @@
-﻿namespace SharpNeedle.Ninja.Csd.Animation;
+﻿namespace SharpNeedle.Ninja.Csd.Motions;
 
 [StructLayout(LayoutKind.Sequential)]
 public struct AspectRatioCorrection

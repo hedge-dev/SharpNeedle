@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.Ninja.Csd;
 
-public class CastDictionary : List<(string Name, int LayerIdx, int CastIdx)>, IBinarySerializable
+public class CastInfoTable : List<(string Name, int LayerIdx, int CastIdx)>, IBinarySerializable
 {
     public void Read(BinaryObjectReader reader)
     {

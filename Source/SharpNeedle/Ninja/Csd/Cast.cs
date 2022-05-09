@@ -1,8 +1,9 @@
 ﻿namespace SharpNeedle.Ninja.Csd;
-using Animation;
+using Motions;
 
-public class Cast : IBinarySerializable, IList<Cast>
+public class Cast : IBinarySerializable<Layer>, IList<Cast>
 {
+    private int mPriority;
     public int Count => Children.Count;
     public bool IsReadOnly => false;
 
@@ -19,8 +20,7 @@ public class Cast : IBinarySerializable, IList<Cast>
     public uint Field2C { get; set; }
     public BitSet<uint> InheritanceFlags { get; set; }
     public uint Field38 { get; set; }
-    public uint Field3C { get; set; }
-    public string FontCharacters { get; set; }
+    public string Text { get; set; }
     public string FontName { get; set; }
     public uint Field4C { get; set; }
     public uint Width { get; set; }
@@ -28,14 +28,26 @@ public class Cast : IBinarySerializable, IList<Cast>
     public uint Field58 { get; set; }
     public uint Field5C { get; set; }
     public Vector2 Offset { get; set; }
-    public float Field68 { get; set; }
-    public float Field6C { get; set; }
+    public Vector2 Position { get; set; }
     public uint Field70 { get; set; }
     public CastInfo Info { get; set; }
-    public CastMaterialInfo Material { get; set; }
+    public int[] SpriteIndices { get; set; }
     public List<Cast> Children { get; set; } = new();
 
-    public void Read(BinaryObjectReader reader)
+    public int Priority
+    {
+        get => mPriority;
+        set
+        {
+            var oldPriority = mPriority;
+            mPriority = value;
+
+            if (oldPriority != mPriority)
+                Layer?.NotifyPriorityChanged(this);
+        }
+    }
+    
+    public void Read(BinaryObjectReader reader, Layer layer)
     {
         Field00 = reader.Read<uint>();
         Field04 = reader.Read<uint>();
@@ -50,25 +62,27 @@ public class Cast : IBinarySerializable, IList<Cast>
         Info = reader.ReadValueOffset<CastInfo>();
         InheritanceFlags = reader.Read<BitSet<uint>>();
         Field38 = reader.Read<uint>();
-        Field3C = reader.Read<uint>();
-        Material = reader.ReadObjectOffset<CastMaterialInfo>();
+        SpriteIndices = reader.ReadArrayOffset<int>(reader.Read<int>());
 
-        FontCharacters = reader.ReadStringOffset();
+        Text = reader.ReadStringOffset();
         FontName = reader.ReadStringOffset();
         
         Field4C = reader.Read<uint>();
-        Width = reader.Read<uint>();
-        Height = reader.Read<uint>();
-        Field58 = reader.Read<uint>();
-        Field5C = reader.Read<uint>();
-        
-        Offset = reader.Read<Vector2>();
-        Field68 = reader.Read<float>();
-        Field6C = reader.Read<float>();
-        Field70 = reader.Read<uint>();
+
+        if (layer.Scene.Version >= 3)
+        {
+            Width = reader.Read<uint>();
+            Height = reader.Read<uint>();
+            Field58 = reader.Read<uint>();
+            Field5C = reader.Read<uint>();
+
+            Offset = reader.Read<Vector2>();
+            Position = reader.Read<Vector2>();
+            Field70 = reader.Read<uint>();
+        }
     }
 
-    public void Write(BinaryObjectWriter writer)
+    public void Write(BinaryObjectWriter writer, Layer layer)
     {
         writer.Write(Field00);
         writer.Write(Field04);
@@ -83,23 +97,27 @@ public class Cast : IBinarySerializable, IList<Cast>
         writer.WriteValueOffset(Info);
         writer.Write(InheritanceFlags);
         writer.Write(Field38);
-        writer.Write(Field3C);
 
-        writer.WriteObjectOffset(Material);
+        writer.Write(SpriteIndices.Length);
+        writer.WriteArrayOffset(SpriteIndices);
 
-        writer.WriteStringOffset(StringBinaryFormat.NullTerminated, FontCharacters);
+        writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Text);
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, FontName);
 
         writer.Write(Field4C);
-        writer.Write(Width);
-        writer.Write(Height);
-        writer.Write(Field58);
-        writer.Write(Field5C);
 
-        writer.Write(Offset);
-        writer.Write(Field68);
-        writer.Write(Field6C);
-        writer.Write(Field70);
+        layer ??= Layer;
+        if (layer.Scene.Version >= 3)
+        {
+            writer.Write(Width);
+            writer.Write(Height);
+            writer.Write(Field58);
+            writer.Write(Field5C);
+
+            writer.Write(Offset);
+            writer.Write(Position);
+            writer.Write(Field70);
+        }
     }
 
     public void AttachMotion(CastMotion motion)

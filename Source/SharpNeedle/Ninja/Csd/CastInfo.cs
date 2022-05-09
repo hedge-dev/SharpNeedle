@@ -3,12 +3,12 @@ namespace SharpNeedle.Ninja.Csd;
 [StructLayout(LayoutKind.Sequential)]
 public struct CastInfo
 {
-    public int Field00;
+    public uint HideFlag;
     public Vector2 Translation;
     public float Rotation;
     public Vector2 Scale;
-    public int Field18;
-    public uint Color;
+    public float SpriteIndex;
+    public Color<byte> Color;
     public uint GradientTopLeft;
     public uint GradientBottomLeft;
     public uint GradientTopRight;

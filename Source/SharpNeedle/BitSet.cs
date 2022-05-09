@@ -37,7 +37,8 @@ public struct BitSet<T> : IEnumerable<bool> where T : IBinaryInteger<T>, IShiftO
             Reset(bit);
     }
 
-    public int PopCount() => NumberHelper.Create<int, T>(T.PopCount(Value));
+    [MethodImpl(MethodImplOptions.AggressiveInlining)] public int PopCount() => NumberHelper.Create<int, T>(T.PopCount(Value));
+    [MethodImpl(MethodImplOptions.AggressiveInlining)] public bool Any() => Value != T.Zero;
 
     public bool this[int bit]
     {

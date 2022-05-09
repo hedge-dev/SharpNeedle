@@ -1,4 +1,4 @@
-﻿namespace SharpNeedle.Ninja.Csd.Animation;
+﻿namespace SharpNeedle.Ninja.Csd.Motions;
 
 [Flags]
 public enum KeyProperty
@@ -9,7 +9,7 @@ public enum KeyProperty
     Rotation,
     ScaleX,
     ScaleY,
-    PatternIndex,
+    SpriteIndex,
     Color,
     GradientTopLeft,
     GradientBottomLeft,

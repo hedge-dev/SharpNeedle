@@ -1,13 +1,15 @@
 ﻿namespace SharpNeedle.Ninja.Csd;
-using Animation;
+using Motions;
 
-public class Layer : IBinarySerializable, IList<Cast>
+public class Layer : IBinarySerializable<Scene>, IList<Cast>
 {
     public int Count => Children.Count;
     public bool IsReadOnly => false;
 
-    public List<Cast> Casts { get; private set; } = new();
+    private List<Cast> CastBuffer { get; set; } = new();
     private List<Cast> Children { get; set; } = new();
+    public IReadOnlyList<Cast> Casts => CastBuffer;
+    public Scene Scene { get; set; }
 
     public void AttachMotion(LayerMotion motion)
     {
@@ -15,17 +17,27 @@ public class Layer : IBinarySerializable, IList<Cast>
         motion.OnAttach(this);
     }
 
-    public void Read(BinaryObjectReader reader)
+    public void Read(BinaryObjectReader reader, Scene context)
     {
-        Casts = reader.ReadObject<BinaryList<BinaryPointer<Cast>>>().Unwind();
+        Scene = context;
+        var castCount = reader.Read<int>();
+        CastBuffer = new List<Cast>(castCount);
+        reader.ReadOffset(() =>
+        {
+            for (int i = 0; i < castCount; i++)
+                CastBuffer.Add(reader.ReadObjectOffset<Cast, Layer>(this));
+        });
+        
         var root = reader.Read<int>();
-        var tree = reader.ReadArrayOffset<TreeDescriptorNode>(Casts.Count);
-        if (Casts.Count != 0)
+        var tree = reader.ReadArrayOffset<TreeDescriptorNode>(CastBuffer.Count);
+        if (CastBuffer.Count != 0)
             ParseTree(root);
 
-        Children = new List<Cast>(Casts.Count);
-        foreach (var cast in Casts)
+        Children = new List<Cast>(CastBuffer.Count);
+        for (var i = 0; i < CastBuffer.Count; i++)
         {
+            var cast = CastBuffer[i];
+            cast.Priority = i;
             cast.Layer = this;
             if (cast.Parent == null)
                 Children.Add(cast);
@@ -37,32 +49,32 @@ public class Layer : IBinarySerializable, IList<Cast>
 
             if (node.ChildIndex != -1)
             {
-                Casts[idx].Add(Casts[node.ChildIndex]);
+                CastBuffer[idx].Add(CastBuffer[node.ChildIndex]);
                 ParseTree(node.ChildIndex, idx);
             }
 
-            if (node.NextIndex != -1)
+            if (node.SiblingIndex != -1)
             {
                 if (p != -1)
-                    Casts[p].Add(Casts[node.NextIndex]);
+                    CastBuffer[p].Add(CastBuffer[node.SiblingIndex]);
                 
-                ParseTree(node.NextIndex, p);
+                ParseTree(node.SiblingIndex, p);
             }
         }
     }
 
-    public void Write(BinaryObjectWriter writer)
+    public void Write(BinaryObjectWriter writer, Scene context)
     {
-        writer.Write(Casts.Count);
+        writer.Write(CastBuffer.Count);
         writer.WriteOffset(() =>
         {
-            foreach (var cast in Casts)
-                writer.WriteObjectOffset(cast);
+            foreach (var cast in CastBuffer)
+                writer.WriteObjectOffset(cast, this);
         });
         
         writer.Write<int>(0);
         
-        var nodes = new TreeDescriptorNode[Casts.Count];
+        var nodes = new TreeDescriptorNode[CastBuffer.Count];
 
         // Initialise items because, the runtime doesn't
         for (int i = 0; i < nodes.Length; i++)
@@ -77,13 +89,13 @@ public class Layer : IBinarySerializable, IList<Cast>
             for (int i = 0; i < casts.Count; i++)
             {
                 var cast = casts[i];
-                var idx = Casts.IndexOf(cast);
+                var idx = CastBuffer.IndexOf(cast);
                 
                 if (cast.Children.Count > 0)
-                    nodes[idx].ChildIndex = Casts.IndexOf(cast.Children[0]);
+                    nodes[idx].ChildIndex = CastBuffer.IndexOf(cast.Children[0]);
 
                 if (i + 1 < casts.Count)
-                    nodes[idx].NextIndex = Casts.IndexOf(casts[i + 1]);
+                    nodes[idx].SiblingIndex = CastBuffer.IndexOf(casts[i + 1]);
 
                 BuildTree(cast);
             }
@@ -100,19 +112,24 @@ public class Layer : IBinarySerializable, IList<Cast>
         Disown(cast);
     }
 
+    internal void NotifyPriorityChanged(Cast cast)
+    {
+        CastBuffer.Sort((x, y) => x.Priority - y.Priority);
+    }
+
     private void TakeOwnership(Cast cast)
     {
         cast.Layer?.Disown(cast);
         
         cast.Layer = this;
-        Casts.Add(cast);
+        CastBuffer.Add(cast);
         foreach (var child in cast)
             TakeOwnership(child);
     }
 
     private void Disown(Cast cast)
     {
-        Casts.Remove(cast);
+        CastBuffer.Remove(cast);
         foreach (var child in cast.Children)
             Disown(child);
     }
@@ -131,15 +148,34 @@ public class Layer : IBinarySerializable, IList<Cast>
     {
         Children.Add(item);
         TakeOwnership(item);
+
+        if (HasPriority(item))
+            CastBuffer.Sort((x, y) => x.Priority - y.Priority);
+
+        bool HasPriority(Cast cast)
+        {
+            if (cast.Priority != 0)
+                return true;
+
+            var hasPrio = false;
+            foreach (var child in cast)
+            {
+                hasPrio = HasPriority(child);
+                if (hasPrio)
+                    break;
+            }
+
+            return hasPrio;
+        }
     }
 
     public void Clear()
     {
-        foreach (var cast in Casts)
+        foreach (var cast in CastBuffer)
             cast.Layer = null;
         
         Children.Clear();
-        Casts.Clear();
+        CastBuffer.Clear();
     }
 
     public bool Contains(Cast item)
@@ -188,17 +224,17 @@ public class Layer : IBinarySerializable, IList<Cast>
     internal struct TreeDescriptorNode
     {
         public int ChildIndex;
-        public int NextIndex;
+        public int SiblingIndex;
         
         public TreeDescriptorNode()
         {
             ChildIndex = -1;
-            NextIndex = -1;
+            SiblingIndex = -1;
         }
 
         public override string ToString()
         {
-            return $"{{ ChildIndex: {ChildIndex}, NextIndex: {NextIndex} }}";
+            return $"{{ ChildIndex: {ChildIndex}, SiblingIndex: {SiblingIndex} }}";
         }
     }
 }

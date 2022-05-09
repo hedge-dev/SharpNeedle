@@ -36,4 +36,32 @@ public static class Extensions
 
         return -1;
     }
+
+    public static LinkedListNode<T> Find<T>(this LinkedList<T> list, Predicate<T> predicate)
+    {
+        var node = list.First;
+        while (node != null)
+        {
+            if (predicate(node.Value))
+                return node;
+
+            node = node.Next;
+        }
+
+        return null;
+    }
+
+    public static LinkedListNode<T> FindLast<T>(this LinkedList<T> list, Predicate<T> predicate)
+    {
+        var node = list.Last;
+        while (node != null)
+        {
+            if (predicate(node.Value))
+                return node;
+
+            node = node.Previous;
+        }
+
+        return null;
+    }
 }
