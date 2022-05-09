@@ -1,11 +1,76 @@
 ﻿// Program for quickly writing temporary things
-using SharpNeedle.LostWorld.Animation;
+using SharpNeedle.Ninja.Csd;
+int indent = 0;
 
-//var res = new BinaryResource<BinaryPrimitive<int>>();
-//res.Read(FileSystem.Open(@"D:\Unpacked CPK\Sonic Lost World\sonic2013_0\set\batl01_obj_00.orc"));
+var arc = ResourceUtility.Open<CsdProject>(@"D:\Unpacked CPK\Sonic Generations\bb\SonicActionCommonHud\ui_gameplay.xncp");
+arc.Write(FileSystem.Create("ui_gameplay.xncp"));
 
-var model = ResourceUtility.Open<CharAnimScript>(@"player_sonic.anm");
-model.Version = new(0, 0, 1, Endianness.Little);
-
-model.Write(FileSystem.Create("player_sonic.anm"));
+var project = arc.Project;
+WriteLine($"{project.Name}:");
+PushIndentation();
+PrintSceneNode(project.Root);
+PopIndentation();
 Console.Read();
+
+void PrintSceneNode(SceneNode node)
+{
+    foreach (var scenePair in node.Scenes)
+    {
+        WriteLine($"{scenePair.Key}:");
+        PushIndentation();
+        int i = 0;
+        foreach (var group in scenePair.Value.Layers)
+        {
+            WriteLine($"Layer_{i++}:");
+            PushIndentation();
+            foreach (var cast in group)
+                PrintCast(cast);
+
+            PopIndentation();
+            Console.WriteLine();
+        }
+        PopIndentation();
+
+        void PrintCast(Cast cast)
+        {
+            WriteLine($"{cast.Name}{(cast.Count == 0 ? "" : ":")}");
+            PushIndentation();
+
+            foreach (var child in cast)
+                PrintCast(child);
+
+            PopIndentation();
+        }
+    }
+
+    foreach (var child in node.Children)
+    {
+        WriteLine($"{child.Key}:");
+        PushIndentation();
+        PrintSceneNode(child.Value);
+        PopIndentation();
+    }
+}
+
+Console.WriteLine();
+
+void ApplyIndentation()
+{
+    for (int i = 0; i < indent; i++)
+        Console.Write("  ");
+}
+
+void Write(string text)
+{
+    ApplyIndentation();
+    Console.Write(text);
+}
+
+void WriteLine(string text)
+{
+    ApplyIndentation();
+    Console.WriteLine(text);
+}
+
+void PushIndentation() => ++indent;
+void PopIndentation() => --indent;

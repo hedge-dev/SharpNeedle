@@ -1,6 +1,6 @@
-﻿namespace SharpNeedle.Ninja.Cell;
+﻿namespace SharpNeedle.Ninja.Csd;
 
-public class CastDictionary : List<(string Name, int GroupIdx, int CastIdx)>, IBinarySerializable
+public class CastDictionary : List<(string Name, int LayerIdx, int CastIdx)>, IBinarySerializable
 {
     public void Read(BinaryObjectReader reader)
     {
@@ -23,18 +23,20 @@ public class CastDictionary : List<(string Name, int GroupIdx, int CastIdx)>, IB
     public void Write(BinaryObjectWriter writer)
     {
         writer.Write(Count);
+        
         if (Count == 0)
         {
             writer.WriteOffsetValue(0);
             return;
         }
 
+        Sort((x, y) => string.Compare(x.Name, y.Name, StringComparison.Ordinal));
         writer.WriteOffset(() =>
         {
             foreach (var item in this)
             {
                 writer.WriteStringOffset(StringBinaryFormat.NullTerminated, item.Name);
-                writer.Write(item.GroupIdx);
+                writer.Write(item.LayerIdx);
                 writer.Write(item.CastIdx);
             }
         });

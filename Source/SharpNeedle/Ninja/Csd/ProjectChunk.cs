@@ -1,10 +1,11 @@
-﻿namespace SharpNeedle.Ninja.Cell;
-using FontCollection = CellCollection<Font>;
+﻿namespace SharpNeedle.Ninja.Csd;
+using System.IO;
+using FontCollection = CsdDictionary<Font>;
 
 public class ProjectChunk : IChunk
 {
     public static readonly uint BinSignature = BinaryHelper.MakeSignature<uint>("nCPJ");
-    public uint Signature { get; private set; }
+    public uint Signature { get; private set; } = BinSignature;
     public string Name { get; set; }
     public uint Field08 { get; set; }
     public uint Field0C { get; set; }
@@ -29,11 +30,21 @@ public class ProjectChunk : IChunk
         writer.Write(Signature);
         writer.Write(0); // Size
 
+        var start = writer.At();
         writer.Write(Field08);
         writer.Write(Field0C);
         writer.WriteObjectOffset(Root);
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-        writer.Write(BinaryHelper.MakeSignature<uint>("DXL."));
+        writer.Write(BinaryHelper.MakeSignature<uint>(writer.Endianness == BinaryHelper.PlatformEndianness ? "LXD." : "DXL."));
         writer.WriteObjectOffset(Fonts);
+        writer.Flush();
+        writer.Align(16);
+        var end = writer.At();
+
+        var size = (long)end - (long)start;
+        writer.At((long)start - sizeof(int), SeekOrigin.Begin);
+        writer.Write((int)size);
+        
+        end.Dispose();
     }
 }

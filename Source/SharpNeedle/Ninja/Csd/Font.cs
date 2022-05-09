@@ -1,4 +1,4 @@
-﻿namespace SharpNeedle.Ninja.Cell;
+﻿namespace SharpNeedle.Ninja.Csd;
 
 public class Font : List<CharacterMapping>, IBinarySerializable
 {
@@ -14,10 +14,4 @@ public class Font : List<CharacterMapping>, IBinarySerializable
         writer.Write(Count);
         writer.WriteCollectionOffset(this);
     }
-}
-
-public struct CharacterMapping
-{
-    public int SourceIndex;
-    public int DestinationIndex;
 }

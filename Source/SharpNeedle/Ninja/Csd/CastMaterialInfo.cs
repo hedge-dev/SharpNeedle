@@ -1,4 +1,4 @@
-namespace SharpNeedle.Ninja.Cell;
+namespace SharpNeedle.Ninja.Csd;
 
 public class CastMaterialInfo : IBinarySerializable
 {
