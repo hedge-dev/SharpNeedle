@@ -4,7 +4,7 @@ using Csd;
 
 public class InfoChunk : IChunk
 {
-    public uint Signature { get; private set; } = BinaryHelper.MakeSignature<uint>("NXIF");
+    public uint Signature { get; set; } = BinaryHelper.MakeSignature<uint>("NXIF");
     public List<IChunk> Chunks { get; set; } = new();
     public OffsetChunk Offsets { get; set; }
     public uint Field1C { get; set; } = 1;
@@ -44,7 +44,7 @@ public class InfoChunk : IChunk
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
-        writer.Write(Signature);
+        writer.WriteLittle(Signature);
         writer.Write(0x18); // Always constant
         writer.Write(Chunks.Count);
 

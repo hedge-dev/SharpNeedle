@@ -68,7 +68,10 @@ public class CsdProject : ResourceBase, IBinarySerializable
         {
             using var stream = Package.GetStream(Package.Add(), true, true);
             using var infoWriter = new BinaryObjectWriter(stream, StreamOwnership.Retain, Endianness);
-            var info = new InfoChunk();
+            var info = new InfoChunk
+            {
+                Signature = BinaryHelper.MakeSignature<uint>(Endianness == Endianness.Little ? "NXIF" : "NYIF"),
+            };
             info.Chunks.Add(chunk);
             infoWriter.WriteObject(info);
         }

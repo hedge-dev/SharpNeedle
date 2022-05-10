@@ -27,7 +27,7 @@ public class ProjectChunk : IChunk
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
-        writer.Write(Signature);
+        writer.WriteLittle(Signature);
         writer.Write(0); // Size
 
         var start = writer.At();
@@ -35,7 +35,7 @@ public class ProjectChunk : IChunk
         writer.Write(Field0C);
         writer.WriteObjectOffset(Root);
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-        writer.Write(BinaryHelper.MakeSignature<uint>(writer.Endianness == BinaryHelper.PlatformEndianness ? "LXD." : "DXL."));
+        writer.Write(BinaryHelper.MakeSignature<uint>("LXD."));
         writer.WriteObjectOffset(Fonts);
         writer.Flush();
         writer.Align(16);

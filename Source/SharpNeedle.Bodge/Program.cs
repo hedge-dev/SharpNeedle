@@ -2,8 +2,10 @@
 using SharpNeedle.Ninja.Csd;
 int indent = 0;
 
-var arc = ResourceUtility.Open<CsdProject>(@"D:\Unpacked CPK\Sonic Generations\bb\SonicActionCommonHud\ui_gameplay.xncp");
-arc.Write(FileSystem.Create("ui_gameplay.xncp"));
+var arc = ResourceUtility.Open<CsdProject>(@"ui_playscreen_ev.yncp");
+arc.Endianness = Endianness.Little;
+arc.Write(FileSystem.Create("ui_playscreen_ev.xncp"));
+
 
 var project = arc.Project;
 WriteLine($"{project.Name}:");

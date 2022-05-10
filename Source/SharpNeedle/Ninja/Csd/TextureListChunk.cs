@@ -44,7 +44,7 @@ public class TextureListChunk : List<CsdTexture>, IChunk
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions context)
     {
-        writer.Write(Signature);
+        writer.WriteLittle(Signature);
         writer.Write<int>(0);
 
         var start = writer.At();
