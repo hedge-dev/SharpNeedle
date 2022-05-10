@@ -2,7 +2,7 @@
 
 public class LayerMotion : IBinarySerializable
 {
-    public List<CastMotion> CastMotions { get; set; }
+    public List<CastMotion> CastMotions { get; set; } = new();
     public Layer Layer { get; internal set; }
 
     public LayerMotion()
@@ -17,11 +17,11 @@ public class LayerMotion : IBinarySerializable
 
     public void OnAttach(Layer layer)
     {
-        for (int i = 0; i < layer.Casts.Count; i++)
-            layer.Casts[i].AttachMotion(CastMotions[i]);
-
         for (int i = CastMotions.Count; i < layer.Casts.Count; i++)
             CastMotions.Add(new CastMotion(layer.Casts[i]));
+        
+        for (int i = 0; i < layer.Casts.Count; i++)
+            layer.Casts[i].AttachMotion(CastMotions[i]);
     }
 
     public void Read(BinaryObjectReader reader)
@@ -32,7 +32,10 @@ public class LayerMotion : IBinarySerializable
     public void Write(BinaryObjectWriter writer)
     {
         // Sanity checks
-        for (int i = 0; i < CastMotions.Count && i < Layer.Casts.Count; i++)
+        for (int i = CastMotions.Count; i < Layer.Casts.Count; i++)
+            CastMotions.Add(new CastMotion(Layer.Casts[i]));
+        
+        for (int i = 0; i < CastMotions.Count; i++)
         {
             if (Layer.Casts[i] == CastMotions[i].Cast)
                 continue;
@@ -43,9 +46,6 @@ public class LayerMotion : IBinarySerializable
             CastMotions[idx] = CastMotions[i];
             CastMotions[i] = temp;
         }
-
-        for (int i = CastMotions.Count; i < Layer.Casts.Count; i++)
-            CastMotions.Add(new CastMotion(Layer.Casts[i]));
 
         writer.WriteObject<BinaryList<CastMotion>>(CastMotions);
     }

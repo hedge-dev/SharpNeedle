@@ -11,13 +11,23 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
     public ICollection<T> Values => Items;
     public bool IsReadOnly => false;
 
-    //public void Insert(string key, T value, int index)
-    //{
-    //    var nameIdx = NameTable.BinarySearch(new NameIndexPair(key, 0), NameIndexPairComparer);
-    //    Items.Insert(index, value);
-    //    NameTable.Add(new NameIndexPair(key, index));
-    //    NameTable.Sort(NameIndexPairComparer);
-    //}
+    public void Insert(string key, T value, int index)
+    {
+        var nameIdx = NameTable.BinarySearch(new NameIndexPair(key, 0), NameIndexPairComparer);
+        if (nameIdx >= 0)
+            throw new Exception($"Key {key} already exists");
+
+        // Fix indices then insert
+        var table = CollectionsMarshal.AsSpan(NameTable);
+        for (int i = 0; i < table.Length; i++)
+        {
+            if (table[i].Index >= index)
+                table[i].Index++;
+        }
+
+        Items.Insert(index, value);
+        NameTable.Insert(~nameIdx, new NameIndexPair(key, index));
+    }
 
     public void Add(KeyValuePair<string, T> item)
     {
@@ -116,6 +126,7 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
             return false;
 
         Items.RemoveAt(NameTable[index].Index);
+        PostRemove(NameTable[index].Index);
         NameTable.RemoveAt(index);
         return true;
     }
@@ -128,7 +139,18 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
 
         NameTable.RemoveAt(index);
         Items.RemoveAt(idx);
+        PostRemove(idx);
         return true;
+    }
+
+    private void PostRemove(int idx)
+    {
+        var table = CollectionsMarshal.AsSpan(NameTable);
+        for (int i = 0; i < table.Length; i++)
+        {
+            if (table[i].Index > idx)
+                table[i].Index--;
+        }
     }
 
     public bool TryGetValue(string key, out T value)
