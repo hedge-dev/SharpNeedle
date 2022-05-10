@@ -36,6 +36,9 @@ public class Motion : IBinarySerializable
 
     public void Write(BinaryObjectWriter writer)
     {
+        // Remove layers we don't have
+        LayerMotions.RemoveAll(x => !Scene.Layers.Contains(x.Layer));
+ 
         // Sanity checks
         for (int i = LayerMotions.Count; i < Scene.Layers.Count; i++)
             LayerMotions.Add(new LayerMotion(Scene.Layers[i]));

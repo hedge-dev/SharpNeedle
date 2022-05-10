@@ -31,6 +31,9 @@ public class LayerMotion : IBinarySerializable
 
     public void Write(BinaryObjectWriter writer)
     {
+        // Remove casts we don't have
+        CastMotions.RemoveAll(x => !Layer.Casts.Contains(x.Cast));
+        
         // Sanity checks
         for (int i = CastMotions.Count; i < Layer.Casts.Count; i++)
             CastMotions.Add(new CastMotion(Layer.Casts[i]));
