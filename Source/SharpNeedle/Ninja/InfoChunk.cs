@@ -11,7 +11,7 @@ public class InfoChunk : IChunk
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
-        options.Header ??= reader.ReadObject<ChunkHeader>();
+        options.Header ??= reader.ReadLittle<ChunkHeader>();
         Signature = options.Header.Value.Signature;
         var chunkCount = reader.Read<int>();
 
@@ -26,12 +26,12 @@ public class InfoChunk : IChunk
             reader.PushOffsetOrigin();
             for (int i = 0; i < chunkCount; i++)
             {
-                var header = reader.ReadObject<ChunkHeader>();
+                var header = reader.ReadLittle<ChunkHeader>();
                 var begin = reader.Position;
                 options.Header = header;
                 if (header.Signature == ProjectChunk.BinSignature)
                     Chunks.Add(reader.ReadObject<ProjectChunk, ChunkBinaryOptions>(options));
-                else if (header.Signature == TextureListChunk.BinSignature)
+                else if (((Signature >> 16) & 0xFFFF) != 0x4C54) // TL
                     Chunks.Add(reader.ReadObject<TextureListChunk, ChunkBinaryOptions>(options));
 
                 reader.At(begin + header.Size, SeekOrigin.Begin);

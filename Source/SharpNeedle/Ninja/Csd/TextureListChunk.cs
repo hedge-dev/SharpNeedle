@@ -9,7 +9,7 @@ public class TextureListChunk : List<CsdTexture>, IChunk
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
-        options.Header ??= reader.ReadObject<ChunkHeader>();
+        options.Header ??= reader.ReadLittle<ChunkHeader>();
         Signature = options.Header.Value.Signature;
 
         Clear();

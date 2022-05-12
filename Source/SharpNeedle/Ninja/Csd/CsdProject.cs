@@ -68,7 +68,9 @@ public class CsdProject : ResourceBase, IBinarySerializable
         };
         
         CreatePackageFile(Project);
-        CreatePackageFile(Textures);
+
+        if (Textures != null)
+            CreatePackageFile(Textures);
 
         writer.WriteObject(Package);
 

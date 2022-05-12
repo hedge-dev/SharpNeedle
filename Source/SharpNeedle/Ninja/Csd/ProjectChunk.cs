@@ -15,7 +15,7 @@ public class ProjectChunk : IChunk
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
-        options.Header ??= reader.ReadObject<ChunkHeader>();
+        options.Header ??= reader.ReadLittle<ChunkHeader>();
         Signature = options.Header.Value.Signature;
         Field08 = reader.Read<uint>();
         Field0C = reader.Read<uint>();
