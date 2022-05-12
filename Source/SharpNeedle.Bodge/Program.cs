@@ -1,17 +1,45 @@
 ﻿// Program for quickly writing temporary things
+using System.Diagnostics;
 using SharpNeedle.Ninja.Csd;
 int indent = 0;
 
-var arc = ResourceUtility.Open<CsdProject>(@"ui_playscreen_ev.yncp");
-arc.Endianness = Endianness.Little;
-arc.Write(FileSystem.Create("ui_playscreen_ev.xncp"));
+var watch = Stopwatch.StartNew();
 
+var shadowCsd = ResourceUtility.Open<CsdProject>(@"Shadow\files\csdFiles\Logo.gncp");
+watch.Stop();
 
-var project = arc.Project;
+Console.WriteLine(watch.Elapsed);
+
+shadowCsd.Project.TextureFormat = TextureFormat.DirectX;
+shadowCsd.Textures = new TextureListChunk
+{
+    new ("000_sega.dds"),
+    new ("001_sonicteam.dds"),
+    new ("002_sega_jp.dds"),
+    new ("003_dolby_gc.dds")
+};
+
+shadowCsd.Endianness = Endianness.Little;
+shadowCsd.Write(FileSystem.Create("Logo.xncp"));
+
+var project = shadowCsd.Project;
+
 WriteLine($"{project.Name}:");
 PushIndentation();
 PrintSceneNode(project.Root);
 PopIndentation();
+
+if (shadowCsd.Textures != null)
+{
+    WriteLine("Textures:");
+    PushIndentation();
+    
+    foreach (var texture in shadowCsd.Textures)
+        WriteLine(texture.Name);
+
+    PopIndentation();
+}
+
 Console.Read();
 
 void PrintSceneNode(SceneNode node)
