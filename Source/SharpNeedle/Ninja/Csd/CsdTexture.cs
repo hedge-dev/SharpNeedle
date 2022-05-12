@@ -5,7 +5,17 @@ public class CsdTexture : IBinarySerializable
     public string Name { get; set; }
     public byte[] Data { get; set; }
     public int MemoryDataIndex { get; internal set; }
-    
+
+    public CsdTexture()
+    {
+
+    }
+
+    public CsdTexture(string name)
+    {
+        Name = name;
+    }
+
     public void Read(BinaryObjectReader reader)
     {
         Name = reader.ReadStringOffset();
