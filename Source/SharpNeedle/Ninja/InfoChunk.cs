@@ -15,6 +15,10 @@ public class InfoChunk : IChunk
         Signature = options.Header.Value.Signature;
         var chunkCount = reader.Read<int>();
 
+        // Check if Signature ends with IF
+        if (((Signature >> 16) & 0xFFFF) != 0x4649)
+            throw new InvalidDataException($"Invalid Signature: 0x{Signature:X}");
+
         Chunks.Clear();
         Chunks.Capacity = chunkCount;
         reader.ReadOffset(() =>

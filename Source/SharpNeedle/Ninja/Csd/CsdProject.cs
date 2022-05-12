@@ -35,19 +35,27 @@ public class CsdProject : ResourceBase, IBinarySerializable
         {
             var stream = Package.GetStream(i);
             using var infoReader = new BinaryObjectReader(stream, StreamOwnership.Transfer, Package.Endianness);
-            var info = infoReader.ReadObject<InfoChunk>();
-            foreach (var chunk in info.Chunks)
+            try
             {
-                switch (chunk)
+                var info = infoReader.ReadObject<InfoChunk>();
+                foreach (var chunk in info.Chunks)
                 {
-                    case ProjectChunk project:
-                        Project = project;
-                        break;
-                    
-                    case TextureListChunk tl:
-                        Textures = tl;
-                        break;
+                    switch (chunk)
+                    {
+                        case ProjectChunk project:
+                            Project = project;
+                            break;
+
+                        case TextureListChunk tl:
+                            Textures = tl;
+                            break;
+                    }
                 }
+            }
+            catch(Exception e)
+            {
+                if (e is not InvalidDataException)
+                    throw;
             }
         }
     }

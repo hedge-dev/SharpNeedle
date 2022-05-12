@@ -7,6 +7,7 @@ public class ProjectChunk : IChunk
     public static readonly uint BinSignature = BinaryHelper.MakeSignature<uint>("nCPJ");
     public uint Signature { get; private set; } = BinSignature;
     public string Name { get; set; }
+    public TextureFormat TextureFormat { get; set; }
     public uint Field08 { get; set; }
     public uint Field0C { get; set; }
     public SceneNode Root { get; set; }
@@ -21,7 +22,7 @@ public class ProjectChunk : IChunk
         Root = reader.ReadObjectOffset<SceneNode>();
         Name = reader.ReadStringOffset();
 
-        var dxlSig = reader.Read<uint>(); // ???
+        TextureFormat = reader.Read<TextureFormat>();
         Fonts = reader.ReadObjectOffset<FontCollection>();
     }
 
@@ -35,7 +36,7 @@ public class ProjectChunk : IChunk
         writer.Write(Field0C);
         writer.WriteObjectOffset(Root);
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-        writer.Write(BinaryHelper.MakeSignature<uint>("LXD."));
+        writer.Write(TextureFormat);
         writer.WriteObjectOffset(Fonts);
         writer.Flush();
         writer.Align(16);
@@ -47,4 +48,11 @@ public class ProjectChunk : IChunk
         
         end.Dispose();
     }
+}
+
+public enum TextureFormat
+{
+    Unknown = 0,
+    DirectX = 0x2E44584C,
+    RenderWare = 0x2E525754,
 }
