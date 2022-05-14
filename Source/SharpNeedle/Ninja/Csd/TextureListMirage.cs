@@ -1,7 +1,7 @@
 ﻿namespace SharpNeedle.Ninja.Csd;
 using System.IO;
 
-public class TextureListDXL : ITextureList
+public class TextureListMirage : ITextureList
 {
     public static readonly uint BinSignature = BinaryHelper.MakeSignature<uint>("NXTL");
     public uint Signature { get; private set; } = BinSignature;

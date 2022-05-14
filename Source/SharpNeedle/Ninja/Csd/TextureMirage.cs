@@ -1,17 +1,17 @@
 ﻿namespace SharpNeedle.Ninja.Csd;
 
-public class TextureDXL : IBinarySerializable, ITexture
+public class TextureMirage : IBinarySerializable, ITexture
 {
     public string Name { get; set; }
     public byte[] Data { get; set; }
     public int MemoryDataIndex { get; internal set; }
 
-    public TextureDXL()
+    public TextureMirage()
     {
 
     }
 
-    public TextureDXL(string name)
+    public TextureMirage(string name)
     {
         Name = name;
     }

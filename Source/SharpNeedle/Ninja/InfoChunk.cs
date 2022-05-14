@@ -40,7 +40,7 @@ public class InfoChunk : IChunk
                             break;
                         
                         default:
-                            Chunks.Add(reader.ReadObject<TextureListDXL, ChunkBinaryOptions>(options));
+                            Chunks.Add(reader.ReadObject<TextureListMirage, ChunkBinaryOptions>(options));
                             break;
                     }
                 }
