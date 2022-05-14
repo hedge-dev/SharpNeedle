@@ -1,17 +1,17 @@
 ﻿namespace SharpNeedle.Ninja.Csd;
 
-public class CsdTexture : IBinarySerializable
+public class TextureDXL : IBinarySerializable, ITexture
 {
     public string Name { get; set; }
     public byte[] Data { get; set; }
     public int MemoryDataIndex { get; internal set; }
 
-    public CsdTexture()
+    public TextureDXL()
     {
 
     }
 
-    public CsdTexture(string name)
+    public TextureDXL(string name)
     {
         Name = name;
     }
@@ -30,5 +30,10 @@ public class CsdTexture : IBinarySerializable
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         
         writer.Write(MemoryDataIndex);
+    }
+
+    public override string ToString()
+    {
+        return Name;
     }
 }

@@ -1,4 +1,5 @@
 ﻿namespace SharpNeedle.Ninja;
+using Csd;
 
 public interface IChunk : IBinarySerializable<ChunkBinaryOptions>
 {
@@ -8,4 +9,5 @@ public interface IChunk : IBinarySerializable<ChunkBinaryOptions>
 public struct ChunkBinaryOptions
 {
     public ChunkHeader? Header;
+    public TextureFormat TextureFormat;
 }

@@ -55,4 +55,5 @@ public enum TextureFormat
     Unknown = 0,
     DirectX = 0x2E44584C,
     RenderWare = 0x2E525754,
+    NextNinja = 0x2E54584C,
 }

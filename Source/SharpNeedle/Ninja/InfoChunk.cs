@@ -32,7 +32,18 @@ public class InfoChunk : IChunk
                 if (header.Signature == ProjectChunk.BinSignature)
                     Chunks.Add(reader.ReadObject<ProjectChunk, ChunkBinaryOptions>(options));
                 else if (((Signature >> 16) & 0xFFFF) != 0x4C54) // TL
-                    Chunks.Add(reader.ReadObject<TextureListChunk, ChunkBinaryOptions>(options));
+                {
+                    switch (options.TextureFormat)
+                    {
+                        case TextureFormat.NextNinja:
+                            Chunks.Add(reader.ReadObject<TextureListNN, ChunkBinaryOptions>(options));
+                            break;
+                        
+                        default:
+                            Chunks.Add(reader.ReadObject<TextureListDXL, ChunkBinaryOptions>(options));
+                            break;
+                    }
+                }
 
                 reader.At(begin + header.Size, SeekOrigin.Begin);
             }

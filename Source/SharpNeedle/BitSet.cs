@@ -16,6 +16,29 @@ public struct BitSet<T> : IEnumerable<bool> where T : IBinaryInteger<T>, IShiftO
             Set(NumberHelper.Create<int, T>(bit));
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public T GetField(Range range)
+    {
+        unchecked
+        {
+            var start = range.Start.IsFromEnd ? BitCount - range.Start.Value : range.Start.Value;
+            var end = range.End.IsFromEnd ? BitCount - range.End.Value : range.End.Value;
+            return Value >> start & ((T.One << end - start) - T.One);
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public void SetField(Range range, int value)
+    {
+        unchecked
+        {
+            var start = range.Start.IsFromEnd ? BitCount - range.Start.Value : range.Start.Value;
+            var end = range.End.IsFromEnd ? BitCount - range.End.Value : range.End.Value;
+            var mask = ((T.One << end - start) - T.One) << start;
+            Value = (Value & mask) | T.Create(value & ((1 << end - start) - 1));
+        }
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Test(int bit) => (Value & T.One << bit) != T.Zero;
 

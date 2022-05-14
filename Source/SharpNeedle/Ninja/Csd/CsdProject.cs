@@ -1,12 +1,12 @@
 ﻿namespace SharpNeedle.Ninja.Csd;
 using System.IO;
 
-[NeedleResource("nn/csd-project", @"\.[xy]ncp$")]
+[NeedleResource("nn/csd-project", @"\.[gsxy]ncp$")]
 public class CsdProject : ResourceBase, IBinarySerializable
 {
     public CsdPackage Package { get; set; }
     public ProjectChunk Project { get; set; }
-    public TextureListChunk Textures { get; set; }
+    public ITextureList Textures { get; set; }
     public Endianness Endianness { get; set; }
 
     public override void Read(IFile file)
@@ -31,22 +31,24 @@ public class CsdProject : ResourceBase, IBinarySerializable
     {
         Package = reader.ReadObject<CsdPackage>();
         Endianness = Package.Endianness;
+        var options = new ChunkBinaryOptions();
         for (int i = 0; i < Package.Files.Count; i++)
         {
             var stream = Package.GetStream(i);
             using var infoReader = new BinaryObjectReader(stream, StreamOwnership.Transfer, Package.Endianness);
             try
             {
-                var info = infoReader.ReadObject<InfoChunk>();
+                var info = infoReader.ReadObject<InfoChunk, ChunkBinaryOptions>(options);
                 foreach (var chunk in info.Chunks)
                 {
                     switch (chunk)
                     {
                         case ProjectChunk project:
                             Project = project;
+                            options.TextureFormat = project.TextureFormat;
                             break;
 
-                        case TextureListChunk tl:
+                        case ITextureList tl:
                             Textures = tl;
                             break;
                     }
@@ -67,6 +69,11 @@ public class CsdProject : ResourceBase, IBinarySerializable
             Endianness = Endianness
         };
         
+        if (Textures is TextureListDXL)
+            Project.TextureFormat = TextureFormat.DirectX;
+        else if (Textures is TextureListNN)
+            Project.TextureFormat = TextureFormat.NextNinja;
+
         CreatePackageFile(Project);
 
         if (Textures != null)
