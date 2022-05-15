@@ -180,9 +180,17 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
 
     public IEnumerator<KeyValuePair<string, T>> GetEnumerator()
     {
-        return Items.Select(x =>
-                new KeyValuePair<string, T>(NameTable[NameTable.FindIndex(y => y.Index == Items.IndexOf(x))].Name, x))
-            .GetEnumerator();
+        for (int i = 0; i < Items.Count; i++)
+        {
+            for (int j = 0; j < NameTable.Count; j++)
+            {
+                if (NameTable[j].Index == i)
+                {
+                    yield return new KeyValuePair<string, T>(NameTable[j].Name, Items[i]);
+                    break;
+                }
+            }
+        }
     }
 
     IEnumerator IEnumerable.GetEnumerator()
