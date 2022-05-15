@@ -1,13 +1,13 @@
 ﻿namespace SharpNeedle.Ninja.Csd;
 using Motions;
 
-public class Cast : IBinarySerializable<Layer>, IList<Cast>
+public class Cast : IBinarySerializable<Family>, IList<Cast>
 {
     private int mPriority;
     public int Count => Children.Count;
     public bool IsReadOnly => false;
 
-    public Layer Layer { get; internal set; }
+    public Family Family { get; internal set; }
     public Cast Parent { get; set; }
     public string Name { get; set; }
     public uint Field00 { get; set; }
@@ -43,11 +43,11 @@ public class Cast : IBinarySerializable<Layer>, IList<Cast>
             mPriority = value;
 
             if (oldPriority != mPriority)
-                Layer?.NotifyPriorityChanged(this);
+                Family?.NotifyPriorityChanged(this);
         }
     }
     
-    public void Read(BinaryObjectReader reader, Layer layer)
+    public void Read(BinaryObjectReader reader, Family family)
     {
         Field00 = reader.Read<uint>();
         Field04 = reader.Read<uint>();
@@ -69,7 +69,7 @@ public class Cast : IBinarySerializable<Layer>, IList<Cast>
         
         Field4C = reader.Read<uint>();
 
-        if (layer.Scene.Version >= 3)
+        if (family.Scene.Version >= 3)
         {
             Width = reader.Read<uint>();
             Height = reader.Read<uint>();
@@ -82,7 +82,7 @@ public class Cast : IBinarySerializable<Layer>, IList<Cast>
         }
     }
 
-    public void Write(BinaryObjectWriter writer, Layer layer)
+    public void Write(BinaryObjectWriter writer, Family family)
     {
         writer.Write(Field00);
         writer.Write(Field04);
@@ -106,8 +106,8 @@ public class Cast : IBinarySerializable<Layer>, IList<Cast>
 
         writer.Write(Field4C);
 
-        layer ??= Layer;
-        if (layer.Scene.Version >= 3)
+        family ??= Family;
+        if (family.Scene.Version >= 3)
         {
             writer.Write(Width);
             writer.Write(Height);
@@ -130,8 +130,8 @@ public class Cast : IBinarySerializable<Layer>, IList<Cast>
         if (item == null)
             throw new ArgumentNullException(nameof(item));
         
-        Layer?.NotifyCastAdded(item);
-        item.Layer = Layer;
+        Family?.NotifyCastAdded(item);
+        item.Family = Family;
         item.Parent = this;
         Children.Add(item);
     }
@@ -141,7 +141,7 @@ public class Cast : IBinarySerializable<Layer>, IList<Cast>
         foreach (var child in this)
         {
             child.Parent = null;
-            Layer?.NotifyCastRemoved(child);
+            Family?.NotifyCastRemoved(child);
         }
         
         Children.Clear();
@@ -164,7 +164,7 @@ public class Cast : IBinarySerializable<Layer>, IList<Cast>
 
         Children.Remove(item);
         item.Parent = null;
-        Layer?.NotifyCastRemoved(item);
+        Family?.NotifyCastRemoved(item);
         return true;
     }
 
@@ -179,14 +179,14 @@ public class Cast : IBinarySerializable<Layer>, IList<Cast>
             throw new ArgumentNullException(nameof(item));
 
         item.Parent = this;
-        Layer?.NotifyCastAdded(item);
+        Family?.NotifyCastAdded(item);
         Children.Insert(index, item);
     }
 
     public void RemoveAt(int index)
     {
         Children[index].Parent = null;
-        Layer?.NotifyCastRemoved(Children[index]);
+        Family?.NotifyCastRemoved(Children[index]);
         Children.RemoveAt(index);
     }
 

@@ -1,7 +1,7 @@
 ﻿namespace SharpNeedle.Ninja.Csd;
 using Motions;
 
-public class Layer : IBinarySerializable<Scene>, IList<Cast>
+public class Family : IBinarySerializable<Scene>, IList<Cast>
 {
     public int Count => Children.Count;
     public bool IsReadOnly => false;
@@ -11,9 +11,9 @@ public class Layer : IBinarySerializable<Scene>, IList<Cast>
     public IReadOnlyList<Cast> Casts => CastBuffer;
     public Scene Scene { get; set; }
 
-    public void AttachMotion(LayerMotion motion)
+    public void AttachMotion(FamilyMotion motion)
     {
-        motion.Layer = this;
+        motion.Family = this;
         motion.OnAttach(this);
     }
 
@@ -25,7 +25,7 @@ public class Layer : IBinarySerializable<Scene>, IList<Cast>
         reader.ReadOffset(() =>
         {
             for (int i = 0; i < castCount; i++)
-                CastBuffer.Add(reader.ReadObjectOffset<Cast, Layer>(this));
+                CastBuffer.Add(reader.ReadObjectOffset<Cast, Family>(this));
         });
         
         var root = reader.Read<int>();
@@ -38,7 +38,7 @@ public class Layer : IBinarySerializable<Scene>, IList<Cast>
         {
             var cast = CastBuffer[i];
             cast.Priority = i;
-            cast.Layer = this;
+            cast.Family = this;
             if (cast.Parent == null)
                 Children.Add(cast);
         }
@@ -119,9 +119,9 @@ public class Layer : IBinarySerializable<Scene>, IList<Cast>
 
     private void TakeOwnership(Cast cast)
     {
-        cast.Layer?.Disown(cast);
+        cast.Family?.Disown(cast);
         
-        cast.Layer = this;
+        cast.Family = this;
         CastBuffer.Add(cast);
         foreach (var child in cast)
             TakeOwnership(child);
@@ -172,7 +172,7 @@ public class Layer : IBinarySerializable<Scene>, IList<Cast>
     public void Clear()
     {
         foreach (var cast in CastBuffer)
-            cast.Layer = null;
+            cast.Family = null;
         
         Children.Clear();
         CastBuffer.Clear();
@@ -190,7 +190,7 @@ public class Layer : IBinarySerializable<Scene>, IList<Cast>
 
     public bool Remove(Cast item)
     {
-        if (item?.Layer != this)
+        if (item?.Family != this)
             return false;
 
         Children.Remove(item);

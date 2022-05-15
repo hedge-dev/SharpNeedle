@@ -1,14 +1,14 @@
 ﻿namespace SharpNeedle.Ninja.Csd.Motions;
 
-public class GroupAnimationData2List : IBinarySerializable<Layer>
+public class GroupAnimationData2List : IBinarySerializable<Family>
 {
-    public Layer Target { get; set; }
-    public void Read(BinaryObjectReader reader, Layer context)
+    public Family Target { get; set; }
+    public void Read(BinaryObjectReader reader, Family context)
     {
         Target = context;
     }
 
-    public void Write(BinaryObjectWriter writer, Layer context)
+    public void Write(BinaryObjectWriter writer, Family context)
     {
         throw new NotImplementedException();
     }

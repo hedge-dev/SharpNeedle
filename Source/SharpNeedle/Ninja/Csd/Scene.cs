@@ -10,7 +10,7 @@ public class Scene : IBinarySerializable
     public float AspectRatio { get; set; } = 1.333333F; // Default Aspect Ratio is 4:3
     public List<Vector2> Textures { get; set; } // Size of textures used in the scene
     public List<Sprite> Sprites { get; set; }
-    public List<Layer> Layers { get; set; }
+    public List<Family> Families { get; set; }
     public CsdDictionary<Motion> Motions { get; set; }
 
     public void Read(BinaryObjectReader reader)
@@ -23,12 +23,12 @@ public class Scene : IBinarySerializable
         Textures = new List<Vector2>(reader.ReadArrayOffset<Vector2>(reader.Read<int>()));
         Sprites = new List<Sprite>(reader.ReadArrayOffset<Sprite>(reader.Read<int>()));
 
-        var layerCount = reader.Read<int>();
-        Layers = new List<Layer>(layerCount);
+        var familyCount = reader.Read<int>();
+        Families = new List<Family>(familyCount);
         reader.ReadOffset(() =>
         {
-            for (int i = 0; i < layerCount; i++)
-                Layers.Add(reader.ReadObject<Layer, Scene>(this));
+            for (int i = 0; i < familyCount; i++)
+                Families.Add(reader.ReadObject<Family, Scene>(this));
         });
         
         var castInfo = reader.ReadObject<CastInfoTable>();
@@ -66,7 +66,7 @@ public class Scene : IBinarySerializable
         }
 
         foreach (var item in castInfo)
-            Layers[item.LayerIdx].Casts[item.CastIdx].Name = item.Name;
+            Families[item.FamilyIdx].Casts[item.CastIdx].Name = item.Name;
     }
 
     public void Write(BinaryObjectWriter writer)
@@ -83,11 +83,11 @@ public class Scene : IBinarySerializable
         writer.Write(Sprites.Count);
         writer.WriteArrayOffset(CollectionsMarshal.AsSpan(Sprites).AsMemory());
 
-        writer.Write(Layers.Count);
+        writer.Write(Families.Count);
         writer.WriteOffset(() =>
         {
-            foreach (var layer in Layers)
-                writer.WriteObject(layer);
+            foreach (var family in Families)
+                writer.WriteObject(family);
         });
         
         writer.WriteObject(BuildCastTable());
@@ -118,12 +118,12 @@ public class Scene : IBinarySerializable
     public CastInfoTable BuildCastTable()
     {
         var result = new CastInfoTable();
-        for (int i = 0; i < Layers.Count; i++)
+        for (int i = 0; i < Families.Count; i++)
         {
-            var layer = Layers[i];
-            for (int c = 0; c < layer.Casts.Count; c++)
+            var family = Families[i];
+            for (int c = 0; c < family.Casts.Count; c++)
             {
-                result.Add(new (layer.Casts[c].Name, i, c));
+                result.Add(new (family.Casts[c].Name, i, c));
             }
         }
 

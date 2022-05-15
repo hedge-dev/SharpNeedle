@@ -69,8 +69,8 @@ public class CsdProject : ResourceBase, IBinarySerializable
             Endianness = Endianness
         };
         
-        if (Textures is TextureListDXL)
-            Project.TextureFormat = TextureFormat.DirectX;
+        if (Textures is TextureListMirage)
+            Project.TextureFormat = TextureFormat.Mirage;
         else if (Textures is TextureListNN)
             Project.TextureFormat = TextureFormat.NextNinja;
 

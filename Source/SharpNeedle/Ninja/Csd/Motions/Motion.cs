@@ -4,7 +4,7 @@ public class Motion : IBinarySerializable
 {
     public float StartFrame { get; set; }
     public float EndFrame { get; set; }
-    public List<LayerMotion> LayerMotions { get; set; }
+    public List<FamilyMotion> FamilyMotions { get; set; }
     public Scene Scene { get; internal set; }
 
     public Motion()
@@ -21,48 +21,48 @@ public class Motion : IBinarySerializable
     {
         Scene = scene;
 
-        // Attach to layers that we don't have
-        for (int i = LayerMotions.Count; i < scene.Layers.Count; i++)
-            LayerMotions.Add(new LayerMotion(scene.Layers[i]));
+        // Attach to families that we don't have
+        for (int i = FamilyMotions.Count; i < scene.Families.Count; i++)
+            FamilyMotions.Add(new FamilyMotion(scene.Families[i]));
 
-        for (int i = 0; i < LayerMotions.Count; i++)
-            scene.Layers[i].AttachMotion(LayerMotions[i]);
+        for (int i = 0; i < FamilyMotions.Count; i++)
+            scene.Families[i].AttachMotion(FamilyMotions[i]);
     }
 
     public void Read(BinaryObjectReader reader)
     {
-        LayerMotions = reader.ReadObject<BinaryList<LayerMotion>>();
+        FamilyMotions = reader.ReadObject<BinaryList<FamilyMotion>>();
     }
 
     public void Write(BinaryObjectWriter writer)
     {
-        // Remove layers we don't have
-        LayerMotions.RemoveAll(x => !Scene.Layers.Contains(x.Layer));
+        // Remove families we don't have
+        FamilyMotions.RemoveAll(x => !Scene.Families.Contains(x.Family));
  
         // Sanity checks
-        for (int i = LayerMotions.Count; i < Scene.Layers.Count; i++)
-            LayerMotions.Add(new LayerMotion(Scene.Layers[i]));
+        for (int i = FamilyMotions.Count; i < Scene.Families.Count; i++)
+            FamilyMotions.Add(new FamilyMotion(Scene.Families[i]));
         
-        for (int i = 0; i < LayerMotions.Count; i++)
+        for (int i = 0; i < FamilyMotions.Count; i++)
         {
-            if (Scene.Layers[i] == LayerMotions[i].Layer)
+            if (Scene.Families[i] == FamilyMotions[i].Family)
                 continue;
 
             // Re-arrange motions to fit the palette
-            var idx = Scene.Layers.IndexOf(LayerMotions[i].Layer);
-            var temp = LayerMotions[i];
-            LayerMotions[idx] = LayerMotions[i];
-            LayerMotions[i] = temp;
+            var idx = Scene.Families.IndexOf(FamilyMotions[i].Family);
+            var temp = FamilyMotions[i];
+            FamilyMotions[idx] = FamilyMotions[i];
+            FamilyMotions[i] = temp;
         }
 
-        writer.WriteObject<BinaryList<LayerMotion>>(LayerMotions);
+        writer.WriteObject<BinaryList<FamilyMotion>>(FamilyMotions);
     }
 
     public void ReadExtended(BinaryObjectReader reader)
     {
         reader.ReadOffset(() =>
         {
-            foreach (var motion in LayerMotions)
+            foreach (var motion in FamilyMotions)
                 motion.ReadExtended(reader);
         });
     }
@@ -71,7 +71,7 @@ public class Motion : IBinarySerializable
     {
         writer.WriteOffset(() =>
         {
-            foreach (var motion in LayerMotions)
+            foreach (var motion in FamilyMotions)
                 motion.WriteExtended(writer);
         });
     }
