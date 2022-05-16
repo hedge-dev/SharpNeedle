@@ -27,7 +27,7 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
     public uint Height { get; set; }
     public uint Field58 { get; set; }
     public uint Field5C { get; set; }
-    public Vector2 Offset { get; set; }
+    public Vector2 Origin { get; set; }
     public Vector2 Position { get; set; }
     public uint Field70 { get; set; }
     public CastInfo Info { get; set; }
@@ -76,7 +76,7 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
             Field58 = reader.Read<uint>();
             Field5C = reader.Read<uint>();
 
-            Offset = reader.Read<Vector2>();
+            Origin = reader.Read<Vector2>();
             Position = reader.Read<Vector2>();
             Field70 = reader.Read<uint>();
         }
@@ -114,7 +114,7 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
             writer.Write(Field58);
             writer.Write(Field5C);
 
-            writer.Write(Offset);
+            writer.Write(Origin);
             writer.Write(Position);
             writer.Write(Field70);
         }

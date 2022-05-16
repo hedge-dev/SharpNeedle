@@ -74,8 +74,8 @@ public class Scene : IBinarySerializable
         writer.Write(Version);
         writer.Write(Priority);
         writer.Write(FrameRate);
-        writer.Write(Motions.Min(x => x.Value.StartFrame));
-        writer.Write(Motions.Max(x => x.Value.EndFrame));
+        writer.Write(Motions.Count != 0 ? Motions.Min(x => x.Value.StartFrame) : 0);
+        writer.Write(Motions.Count != 0 ? Motions.Max(x => x.Value.EndFrame) : 0);
 
         writer.Write(Textures.Count);
         writer.WriteArrayOffset(CollectionsMarshal.AsSpan(Textures).AsMemory());
