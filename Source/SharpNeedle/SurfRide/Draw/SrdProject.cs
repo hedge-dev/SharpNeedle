@@ -15,7 +15,7 @@ public class SrdProject : ResourceBase, IBinarySerializable<uint>
         BaseFile = file;
         
         using var reader = new BinaryObjectReader(file.Open(), StreamOwnership.Transfer, Endianness.Little);
-        Read(reader, 5);
+        Read(reader, 4);
     }
     
     public override void Write(IFile file)
@@ -24,7 +24,7 @@ public class SrdProject : ResourceBase, IBinarySerializable<uint>
         BaseFile = file;
         
         using var writer = new BinaryObjectWriter(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness);
-        Write(writer, 5);
+        Write(writer, 4);
     }
 
     public void Read(BinaryObjectReader reader, uint version)
