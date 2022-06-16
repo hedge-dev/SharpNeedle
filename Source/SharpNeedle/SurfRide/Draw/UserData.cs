@@ -60,6 +60,7 @@ public class Data : IBinarySerializable<ChunkBinaryOptions>
                 Value = reader.ReadValueOffset<uint>();
                 break;
         }
+        
         if (options.Version >= 3)
             reader.Align(8);
         else
@@ -97,6 +98,7 @@ public class Data : IBinarySerializable<ChunkBinaryOptions>
                 writer.WriteValueOffset(Value.UnsignedInteger);
                 break;
         }
+        
         if (options.Version >= 3)
             writer.Align(8);
         else

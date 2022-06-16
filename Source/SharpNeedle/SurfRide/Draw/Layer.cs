@@ -36,6 +36,7 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>
             default:
                 throw new NotImplementedException();
         }
+        
         var animCount = reader.Read<int>();
         if (options.Version >= 3)
             reader.Align(8);
@@ -83,6 +84,7 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>
             writer.WriteOffsetValue(0);
             writer.WriteOffsetValue(0);
         }
+        
         writer.Write(Animations.Count);
         if (options.Version >= 3)
             writer.Align(8);

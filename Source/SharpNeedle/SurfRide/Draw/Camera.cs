@@ -59,6 +59,7 @@ public class Camera : IBinarySerializable<ChunkBinaryOptions>
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
             writer.Write(ID);
         }
+        
         if (options.Version >= 4)
         {
             writer.Align(16);
@@ -73,6 +74,7 @@ public class Camera : IBinarySerializable<ChunkBinaryOptions>
             writer.Write(Position);
             writer.Write(LookAt);
         }
+        
         writer.Write(Flags);
         writer.Write(Near);
         writer.Write(Far);

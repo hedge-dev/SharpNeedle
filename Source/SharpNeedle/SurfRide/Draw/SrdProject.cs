@@ -42,6 +42,7 @@ public class SrdProject : ResourceBase, IBinarySerializable<uint>
                     break;
             }
         }
+        
         RevisionDate = info.RevisionDate;
         Endianness = reader.Endianness;
     }

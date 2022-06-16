@@ -77,6 +77,7 @@ public class TextureList : List<Texture>, IBinarySerializable<ChunkBinaryOptions
             writer.OffsetBinaryFormat = OffsetBinaryFormat.U64;
             writer.DefaultAlignment = 8;
         }
+        
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         if (options.Version >= 4)
             writer.Write(Field08);

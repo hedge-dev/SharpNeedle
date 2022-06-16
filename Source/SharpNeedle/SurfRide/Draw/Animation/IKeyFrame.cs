@@ -80,6 +80,7 @@ public struct Union : IBinarySerializable<uint>
             default:
                 throw new NotImplementedException();
         }
+        
         reader.Align(4);
     }
 
@@ -114,6 +115,7 @@ public struct Union : IBinarySerializable<uint>
             default:
                 throw new NotImplementedException();
         }
+
         writer.Align(4);
     }
 }

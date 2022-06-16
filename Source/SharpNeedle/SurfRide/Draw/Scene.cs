@@ -87,6 +87,7 @@ public class Scene : IBinarySerializable<ChunkBinaryOptions>
         {
             writer.WriteOffsetValue(0);
         }
+        
         writer.Write(BackgroundColor);
         writer.Write(FrameSize);
         if (options.Version >= 3)

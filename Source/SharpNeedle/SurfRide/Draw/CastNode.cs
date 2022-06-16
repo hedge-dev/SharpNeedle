@@ -30,6 +30,7 @@ public class CastNode : IBinarySerializable<ChunkBinaryOptions>
                 reader.ReadOffsetValue();
                 break;
         }
+        
         ChildIndex = reader.Read<short>();
         SiblingIndex = reader.Read<short>();
         if (options.Version >= 3)
