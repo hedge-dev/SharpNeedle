@@ -15,6 +15,7 @@ public class ProjectChunk : IChunk
         Signature = options.Header.Value.Signature;
         if (options.Version >= 3)
             reader.OffsetBinaryFormat = OffsetBinaryFormat.U64;
+        
         Project = reader.ReadObjectAtOffset<ProjectNode, ChunkBinaryOptions>((int)start - 8 + reader.Read<int>(), options);
         Field0C = reader.Read<uint>();
     }
@@ -69,8 +70,10 @@ public class ProjectNode : IBinarySerializable<ChunkBinaryOptions>
         EndFrame = reader.Read<uint>();
         if (options.Version >= 1)
             FrameRate = reader.Read<float>();
+        
         if (options.Version >= 3)
             reader.Align(8);
+        
         long userDataOffset = reader.ReadOffsetValue();
         if (userDataOffset != 0)
             UserData = reader.ReadObjectAtOffset<UserData, ChunkBinaryOptions>(userDataOffset, options);
@@ -87,21 +90,26 @@ public class ProjectNode : IBinarySerializable<ChunkBinaryOptions>
             writer.WriteObjectCollectionOffset(options, Scenes);
         else
             writer.WriteOffsetValue(0);
+        
         if (TextureLists.Count != 0)
             writer.WriteOffsetValue(0x30);
         else
             writer.WriteOffsetValue(0);
+        
         if (Fonts.Count != 0)
             writer.WriteObjectCollectionOffset(options, Fonts);
         else
             writer.WriteOffsetValue(0);
+        
         writer.WriteObject(Camera, options);
         writer.Write(StartFrame);
         writer.Write(EndFrame);
         if (options.Version >= 1)
             writer.Write(FrameRate);
+        
         if (options.Version >= 3)
             writer.Align(8);
+        
         if (UserData != null)
             writer.WriteObjectOffset(UserData, options);
         else

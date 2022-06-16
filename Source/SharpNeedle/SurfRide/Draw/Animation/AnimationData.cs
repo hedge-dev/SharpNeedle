@@ -13,12 +13,14 @@ public class AnimationData : List<AnimationLink>, IBinarySerializable<ChunkBinar
         Clear();
         if (options.Version >= 3)
             reader.Align(8);
+        
         Name = reader.ReadStringOffset();
         ID = reader.Read<int>();
         Capacity = reader.Read<int>();
         FrameCount = reader.Read<uint>();
         if (options.Version >= 3)
             reader.Align(8);
+        
         AddRange(reader.ReadObjectArrayOffset<AnimationLink, ChunkBinaryOptions>(options, Capacity));
         if (options.Version >= 1)
         {
@@ -41,16 +43,19 @@ public class AnimationData : List<AnimationLink>, IBinarySerializable<ChunkBinar
     {
         if (options.Version >= 3)
             writer.Align(8);
+        
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         writer.Write(ID);
         writer.Write(Count);
         writer.Write(FrameCount);
         if (options.Version >= 3)
             writer.Align(8);
+        
         if (Count != 0)
             writer.WriteObjectCollectionOffset(options, this);
         else
             writer.WriteOffsetValue(0);
+        
         if (options.Version >= 1)
         {
             if (UserData != null)

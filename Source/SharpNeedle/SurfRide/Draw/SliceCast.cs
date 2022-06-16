@@ -2,7 +2,7 @@
 
 public class SliceCast : ICast
 {
-    public FlagType Flags { get; set; }
+    public CastAttribute Flags { get; set; }
     public float Width { get; set; }
     public float Height { get; set; }
     public Vector2 AnchorPoint { get; set; }
@@ -24,7 +24,7 @@ public class SliceCast : ICast
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
-        Flags = reader.Read<FlagType>();
+        Flags = reader.Read<CastAttribute>();
         Width = reader.Read<float>();
         Height = reader.Read<float>();
         AnchorPoint = reader.Read<Vector2>();
@@ -42,10 +42,12 @@ public class SliceCast : ICast
         Field36 = reader.Read<short>();
         if (options.Version >= 3)
             reader.Align(8);
+        
         if (infoCount != 0)
             Infos.AddRange(reader.ReadArrayOffset<SliceInfo>(infoCount));
         else
             reader.ReadOffsetValue();
+        
         Field40 = reader.ReadOffsetValue();
         Field48 = reader.ReadOffsetValue();
         Slices.AddRange(reader.ReadObjectArray<Slice>(Field2C * Field2E));
@@ -64,17 +66,19 @@ public class SliceCast : ICast
         writer.Write(Field24);
         writer.Write(Field28);
         writer.Write(Field2C);
-        writer.Write<short>(Field2E);
+        writer.Write(Field2E);
         writer.Write(Field30);
         writer.Write(Field32);
         writer.Write((short)Infos.Count);
         writer.Write(Field36);
         if (options.Version >= 3)
             writer.Align(8);
+        
         if (Infos.Count != 0)
             writer.WriteCollectionOffset(Infos);
         else
             writer.WriteOffsetValue(0);
+        
         writer.WriteOffsetValue(Field40);
         writer.WriteOffsetValue(Field48);
         writer.WriteObjectCollection(Slices);

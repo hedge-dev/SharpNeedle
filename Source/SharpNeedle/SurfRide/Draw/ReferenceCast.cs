@@ -12,6 +12,7 @@ public class ReferenceCast : ICast
     {
         if (options.Version >= 3)
             reader.Align(8);
+
         Layer = reader.ReadObjectOffset<Layer, ChunkBinaryOptions>(options);
         Field08 = reader.Read<uint>();
         Field0C = reader.Read<uint>();
@@ -23,6 +24,7 @@ public class ReferenceCast : ICast
     {
         if (options.Version >= 3)
             writer.Align(8);
+        
         writer.WriteObjectOffset(Layer, options);
         writer.Write(Field08);
         writer.Write(Field0C);

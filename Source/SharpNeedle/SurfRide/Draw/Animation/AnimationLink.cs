@@ -11,6 +11,7 @@ public class AnimationLink : IBinarySerializable<ChunkBinaryOptions>
         var trackCount = reader.Read<ushort>();
         if (options.Version >= 3)
             reader.Align(8);
+        
         Tracks.AddRange(reader.ReadObjectArrayOffset<AnimationTrack, ChunkBinaryOptions>(options, trackCount));
     }
 
@@ -20,6 +21,7 @@ public class AnimationLink : IBinarySerializable<ChunkBinaryOptions>
         writer.Write((ushort)Tracks.Count);
         if (options.Version >= 3)
             writer.Align(8);
+        
         writer.WriteObjectCollectionOffset(options, Tracks);
     }
 }

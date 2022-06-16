@@ -8,6 +8,7 @@ public class UserData : List<Data>, IBinarySerializable<ChunkBinaryOptions>
         Capacity = reader.Read<int>();
         if (options.Version >= 3)
             reader.Align(8);
+        
         AddRange(reader.ReadObjectArrayOffset<Data, ChunkBinaryOptions>(options, Capacity));
     }
     
@@ -16,6 +17,7 @@ public class UserData : List<Data>, IBinarySerializable<ChunkBinaryOptions>
         writer.Write(Count);
         if (options.Version >= 3)
             writer.Align(8);
+        
         writer.WriteObjectCollectionOffset(options, this);
     }
 }
@@ -31,10 +33,12 @@ public class Data : IBinarySerializable<ChunkBinaryOptions>
     {
         if (options.Version >= 3)
             reader.Align(8);
+        
         Name = reader.ReadStringOffset();
         Type = reader.Read<int>();
         if (options.Version >= 3)
             reader.Align(8);
+        
         switch (Type)
         {
             case 0:
@@ -66,10 +70,12 @@ public class Data : IBinarySerializable<ChunkBinaryOptions>
     {
         if (options.Version >= 3)
             writer.Align(8);
+        
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         writer.Write(Type);
         if (options.Version >= 3)
             writer.Align(8);
+        
         switch (Type)
         {
             case 0:

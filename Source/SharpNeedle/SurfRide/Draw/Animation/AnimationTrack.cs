@@ -17,6 +17,7 @@ public class AnimationTrack : List<IKeyFrame>, IBinarySerializable<ChunkBinaryOp
         EndFrame = reader.Read<uint>();
         if (options.Version >= 3)
             reader.Align(8);
+        
         switch (Flags & 3)
         {
             case 0:
@@ -45,6 +46,7 @@ public class AnimationTrack : List<IKeyFrame>, IBinarySerializable<ChunkBinaryOp
         writer.Write(EndFrame);
         if (options.Version >= 3)
             writer.Align(8);
+        
         writer.WriteObjectCollectionOffset(Flags, this);
     }
 }

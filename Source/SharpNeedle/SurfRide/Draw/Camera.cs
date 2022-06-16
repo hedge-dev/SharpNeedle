@@ -19,9 +19,11 @@ public class Camera : IBinarySerializable<ChunkBinaryOptions>
         {
             if (options.Version >= 3)
                 reader.Align(8);
+            
             Name = reader.ReadStringOffset();
             ID = reader.Read<int>();
         }
+        
         if (options.Version >= 4)
         {
             reader.Align(16);
@@ -36,6 +38,7 @@ public class Camera : IBinarySerializable<ChunkBinaryOptions>
             Position = reader.Read<Vector3>();
             LookAt = reader.Read<Vector3>();
         }
+        
         Flags = reader.Read<uint>();
         Near = reader.Read<float>();
         Far = reader.Read<float>();
@@ -52,6 +55,7 @@ public class Camera : IBinarySerializable<ChunkBinaryOptions>
         {
             if (options.Version >= 3)
                 writer.Align(8);
+            
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
             writer.Write(ID);
         }

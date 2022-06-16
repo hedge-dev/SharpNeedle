@@ -52,16 +52,20 @@ public class TextureList : List<Texture>, IBinarySerializable<ChunkBinaryOptions
         Clear();
         if (options.Version >= 3)
             reader.OffsetBinaryFormat = OffsetBinaryFormat.U64;
+        
         Name = reader.ReadStringOffset();
         if (options.Version >= 4)
             Field08 = reader.Read<uint>();
-        Capacity = reader.Read<int>();
+        
+        Capacity = reader.Read<int>();      
         if (options.Version >= 3)
             reader.Align(8);
+        
         AddRange(reader.ReadObjectArrayOffset<Texture, ChunkBinaryOptions>(options, Capacity));
         long userDataOffset = reader.ReadOffsetValue();
         if (userDataOffset != 0)
             UserData = reader.ReadObjectAtOffset<UserData, ChunkBinaryOptions>(userDataOffset, options);
+        
         if (options.Version == 0)
             Field14 = reader.Read<uint>();
     }
@@ -76,12 +80,14 @@ public class TextureList : List<Texture>, IBinarySerializable<ChunkBinaryOptions
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         if (options.Version >= 4)
             writer.Write(Field08);
+        
         writer.Write(Count);
         writer.WriteObjectCollectionOffset(options, this);
         if (UserData != null)
             writer.WriteObjectOffset(UserData, options);
         else
             writer.WriteOffsetValue(0);
+        
         if (options.Version == 0)
             writer.Write(Field14);
     }

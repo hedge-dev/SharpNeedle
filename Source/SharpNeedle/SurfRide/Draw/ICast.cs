@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.SurfRide.Draw;
 
-public enum FlagType : uint
+public enum CastAttribute : uint
 {
     Transparent = 1,
     InvertColors = 2,

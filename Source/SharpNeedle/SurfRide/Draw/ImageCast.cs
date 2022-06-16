@@ -34,18 +34,22 @@ public class ImageCast : ICast
         var unknownInfoCount = reader.Read<short>();
         if (options.Version >= 3)
             reader.Align(8);
+        
         if (patternInfoCount > 0)
             Patterns.AddRange(reader.ReadArrayOffset<Pattern>(patternInfoCount));
         else
             reader.ReadOffsetValue();
+        
         if (unknownInfoCount > 0)
             Unknowns.AddRange(reader.ReadArrayOffset<UnknownInfo>(unknownInfoCount));
         else
             reader.ReadOffsetValue();
+        
         if ((Flags & 0xF00) == 0x100)
             FontData = reader.ReadObjectOffset<FontData, ChunkBinaryOptions>(options);
         else
             reader.ReadOffsetValue();
+        
         Field38 = reader.ReadOffsetValue();
         Field40 = reader.ReadOffsetValue();
     }
@@ -66,18 +70,22 @@ public class ImageCast : ICast
         writer.Write((ushort)Unknowns.Count);
         if (options.Version >= 3)
             writer.Align(8);
+        
         if (Patterns.Count != 0)
             writer.WriteCollectionOffset(Patterns);
         else
             writer.WriteOffsetValue(0);
+        
         if (Unknowns.Count != 0)
             writer.WriteCollectionOffset(Unknowns);
         else
             writer.WriteOffsetValue(0);
+        
         if (FontData != null)
             writer.WriteObjectOffset(FontData, options);
         else
             writer.WriteOffsetValue(0);
+        
         writer.WriteOffsetValue(Field38);
         writer.WriteOffsetValue(Field40);
     }
@@ -115,6 +123,7 @@ public class FontData : IBinarySerializable<ChunkBinaryOptions>
         FontListIndex = reader.Read<uint>();
         if (options.Version >= 3)
             reader.Align(8);
+        
         Characters = reader.ReadStringOffset();
         Scale = reader.Read<Vector2>();
         Field14 = reader.Read<uint>();
@@ -123,6 +132,7 @@ public class FontData : IBinarySerializable<ChunkBinaryOptions>
         Field1E = reader.Read<ushort>();
         if (options.Version >= 3)
             reader.Align(8);
+        
         Font = reader.ReadObjectOffset<Font, ChunkBinaryOptions>(options);
     }
 
@@ -132,6 +142,7 @@ public class FontData : IBinarySerializable<ChunkBinaryOptions>
         writer.Write(FontListIndex);
         if (options.Version >= 3)
             writer.Align(8);
+        
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Characters);
         writer.Write(Scale);
         writer.Write(Field14);
@@ -140,6 +151,7 @@ public class FontData : IBinarySerializable<ChunkBinaryOptions>
         writer.Write(Field1E);
         if (options.Version >= 3)
             writer.Align(8);
+        
         writer.WriteObjectOffset(Font, options);
     }
 }

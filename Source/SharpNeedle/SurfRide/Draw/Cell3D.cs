@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.SurfRide.Draw;
 
-public class CastCell3D : ICastCell
+public class CastCell3D : ICell
 {
     public uint Color { get; set; }
     public byte Field04 { get; set; }

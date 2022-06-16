@@ -34,6 +34,7 @@ public class CastNode : IBinarySerializable<ChunkBinaryOptions>
         SiblingIndex = reader.Read<short>();
         if (options.Version >= 3)
             reader.Align(8);
+        
         long userDataOffset = reader.ReadOffsetValue();
         if (userDataOffset != 0)
             UserData = reader.ReadObjectAtOffset<UserData, ChunkBinaryOptions>(userDataOffset, options);
@@ -43,6 +44,7 @@ public class CastNode : IBinarySerializable<ChunkBinaryOptions>
     {
         if (options.Version >= 3)
             writer.Align(8);
+        
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         writer.Write(ID);
         writer.Write(Flags);
@@ -50,10 +52,12 @@ public class CastNode : IBinarySerializable<ChunkBinaryOptions>
             writer.WriteObjectOffset(Cast, options);
         else
             writer.WriteOffsetValue(0);
+        
         writer.Write(ChildIndex);
         writer.Write(SiblingIndex);
         if (options.Version >= 3)
             writer.Align(8);
+        
         if (UserData != null)
             writer.WriteObjectOffset(UserData, options);
         else

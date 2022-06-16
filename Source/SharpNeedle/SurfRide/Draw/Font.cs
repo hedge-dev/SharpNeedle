@@ -15,18 +15,21 @@ public class Font : List<CharacterMapping>, IBinarySerializable<ChunkBinaryOptio
         Clear();
         if (options.Version >= 3)
             reader.Align(8);
+        
         Name = reader.ReadStringOffset();
         ID = reader.Read<int>();
         Field0C = reader.Read<uint>();
         if (options.Version >= 4)
             Field10 = reader.Read<short>();
+        
         Capacity = reader.Read<ushort>();
         Field14 = reader.Read<ushort>();
         if (options.Version >= 3)
             reader.Align(8);
         else
             reader.Align(4);
-        AddRange(reader.ReadObjectArrayOffset<CharacterMapping>(Capacity));
+        
+        AddRange(reader.ReadArrayOffset<CharacterMapping>(Capacity));
         Field20 = reader.ReadOffsetValue();
         long userDataOffset = reader.ReadOffsetValue();
         if (userDataOffset != 0)
@@ -37,18 +40,21 @@ public class Font : List<CharacterMapping>, IBinarySerializable<ChunkBinaryOptio
     {
         if (options.Version >= 3)
             writer.Align(8);
+        
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         writer.Write(ID);
         writer.Write(Field0C);
         if (options.Version >= 4)
             writer.Write(Field10);
+        
         writer.Write((ushort)Count);
         writer.Write(Field14);
         if (options.Version >= 3)
             writer.Align(8);
         else
             writer.Align(4);
-        writer.WriteObjectCollectionOffset(this);
+        
+        writer.WriteCollectionOffset(this);
         writer.WriteOffsetValue(Field20);
         if (UserData != null)
             writer.WriteObjectOffset(UserData, options);
@@ -57,26 +63,10 @@ public class Font : List<CharacterMapping>, IBinarySerializable<ChunkBinaryOptio
     }
 }
 
-public class CharacterMapping : IBinarySerializable
+public struct CharacterMapping
 {
     public ushort Character;
     public ushort TextureListIndex;
     public ushort TextureIndex;
     public ushort SpriteIndex;
-
-    public void Read(BinaryObjectReader reader)
-    {
-        Character = reader.Read<ushort>();
-        TextureListIndex = reader.Read<ushort>();
-        TextureIndex = reader.Read<ushort>();
-        SpriteIndex = reader.Read<ushort>();
-    }
-
-    public void Write(BinaryObjectWriter writer)
-    {
-        writer.Write(Character);
-        writer.Write(TextureListIndex);
-        writer.Write(TextureIndex);
-        writer.Write(SpriteIndex);
-    }
 }
