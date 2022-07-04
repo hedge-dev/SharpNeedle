@@ -2,7 +2,7 @@
 
 public interface ICell : IBinarySerializable<ChunkBinaryOptions>
 {
-    public uint Color { get; set; }
+    public Color<byte> Color { get; set; }
     public byte Field04 { get; set; }
     public byte Field05 { get; set; }
     public byte Field06 { get; set; }
