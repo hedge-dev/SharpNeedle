@@ -39,6 +39,9 @@ public class Texture : List<Image>, IBinarySerializable<ChunkBinaryOptions>
     {
         if (options.Version >= 3)
             writer.Align(8);
+
+        if (options.Version < 5 && FileName != null)
+            Name = FileName;
         
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         if (options.Version >= 5)
