@@ -2,7 +2,7 @@
 
 public class CastCell3D : ICell
 {
-    public uint Color { get; set; }
+    public Color<byte> Color { get; set; }
     public byte Field04 { get; set; }
     public byte Field05 { get; set; }
     public byte Field06 { get; set; }
@@ -17,7 +17,7 @@ public class CastCell3D : ICell
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
-        Color = reader.Read<uint>();
+        Color = reader.Read<Color<byte>>();
         Field04 = reader.Read<byte>();
         Field05 = reader.Read<byte>();
         Field06 = reader.Read<byte>();
