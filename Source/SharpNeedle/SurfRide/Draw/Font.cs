@@ -29,7 +29,7 @@ public class Font : List<CharacterMapping>, IBinarySerializable<ChunkBinaryOptio
         else
             reader.Align(4);
         
-        AddRange(reader.ReadArrayOffset<CharacterMapping>(Capacity));
+        AddRange(reader.ReadObjectArrayOffset<CharacterMapping>(Capacity));
         Field20 = reader.ReadOffsetValue();
         long userDataOffset = reader.ReadOffsetValue();
         if (userDataOffset != 0)
@@ -54,7 +54,7 @@ public class Font : List<CharacterMapping>, IBinarySerializable<ChunkBinaryOptio
         else
             writer.Align(4);
         
-        writer.WriteCollectionOffset(this);
+        writer.WriteObjectCollectionOffset(this);
         writer.WriteOffsetValue(Field20);
         if (UserData != null)
             writer.WriteObjectOffset(UserData, options);
@@ -63,10 +63,26 @@ public class Font : List<CharacterMapping>, IBinarySerializable<ChunkBinaryOptio
     }
 }
 
-public struct CharacterMapping
+public class CharacterMapping : IBinarySerializable
 {
     public ushort Character;
     public ushort TextureListIndex;
     public ushort TextureIndex;
     public ushort SpriteIndex;
+
+    public void Read(BinaryObjectReader reader)
+    {
+        Character = reader.Read<ushort>();
+        TextureListIndex = reader.Read<ushort>();
+        TextureIndex = reader.Read<ushort>();
+        SpriteIndex = reader.Read<ushort>();
+    }
+
+    public void Write(BinaryObjectWriter writer)
+    {
+        writer.Write(Character);
+        writer.Write(TextureListIndex);
+        writer.Write(TextureIndex);
+        writer.Write(SpriteIndex);
+    }
 }
