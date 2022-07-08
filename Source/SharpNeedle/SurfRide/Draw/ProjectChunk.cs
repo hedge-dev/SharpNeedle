@@ -30,7 +30,7 @@ public class ProjectChunk : ProjectNode, IChunk
         var start = writer.At();
         writer.Write(0x10); // Project Offset, untracked
         writer.Write(Field0C);
-        writer.WriteObject((ProjectNode)this, options);
+        base.Write(writer, options);
 
         writer.Flush();
         writer.Align(16);
