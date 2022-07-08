@@ -103,4 +103,19 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>
         else
             writer.WriteOffsetValue(0);
     }
+
+    public CastNode GetCastNode(string name)
+    {
+        return CastNodes.Find(item => item.Name == name);
+    }
+
+    public ICell GetCastCell(string name)
+    {
+        return CastCells[CastNodes.FindIndex(item => item.Name == name)];
+    }
+
+    public AnimationData GetAnimation(string name)
+    {
+        return Animations.Find(item => item.Name == name);
+    }
 }

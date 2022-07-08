@@ -92,4 +92,9 @@ public class TextureList : List<Texture>, IBinarySerializable<ChunkBinaryOptions
         if (options.Version == 0)
             writer.Write(Field14);
     }
+
+    public Texture GetTexture(string name)
+    {
+        return Find(item => item.Name == name);
+    }
 }

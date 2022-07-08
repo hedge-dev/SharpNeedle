@@ -15,7 +15,7 @@ public class SrdProject : ResourceBase, IBinarySerializable<uint>
         BaseFile = file;
         
         using var reader = new BinaryObjectReader(file.Open(), StreamOwnership.Transfer, Endianness.Little);
-        Read(reader, 5);
+        Read(reader, 2);
     }
     
     public override void Write(IFile file)
@@ -24,7 +24,7 @@ public class SrdProject : ResourceBase, IBinarySerializable<uint>
         BaseFile = file;
         
         using var writer = new BinaryObjectWriter(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness);
-        Write(writer, 5);
+        Write(writer, 2);
     }
 
     public void Read(BinaryObjectReader reader, uint version)
@@ -54,5 +54,10 @@ public class SrdProject : ResourceBase, IBinarySerializable<uint>
         info.Chunks.Add(TextureLists);
         info.Chunks.Add(Project);
         writer.WriteObject(info, new ChunkBinaryOptions() { Version = version });
+    }
+
+    public TextureList GetTextureList(string name)
+    {
+        return TextureLists.Find(item => item.Name == name);
     }
 }

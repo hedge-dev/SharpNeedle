@@ -98,4 +98,14 @@ public class Scene : IBinarySerializable<ChunkBinaryOptions>
         else
             writer.WriteOffsetValue(0);
     }
+
+    public Layer GetLayer(string name)
+    {
+        return Layers.Find(item => item.Name == name);
+    }
+
+    public Camera GetCamera(string name)
+    {
+        return Cameras.Find(item => item.Name == name);
+    }
 }
