@@ -6,10 +6,10 @@ public class ImageCast : ICast
     public float Width { get; set; }
     public float Height { get; set; }
     public Vector2 AnchorPoint { get; set; }
-    public uint GradientTopLeft { get; set; }
-    public uint GradientBottomLeft { get; set; }
-    public uint GradientTopRight { get; set; }
-    public uint GradientBottomRight { get; set; }
+    public Color<byte> GradientTopLeft { get; set; }
+    public Color<byte> GradientBottomLeft { get; set; }
+    public Color<byte> GradientTopRight { get; set; }
+    public Color<byte> GradientBottomRight { get; set; }
     public short Field24 { get; set; }
     public short Field26 { get; set; }
     public long Field38 { get; set; }
@@ -24,10 +24,10 @@ public class ImageCast : ICast
         Width = reader.Read<float>();
         Height = reader.Read<float>();
         AnchorPoint = reader.Read<Vector2>();
-        GradientTopLeft = reader.Read<uint>();
-        GradientBottomLeft = reader.Read<uint>();
-        GradientTopRight = reader.Read<uint>();
-        GradientBottomRight = reader.Read<uint>();
+        GradientTopLeft = reader.Read<Color<byte>>();
+        GradientBottomLeft = reader.Read<Color<byte>>();
+        GradientTopRight = reader.Read<Color<byte>>();
+        GradientBottomRight = reader.Read<Color<byte>>();
         Field24 = reader.Read<short>();
         Field26 = reader.Read<short>();
         var patternInfoCount = reader.Read<ushort>();
