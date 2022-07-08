@@ -1,12 +1,11 @@
 ﻿namespace SharpNeedle.SurfRide.Draw;
 using System.IO;
 
-public class ProjectChunk : IChunk
+public class ProjectChunk : ProjectNode, IChunk
 {
     public static readonly uint BinSignature = BinaryHelper.MakeSignature<uint>("SWPR");
     public uint Signature { get; private set; }
     public uint Field0C { get; set; }
-    public ProjectNode Project { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
@@ -15,8 +14,11 @@ public class ProjectChunk : IChunk
         Signature = options.Header.Value.Signature;
         if (options.Version >= 3)
             reader.OffsetBinaryFormat = OffsetBinaryFormat.U64;
-        
-        Project = reader.ReadObjectAtOffset<ProjectNode, ChunkBinaryOptions>((int)start - 8 + reader.Read<int>(), options);
+
+        reader.ReadAtOffset((int)start - 8 + reader.Read<int>(), () =>
+        {
+            base.Read(reader, options);
+        });
         Field0C = reader.Read<uint>();
     }
 
@@ -28,7 +30,7 @@ public class ProjectChunk : IChunk
         var start = writer.At();
         writer.Write(0x10); // Project Offset, untracked
         writer.Write(Field0C);
-        writer.WriteObject(Project, options);
+        writer.WriteObject((ProjectNode)this, options);
 
         writer.Flush();
         writer.Align(16);
@@ -114,5 +116,19 @@ public class ProjectNode : IBinarySerializable<ChunkBinaryOptions>
             writer.WriteObjectOffset(UserData, options);
         else
             writer.WriteOffsetValue(0);
+    }
+
+    public Scene GetScene(string name)
+    {
+        return Scenes.Find(item => item.Name == name);
+    }
+
+    public TextureList GetTextureList(string name)
+    {
+        return TextureLists.Find(item => item.Name == name);
+    }
+    public Font GetFont(string name)
+    {
+        return Fonts.Find(item => item.Name == name);
     }
 }
