@@ -1,12 +1,10 @@
 ﻿namespace SharpNeedle.SurfRide.Draw;
 
-public class ReferenceCast : ICast
+public class ReferenceCast : ICastData
 {
     public Layer Layer { get; set; }
-    public uint Field08 { get; set; }
-    public uint Field0C { get; set; }
-    public uint Field10 { get; set; }
-    public uint Field14 { get; set; }
+    public long Field08 { get; set; }
+    public long Field0C { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
@@ -14,10 +12,8 @@ public class ReferenceCast : ICast
             reader.Align(8);
 
         Layer = reader.ReadObjectOffset<Layer, ChunkBinaryOptions>(options);
-        Field08 = reader.Read<uint>();
-        Field0C = reader.Read<uint>();
-        Field10 = reader.Read<uint>();
-        Field14 = reader.Read<uint>();
+        Field08 = reader.ReadOffsetValue();
+        Field0C = reader.ReadOffsetValue();
     }
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
@@ -26,9 +22,7 @@ public class ReferenceCast : ICast
             writer.Align(8);
         
         writer.WriteObjectOffset(Layer, options);
-        writer.Write(Field08);
-        writer.Write(Field0C);
-        writer.Write(Field10);
-        writer.Write(Field14);
+        writer.WriteOffsetValue(Field08);
+        writer.WriteOffsetValue(Field0C);
     }
 }

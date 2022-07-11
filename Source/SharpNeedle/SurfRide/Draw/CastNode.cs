@@ -7,7 +7,7 @@ public class CastNode : IBinarySerializable<ChunkBinaryOptions>
     public uint Flags { get; set; }
     public short ChildIndex { get; set; }
     public short SiblingIndex { get; set; }
-    public ICast Cast { get; set; }
+    public ICastData Data { get; set; }
     public UserData UserData { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
@@ -18,16 +18,16 @@ public class CastNode : IBinarySerializable<ChunkBinaryOptions>
         switch (Flags & 0xF)
         {
             case 1:
-                Cast = reader.ReadObjectOffset<ImageCast, ChunkBinaryOptions>(options);
+                Data = reader.ReadObjectOffset<ImageCast, ChunkBinaryOptions>(options);
                 break;
             case 2:
-                Cast = reader.ReadObjectOffset<SliceCast, ChunkBinaryOptions>(options);
+                Data = reader.ReadObjectOffset<SliceCast, ChunkBinaryOptions>(options);
                 break;
             case 3:
-                Cast = reader.ReadObjectOffset<ReferenceCast, ChunkBinaryOptions>(options);
+                Data = reader.ReadObjectOffset<ReferenceCast, ChunkBinaryOptions>(options);
                 break;
             default:
-                reader.ReadOffsetValue();
+                reader.ReadOffsetValue(); // 0 == NullCast
                 break;
         }
         
@@ -49,8 +49,8 @@ public class CastNode : IBinarySerializable<ChunkBinaryOptions>
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         writer.Write(ID);
         writer.Write(Flags);
-        if (Cast != null)
-            writer.WriteObjectOffset(Cast, options);
+        if (Data != null)
+            writer.WriteObjectOffset(Data, options);
         else
             writer.WriteOffsetValue(0);
         

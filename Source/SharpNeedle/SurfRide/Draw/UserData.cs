@@ -124,10 +124,10 @@ public struct Union
     public void Set(uint value) => UnsignedInteger = value;
     public void Set(float value) => Float = value;
 
-    public static implicit operator Union(bool value) => new Union(value);
-    public static implicit operator Union(int value) => new Union(value);
-    public static implicit operator Union(uint value) => new Union(value);
-    public static implicit operator Union(float value) => new Union(value);
+    public static implicit operator Union(bool value) => new(value);
+    public static implicit operator Union(int value) => new(value);
+    public static implicit operator Union(uint value) => new(value);
+    public static implicit operator Union(float value) => new(value);
 
     public static implicit operator bool(Union value) => value.Boolean;
     public static implicit operator int(Union value) => value.Integer;
