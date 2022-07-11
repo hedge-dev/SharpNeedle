@@ -35,7 +35,7 @@ public class Track : List<KeyFrame>, IBinarySerializable<ChunkBinaryOptions>
     }
 }
 
-public enum FCurveType
+public enum FCurveType : short
 {
     Tx,
     Ty,
