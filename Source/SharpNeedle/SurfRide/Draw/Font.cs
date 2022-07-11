@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.SurfRide.Draw;
 
-public class Font : List<CharacterMapping>, IBinarySerializable<ChunkBinaryOptions>
+public class Font : List<CharData>, IBinarySerializable<ChunkBinaryOptions>
 {
     public string Name { get; set; }
     public int ID { get; set; }
@@ -29,7 +29,7 @@ public class Font : List<CharacterMapping>, IBinarySerializable<ChunkBinaryOptio
         else
             reader.Align(4);
         
-        AddRange(reader.ReadObjectArrayOffset<CharacterMapping>(Capacity));
+        AddRange(reader.ReadObjectArrayOffset<CharData>(Capacity));
         Field20 = reader.ReadOffsetValue();
         long userDataOffset = reader.ReadOffsetValue();
         if (userDataOffset != 0)
@@ -63,26 +63,26 @@ public class Font : List<CharacterMapping>, IBinarySerializable<ChunkBinaryOptio
     }
 }
 
-public class CharacterMapping : IBinarySerializable
+public class CharData : IBinarySerializable
 {
-    public ushort Character;
+    public ushort Code;
     public ushort TextureListIndex;
     public ushort TextureIndex;
-    public ushort SpriteIndex;
+    public ushort CropIndex;
 
     public void Read(BinaryObjectReader reader)
     {
-        Character = reader.Read<ushort>();
+        Code = reader.Read<ushort>();
         TextureListIndex = reader.Read<ushort>();
         TextureIndex = reader.Read<ushort>();
-        SpriteIndex = reader.Read<ushort>();
+        CropIndex = reader.Read<ushort>();
     }
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.Write(Character);
+        writer.Write(Code);
         writer.Write(TextureListIndex);
         writer.Write(TextureIndex);
-        writer.Write(SpriteIndex);
+        writer.Write(CropIndex);
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.SurfRide.Draw;
 
-public class Texture : List<Image>, IBinarySerializable<ChunkBinaryOptions>
+public class Texture : List<Rectangle>, IBinarySerializable<ChunkBinaryOptions>
 {
     public string Name { get; set; }
     public string FileName { get; set; }
@@ -26,7 +26,7 @@ public class Texture : List<Image>, IBinarySerializable<ChunkBinaryOptions>
         Flags = reader.Read<uint>();
         Capacity = reader.Read<int>();
         if (Capacity != 0)
-            AddRange(reader.ReadArrayOffset<Image>(Capacity));
+            AddRange(reader.ReadObjectArrayOffset<Rectangle>(Capacity));
         else
             reader.ReadOffsetValue();
         
@@ -53,7 +53,7 @@ public class Texture : List<Image>, IBinarySerializable<ChunkBinaryOptions>
         writer.Write(Flags);
         writer.Write(Count);
         if (Count != 0)
-            writer.WriteCollectionOffset(this);
+            writer.WriteObjectCollectionOffset(this);
         else
             writer.WriteOffsetValue(0);
         
@@ -63,8 +63,26 @@ public class Texture : List<Image>, IBinarySerializable<ChunkBinaryOptions>
             writer.WriteOffsetValue(0);
     }
 }
-public struct Image
+public class Rectangle : IBinarySerializable
 {
-    public Vector2 TopLeft;
-    public Vector2 BottomRight;
+    public float Left { get; set; }
+    public float Top { get; set; }
+    public float Right { get; set; }
+    public float Bottom { get; set; }
+
+    public void Read(BinaryObjectReader reader)
+    {
+        Left = reader.Read<float>();
+        Top = reader.Read<float>();
+        Right = reader.Read<float>();
+        Bottom = reader.Read<float>();
+    }
+    
+    public void Write(BinaryObjectWriter writer)
+    {
+        writer.Write(Left);
+        writer.Write(Top);
+        writer.Write(Right);
+        writer.Write(Bottom);
+    }
 }

@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.SurfRide.Draw;
 
-public class Cell3D : ICell
+public class Cell2D : ICell
 {
     public Color<byte> MaterialColor { get; set; }
     public Color<byte> IlluminationColor { get; set; }
@@ -8,9 +8,9 @@ public class Cell3D : ICell
     public byte Field09 { get; set; }
     public byte Field0A { get; set; }
     public byte Field0B { get; set; }
-    public Vector3 Position { get; set; }
-    public Vector3 Rotation { get; set; }
-    public Vector3 Scale { get; set; }
+    public Vector2 Translation { get; set; }
+    public Vector2 Scale { get; set; }
+    public uint RotationZ { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
@@ -20,21 +20,21 @@ public class Cell3D : ICell
         Field09 = reader.Read<byte>();
         Field0A = reader.Read<byte>();
         Field0B = reader.Read<byte>();
+        Translation = reader.Read<Vector2>();
         if (options.Version >= 4)
         {
             reader.Align(16);
-            Position = reader.Read<Vector3>();
+            Translation = reader.Read<Vector2>();
             reader.Align(16);
-            Rotation = reader.Read<Vector3>();
-            reader.Align(16);
-            Scale = reader.Read<Vector3>();
+            Scale = reader.Read<Vector2>();
+            RotationZ = reader.Read<uint>();
             reader.Align(16);
         }
         else
         {
-            Position = reader.Read<Vector3>();
-            Rotation = reader.Read<Vector3>();
-            Scale = reader.Read<Vector3>();
+            Translation = reader.Read<Vector2>();
+            Scale = reader.Read<Vector2>();
+            RotationZ = reader.Read<uint>();
         }
     }
 
@@ -49,18 +49,17 @@ public class Cell3D : ICell
         if (options.Version >= 4)
         {
             writer.Align(16);
-            writer.Write(Position);
-            writer.Align(16);
-            writer.Write(Rotation);
+            writer.Write(Translation);
             writer.Align(16);
             writer.Write(Scale);
+            writer.Write(RotationZ);
             writer.Align(16);
         }
         else
         {
-            writer.Write(Position);
-            writer.Write(Rotation);
+            writer.Write(Translation);
             writer.Write(Scale);
+            writer.Write(RotationZ);
         }
     }
 }

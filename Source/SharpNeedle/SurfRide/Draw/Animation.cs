@@ -1,10 +1,10 @@
-﻿namespace SharpNeedle.SurfRide.Draw.Animation;
+﻿namespace SharpNeedle.SurfRide.Draw;
 
-public class AnimationData : List<AnimationLink>, IBinarySerializable<ChunkBinaryOptions>
+public class Animation : List<Motion>, IBinarySerializable<ChunkBinaryOptions>
 {
     public string Name { get; set; }
     public int ID { get; set; }
-    public uint FrameCount { get; set; }
+    public uint EndFrame { get; set; }
     public bool IsLooping { get; set; }
     public UserData UserData { get; set; }
 
@@ -17,11 +17,11 @@ public class AnimationData : List<AnimationLink>, IBinarySerializable<ChunkBinar
         Name = reader.ReadStringOffset();
         ID = reader.Read<int>();
         Capacity = reader.Read<int>();
-        FrameCount = reader.Read<uint>();
+        EndFrame = reader.Read<uint>();
         if (options.Version >= 3)
             reader.Align(8);
         
-        AddRange(reader.ReadObjectArrayOffset<AnimationLink, ChunkBinaryOptions>(options, Capacity));
+        AddRange(reader.ReadObjectArrayOffset<Motion, ChunkBinaryOptions>(options, Capacity));
         if (options.Version >= 1)
         {
             long userDataOffset = reader.ReadOffsetValue();
@@ -47,7 +47,7 @@ public class AnimationData : List<AnimationLink>, IBinarySerializable<ChunkBinar
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         writer.Write(ID);
         writer.Write(Count);
-        writer.Write(FrameCount);
+        writer.Write(EndFrame);
         if (options.Version >= 3)
             writer.Align(8);
         

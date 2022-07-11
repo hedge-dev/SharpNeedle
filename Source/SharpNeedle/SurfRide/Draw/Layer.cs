@@ -1,15 +1,14 @@
 ﻿namespace SharpNeedle.SurfRide.Draw;
-using Animation;
 
 public class Layer : IBinarySerializable<ChunkBinaryOptions>
 {
     public string Name { get; set; }
     public int ID { get; set; }
     public uint Flags { get; set; }
-    public uint DefaultAnimationIndex { get; set; }
-    public List<CastNode> CastNodes { get; set; } = new();
-    public List<ICell> CastCells { get; set; } = new();
-    public List<AnimationData> Animations { get; set; } = new();
+    public uint CurrentAnimationIndex { get; set; }
+    public List<CastNode> Nodes { get; set; } = new();
+    public List<ICell> Cells { get; set; } = new();
+    public List<Animation> Animations { get; set; } = new();
     public UserData UserData { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
@@ -24,14 +23,14 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>
         if (options.Version >= 3)
             reader.Align(8);
         
-        CastNodes.AddRange(reader.ReadObjectArrayOffset<CastNode, ChunkBinaryOptions>(options, castCount));
+        Nodes.AddRange(reader.ReadObjectArrayOffset<CastNode, ChunkBinaryOptions>(options, castCount));
         switch (Flags & 0xF)
         {
             case 0:
-                CastCells.AddRange(reader.ReadObjectArrayOffset<CastCell, ChunkBinaryOptions>(options, castCount));
+                Cells.AddRange(reader.ReadObjectArrayOffset<Cell2D, ChunkBinaryOptions>(options, castCount));
                 break;
             case 1:
-                CastCells.AddRange(reader.ReadObjectArrayOffset<CastCell3D, ChunkBinaryOptions>(options, castCount));
+                Cells.AddRange(reader.ReadObjectArrayOffset<Cell3D, ChunkBinaryOptions>(options, castCount));
                 break;
             default:
                 throw new NotImplementedException();
@@ -41,8 +40,8 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>
         if (options.Version >= 3)
             reader.Align(8);
 
-        Animations.AddRange(reader.ReadObjectArrayOffset<AnimationData, ChunkBinaryOptions>(options, animCount));
-        DefaultAnimationIndex = reader.Read<uint>();
+        Animations.AddRange(reader.ReadObjectArrayOffset<Animation, ChunkBinaryOptions>(options, animCount));
+        CurrentAnimationIndex = reader.Read<uint>();
         if (options.Version >= 3)
             reader.Align(8);
         
@@ -59,24 +58,24 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         writer.Write(ID);
         writer.Write(Flags);
-        writer.Write(CastNodes.Count);
+        writer.Write(Nodes.Count);
         if (options.Version >= 3)
             writer.Align(8);
         
-        if (CastNodes.Count != 0)
+        if (Nodes.Count != 0)
         {
-            writer.WriteObjectCollectionOffset(options, CastNodes);
+            writer.WriteObjectCollectionOffset(options, Nodes);
             if (options.Version >= 4)
             {
                 writer.WriteOffset(() =>
                 {
-                    foreach (var cell in CastCells)
+                    foreach (var cell in Cells)
                         writer.WriteObject(cell, options);
                 }, 16);
             }
             else
             {
-                writer.WriteObjectCollectionOffset(options, CastCells);
+                writer.WriteObjectCollectionOffset(options, Cells);
             }
         }
         else
@@ -94,7 +93,7 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>
         else
             writer.WriteOffsetValue(0);
         
-        writer.Write(DefaultAnimationIndex);
+        writer.Write(CurrentAnimationIndex);
         if (options.Version >= 3)
             writer.Align(8);
 
@@ -106,15 +105,15 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>
 
     public CastNode GetCastNode(string name)
     {
-        return CastNodes.Find(item => item.Name == name);
+        return Nodes.Find(item => item.Name == name);
     }
 
     public ICell GetCastCell(string name)
     {
-        return CastCells[CastNodes.FindIndex(item => item.Name == name)];
+        return Cells[Nodes.FindIndex(item => item.Name == name)];
     }
 
-    public AnimationData GetAnimation(string name)
+    public Animation GetAnimation(string name)
     {
         return Animations.Find(item => item.Name == name);
     }
