@@ -2,19 +2,18 @@
 
 public class SliceCastData : IImageDataBase
 {
-    public float Width { get; set; }
-    public float Height { get; set; }
+    public Vector2 Size { get; set; }
     public Vector2 PivotPoint { get; set; }
     public Color<byte> VertexColorTopLeft { get; set; }
     public Color<byte> VertexColorBottomLeft { get; set; }
     public Color<byte> VertexColorTopRight { get; set; }
     public Color<byte> VertexColorBottomRight { get; set; }
-    public float Field24 { get; set; }
-    public float Field28 { get; set; }
+    public float HorizontalFixedSize { get; set; }
+    public float VerticalFixedSize { get; set; }
     public short SliceHorizontalCount { get; set; }
     public short SliceVerticalCount { get; set; }
-    public short Field30 { get; set; }
-    public short Field32 { get; set; }
+    public short HorizontalFixedCount { get; set; }
+    public short VerticalFixedCount { get; set; }
     public long Field40 { get; set; }
     public BlendMode BlendMode { get; set; }
     public UvRotation UvRotation { get; set; }
@@ -32,19 +31,18 @@ public class SliceCastData : IImageDataBase
         TextureFilterMode = (flags & 0x2000) == 0x2000 ? TextureFilterMode.PointSample : TextureFilterMode.Linear;
         UvRotation = (UvRotation)(flags & 0xF0);
 
-        Width = reader.Read<float>();
-        Height = reader.Read<float>();
+        Size = reader.Read<Vector2>();
         PivotPoint = reader.Read<Vector2>();
         VertexColorTopLeft = reader.Read<Color<byte>>();
         VertexColorBottomLeft = reader.Read<Color<byte>>();
         VertexColorTopRight = reader.Read<Color<byte>>();
         VertexColorBottomRight = reader.Read<Color<byte>>();
-        Field24 = reader.Read<float>();
-        Field28 = reader.Read<float>();
+        HorizontalFixedSize = reader.Read<float>();
+        VerticalFixedSize = reader.Read<float>();
         SliceHorizontalCount = reader.Read<short>();
         SliceVerticalCount = reader.Read<short>();
-        Field30 = reader.Read<short>();
-        Field32 = reader.Read<short>();
+        HorizontalFixedCount = reader.Read<short>();
+        VerticalFixedCount = reader.Read<short>();
         Surface0.CropRefs.Capacity = reader.Read<short>();
         Surface1.CropRefs.Capacity = reader.Read<short>();
         if (options.Version >= 3)
@@ -71,19 +69,18 @@ public class SliceCastData : IImageDataBase
             flags += 0x2000;
 
         writer.Write(flags);
-        writer.Write(Width);
-        writer.Write(Height);
+        writer.Write(Size);
         writer.Write(PivotPoint);
         writer.Write(VertexColorTopLeft);
         writer.Write(VertexColorBottomLeft);
         writer.Write(VertexColorTopRight);
         writer.Write(VertexColorBottomRight);
-        writer.Write(Field24);
-        writer.Write(Field28);
+        writer.Write(HorizontalFixedSize);
+        writer.Write(VerticalFixedSize);
         writer.Write(SliceHorizontalCount);
         writer.Write(SliceVerticalCount);
-        writer.Write(Field30);
-        writer.Write(Field32);
+        writer.Write(HorizontalFixedCount);
+        writer.Write(VerticalFixedCount);
         writer.Write((short)Surface0.CropRefs.Count);
         writer.Write((short)Surface1.CropRefs.Count);
         if (options.Version >= 3)

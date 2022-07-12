@@ -2,8 +2,7 @@
 
 public interface IImageDataBase : ICastData
 {
-    public float Width { get; set; }
-    public float Height { get; set; }
+    public Vector2 Size { get; set; }
     public Vector2 PivotPoint { get; set; }
     public Color<byte> VertexColorTopLeft { get; set; }
     public Color<byte> VertexColorBottomLeft { get; set; }

@@ -2,8 +2,7 @@
 
 public class ImageCastData : IImageDataBase
 {
-    public float Width { get; set; }
-    public float Height { get; set; }
+    public Vector2 Size { get; set; }
     public Vector2 PivotPoint { get; set; }
     public Color<byte> VertexColorTopLeft { get; set; }
     public Color<byte> VertexColorBottomLeft { get; set; }
@@ -27,8 +26,7 @@ public class ImageCastData : IImageDataBase
         TextureFilterMode = (flags & 0x2000) == 0x2000 ? TextureFilterMode.PointSample : TextureFilterMode.Linear;
         UvRotation = (UvRotation)(flags & 0xF0);
 
-        Width = reader.Read<float>();
-        Height = reader.Read<float>();
+        Size = reader.Read<Vector2>();
         PivotPoint = reader.Read<Vector2>();
         VertexColorTopLeft = reader.Read<Color<byte>>();
         VertexColorBottomLeft = reader.Read<Color<byte>>();
@@ -70,8 +68,7 @@ public class ImageCastData : IImageDataBase
             flags += 0x2000;
 
         writer.Write(flags);
-        writer.Write(Width);
-        writer.Write(Height);
+        writer.Write(Size);
         writer.Write(PivotPoint);
         writer.Write(VertexColorTopLeft);
         writer.Write(VertexColorBottomLeft);
