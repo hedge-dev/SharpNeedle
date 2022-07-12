@@ -1,9 +1,9 @@
 ﻿namespace SharpNeedle.SurfRide.Draw;
 
-public class Texture : List<Rectangle>, IBinarySerializable<ChunkBinaryOptions>
+public class Texture : List<Crop>, IBinarySerializable<ChunkBinaryOptions>
 {
     public string Name { get; set; }
-    public string FileName { get; set; }
+    public string TextureFileName { get; set; }
     public int ID { get; set; }
     public ushort Width { get; set; }
     public ushort Height { get; set; }
@@ -18,7 +18,7 @@ public class Texture : List<Rectangle>, IBinarySerializable<ChunkBinaryOptions>
 
         Name = reader.ReadStringOffset();
         if (options.Version >= 5)
-            FileName = reader.ReadStringOffset();
+            TextureFileName = reader.ReadStringOffset();
         
         ID = reader.Read<int>();
         Width = reader.Read<ushort>();
@@ -26,7 +26,7 @@ public class Texture : List<Rectangle>, IBinarySerializable<ChunkBinaryOptions>
         Flags = reader.Read<uint>();
         Capacity = reader.Read<int>();
         if (Capacity != 0)
-            AddRange(reader.ReadObjectArrayOffset<Rectangle>(Capacity));
+            AddRange(reader.ReadObjectArrayOffset<Crop>(Capacity));
         else
             reader.ReadOffsetValue();
         
@@ -40,12 +40,12 @@ public class Texture : List<Rectangle>, IBinarySerializable<ChunkBinaryOptions>
         if (options.Version >= 3)
             writer.Align(8);
 
-        if (options.Version < 5 && FileName != null)
-            Name = FileName;
+        if (options.Version < 5 && TextureFileName != null)
+            Name = TextureFileName;
         
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         if (options.Version >= 5)
-            writer.WriteStringOffset(StringBinaryFormat.NullTerminated, FileName);
+            writer.WriteStringOffset(StringBinaryFormat.NullTerminated, TextureFileName);
 
         writer.Write(ID);
         writer.Write(Width);
@@ -61,28 +61,5 @@ public class Texture : List<Rectangle>, IBinarySerializable<ChunkBinaryOptions>
             writer.WriteObjectOffset(UserData, options);
         else
             writer.WriteOffsetValue(0);
-    }
-}
-public class Rectangle : IBinarySerializable
-{
-    public float Left { get; set; }
-    public float Top { get; set; }
-    public float Right { get; set; }
-    public float Bottom { get; set; }
-
-    public void Read(BinaryObjectReader reader)
-    {
-        Left = reader.Read<float>();
-        Top = reader.Read<float>();
-        Right = reader.Read<float>();
-        Bottom = reader.Read<float>();
-    }
-    
-    public void Write(BinaryObjectWriter writer)
-    {
-        writer.Write(Left);
-        writer.Write(Top);
-        writer.Write(Right);
-        writer.Write(Bottom);
     }
 }

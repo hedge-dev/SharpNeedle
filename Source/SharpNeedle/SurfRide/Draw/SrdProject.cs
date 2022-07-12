@@ -6,7 +6,7 @@ public class SrdProject : ResourceBase, IBinarySerializable<uint>
 {
     public ProjectChunk Project { get; set; }
     public TextureListChunk TextureLists { get; set; }
-    public int RevisionDate { get; set; }
+    public int Version { get; set; }
     public Endianness Endianness { get; set; } = BinaryHelper.PlatformEndianness;
 
     public override void Read(IFile file)
@@ -43,14 +43,14 @@ public class SrdProject : ResourceBase, IBinarySerializable<uint>
             }
         }
         
-        RevisionDate = info.RevisionDate;
+        Version = info.Version;
         Endianness = reader.Endianness;
     }
     
     public void Write(BinaryObjectWriter writer, uint version)
     {
         var info = new InfoChunk();
-        info.RevisionDate = RevisionDate;
+        info.Version = Version;
         info.Chunks.Add(TextureLists);
         info.Chunks.Add(Project);
         writer.WriteObject(info, new ChunkBinaryOptions() { Version = version });

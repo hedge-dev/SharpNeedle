@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.SurfRide.Draw;
 
-public class ReferenceCast : ICastData
+public class ReferenceCastData : ICastData
 {
     public Layer Layer { get; set; }
     public long Field08 { get; set; }
