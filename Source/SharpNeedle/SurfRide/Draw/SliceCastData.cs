@@ -13,6 +13,8 @@ public class SliceCastData : IImageDataBase
     public float Field28 { get; set; }
     public short SliceHorizontalCount { get; set; }
     public short SliceVerticalCount { get; set; }
+    public short Field30 { get; set; }
+    public short Field32 { get; set; }
     public long Field40 { get; set; }
     public BlendMode BlendMode { get; set; }
     public UvRotation UvRotation { get; set; }
@@ -41,8 +43,8 @@ public class SliceCastData : IImageDataBase
         Field28 = reader.Read<float>();
         SliceHorizontalCount = reader.Read<short>();
         SliceVerticalCount = reader.Read<short>();
-        Surface0.CropIndex = reader.Read<short>();
-        Surface1.CropIndex = reader.Read<short>();
+        Field30 = reader.Read<short>();
+        Field32 = reader.Read<short>();
         Surface0.CropRefs.Capacity = reader.Read<short>();
         Surface1.CropRefs.Capacity = reader.Read<short>();
         if (options.Version >= 3)
@@ -80,8 +82,8 @@ public class SliceCastData : IImageDataBase
         writer.Write(Field28);
         writer.Write(SliceHorizontalCount);
         writer.Write(SliceVerticalCount);
-        writer.Write(Surface0.CropIndex);
-        writer.Write(Surface1.CropIndex);
+        writer.Write(Field30);
+        writer.Write(Field32);
         writer.Write((short)Surface0.CropRefs.Count);
         writer.Write((short)Surface1.CropRefs.Count);
         if (options.Version >= 3)
@@ -113,7 +115,8 @@ public class Slice : IBinarySerializable
     public Color<byte> VertexColorBottomLeft { get; set; }
     public Color<byte> VertexColorTopRight { get; set; }
     public Color<byte> VertexColorBottomRight { get; set; }
-    public uint SliceIndex { get; set; }
+    public short CropIndex0 { get; set; }
+    public short CropIndex1 { get; set; }
 
     public void Read(BinaryObjectReader reader)
     {
@@ -126,7 +129,8 @@ public class Slice : IBinarySerializable
         VertexColorBottomLeft = reader.Read<Color<byte>>();
         VertexColorTopRight = reader.Read<Color<byte>>();
         VertexColorBottomRight = reader.Read<Color<byte>>();
-        SliceIndex = reader.Read<uint>();
+        CropIndex0 = reader.Read<short>();
+        CropIndex1 = reader.Read<short>();
     }
 
     public void Write(BinaryObjectWriter writer)
@@ -140,6 +144,7 @@ public class Slice : IBinarySerializable
         writer.Write(VertexColorBottomLeft);
         writer.Write(VertexColorTopRight);
         writer.Write(VertexColorBottomRight);
-        writer.Write(SliceIndex);
+        writer.Write(CropIndex0);
+        writer.Write(CropIndex1);
     }
 }
