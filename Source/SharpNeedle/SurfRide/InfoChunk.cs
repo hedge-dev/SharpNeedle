@@ -7,7 +7,7 @@ public class InfoChunk : IChunk
     public uint Signature { get; private set; } = BinaryHelper.MakeSignature<uint>("SWIF");
     public List<IChunk> Chunks { get; set; } = new();
     public OffsetChunk Offsets { get; set; }
-    public int RevisionDate { get; set; }
+    public int Version { get; set; }
     
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
@@ -18,10 +18,10 @@ public class InfoChunk : IChunk
 
         var beforeChunk = reader.At();
         reader.Skip(12);
-        RevisionDate = reader.Read<int>();
+        Version = reader.Read<int>();
         if (options.Version <= 2)
         {
-            switch (RevisionDate)
+            switch (Version)
             {
                 case 20100420:
                     options.Version = 0;
@@ -73,7 +73,7 @@ public class InfoChunk : IChunk
         writer.Write(0); // Chunk list size
 
         writer.Write(0); // OffsetChunk Ptr
-        writer.Write(RevisionDate);
+        writer.Write(Version);
         writer.Write(0); // Padding
 
         var chunkBegin = writer.At();

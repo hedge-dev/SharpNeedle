@@ -18,13 +18,13 @@ public class CastNode : IBinarySerializable<ChunkBinaryOptions>
         switch (Flags & 0xF)
         {
             case 1:
-                Data = reader.ReadObjectOffset<ImageCast, ChunkBinaryOptions>(options);
+                Data = reader.ReadObjectOffset<ImageCastData, ChunkBinaryOptions>(options);
                 break;
             case 2:
-                Data = reader.ReadObjectOffset<SliceCast, ChunkBinaryOptions>(options);
+                Data = reader.ReadObjectOffset<SliceCastData, ChunkBinaryOptions>(options);
                 break;
             case 3:
-                Data = reader.ReadObjectOffset<ReferenceCast, ChunkBinaryOptions>(options);
+                Data = reader.ReadObjectOffset<ReferenceCastData, ChunkBinaryOptions>(options);
                 break;
             default:
                 reader.ReadOffsetValue(); // 0 == NullCast

@@ -4,7 +4,7 @@ public class Camera : IBinarySerializable<ChunkBinaryOptions>
 {
     public string Name { get; set; }
     public int ID { get; set; }
-    public uint Flags { get; set; }
+    public uint FieldOfView { get; set; }
     public float NearPlane { get; set; }
     public float FarPlane { get; set; }
     public long Field30 { get; set; }
@@ -38,8 +38,8 @@ public class Camera : IBinarySerializable<ChunkBinaryOptions>
             Position = reader.Read<Vector3>();
             Target = reader.Read<Vector3>();
         }
-        
-        Flags = reader.Read<uint>();
+
+        FieldOfView = reader.Read<uint>();
         NearPlane = reader.Read<float>();
         FarPlane = reader.Read<float>();
         if (options.Version >= 1)
@@ -75,7 +75,7 @@ public class Camera : IBinarySerializable<ChunkBinaryOptions>
             writer.Write(Target);
         }
         
-        writer.Write(Flags);
+        writer.Write(FieldOfView);
         writer.Write(NearPlane);
         writer.Write(FarPlane);
         if (options.Version >= 1)
