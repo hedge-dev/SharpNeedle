@@ -3,8 +3,10 @@
 public class ReferenceCastData : ICastData
 {
     public Layer Layer { get; set; }
-    public long Field08 { get; set; }
-    public long Field0C { get; set; }
+    public int Field04 { get; set; }
+    public int Field08 { get; set; }
+    public int Field0C { get; set; }
+    public int Field10 { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
@@ -12,8 +14,10 @@ public class ReferenceCastData : ICastData
             reader.Align(8);
 
         Layer = reader.ReadObjectOffset<Layer, ChunkBinaryOptions>(options);
-        Field08 = reader.ReadOffsetValue();
-        Field0C = reader.ReadOffsetValue();
+        Field04 = reader.Read<int>();
+        Field08 = reader.Read<int>();
+        Field0C = reader.Read<int>();
+        Field10 = reader.Read<int>();
     }
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
@@ -22,7 +26,9 @@ public class ReferenceCastData : ICastData
             writer.Align(8);
         
         writer.WriteObjectOffset(Layer, options);
-        writer.WriteOffsetValue(Field08);
-        writer.WriteOffsetValue(Field0C);
+        writer.Write(Field04);
+        writer.Write(Field08);
+        writer.Write(Field0C);
+        writer.Write(Field10);
     }
 }
