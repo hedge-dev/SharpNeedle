@@ -2,6 +2,7 @@
 
 public class SliceCastData : IImageDataBase
 {
+    public CastAttribute Flags { get; set; }
     public Vector2 Size { get; set; }
     public Vector2 PivotPoint { get; set; }
     public Color<byte> VertexColorTopLeft { get; set; }
@@ -14,23 +15,14 @@ public class SliceCastData : IImageDataBase
     public short SliceVerticalCount { get; set; }
     public short HorizontalFixedCount { get; set; }
     public short VerticalFixedCount { get; set; }
-    public long Field40 { get; set; }
-    public BlendMode BlendMode { get; set; }
-    public UvRotation UvRotation { get; set; }
-    public TextureFilterMode TextureFilterMode { get; set; }
-    public PivotPosition PivotPosition { get; set; }
+    public long EventOffset { get; set; }
     public ImageCastSurface Surface0 { get; set; } = new();
     public ImageCastSurface Surface1 { get; set; } = new();
     public List<Slice> Slices { get; set; } = new();
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
-        var flags = reader.Read<uint>();
-        BlendMode = (BlendMode)(flags & 0xF);
-        PivotPosition = (PivotPosition)(flags & 0xFF0000);
-        TextureFilterMode = (flags & 0x2000) == 0x2000 ? TextureFilterMode.PointSample : TextureFilterMode.Linear;
-        UvRotation = (UvRotation)(flags & 0xF0);
-
+        Flags = reader.Read<CastAttribute>();
         Size = reader.Read<Vector2>();
         PivotPoint = reader.Read<Vector2>();
         VertexColorTopLeft = reader.Read<Color<byte>>();
@@ -58,17 +50,13 @@ public class SliceCastData : IImageDataBase
         else
             reader.ReadOffsetValue();
 
-        Field40 = reader.ReadOffsetValue();
+        EventOffset = reader.ReadOffsetValue();
         Slices.AddRange(reader.ReadObjectArray<Slice>(SliceHorizontalCount * SliceVerticalCount));
     }
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
-        int flags = (int)BlendMode + (int)UvRotation + (int)PivotPosition;
-        if (TextureFilterMode == TextureFilterMode.PointSample)
-            flags += 0x2000;
-
-        writer.Write(flags);
+        writer.Write(Flags);
         writer.Write(Size);
         writer.Write(PivotPoint);
         writer.Write(VertexColorTopLeft);
@@ -96,7 +84,7 @@ public class SliceCastData : IImageDataBase
         else
             writer.WriteOffsetValue(0);
 
-        writer.WriteOffsetValue(Field40);
+        writer.WriteOffsetValue(EventOffset);
         writer.WriteObjectCollection(Slices);
     }
 }
