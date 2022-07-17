@@ -2,6 +2,7 @@
 
 public class ImageCastData : IImageDataBase
 {
+    public CastAttribute Flags { get; set; }
     public Vector2 Size { get; set; }
     public Vector2 PivotPoint { get; set; }
     public Color<byte> VertexColorTopLeft { get; set; }
@@ -9,23 +10,14 @@ public class ImageCastData : IImageDataBase
     public Color<byte> VertexColorTopRight { get; set; }
     public Color<byte> VertexColorBottomRight { get; set; }
     public long Field38 { get; set; }
-    public long Field3C { get; set; }
-    public BlendMode BlendMode { get; set; }
-    public UvRotation UvRotation { get; set; }
-    public TextureFilterMode TextureFilterMode { get; set; }
-    public PivotPosition PivotPosition { get; set; }
+    public long EventOffset { get; set; }
     public ImageCastSurface Surface0 { get; set; } = new();
     public ImageCastSurface Surface1 { get; set; } = new();
     public FontData FontData { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
-        var flags = reader.Read<uint>();
-        BlendMode = (BlendMode)(flags & 0xF);
-        PivotPosition = (PivotPosition)(flags & 0xFF0000);
-        TextureFilterMode = (flags & 0x2000) == 0x2000 ? TextureFilterMode.PointSample : TextureFilterMode.Linear;
-        UvRotation = (UvRotation)(flags & 0xF0);
-
+        Flags = reader.Read<CastAttribute>();
         Size = reader.Read<Vector2>();
         PivotPoint = reader.Read<Vector2>();
         VertexColorTopLeft = reader.Read<Color<byte>>();
@@ -49,25 +41,18 @@ public class ImageCastData : IImageDataBase
         else
             reader.ReadOffsetValue();
         
-        if ((flags & 0xF00) == 0x100)
+        if ((Flags & CastAttribute.UseFont) == CastAttribute.UseFont)
             FontData = reader.ReadObjectOffset<FontData, ChunkBinaryOptions>(options);
         else
             reader.ReadOffsetValue();
         
         Field38 = reader.ReadOffsetValue();
-        Field3C = reader.ReadOffsetValue();
+        EventOffset = reader.ReadOffsetValue();
     }
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
-        int flags = (int)BlendMode + (int)UvRotation + (int)PivotPosition;
-        if (FontData != null)
-            flags += 0x100;
-
-        if (TextureFilterMode == TextureFilterMode.PointSample)
-            flags += 0x2000;
-
-        writer.Write(flags);
+        writer.Write(Flags);
         writer.Write(Size);
         writer.Write(PivotPoint);
         writer.Write(VertexColorTopLeft);
@@ -97,7 +82,7 @@ public class ImageCastData : IImageDataBase
             writer.WriteOffsetValue(0);
         
         writer.WriteOffsetValue(Field38);
-        writer.WriteOffsetValue(Field3C);
+        writer.WriteOffsetValue(EventOffset);
     }
 }
 
