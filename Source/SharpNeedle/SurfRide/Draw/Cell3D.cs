@@ -9,7 +9,9 @@ public class Cell3D : ICell
     public byte Field0A { get; set; }
     public byte Field0B { get; set; }
     public Vector3 Position { get; set; }
-    public Vector3 Rotation { get; set; }
+    public int RotationX { get; set; }
+    public int RotationY { get; set; }
+    public int RotationZ { get; set; }
     public Vector3 Scale { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
@@ -25,7 +27,9 @@ public class Cell3D : ICell
             reader.Align(16);
             Position = reader.Read<Vector3>();
             reader.Align(16);
-            Rotation = reader.Read<Vector3>();
+            RotationX = reader.Read<int>();
+            RotationY = reader.Read<int>();
+            RotationZ = reader.Read<int>();
             reader.Align(16);
             Scale = reader.Read<Vector3>();
             reader.Align(16);
@@ -33,7 +37,9 @@ public class Cell3D : ICell
         else
         {
             Position = reader.Read<Vector3>();
-            Rotation = reader.Read<Vector3>();
+            RotationX = reader.Read<int>();
+            RotationY = reader.Read<int>();
+            RotationZ = reader.Read<int>();
             Scale = reader.Read<Vector3>();
         }
     }
@@ -51,7 +57,9 @@ public class Cell3D : ICell
             writer.Align(16);
             writer.Write(Position);
             writer.Align(16);
-            writer.Write(Rotation);
+            writer.Write(RotationX);
+            writer.Write(RotationY);
+            writer.Write(RotationZ);
             writer.Align(16);
             writer.Write(Scale);
             writer.Align(16);
@@ -59,7 +67,9 @@ public class Cell3D : ICell
         else
         {
             writer.Write(Position);
-            writer.Write(Rotation);
+            writer.Write(RotationX);
+            writer.Write(RotationY);
+            writer.Write(RotationZ);
             writer.Write(Scale);
         }
     }
