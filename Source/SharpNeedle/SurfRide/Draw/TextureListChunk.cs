@@ -4,7 +4,7 @@ using System.IO;
 public class TextureListChunk : List<TextureList>, IChunk
 {
     public static readonly uint BinSignature = BinaryHelper.MakeSignature<uint>("SWTL");
-    public uint Signature { get; private set; }
+    public uint Signature { get; private set; } = BinSignature;
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
@@ -37,6 +37,11 @@ public class TextureListChunk : List<TextureList>, IChunk
         writer.Write((int)size);
 
         end.Dispose();
+    }
+
+    public TextureList GetTextureList(string name)
+    {
+        return Find(item => item.Name == name);
     }
 }
 

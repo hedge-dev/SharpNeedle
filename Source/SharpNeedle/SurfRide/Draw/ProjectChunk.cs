@@ -4,7 +4,7 @@ using System.IO;
 public class ProjectChunk : ProjectNode, IChunk
 {
     public static readonly uint BinSignature = BinaryHelper.MakeSignature<uint>("SWPR");
-    public uint Signature { get; private set; }
+    public uint Signature { get; private set; } = BinSignature;
     public uint Field0C { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
