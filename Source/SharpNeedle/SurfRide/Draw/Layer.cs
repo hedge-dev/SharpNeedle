@@ -29,9 +29,11 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>
             case 0:
                 Cells.AddRange(reader.ReadObjectArrayOffset<Cell2D, ChunkBinaryOptions>(options, castCount));
                 break;
+
             case 1:
                 Cells.AddRange(reader.ReadObjectArrayOffset<Cell3D, ChunkBinaryOptions>(options, castCount));
                 break;
+
             default:
                 throw new NotImplementedException();
         }

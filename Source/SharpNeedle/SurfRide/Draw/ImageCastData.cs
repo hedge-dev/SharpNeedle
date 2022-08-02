@@ -9,9 +9,8 @@ public class ImageCastData : IImageDataBase
     public Color<byte> VertexColorBottomLeft { get; set; }
     public Color<byte> VertexColorTopRight { get; set; }
     public Color<byte> VertexColorBottomRight { get; set; }
-    public long Field38 { get; set; }
-    public long EventOffset { get; set; }
-    public ImageCastSurface Surface0 { get; set; } = new();
+    public IEffectData Effect { get; set; }
+    public ImageCastSurface Surface { get; set; } = new();
     public ImageCastSurface Surface1 { get; set; } = new();
     public FontData FontData { get; set; }
 
@@ -24,15 +23,15 @@ public class ImageCastData : IImageDataBase
         VertexColorBottomLeft = reader.Read<Color<byte>>();
         VertexColorTopRight = reader.Read<Color<byte>>();
         VertexColorBottomRight = reader.Read<Color<byte>>();
-        Surface0.CropIndex = reader.Read<short>();
+        Surface.CropIndex = reader.Read<short>();
         Surface1.CropIndex = reader.Read<short>();
-        Surface0.CropRefs.Capacity = reader.Read<short>();
+        Surface.CropRefs.Capacity = reader.Read<short>();
         Surface1.CropRefs.Capacity = reader.Read<short>();
         if (options.Version >= 3)
             reader.Align(8);
         
-        if (Surface0.CropRefs.Capacity > 0)
-            Surface0.CropRefs.AddRange(reader.ReadArrayOffset<CropRef>(Surface0.CropRefs.Capacity));
+        if (Surface.CropRefs.Capacity > 0)
+            Surface.CropRefs.AddRange(reader.ReadArrayOffset<CropRef>(Surface.CropRefs.Capacity));
         else
             reader.ReadOffsetValue();
 
@@ -45,9 +44,12 @@ public class ImageCastData : IImageDataBase
             FontData = reader.ReadObjectOffset<FontData, ChunkBinaryOptions>(options);
         else
             reader.ReadOffsetValue();
-        
-        Field38 = reader.ReadOffsetValue();
-        EventOffset = reader.ReadOffsetValue();
+
+        var type = reader.Read<EffectType>();
+        if (options.Version >= 3)
+            reader.Align(8);
+
+        Effect = Utilities.ReadEffectOffset(reader, type, options);
     }
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
@@ -59,15 +61,15 @@ public class ImageCastData : IImageDataBase
         writer.Write(VertexColorBottomLeft);
         writer.Write(VertexColorTopRight);
         writer.Write(VertexColorBottomRight);
-        writer.Write(Surface0.CropIndex);
+        writer.Write(Surface.CropIndex);
         writer.Write(Surface1.CropIndex);
-        writer.Write((short)Surface0.CropRefs.Count);
+        writer.Write((short)Surface.CropRefs.Count);
         writer.Write((short)Surface1.CropRefs.Count);
         if (options.Version >= 3)
             writer.Align(8);
         
-        if (Surface0.CropRefs.Count != 0)
-            writer.WriteCollectionOffset(Surface0.CropRefs);
+        if (Surface.CropRefs.Count != 0)
+            writer.WriteCollectionOffset(Surface.CropRefs);
         else
             writer.WriteOffsetValue(0);
         
@@ -80,9 +82,12 @@ public class ImageCastData : IImageDataBase
             writer.WriteObjectOffset(FontData, options);
         else
             writer.WriteOffsetValue(0);
-        
-        writer.WriteOffsetValue(Field38);
-        writer.WriteOffsetValue(EventOffset);
+
+        writer.Write(Effect?.Type ?? EffectType.None);
+        if (options.Version >= 3)
+            writer.Align(8);
+
+        writer.WriteObjectOffset(Effect, options, 16);
     }
 }
 

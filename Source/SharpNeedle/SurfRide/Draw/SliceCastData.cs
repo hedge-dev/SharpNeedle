@@ -15,9 +15,8 @@ public class SliceCastData : IImageDataBase
     public short SliceVerticalCount { get; set; }
     public short HorizontalFixedCount { get; set; }
     public short VerticalFixedCount { get; set; }
-    public long EventOffset { get; set; }
-    public ImageCastSurface Surface0 { get; set; } = new();
-    public ImageCastSurface Surface1 { get; set; } = new();
+    public IEffectData Effect { get; set; }
+    public ImageCastSurface Surface { get; set; } = new();
     public List<Slice> Slices { get; set; } = new();
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
@@ -35,22 +34,22 @@ public class SliceCastData : IImageDataBase
         SliceVerticalCount = reader.Read<short>();
         HorizontalFixedCount = reader.Read<short>();
         VerticalFixedCount = reader.Read<short>();
-        Surface0.CropRefs.Capacity = reader.Read<short>();
-        Surface1.CropRefs.Capacity = reader.Read<short>();
+        Surface.CropRefs.Capacity = reader.Read<short>();
+        reader.Skip(2); // Alignment
+
         if (options.Version >= 3)
             reader.Align(8);
         
-        if (Surface0.CropRefs.Capacity != 0)
-            Surface0.CropRefs.AddRange(reader.ReadArrayOffset<CropRef>(Surface0.CropRefs.Capacity));
+        if (Surface.CropRefs.Capacity != 0)
+            Surface.CropRefs.AddRange(reader.ReadArrayOffset<CropRef>(Surface.CropRefs.Capacity));
         else
             reader.ReadOffsetValue();
 
-        if (Surface1.CropRefs.Capacity != 0)
-            Surface1.CropRefs.AddRange(reader.ReadArrayOffset<CropRef>(Surface1.CropRefs.Capacity));
-        else
-            reader.ReadOffsetValue();
+        var type = reader.Read<EffectType>();
+        if (options.Version >= 3)
+            reader.Align(8);
 
-        EventOffset = reader.ReadOffsetValue();
+        Effect = Utilities.ReadEffectOffset(reader, type, options);
         Slices.AddRange(reader.ReadObjectArray<Slice>(SliceHorizontalCount * SliceVerticalCount));
     }
 
@@ -69,22 +68,22 @@ public class SliceCastData : IImageDataBase
         writer.Write(SliceVerticalCount);
         writer.Write(HorizontalFixedCount);
         writer.Write(VerticalFixedCount);
-        writer.Write((short)Surface0.CropRefs.Count);
-        writer.Write((short)Surface1.CropRefs.Count);
+        writer.Write((short)Surface.CropRefs.Count);
+        writer.Write((short)0); // Alignment
+
         if (options.Version >= 3)
             writer.Align(8);
         
-        if (Surface0.CropRefs.Count != 0)
-            writer.WriteCollectionOffset(Surface0.CropRefs);
+        if (Surface.CropRefs.Count != 0)
+            writer.WriteCollectionOffset(Surface.CropRefs);
         else
             writer.WriteOffsetValue(0);
 
-        if (Surface1.CropRefs.Count != 0)
-            writer.WriteCollectionOffset(Surface1.CropRefs);
-        else
-            writer.WriteOffsetValue(0);
+        writer.Write(Effect?.Type ?? EffectType.None);
+        if (options.Version >= 3)
+            writer.Align(8);
 
-        writer.WriteOffsetValue(EventOffset);
+        writer.WriteObjectOffset(Effect, options, 16);
         writer.WriteObjectCollection(Slices);
     }
 }

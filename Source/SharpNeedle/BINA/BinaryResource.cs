@@ -8,7 +8,13 @@ public abstract class BinaryResource : ResourceBase, IBinarySerializable
 
     public Version Version { get; set; }
     public uint Size { get; set; }
-    public List<IChunk> Chunks { get; set; } = new();
+    public List<IChunk> Chunks { get; set; } = new(2);
+
+    protected BinaryResource()
+    {
+        Version = new Version(2, 0, 0, BinaryHelper.PlatformEndianness);
+        Chunks.Add(new DataChunk<IBinarySerializable>(this));
+    }
 
     public override void Read(IFile file)
     {
@@ -16,6 +22,7 @@ public abstract class BinaryResource : ResourceBase, IBinarySerializable
         Name = Path.GetFileNameWithoutExtension(file.Name);
         using var reader = new BinaryObjectReader(file.Open(), StreamOwnership.Transfer, Endianness.Little);
 
+        Chunks.Clear();
         var signature = reader.ReadNative<uint>();
         var isV2 = BinaryHelper.EnsureSignature(signature, false, Signature);
         if (isV2)
