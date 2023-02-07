@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle;
 
-public struct BitSet<T> : IEnumerable<bool> where T : IBinaryInteger<T>, IShiftOperators<T, T>
+public struct BitSet<T> : IEnumerable<bool> where T : INumberBase<T>, IBinaryInteger<T>
 {
     public T Value;
     public int BitCount => Unsafe.SizeOf<T>() * 8;
@@ -35,7 +35,7 @@ public struct BitSet<T> : IEnumerable<bool> where T : IBinaryInteger<T>, IShiftO
             var start = range.Start.IsFromEnd ? BitCount - range.Start.Value : range.Start.Value;
             var end = range.End.IsFromEnd ? BitCount - range.End.Value : range.End.Value;
             var mask = ((T.One << end - start) - T.One) << start;
-            Value = (Value & mask) | T.Create(value & ((1 << end - start) - 1));
+            Value = (Value & mask) | T.CreateChecked(value & ((1 << end - start) - 1));
         }
     }
 
@@ -89,6 +89,6 @@ public struct BitSet<T> : IEnumerable<bool> where T : IBinaryInteger<T>, IShiftO
     {
         public static TTo Create<TTo, TFrom>(TFrom number) where TTo : IBinaryInteger<TTo>
             where TFrom : IBinaryInteger<TFrom>
-            => TTo.Create(number);
+            => TTo.CreateChecked(number);
     }
 }
