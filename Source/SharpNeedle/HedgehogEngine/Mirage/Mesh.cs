@@ -25,14 +25,13 @@ public class Mesh : IBinarySerializable, IDisposable, ICloneable<Mesh>
 
         reader.ReadOffset(() =>
         {
-            var element = reader.Read<VertexElement>();
-            reader.Align(4);
-
-            while (element.Format != VertexFormat.Invalid)
+            while (true)
             {
-                Elements.Add(element);
+                var element = reader.Read<VertexElement>();
+                if (element.Format == VertexFormat.Invalid)
+                    break;
 
-                element = reader.Read<VertexElement>();
+                Elements.Add(element);
                 reader.Align(4);
             }
         });
@@ -61,8 +60,11 @@ public class Mesh : IBinarySerializable, IDisposable, ICloneable<Mesh>
         writer.WriteOffset(() =>
         {
             foreach (var element in Elements)
+            {
                 writer.Write(element);
-            
+                writer.Align(4);
+            }
+
             writer.Write(VertexElement.Invalid);
         });
 

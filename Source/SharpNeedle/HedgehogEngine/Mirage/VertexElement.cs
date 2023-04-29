@@ -1,8 +1,9 @@
 ﻿namespace SharpNeedle.HedgehogEngine.Mirage;
 
+[StructLayout(LayoutKind.Sequential)]
 public struct VertexElement
 {
-    public static readonly VertexElement Invalid = new() { Format = VertexFormat.Invalid };
+    public static readonly VertexElement Invalid = new() { Stream = 0xFF, Format = VertexFormat.Invalid };
 
     public ushort Stream;
     public ushort Offset;
