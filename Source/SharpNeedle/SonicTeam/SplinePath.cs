@@ -38,8 +38,6 @@ public class SplinePath : BinaryResource
         writer.Write(0x200); // Version?
 
         writer.Write(Paths.Count);
-       
-        writer.OffsetBinaryFormat = OffsetBinaryFormat.U64;
 
         if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
             writer.Align(8);
@@ -48,8 +46,6 @@ public class SplinePath : BinaryResource
             writer.WriteObjectCollectionOffset(Paths);
         else
             writer.WriteOffsetValue(0);
-
-        writer.OffsetBinaryFormat = OffsetBinaryFormat.U32;
     }
 }
 
@@ -125,8 +121,6 @@ public class PathObject : IBinarySerializable
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.OffsetBinaryFormat = OffsetBinaryFormat.U64;
-
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         writer.Write(Field04);
         writer.Write((byte)0);
@@ -183,8 +177,6 @@ public class PathObject : IBinarySerializable
             writer.Align(8);
 
         writer.WriteObjectOffset(Unknown);
-
-        writer.OffsetBinaryFormat = OffsetBinaryFormat.U32;
     }
 
     public override string ToString()
@@ -246,8 +238,6 @@ public class PathObject : IBinarySerializable
 
         public void Write(BinaryObjectWriter writer)
         {
-            writer.OffsetBinaryFormat = OffsetBinaryFormat.U64;
-
             if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
                 writer.Align(8);
 
@@ -275,8 +265,6 @@ public class PathObject : IBinarySerializable
                 default:
                     throw new NotImplementedException($"{Type} is not recognized");
             }
-
-            writer.OffsetBinaryFormat = OffsetBinaryFormat.U32;
         }
 
         public override string ToString()
@@ -363,8 +351,6 @@ public class PathObject : IBinarySerializable
 
         public void Write(BinaryObjectWriter writer)
         {
-            writer.OffsetBinaryFormat = OffsetBinaryFormat.U64;
-
             writer.Write(Field00);
 
             writer.Write(SubUnknown1s.Count);
@@ -387,8 +373,6 @@ public class PathObject : IBinarySerializable
                 writer.Align(8);
 
             writer.WriteCollectionOffset(SubUnknown3s);
-
-            writer.OffsetBinaryFormat = OffsetBinaryFormat.U32;
         }
     }
 }
