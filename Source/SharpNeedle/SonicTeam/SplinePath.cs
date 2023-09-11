@@ -104,24 +104,26 @@ public class SplinePath : BinaryResource
 
             foreach (var path in Paths)
             {
-                if (path.Name.Equals("StageGuidePath"))
+                if (path.Name.Equals("StageGuidePath", StringComparison.InvariantCulture))
                     continue;
 
-                if (!path.Name.Contains("@"))
+                if (path.Name.LastIndexOf('@') == -1)
                 {
                     paths[0].Add(path);
                 }
                 else
                 {
-                    string[] splits = path.Name.Split('@');
-                    if (splits[1].StartsWith("QS"))
+                    var type = path.Name.AsSpan(path.Name.LastIndexOf('@') + 1);
+                    if (type.StartsWith("QS", StringComparison.InvariantCulture))
                         paths[1].Add(path);
-                    else if (splits[1].StartsWith("SV"))
+                    else if (type.StartsWith("SV", StringComparison.InvariantCulture))
                         paths[2].Add(path);
-                    else if (splits[1].StartsWith("GR"))
+                    else if (type.StartsWith("GR", StringComparison.InvariantCulture))
                         paths[3].Add(path);
-                    if (splits[1].StartsWith("DP"))
+                    else if (type.StartsWith("DP", StringComparison.InvariantCulture))
                         paths[4].Add(path);
+                    else
+                        throw new NotImplementedException($"{type} is not recognized");
                 }
             }
 
