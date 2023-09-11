@@ -3,6 +3,7 @@
 using BINA;
 using SharpNeedle;
 using SharpNeedle.SurfRide.Draw;
+using System.ComponentModel.Design;
 using System.IO;
 using System.Reflection.PortableExecutable;
 
@@ -10,12 +11,14 @@ using System.Reflection.PortableExecutable;
 public class SplinePath : BinaryResource
 {
     public new static readonly uint Signature = BinaryHelper.MakeSignature<uint>("HTAP");
+    public uint Version { get; set; }
     public List<PathObject> Paths { get; set; } = new();
 
     public override void Read(BinaryObjectReader reader)
     {
         reader.EnsureSignature(Signature);
-        reader.Skip(4); // Version?
+        
+        Version = reader.Read<uint>();
 
         int pathCount = reader.Read<int>();
         long pathOffset = reader.ReadOffsetValue();
@@ -25,31 +28,124 @@ public class SplinePath : BinaryResource
             pathOffset = reader.ReadOffsetValue();
         }
 
+        Dictionary<string, uint> paths = new();
+        if (Version == 1)
+        {
+            reader.ReadAtOffset(pathOffset, () =>
+            {
+                for (uint i = 0; i < pathCount; i++)
+                    paths.Add(reader.ReadStringOffset(), reader.Read<uint>());
+            });
+
+            paths = paths.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
+
+            pathCount = reader.Read<int>();
+            pathOffset = reader.ReadOffsetValue();
+            if (pathCount != 0 && pathOffset == 0)
+            {
+                reader.OffsetBinaryFormat = OffsetBinaryFormat.U64;
+                pathOffset = reader.ReadOffsetValue();
+            }
+        }
+
         reader.ReadAtOffset((pathOffset), () =>
         {
             for (int i = 0; i < pathCount; i++)
-                Paths.Add(reader.ReadObject<PathObject>());
+                Paths.Add(reader.ReadObject<PathObject, uint>(Version));
         });
     }
 
     public override void Write(BinaryObjectWriter writer)
     {
         writer.Write(Signature);
-        writer.Write(0x200); // Version?
+        writer.Write(Version);
 
         writer.Write(Paths.Count);
 
         if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
             writer.Align(8);
 
+        if (Version == 1)
+        {
+            writer.WriteOffset(() =>
+            {
+                for (int i = 0; i < Paths.Count; i++)
+                {
+                    writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Paths[i].Name);
+                    writer.Write(i);
+                }
+            });
+        }
+
+        writer.Write(Paths.Count);
+
         if (Paths.Count != 0)
-            writer.WriteObjectCollectionOffset(Paths);
+            writer.WriteObjectCollectionOffset(Version, Paths);
         else
             writer.WriteOffsetValue(0);
+
+        if (Version == 1)
+        {
+            var guidePath = Paths.FirstOrDefault(obj => obj.Name == "StageGuidePath");
+
+            if (guidePath != null)
+            {
+                writer.WriteOffset(() =>
+                {
+                    writer.WriteStringOffset(StringBinaryFormat.NullTerminated, guidePath.Name);
+                });
+            }
+            else
+            {
+                writer.WriteOffsetValue(0);
+            }
+
+            List<List<PathObject>> paths = new() { new(), new(), new(), new(), new() };
+
+            foreach (var path in Paths)
+            {
+                if (path.Name.Equals("StageGuidePath"))
+                    continue;
+
+                if (!path.Name.Contains("@"))
+                {
+                    paths[0].Add(path);
+                }
+                else
+                {
+                    string[] splits = path.Name.Split('@');
+                    if (splits[1].StartsWith("QS"))
+                        paths[1].Add(path);
+                    else if (splits[1].StartsWith("SV"))
+                        paths[2].Add(path);
+                    else if (splits[1].StartsWith("GR"))
+                        paths[3].Add(path);
+                    if (splits[1].StartsWith("DP"))
+                        paths[4].Add(path);
+                }
+            }
+
+            foreach (var list in paths)
+            {
+                writer.Write(list.Count);
+                if (list.Count != 0)
+                {
+                    writer.WriteOffset(() =>
+                    {
+                        foreach (var path in list)
+                            writer.WriteObjectOffset(path, Version);
+                    });
+                }
+                else
+                {
+                    writer.WriteOffsetValue(0);
+                }
+            }
+        }
     }
 }
 
-public class PathObject : IBinarySerializable
+public class PathObject : IBinarySerializable<uint>
 {
     public string Name { get; set; }
     public byte Field04 { get; set; }
@@ -57,126 +153,226 @@ public class PathObject : IBinarySerializable
     public int Field48 { get; set; }
     public AABB Bounds { get; set; }
     public UnknownStruct Unknown { get; set; }
-    public List<bool> KnotFlags { get; set; } = new(); // Is Enabled?
+    public List<int> KnotFlags { get; set; } = new(); // Knot Type?
     public List<float> KnotDistances { get; set; } = new();
+    public List<float> KnotField2Cs { get; set; } = new(); // Only used by Version 1
     public List<Vector3> Knots { get; set; } = new();
     public List<Vector3> KnotTangentIns { get; set; } = new(); // Guessed
     public List<Vector3> KnotTangentOuts { get; set; } = new(); // Guessed
     public List<DoubleKnot> DoubleKnots { get; set; } = new();
     public List<UserData> UserDatas { get; set; } = new();
 
-    public void Read(BinaryObjectReader reader)
+    public void Read(BinaryObjectReader reader, uint version)
     {
+        if (reader.OffsetBinaryFormat == OffsetBinaryFormat.U64)
+            reader.Align(8);
+
         Name = reader.ReadStringOffset();
-        Field04 = reader.Read<byte>();
 
-        reader.Skip(1); // Padding?
-
-        short knotCount = reader.Read<short>();
-
-        Distance = reader.Read<float>();
-
-        if (reader.OffsetBinaryFormat == OffsetBinaryFormat.U64)
-            reader.Align(8);
-
-        if (knotCount != 0)
+        if (version == 1)
         {
-            KnotFlags.AddRange(reader.ReadArrayOffset<bool>(knotCount));
-            KnotDistances.AddRange(reader.ReadArrayOffset<float>(knotCount));
-            Knots.AddRange(reader.ReadArrayOffset<Vector3>(knotCount));
-            KnotTangentIns.AddRange(reader.ReadArrayOffset<Vector3>(knotCount));
-            KnotTangentOuts.AddRange(reader.ReadArrayOffset<Vector3>(knotCount));
+            reader.Skip(4); // Always 0?
+            reader.Skip(4); // Always 1?
+
+            Distance = reader.Read<float>();
+
+            uint knotCount = reader.Read<uint>();
+
+            if (reader.OffsetBinaryFormat == OffsetBinaryFormat.U64)
+                reader.Align(8);
+
+            reader.ReadOffset(() =>
+            {
+                for (int i = 0; i < knotCount; i++)
+                {
+                    KnotDistances.Add(reader.Read<float>());
+                    KnotFlags.Add(reader.Read<int>());
+                    Knots.Add(reader.Read<Vector3>());
+                    KnotTangentIns.Add(reader.Read<Vector3>());
+                    KnotTangentOuts.Add(reader.Read<Vector3>());
+                    KnotField2Cs.Add(reader.Read<float>());
+                }
+            });
+
+            int doubleKnotCount = reader.Read<int>() / 2;
+
+            if (reader.OffsetBinaryFormat == OffsetBinaryFormat.U64)
+                reader.Align(8);
+
+            if (doubleKnotCount != 0)
+                DoubleKnots.AddRange(reader.ReadArrayOffset<DoubleKnot>(doubleKnotCount));
+            else
+                reader.Skip(reader.OffsetBinaryFormat == OffsetBinaryFormat.U32 ? 4 : 8);
         }
         else
         {
-            reader.Skip(reader.OffsetBinaryFormat == OffsetBinaryFormat.U32 ? 20 : 40);
+            Field04 = reader.Read<byte>();
+
+            reader.Skip(1); // Padding?
+
+            short knotCount = reader.Read<short>();
+
+            Distance = reader.Read<float>();
+
+            if (reader.OffsetBinaryFormat == OffsetBinaryFormat.U64)
+                reader.Align(8);
+
+            if (knotCount != 0)
+            {
+                reader.ReadOffset(() =>
+                {
+                    for (int i = 0; i < knotCount; i++)
+                        KnotFlags.Add(reader.Read<byte>());
+                });
+                KnotDistances.AddRange(reader.ReadArrayOffset<float>(knotCount));
+                Knots.AddRange(reader.ReadArrayOffset<Vector3>(knotCount));
+                KnotTangentIns.AddRange(reader.ReadArrayOffset<Vector3>(knotCount));
+                KnotTangentOuts.AddRange(reader.ReadArrayOffset<Vector3>(knotCount));
+            }
+            else
+            {
+                reader.Skip(reader.OffsetBinaryFormat == OffsetBinaryFormat.U32 ? 20 : 40);
+            }
+
+            int doubleKnotCount = reader.Read<int>() / 2;
+
+            if (reader.OffsetBinaryFormat == OffsetBinaryFormat.U64)
+                reader.Align(8);
+
+            if (doubleKnotCount != 0)
+                DoubleKnots.AddRange(reader.ReadArrayOffset<DoubleKnot>(doubleKnotCount));
+            else
+                reader.Skip(reader.OffsetBinaryFormat == OffsetBinaryFormat.U32 ? 4 : 8);
+
+            Bounds = reader.Read<AABB>();
+
+            int userDataCount = reader.Read<int>();
+
+            if (reader.OffsetBinaryFormat == OffsetBinaryFormat.U64)
+                reader.Align(8);
+
+            UserDatas.AddRange(reader.ReadObjectArrayOffset<UserData>(userDataCount));
+
+            Field48 = reader.Read<int>(); // Always 0?
+
+            if (reader.OffsetBinaryFormat == OffsetBinaryFormat.U64)
+                reader.Align(8);
+
+            Unknown = reader.ReadObjectOffset<UnknownStruct>();
         }
-
-        int doubleKnotCount = reader.Read<int>() / 2;
-
-        if (reader.OffsetBinaryFormat == OffsetBinaryFormat.U64)
-            reader.Align(8);
-
-        if (doubleKnotCount != 0)
-            DoubleKnots.AddRange(reader.ReadArrayOffset<DoubleKnot>(doubleKnotCount));
-        else
-            reader.Skip(reader.OffsetBinaryFormat == OffsetBinaryFormat.U32 ? 4 : 8);
-
-        Bounds = reader.Read<AABB>();
-
-        int userDataCount = reader.Read<int>();
-
-        if (reader.OffsetBinaryFormat == OffsetBinaryFormat.U64)
-            reader.Align(8);
-
-        UserDatas.AddRange(reader.ReadObjectArrayOffset<UserData>(userDataCount));
-
-        Field48 = reader.Read<int>(); // Always 0?
-
-        if (reader.OffsetBinaryFormat == OffsetBinaryFormat.U64)
-            reader.Align(8);
-
-        Unknown = reader.ReadObjectOffset<UnknownStruct>();
     }
 
-    public void Write(BinaryObjectWriter writer)
+    public void Write(BinaryObjectWriter writer, uint version)
     {
+        if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
+            writer.Align(8);
+
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-        writer.Write(Field04);
-        writer.Write((byte)0);
-
-        writer.Write((short)Knots.Count);
-
-        writer.Write(Distance);
-
-        if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
-            writer.Align(8);
-
-        if (Knots.Count != 0)
+        
+        if (version == 1)
         {
-            writer.WriteArrayOffset(KnotFlags.ToArray());
-            writer.WriteArrayOffset(KnotDistances.ToArray());
-            writer.WriteArrayOffset(Knots.ToArray());
-            writer.WriteArrayOffset(KnotTangentIns.ToArray());
-            writer.WriteArrayOffset(KnotTangentOuts.ToArray());
+            writer.Write(0); // Always 0?
+            writer.Write(1); // Always 1?
+
+            writer.Write(Distance);
+
+            writer.Write(Knots.Count);
+
+            if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
+                writer.Align(8);
+
+            if (Knots.Count != 0)
+            {
+                writer.WriteOffset(() =>
+                {
+                    for (int i = 0; i < Knots.Count; i++)
+                    {
+                        writer.Write(KnotDistances[i]);
+                        writer.Write(KnotFlags[i]);
+                        writer.Write(Knots[i]);
+                        writer.Write(KnotTangentIns[i]);
+                        writer.Write(KnotTangentOuts[i]);
+                        writer.Write(KnotField2Cs[i]);
+                    }
+                });
+            }
+            else
+            {
+                writer.WriteOffsetValue(0);
+            }
+
+            writer.Write(DoubleKnots.Count * 2);
+
+            if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
+                writer.Align(8);
+
+            if (DoubleKnots.Count != 0)
+                writer.WriteCollectionOffset(DoubleKnots);
+            else
+                writer.WriteOffsetValue(0);
         }
         else
         {
-            writer.WriteOffsetValue(0);
-            writer.WriteOffsetValue(0);
-            writer.WriteOffsetValue(0);
-            writer.WriteOffsetValue(0);
-            writer.WriteOffsetValue(0);
+            writer.Write(Field04);
+            writer.Write((byte)0);
+
+            writer.Write((short)Knots.Count);
+
+            writer.Write(Distance);
+
+            if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
+                writer.Align(8);
+
+            if (Knots.Count != 0)
+            {
+                writer.WriteOffset(() =>
+                {
+                    for (int i = 0; i < Knots.Count; i++)
+                        writer.Write((byte)KnotFlags[i]);
+                });
+                writer.WriteArrayOffset(KnotDistances.ToArray());
+                writer.WriteArrayOffset(Knots.ToArray());
+                writer.WriteArrayOffset(KnotTangentIns.ToArray());
+                writer.WriteArrayOffset(KnotTangentOuts.ToArray());
+            }
+            else
+            {
+                writer.WriteOffsetValue(0);
+                writer.WriteOffsetValue(0);
+                writer.WriteOffsetValue(0);
+                writer.WriteOffsetValue(0);
+                writer.WriteOffsetValue(0);
+            }
+
+            writer.Write(DoubleKnots.Count * 2);
+
+            if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
+                writer.Align(8);
+
+            if (DoubleKnots.Count != 0)
+                writer.WriteCollectionOffset(DoubleKnots);
+            else
+                writer.WriteOffsetValue(0);
+
+            writer.Write(Bounds);
+
+            writer.Write(UserDatas.Count);
+
+            if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
+                writer.Align(8);
+
+            if (UserDatas.Count != 0)
+                writer.WriteObjectCollectionOffset(UserDatas);
+            else
+                writer.WriteOffsetValue(0);
+
+            writer.Write(Field48);
+
+            if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
+                writer.Align(8);
+
+            writer.WriteObjectOffset(Unknown);
         }
-
-        writer.Write(DoubleKnots.Count * 2);
-
-        if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
-            writer.Align(8);
-
-        if (DoubleKnots.Count != 0)
-            writer.WriteCollectionOffset(DoubleKnots);
-        else
-            writer.WriteOffsetValue(0);
-
-        writer.Write(Bounds);
-
-        writer.Write(UserDatas.Count);
-
-        if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
-            writer.Align(8);
-
-        if (UserDatas.Count != 0)
-            writer.WriteObjectCollectionOffset(UserDatas);
-        else
-            writer.WriteOffsetValue(0);
-
-        writer.Write(Field48);
-
-        if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
-            writer.Align(8);
-
-        writer.WriteObjectOffset(Unknown);
     }
 
     public override string ToString()
