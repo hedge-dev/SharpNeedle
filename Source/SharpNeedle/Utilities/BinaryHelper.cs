@@ -20,6 +20,20 @@ public static class BinaryHelper
         throw new NotImplementedException();
     }
 
+    public static int GetOffsetSize(this BinaryObjectWriter writer)
+    {
+        switch (writer.OffsetBinaryFormat)
+        {
+            case OffsetBinaryFormat.U32:
+                return 4;
+
+            case OffsetBinaryFormat.U64:
+                return 8;
+        }
+
+        throw new NotImplementedException();
+    }
+
     public static T[] ReadObjectArray<T>(this BinaryObjectReader reader, int count) where T : IBinarySerializable, new()
     {
         var result = new T[count];

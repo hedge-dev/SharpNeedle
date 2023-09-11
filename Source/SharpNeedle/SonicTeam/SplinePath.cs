@@ -414,6 +414,7 @@ public class PathObject : IBinarySerializable<uint>
             Name = reader.ReadStringOffset();
 
             Type = reader.Read<DataType>();
+            reader.Align(reader.GetOffsetSize());
 
             if (reader.OffsetBinaryFormat == OffsetBinaryFormat.U64)
                 reader.Align(8);
@@ -442,9 +443,7 @@ public class PathObject : IBinarySerializable<uint>
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
 
             writer.Write(Type);
-
-            if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
-                writer.Align(8);
+            writer.Align(writer.GetOffsetSize());
 
             switch (Type)
             {
@@ -470,7 +469,7 @@ public class PathObject : IBinarySerializable<uint>
             return Name;
         }
 
-        public enum DataType
+        public enum DataType : byte
         {
             Integer,
             Float, // Guessed
