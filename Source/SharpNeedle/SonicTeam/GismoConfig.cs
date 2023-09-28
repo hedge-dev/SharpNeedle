@@ -87,7 +87,7 @@ public class GismoConfig : BinaryResource
                 Field0A = reader.Read<short>();
                 Field0C = reader.Read<short>();
 
-                ShapeType = reader.Read<ShapeType>();
+                ShapeType = (ShapeType)reader.Read<byte>();
 
                 Field0F = reader.Read<byte>();
                 Field10 = reader.Read<int>();
@@ -132,7 +132,7 @@ public class GismoConfig : BinaryResource
                 writer.Write(Field0A);
                 writer.Write(Field0C);
 
-                writer.Write(ShapeType);
+                writer.Write((byte)ShapeType);
 
                 writer.Write(Field0F);
                 writer.Write(Field10);
