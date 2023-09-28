@@ -1,6 +1,6 @@
-﻿using SharpNeedle.BINA;
+﻿namespace SharpNeedle.SonicTeam;
 
-namespace SharpNeedle.SonicTeam;
+using BINA;
 
 [NeedleResource("st/gismoconfig", @"\.(orc|gism)$")]
 public class GismoConfig : BinaryResource
