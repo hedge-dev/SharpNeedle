@@ -52,7 +52,7 @@ public class GismoConfig : BinaryResource
         public string SkeletonName { get; set; }
 
         // Only used in Lost World variant
-        public EShapeType ShapeType { get; set; }
+        public ShapeType ShapeType { get; set; }
         public bool IsMotionOn { get; set; }
         public bool IsProgramMotionOn { get; set; }
         public float CollisionRadius { get; set; }
@@ -87,7 +87,7 @@ public class GismoConfig : BinaryResource
                 Field0A = reader.Read<short>();
                 Field0C = reader.Read<short>();
 
-                ShapeType = reader.Read<EShapeType>();
+                ShapeType = reader.Read<ShapeType>();
 
                 Field0F = reader.Read<byte>();
                 Field10 = reader.Read<int>();
@@ -109,7 +109,7 @@ public class GismoConfig : BinaryResource
 
             if (!isV1)
             {
-                ShapeType = reader.Read<EShapeType>();
+                ShapeType = reader.Read<ShapeType>();
                 CollisionRadius = reader.Read<float>();
                 CollisionHeight = reader.Read<float>();
 
@@ -165,24 +165,16 @@ public class GismoConfig : BinaryResource
                 writer.WriteObjectOffset(ProgramMotion);
             }
         }
-
-        public enum EShapeType : int
-        {
-            Sphere = 1,
-            Capsule,
-            Box = 4 // Unused in Lost World
-        }
     }
 
     public class MotionData : IBinarySerializable
     {
         public string AnimationName { get; set; }
-        public EPlayPolicy PlayPolicy { get; set; }
-
+        public PlayPolicy PlayPolicy { get; set; }
 
         public void Read(BinaryObjectReader reader)
         {
-            PlayPolicy = reader.Read<EPlayPolicy>();
+            PlayPolicy = reader.Read<PlayPolicy>();
             AnimationName = reader.ReadStringOffset();
         }
 
@@ -191,16 +183,11 @@ public class GismoConfig : BinaryResource
             writer.Write(PlayPolicy);
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, AnimationName);
         }
-
-        public enum EPlayPolicy : int
-        {
-
-        }
     }
 
     public class ProgramMotionData : IBinarySerializable
     {
-        public EMotionType MotionType { get; set; }
+        public MotionType MotionType { get; set; }
         public int Field00 { get; set; }
         public float Power { get; set; }
         public float SpeedScale { get; set; }
@@ -211,7 +198,7 @@ public class GismoConfig : BinaryResource
         {
             Field00 = reader.Read<int>();
             
-            MotionType = reader.Read<EMotionType>();
+            MotionType = reader.Read<MotionType>();
 
             Axis = reader.Read<Vector3>();
 
@@ -232,11 +219,23 @@ public class GismoConfig : BinaryResource
             writer.Write(SpeedScale);
             writer.Write(Time);
         }
-
-        public enum EMotionType : int
-        {
-            Swing,
-            Rotate
-        }
     }
+}
+
+public enum ShapeType : int
+{
+    Sphere = 1,
+    Capsule,
+    Box = 4 // Unused in Lost World
+}
+
+public enum PlayPolicy : int
+{
+
+}
+
+public enum MotionType : int
+{
+    Swing,
+    Rotate
 }
