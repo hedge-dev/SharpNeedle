@@ -13,12 +13,12 @@ public class GismoConfig : BinaryResource
     {
         if (base.Version.IsV1)
         {
-            reader.EnsureSignature(Signature);
+            reader.EnsureSignatureNative(Signature);
         }
         else
         {
             reader.ReadOffset(() =>
-                reader.EnsureSignature(Signature));
+                reader.EnsureSignatureNative(Signature));
         }
 
         Version = reader.Read<uint>();
