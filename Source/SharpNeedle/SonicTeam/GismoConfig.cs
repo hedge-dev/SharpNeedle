@@ -47,11 +47,11 @@ public class GismoConfig : BinaryResource
 
     public class ObjectData : IBinarySerializable<bool>
     {
-        public string Name { get; set; }
-        public string ModelName { get; set; }
-        public string SkeletonName { get; set; }
+        public string Name { get; set; } // Model name in Sonic Colors Variant
 
         // Only used in Lost World variant
+        public string ModelName { get; set; }
+        public string SkeletonName { get; set; }
         public ShapeType ShapeType { get; set; }
         public bool IsMotionOn { get; set; }
         public bool IsProgramMotionOn { get; set; }
@@ -62,6 +62,8 @@ public class GismoConfig : BinaryResource
         public ProgramMotionData ProgramMotion { get; set; } = new();
 
         // Only used in Colors variant (Maybe related to breaking? Could have overlap with collision fields from Lost World)
+        public string ParticleName { get; set; }
+        public string SoundCueName { get; set; }
         public int Field00 { get; set; }
         public int Field04 { get; set; }
         public short Field08 { get; set; }
@@ -104,11 +106,16 @@ public class GismoConfig : BinaryResource
             }
 
             Name = reader.ReadStringOffset();
-            ModelName = reader.ReadStringOffset();
-            SkeletonName = reader.ReadStringOffset();
 
-            if (!isV1)
+            if (isV1)
             {
+                ParticleName = reader.ReadStringOffset();
+                SoundCueName = reader.ReadStringOffset();
+            }
+            else
+            {
+                ModelName = reader.ReadStringOffset();
+                SkeletonName = reader.ReadStringOffset();
                 ShapeType = reader.Read<ShapeType>();
                 CollisionRadius = reader.Read<float>();
                 CollisionHeight = reader.Read<float>();
