@@ -36,7 +36,7 @@ public class GismoConfig : BinaryResource
         else
         {
             writer.WriteOffset(() =>
-                writer.Write(Signature));
+                writer.WriteNative(Signature));
         }
 
         writer.Write(Version);
