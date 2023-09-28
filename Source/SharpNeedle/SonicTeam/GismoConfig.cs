@@ -31,7 +31,7 @@ public class GismoConfig : BinaryResource
     {
         if (base.Version.IsV1)
         {
-            writer.Write(Signature);
+            writer.WriteNative(Signature);
         }
         else
         {
