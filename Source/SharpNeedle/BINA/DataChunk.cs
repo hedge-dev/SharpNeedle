@@ -47,56 +47,41 @@ public class DataChunk<T> : DataChunk, IChunk where T : IBinarySerializable
             Data.Write(writer);
             return;
         }
+        
+        var dataStream = new MemoryStream();
+        var dataWriter = new BinaryObjectWriter(dataStream, StreamOwnership.Transfer, writer.Endianness, writer.Encoding, writer.FilePath);
+        Data.Write(dataWriter);
+        dataWriter.Flush();
 
-        var begin = writer.Position;
+        Offsets = new OffsetTable();
+        foreach (var offset in dataWriter.OffsetHandler.OffsetPositions)
+        {
+            Offsets.Add(offset);
+        }
+
+        dataWriter.Seek(0, SeekOrigin.End);
+        dataWriter.Align(4);
+
+        var baseSize = dataWriter.Length;
+        var table = Offsets.Encode();
+        dataWriter.Write(0); // Dummy string table
+        dataWriter.WriteArray(table.AsSpan());
+
         writer.Write(Signature);
         
-        var headToken = writer.At();
-        writer.Write(0); // Size
-        writer.Write(0); // String Table
+        writer.Write((int)(baseSize + table.Length + 0x34)); // Size
+        writer.Write((int)baseSize); // String Table
         writer.Write(4); // String Table Size
-        writer.Write(0); // Offset Table Size
+        writer.Write(table.Length); // Offset Table Size
 
         writer.Write((short)0x18);
         writer.Write((short)0x00);
-        
+
         // Reserved
         writer.WriteCollection(Enumerable.Repeat<long>(0, 3));
-        
-        writer.PushOffsetOrigin();
-        Data.Write(writer);
-        writer.Flush();
 
-        Offsets ??= new OffsetTable();
-        Offsets.Clear();
-
-        var origin = writer.OffsetHandler.OffsetOrigin;
-        foreach (var offset in writer.OffsetHandler.OffsetPositions)
-        {
-            Offsets.Add(offset - origin);
-        }
-
-        var encodedOffsets = Offsets.Encode();
-
-        var endToken = writer.At(writer.Length, SeekOrigin.End);
-        headToken.Dispose();
-        writer.Skip(4); // Size isn't ready yet
-        writer.WriteOffset(() =>
-        {
-            writer.Write(0); // Empty string table
-            writer.WriteArray(encodedOffsets);
-        });
-        writer.Skip(4); // We already wrote string table size
-        writer.Write(encodedOffsets.Length);
-
-        // Return to where we were
-        endToken.Dispose();
-        writer.Flush();
-
-        endToken = writer.At(writer.Length, SeekOrigin.End);
-        headToken.Dispose();
-        writer.Write((uint)((long)endToken - begin));
-        writer.PopOffsetOrigin();
+        // Slice the buffer because the capacity can be bigger
+        writer.WriteArray(dataStream.GetBuffer().AsSpan()[..(int)dataStream.Length]);
     }
 }
 
@@ -105,6 +90,6 @@ public class DataChunk
     public static readonly uint BinSignature = BinaryHelper.MakeSignature<uint>("DATA");
     public static readonly uint AltBinSignature = BinaryHelper.MakeSignature<uint>("IMAG");
 
-    public uint Signature { get; set; }
+    public uint Signature { get; set; } = BinSignature;
     public OffsetTable Offsets { get; set; }
 }

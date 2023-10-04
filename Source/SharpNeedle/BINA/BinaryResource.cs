@@ -28,6 +28,11 @@ public abstract class BinaryResource : ResourceBase, IBinarySerializable
         if (isV2)
         {
             Version = reader.ReadObject<Version>();
+            if (Version.Is64Bit)
+            {
+                reader.OffsetBinaryFormat = OffsetBinaryFormat.U64;
+            }
+
             reader.Endianness = Version.Endianness;
 
             Size = reader.Read<uint>();
@@ -89,6 +94,11 @@ public abstract class BinaryResource : ResourceBase, IBinarySerializable
     {
         BaseFile = file;
         using var writer = new BinaryObjectWriter(file.Open(FileAccess.Write), StreamOwnership.Transfer, Version.Endianness);
+        if (Version.Is64Bit)
+        {
+            writer.OffsetBinaryFormat = OffsetBinaryFormat.U64;
+        }
+
         if (Version.IsV1)
             WriteV1(writer);
         else

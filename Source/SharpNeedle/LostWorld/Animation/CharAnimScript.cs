@@ -4,7 +4,7 @@ using BINA;
 [NeedleResource("lw/anm", @"\.anm$")]
 public class CharAnimScript : BinaryResource
 {
-    public string ScriptVersion { get; set; }
+    public string ScriptVersion { get; set; } = "1.02";
     public List<SimpleAnimation> SimpleAnimations { get; set; }
     public List<ComplexAnimation> ComplexAnimations { get; set; }
     public TransitionTable Transitions { get; set; }
