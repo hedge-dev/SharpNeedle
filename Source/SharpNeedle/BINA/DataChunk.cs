@@ -50,6 +50,7 @@ public class DataChunk<T> : DataChunk, IChunk where T : IBinarySerializable
         
         var dataStream = new MemoryStream();
         var dataWriter = new BinaryObjectWriter(dataStream, StreamOwnership.Transfer, writer.Endianness, writer.Encoding, writer.FilePath);
+        dataWriter.OffsetBinaryFormat = writer.OffsetBinaryFormat;
         Data.Write(dataWriter);
         dataWriter.Flush();
 
