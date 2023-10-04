@@ -2,10 +2,6 @@
 
 using BINA;
 using SharpNeedle;
-using SharpNeedle.SurfRide.Draw;
-using System.ComponentModel.Design;
-using System.IO;
-using System.Reflection.PortableExecutable;
 
 [NeedleResource("st/spline", @"\.path(2?\.bin)?$")]
 public class SplinePath : BinaryResource
