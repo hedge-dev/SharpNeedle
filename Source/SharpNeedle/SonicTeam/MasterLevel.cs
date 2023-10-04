@@ -103,7 +103,7 @@ public class MasterLevel : BinaryResource
 
                     for (int i = 0; i < dependencyCount; i++)
                     {
-                        options.IsLast = i + 1 == Dependencies.Count;
+                        fileOptions.IsLast = i + 1 == dependencyCount;
 
                         reader.ReadOffset(() =>
                         {
@@ -130,7 +130,7 @@ public class MasterLevel : BinaryResource
             Files = Files.OrderBy(o => o.Name).ToList();
             Dependencies = Dependencies.OrderBy(o => o.Name).ToList();
 
-            writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
+            writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name, writer.GetOffsetSize());
 
             writer.Write(Files.Count);
             writer.Write(Dependencies.Count);
@@ -153,7 +153,7 @@ public class MasterLevel : BinaryResource
 
                 for (int i = 0; i < Dependencies.Count; i++)
                 {
-                    options.IsLast = i + 1 == Dependencies.Count;
+                    fileOptions.IsLast = i + 1 == Dependencies.Count;
 
                     writer.WriteObjectOffset(Dependencies[i], fileOptions, writer.GetOffsetSize());
                 }
@@ -219,7 +219,7 @@ public class MasterLevel : BinaryResource
         {
             writer.Align(8);
 
-            writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
+            writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name, writer.GetOffsetSize());
 
             if (options.IsDependency)
             {
@@ -243,12 +243,12 @@ public class MasterLevel : BinaryResource
                     }
                     else
                     {
-                        writer.WriteObjectOffset(NextFileInfo);
+                        writer.WriteObjectOffset(NextFileInfo, writer.GetOffsetSize());
                     }
                 }
                 else
                 {
-                    writer.WriteStringOffset(StringBinaryFormat.NullTerminated, NextDependencyName);
+                    writer.WriteStringOffset(StringBinaryFormat.NullTerminated, NextDependencyName, writer.GetOffsetSize());
                 }
             }
         }
