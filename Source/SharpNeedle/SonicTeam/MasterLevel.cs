@@ -54,8 +54,8 @@ public class MasterLevel : BinaryResource
     public class LevelInfo : IBinarySerializable
     {
         public string Name { get; set; }
-        public bool Field20 { get; set; }
-        public bool Field21 { get; set; }
+        public bool HasFilesAndDependencies { get; set; }
+        public bool HasFiles { get; set; }
         public List<FileInfo> Files { get; set; } = new();
         public List<FileInfo> Dependencies { get; set; } = new(); // Guessed
 
@@ -96,8 +96,8 @@ public class MasterLevel : BinaryResource
                 }
             });
 
-            Field20 = reader.Read<bool>();
-            Field21 = reader.Read<bool>();
+            HasFilesAndDependencies = reader.Read<bool>();
+            HasFiles = reader.Read<bool>();
 
             reader.Align(16);
         }
@@ -130,8 +130,8 @@ public class MasterLevel : BinaryResource
                 }
             });
 
-            writer.Write(Field20);
-            writer.Write(Field21);
+            writer.Write(HasFilesAndDependencies);
+            writer.Write(HasFiles);
 
             writer.Align(16);
         }
