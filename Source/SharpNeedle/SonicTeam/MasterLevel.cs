@@ -1,6 +1,7 @@
 ﻿namespace SharpNeedle.SonicTeam; 
 
 using SharpNeedle.BINA;
+using System.Reflection.PortableExecutable;
 
 [NeedleResource("st/masterlevel", @"\.mlevel$")]
 public class MasterLevel : BinaryResource
@@ -19,8 +20,13 @@ public class MasterLevel : BinaryResource
         var levelCount = reader.ReadOffsetValue();
         reader.ReadOffset(() =>
         {
+            LevelInfoBinaryOptions options = new();
+
             for (int i = 0; i < levelCount; i++)
-                Levels.Add(reader.ReadObjectOffset<LevelInfo>());
+            {
+                options.IsLast = i + 1 == levelCount;
+                Levels.Add(reader.ReadObjectOffset<LevelInfo, LevelInfoBinaryOptions>(options));
+            }
 
             reader.Skip(8); // Potential Runtime Field
         });
@@ -40,8 +46,13 @@ public class MasterLevel : BinaryResource
         writer.Write<long>(Levels.Count);
         writer.WriteOffset(() =>
         {
+            LevelInfoBinaryOptions options = new();
+
             for (int i = 0; i < Levels.Count; i++)
-                writer.WriteObjectOffset(Levels[i], writer.GetOffsetSize());
+            {
+                options.IsLast = i + 1 == Levels.Count;
+                writer.WriteObjectOffset(Levels[i], options, writer.GetOffsetSize());
+            }
 
             writer.Skip(8); // Potential Runtime Field
         });
@@ -49,7 +60,7 @@ public class MasterLevel : BinaryResource
         writer.Align(16);
     }
 
-    public class LevelInfo : IBinarySerializable
+    public class LevelInfo : IBinarySerializable<LevelInfoBinaryOptions>
     {
         public string Name { get; set; }
         public bool HasFiles { get; set; }
@@ -57,7 +68,7 @@ public class MasterLevel : BinaryResource
         public List<FileInfo> Files { get; set; } = new();
         public List<FileInfo> Dependencies { get; set; } = new(); // Guessed
 
-        public void Read(BinaryObjectReader reader)
+        public void Read(BinaryObjectReader reader, LevelInfoBinaryOptions options)
         {
             reader.Align(8);
 
@@ -84,9 +95,10 @@ public class MasterLevel : BinaryResource
             {
                 if (dependencyCount != 0)
                 {
-                    FileInfoBinaryOptions options = new()
+                    FileInfoBinaryOptions fileOptions = new()
                     {
-                        IsDependency = true
+                        IsDependency = true,
+                        IsLastLevel = options.IsLast
                     };
 
                     for (int i = 0; i < dependencyCount; i++)
@@ -95,7 +107,7 @@ public class MasterLevel : BinaryResource
 
                         reader.ReadOffset(() =>
                         {
-                            Dependencies.Add(reader.ReadObject<FileInfo, FileInfoBinaryOptions>(options));
+                            Dependencies.Add(reader.ReadObject<FileInfo, FileInfoBinaryOptions>(fileOptions));
                         });
                     }
                 }
@@ -111,7 +123,7 @@ public class MasterLevel : BinaryResource
             reader.Align(8);
         }
 
-        public void Write(BinaryObjectWriter writer)
+        public void Write(BinaryObjectWriter writer, LevelInfoBinaryOptions options)
         {
             writer.Align(8);
 
@@ -133,16 +145,17 @@ public class MasterLevel : BinaryResource
 
             writer.WriteOffset(() =>
             {
-                FileInfoBinaryOptions options = new()
+                FileInfoBinaryOptions fileOptions = new()
                 {
-                    IsDependency = true
+                    IsDependency = true,
+                    IsLastLevel = options.IsLast
                 };
 
                 for (int i = 0; i < Dependencies.Count; i++)
                 {
                     options.IsLast = i + 1 == Dependencies.Count;
 
-                    writer.WriteObjectOffset(Dependencies[i], options, writer.GetOffsetSize());
+                    writer.WriteObjectOffset(Dependencies[i], fileOptions, writer.GetOffsetSize());
                 }
             });
 
@@ -182,20 +195,23 @@ public class MasterLevel : BinaryResource
                 });
             }
 
-            long offset = reader.ReadOffsetValue();
-            if (offset != 0)
+            if (!options.IsLastLevel)
             {
-                reader.ReadAtOffset(offset, () =>
+                long offset = reader.ReadOffsetValue();
+                if (offset != 0)
                 {
-                    if (options.IsLast)
+                    reader.ReadAtOffset(offset, () =>
                     {
-                        NextFileInfo = reader.ReadObject<FileInfo>();
-                    }
-                    else
-                    {
-                        NextDependencyName = reader.ReadString(StringBinaryFormat.NullTerminated);
-                    }
-                });
+                        if (options.IsLast)
+                        {
+                            NextFileInfo = reader.ReadObject<FileInfo>();
+                        }
+                        else
+                        {
+                            NextDependencyName = reader.ReadString(StringBinaryFormat.NullTerminated);
+                        }
+                    });
+                }
             }
         }
 
@@ -217,27 +233,36 @@ public class MasterLevel : BinaryResource
                 });
             }
 
-            if (String.IsNullOrEmpty(NextDependencyName))
+            if (!options.IsLastLevel)
             {
-                if (NextFileInfo == null)
+                if (String.IsNullOrEmpty(NextDependencyName))
                 {
-                    writer.WriteOffsetValue(0);
+                    if (NextFileInfo == null)
+                    {
+                        writer.WriteOffsetValue(0);
+                    }
+                    else
+                    {
+                        writer.WriteObjectOffset(NextFileInfo);
+                    }
                 }
                 else
                 {
-                    writer.WriteObjectOffset(NextFileInfo);
+                    writer.WriteStringOffset(StringBinaryFormat.NullTerminated, NextDependencyName);
                 }
             }
-            else
-            {
-                writer.WriteStringOffset(StringBinaryFormat.NullTerminated, NextDependencyName);
-            }
         }
+    }
+
+    public struct LevelInfoBinaryOptions
+    {
+        public bool IsLast;
     }
 
     public struct FileInfoBinaryOptions
     {
         public bool IsLast;
+        public bool IsLastLevel;
         public bool IsDependency;
     }
 }
