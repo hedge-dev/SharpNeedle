@@ -1,12 +1,13 @@
 ﻿namespace SharpNeedle.SonicTeam; 
 
 using SharpNeedle.BINA;
+using System.Diagnostics;
+using System.Reflection.PortableExecutable;
 
 [NeedleResource("st/masterlevel", @"\.mlevel$")]
 public class MasterLevel : BinaryResource
 {
     public new static readonly uint Signature = BinaryHelper.MakeSignature<uint>("LMEH");
-    public int Field04 { get; set; }
     public List<LevelInfo> Levels { get; set; } = new();
 
     public override void Read(BinaryObjectReader reader)
@@ -15,15 +16,16 @@ public class MasterLevel : BinaryResource
 
         reader.EnsureSignature(Signature);
 
-        Field04 = reader.Read<int>(); // Always 0? Potentially Padding or Version
+        reader.Align(reader.GetOffsetSize()); // 4 empty bytes, always 0(?). Very Likely Padding or Version
 
         var levelCount = reader.ReadOffsetValue();
         reader.ReadOffset(() =>
         {
             for (int i = 0; i < levelCount; i++)
                 Levels.Add(reader.ReadObjectOffset<LevelInfo>());
-        });
 
+            reader.Skip(8); // Potential Runtime Field
+        });
 
         reader.Align(16);
     }
@@ -31,17 +33,19 @@ public class MasterLevel : BinaryResource
     public override void Write(BinaryObjectWriter writer)
     {
         writer.OffsetBinaryFormat = OffsetBinaryFormat.U64;
+        Levels = Levels.OrderBy(o => o.Name).ToList();
 
         writer.Write(Signature);
-        writer.Write(Field04);
 
-        Levels = Levels.OrderBy(o => o.Name).ToList();
+        writer.Align(writer.GetOffsetSize());
 
         writer.Write<long>(Levels.Count);
         writer.WriteOffset(() =>
         {
             for (int i = 0; i < Levels.Count; i++)
-                writer.WriteObjectOffset(Levels[i], 8);
+                writer.WriteObjectOffset(Levels[i], writer.GetOffsetSize());
+
+            writer.Skip(8); // Potential Runtime Field
         });
 
         writer.Align(16);
@@ -52,7 +56,6 @@ public class MasterLevel : BinaryResource
         public string Name { get; set; }
         public bool Field20 { get; set; }
         public bool Field21 { get; set; }
-        public long Field28 { get; set; }
         public List<FileInfo> Files { get; set; } = new();
         public List<FileInfo> Dependencies { get; set; } = new(); // Guessed
 
@@ -95,17 +98,18 @@ public class MasterLevel : BinaryResource
 
             Field20 = reader.Read<bool>();
             Field21 = reader.Read<bool>();
-            Field28 = reader.ReadOffsetValue();
+
+            reader.Align(16);
         }
 
         public void Write(BinaryObjectWriter writer)
         {
             writer.Align(8);
 
-            writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-
             Files = Files.OrderBy(o => o.Name).ToList();
             Dependencies = Dependencies.OrderBy(o => o.Name).ToList();
+
+            writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
 
             writer.Write(Files.Count);
             writer.Write(Dependencies.Count);
@@ -114,7 +118,7 @@ public class MasterLevel : BinaryResource
             {
                 for (int i = 0; i < Files.Count; i++)
                 {
-                    writer.WriteObjectOffset(Files[i], 8);
+                    writer.WriteObjectOffset(Files[i], writer.GetOffsetSize());
                 }
             });
 
@@ -122,13 +126,14 @@ public class MasterLevel : BinaryResource
             {
                 for (int i = 0; i < Dependencies.Count; i++)
                 {
-                    writer.WriteObjectOffset(Dependencies[i], 8);
+                    writer.WriteObjectOffset(Dependencies[i], writer.GetOffsetSize());
                 }
             });
 
             writer.Write(Field20);
             writer.Write(Field21);
-            writer.Write(Field28);
+
+            writer.Align(16);
         }
     }
 
