@@ -1,8 +1,6 @@
 ﻿namespace SharpNeedle.SonicTeam; 
 
 using SharpNeedle.BINA;
-using System.Diagnostics;
-using System.Reflection.PortableExecutable;
 
 [NeedleResource("st/masterlevel", @"\.mlevel$")]
 public class MasterLevel : BinaryResource
@@ -86,11 +84,18 @@ public class MasterLevel : BinaryResource
             {
                 if (dependencyCount != 0)
                 {
+                    FileInfoBinaryOptions options = new()
+                    {
+                        IsDependency = true
+                    };
+
                     for (int i = 0; i < dependencyCount; i++)
                     {
+                        options.IsLast = i + 1 == Dependencies.Count;
+
                         reader.ReadOffset(() =>
                         {
-                            Dependencies.Add(reader.ReadObject<FileInfo, bool>(i + 1 == dependencyCount));
+                            Dependencies.Add(reader.ReadObject<FileInfo, FileInfoBinaryOptions>(options));
                         });
                     }
                 }
@@ -128,9 +133,16 @@ public class MasterLevel : BinaryResource
 
             writer.WriteOffset(() =>
             {
+                FileInfoBinaryOptions options = new()
+                {
+                    IsDependency = true
+                };
+
                 for (int i = 0; i < Dependencies.Count; i++)
                 {
-                    writer.WriteObjectOffset(Dependencies[i], i + 1 == Dependencies.Count, writer.GetOffsetSize());
+                    options.IsLast = i + 1 == Dependencies.Count;
+
+                    writer.WriteObjectOffset(Dependencies[i], options, writer.GetOffsetSize());
                 }
             });
 
@@ -145,30 +157,37 @@ public class MasterLevel : BinaryResource
         }
     }
 
-    public class FileInfo : IBinarySerializable<bool>
+    public class FileInfo : IBinarySerializable<FileInfoBinaryOptions>
     {
         public string Name { get; set; }
         public bool Field08 { get; set; }
         public string NextDependencyName { get; set; }
         public FileInfo NextFileInfo { get; set; }
 
-        public void Read(BinaryObjectReader reader, bool isLast)
+        public void Read(BinaryObjectReader reader, FileInfoBinaryOptions options)
         {
             reader.Align(8);
 
             Name = reader.ReadStringOffset(StringBinaryFormat.NullTerminated);
 
-            reader.ReadOffset(() =>
+            if (options.IsDependency)
             {
-                Field08 = reader.Read<bool>();
-            });
+                reader.ReadOffsetValue();
+            }
+            else
+            {
+                reader.ReadOffset(() =>
+                {
+                    Field08 = reader.Read<bool>();
+                });
+            }
 
             long offset = reader.ReadOffsetValue();
             if (offset != 0)
             {
                 reader.ReadAtOffset(offset, () =>
                 {
-                    if (isLast)
+                    if (options.IsLast)
                     {
                         NextFileInfo = reader.ReadObject<FileInfo>();
                     }
@@ -180,16 +199,23 @@ public class MasterLevel : BinaryResource
             }
         }
 
-        public void Write(BinaryObjectWriter writer, bool isLast)
+        public void Write(BinaryObjectWriter writer, FileInfoBinaryOptions options)
         {
             writer.Align(8);
 
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
 
-            writer.WriteOffset(() =>
+            if (options.IsDependency)
             {
-                writer.Write(Field08);
-            });
+                writer.WriteOffsetValue(0);
+            }
+            else
+            {
+                writer.WriteOffset(() =>
+                {
+                    writer.Write(Field08);
+                });
+            }
 
             if (String.IsNullOrEmpty(NextDependencyName))
             {
@@ -209,22 +235,9 @@ public class MasterLevel : BinaryResource
         }
     }
 
-    [StructLayout(LayoutKind.Explicit, Size = 24)]
-    public struct UnknownUnion
+    public struct FileInfoBinaryOptions
     {
-        [FieldOffset(0)] public string Name;
-        [FieldOffset(0)] public FileInfo FileInfo;
-
-        public UnknownUnion(string value) : this() => Name = value;
-        public UnknownUnion(FileInfo value) : this() => FileInfo = value;
-
-        public void Set(string value) => Name = value;
-        public void Set(FileInfo value) => FileInfo = value;
-
-        public static implicit operator UnknownUnion(string value) => new(value);
-        public static implicit operator UnknownUnion(FileInfo value) => new(value);
-
-        public static implicit operator string(UnknownUnion value) => value.Name;
-        public static implicit operator FileInfo(UnknownUnion value) => value.FileInfo;
+        public bool IsLast;
+        public bool IsDependency;
     }
 }
