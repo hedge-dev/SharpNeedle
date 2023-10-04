@@ -9,10 +9,13 @@ public class MasterLevel : BinaryResource
     public new static readonly uint Signature = BinaryHelper.MakeSignature<uint>("LMEH");
     public List<LevelInfo> Levels { get; set; } = new();
 
+    public MasterLevel()
+    {
+        Version = new Version(2, 1, 0, BinaryHelper.PlatformEndianness);
+    }
+
     public override void Read(BinaryObjectReader reader)
     {
-        reader.OffsetBinaryFormat = OffsetBinaryFormat.U64;
-
         reader.EnsureSignature(Signature);
 
         reader.Align(reader.GetOffsetSize()); // 4 empty bytes, always 0(?). Very Likely Padding or Version
@@ -36,7 +39,6 @@ public class MasterLevel : BinaryResource
 
     public override void Write(BinaryObjectWriter writer)
     {
-        writer.OffsetBinaryFormat = OffsetBinaryFormat.U64;
         Levels = Levels.OrderBy(o => o.Name).ToList();
 
         writer.Write(Signature);
