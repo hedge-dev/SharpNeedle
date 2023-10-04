@@ -1,7 +1,5 @@
-﻿namespace SharpNeedle.SonicTeam; 
-
-using SharpNeedle.BINA;
-using System.Reflection.PortableExecutable;
+﻿namespace SharpNeedle.SonicTeam;
+using BINA;
 
 [NeedleResource("st/masterlevel", @"\.mlevel$")]
 public class MasterLevel : BinaryResource
@@ -183,7 +181,7 @@ public class MasterLevel : BinaryResource
         {
             reader.Align(8);
 
-            Name = reader.ReadStringOffset(StringBinaryFormat.NullTerminated);
+            Name = reader.ReadStringOffset();
 
             if (options.IsDependency)
             {
@@ -237,7 +235,7 @@ public class MasterLevel : BinaryResource
 
             if (!options.IsLastLevel)
             {
-                if (String.IsNullOrEmpty(NextDependencyName))
+                if (string.IsNullOrEmpty(NextDependencyName))
                 {
                     if (NextFileInfo == null)
                     {
