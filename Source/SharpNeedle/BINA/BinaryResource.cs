@@ -155,7 +155,7 @@ public abstract class BinaryResource : ResourceBase, IBinarySerializable
     private void WriteV2(BinaryObjectWriter writer)
     {
         var begin = writer.Position;
-        writer.Write(Signature);
+        writer.WriteNative(Signature);
         writer.WriteObject(Version);
 
         var sizeToken = writer.At();

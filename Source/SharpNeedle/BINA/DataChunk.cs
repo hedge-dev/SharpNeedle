@@ -68,7 +68,7 @@ public class DataChunk<T> : DataChunk, IChunk where T : IBinarySerializable
         dataWriter.Write(0); // Dummy string table
         dataWriter.WriteArray(table.AsSpan());
 
-        writer.Write(Signature);
+        writer.WriteNative(Signature);
         
         writer.Write((int)(baseSize + table.Length + 0x34)); // Size
         writer.Write((int)baseSize); // String Table
