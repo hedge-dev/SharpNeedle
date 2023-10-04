@@ -50,11 +50,11 @@ public class MasterLevel : BinaryResource
     public class LevelInfo : IBinarySerializable
     {
         public string Name { get; set; }
-        public List<FileInfo> Files { get; set; } = new();
-        public List<FileInfo> Dependencies { get; set; } = new(); // Guessed
         public bool Field20 { get; set; }
         public bool Field21 { get; set; }
         public long Field28 { get; set; }
+        public List<FileInfo> Files { get; set; } = new();
+        public List<FileInfo> Dependencies { get; set; } = new(); // Guessed
 
         public void Read(BinaryObjectReader reader)
         {
