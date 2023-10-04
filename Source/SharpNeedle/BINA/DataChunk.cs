@@ -53,7 +53,7 @@ public class DataChunk<T> : DataChunk, IChunk where T : IBinarySerializable
         Data.Write(dataWriter);
         dataWriter.Flush();
 
-        Offsets ??= new OffsetTable();
+        Offsets = new OffsetTable();
         foreach (var offset in dataWriter.OffsetHandler.OffsetPositions)
         {
             Offsets.Add(offset);
