@@ -18,11 +18,6 @@ public class SplinePath : BinaryResource
 
         int pathCount = reader.Read<int>();
         long pathOffset = reader.ReadOffsetValue();
-        if (pathCount != 0 && pathOffset == 0)
-        {
-            reader.OffsetBinaryFormat = OffsetBinaryFormat.U64;
-            pathOffset = reader.ReadOffsetValue();
-        }
 
         Dictionary<string, uint> paths = new();
         if (Version == 1)
@@ -37,7 +32,7 @@ public class SplinePath : BinaryResource
 
             pathCount = reader.Read<int>();
             pathOffset = reader.ReadOffsetValue();
-            if (pathCount != 0 && pathOffset == 0)
+            if (pathCount != 0 && pathOffset == 0) // Sonic Colours Ultimate
             {
                 reader.OffsetBinaryFormat = OffsetBinaryFormat.U64;
                 pathOffset = reader.ReadOffsetValue();
@@ -56,11 +51,8 @@ public class SplinePath : BinaryResource
         writer.Write(Signature);
         writer.Write(Version);
 
-        writer.Write(Paths.Count);
-
-        if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
-            writer.Align(8);
-
+        writer.WriteOffsetValue(Paths.Count);
+        
         if (Version == 1)
         {
             writer.WriteOffset(() =>
@@ -262,8 +254,7 @@ public class PathObject : IBinarySerializable<uint>
 
     public void Write(BinaryObjectWriter writer, uint version)
     {
-        if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
-            writer.Align(8);
+        writer.Align(writer.GetOffsetSize());
 
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         
@@ -276,8 +267,7 @@ public class PathObject : IBinarySerializable<uint>
 
             writer.Write(Knots.Count);
 
-            if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
-                writer.Align(8);
+            writer.Align(writer.GetOffsetSize());
 
             if (Knots.Count != 0)
             {
@@ -301,8 +291,7 @@ public class PathObject : IBinarySerializable<uint>
 
             writer.Write(DoubleKnots.Count * 2);
 
-            if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
-                writer.Align(8);
+            writer.Align(writer.GetOffsetSize());
 
             if (DoubleKnots.Count != 0)
                 writer.WriteCollectionOffset(DoubleKnots);
@@ -318,8 +307,7 @@ public class PathObject : IBinarySerializable<uint>
 
             writer.Write(Distance);
 
-            if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
-                writer.Align(8);
+            writer.Align(writer.GetOffsetSize());
 
             if (Knots.Count != 0)
             {
@@ -342,10 +330,7 @@ public class PathObject : IBinarySerializable<uint>
                 writer.WriteOffsetValue(0);
             }
 
-            writer.Write(DoubleKnots.Count * 2);
-
-            if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
-                writer.Align(8);
+            writer.WriteOffsetValue(DoubleKnots.Count * 2);
 
             if (DoubleKnots.Count != 0)
                 writer.WriteCollectionOffset(DoubleKnots);
@@ -353,22 +338,14 @@ public class PathObject : IBinarySerializable<uint>
                 writer.WriteOffsetValue(0);
 
             writer.Write(Bounds);
-
-            writer.Write(UserDatas.Count);
-
-            if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
-                writer.Align(8);
+            writer.WriteOffsetValue(UserDatas.Count);
 
             if (UserDatas.Count != 0)
                 writer.WriteObjectCollectionOffset(UserDatas);
             else
                 writer.WriteOffsetValue(0);
 
-            writer.Write(Field48);
-
-            if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
-                writer.Align(8);
-
+            writer.WriteOffsetValue(Field48);
             writer.WriteObjectOffset(Unknown);
         }
     }
@@ -433,9 +410,7 @@ public class PathObject : IBinarySerializable<uint>
 
         public void Write(BinaryObjectWriter writer)
         {
-            if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
-                writer.Align(8);
-
+            writer.Align(writer.GetOffsetSize());
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
 
             writer.Write(Type);
@@ -520,25 +495,14 @@ public class PathObject : IBinarySerializable<uint>
         {
             Field00 = reader.Read<int>();
 
-            int subUnknown1Count = reader.Read<int>();
-
-            if (reader.OffsetBinaryFormat == OffsetBinaryFormat.U64)
-                reader.Align(8);
-
+            var subUnknown1Count = (int)reader.ReadOffsetValue();
+            
             SubUnknown1s.AddRange(reader.ReadObjectArrayOffset<SubUnknown1>(subUnknown1Count));
 
-            int subUnknown2Count = reader.Read<int>();
-
-            if (reader.OffsetBinaryFormat == OffsetBinaryFormat.U64)
-                reader.Align(8);
-
+            var subUnknown2Count = (int)reader.ReadOffsetValue();
             SubUnknown2s.AddRange(reader.ReadObjectArrayOffset<SubUnknown2>(subUnknown2Count));
             
-            int subUnknown3Count = reader.Read<int>();
-
-            if (reader.OffsetBinaryFormat == OffsetBinaryFormat.U64)
-                reader.Align(8);
-
+            var subUnknown3Count = (int)reader.ReadOffsetValue();
             SubUnknown3s.AddRange(reader.ReadArrayOffset<int>(subUnknown3Count));
         }
 
@@ -546,24 +510,15 @@ public class PathObject : IBinarySerializable<uint>
         {
             writer.Write(Field00);
 
-            writer.Write(SubUnknown1s.Count);
-
-            if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
-                writer.Align(8);
+            writer.WriteOffsetValue(SubUnknown1s.Count);
 
             writer.WriteObjectCollectionOffset(SubUnknown1s);
 
-            writer.Write(SubUnknown2s.Count);
-
-            if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
-                writer.Align(8);
+            writer.WriteOffsetValue(SubUnknown2s.Count);
 
             writer.WriteObjectCollectionOffset(SubUnknown2s);
 
-            writer.Write(SubUnknown3s.Count);
-
-            if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
-                writer.Align(8);
+            writer.WriteOffsetValue(SubUnknown3s.Count);
 
             writer.WriteCollectionOffset(SubUnknown3s);
         }
