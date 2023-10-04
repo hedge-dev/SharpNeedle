@@ -90,7 +90,7 @@ public class MasterLevel : BinaryResource
                     {
                         reader.ReadOffset(() =>
                         {
-                            Dependencies.Add(reader.ReadObject<FileInfo>());
+                            Dependencies.Add(reader.ReadObject<FileInfo, bool>(i + 1 == dependencyCount));
                         });
                     }
                 }
@@ -130,7 +130,7 @@ public class MasterLevel : BinaryResource
             {
                 for (int i = 0; i < Dependencies.Count; i++)
                 {
-                    writer.WriteObjectOffset(Dependencies[i], writer.GetOffsetSize());
+                    writer.WriteObjectOffset(Dependencies[i], i + 1 == Dependencies.Count, writer.GetOffsetSize());
                 }
             });
 
@@ -145,13 +145,14 @@ public class MasterLevel : BinaryResource
         }
     }
 
-    public class FileInfo : IBinarySerializable
+    public class FileInfo : IBinarySerializable<bool>
     {
         public string Name { get; set; }
         public bool Field08 { get; set; }
-        public long Field10 { get; set; }
+        public string NextDependencyName { get; set; }
+        public FileInfo NextFileInfo { get; set; }
 
-        public void Read(BinaryObjectReader reader)
+        public void Read(BinaryObjectReader reader, bool isLast)
         {
             reader.Align(8);
 
@@ -162,10 +163,24 @@ public class MasterLevel : BinaryResource
                 Field08 = reader.Read<bool>();
             });
 
-            Field10 = reader.ReadOffsetValue();
+            long offset = reader.ReadOffsetValue();
+            if (offset != 0)
+            {
+                reader.ReadAtOffset(offset, () =>
+                {
+                    if (isLast)
+                    {
+                        NextFileInfo = reader.ReadObject<FileInfo>();
+                    }
+                    else
+                    {
+                        NextDependencyName = reader.ReadString(StringBinaryFormat.NullTerminated);
+                    }
+                });
+            }
         }
 
-        public void Write(BinaryObjectWriter writer)
+        public void Write(BinaryObjectWriter writer, bool isLast)
         {
             writer.Align(8);
 
@@ -176,7 +191,40 @@ public class MasterLevel : BinaryResource
                 writer.Write(Field08);
             });
 
-            writer.Write(Field10);
+            if (String.IsNullOrEmpty(NextDependencyName))
+            {
+                if (String.IsNullOrEmpty(NextFileInfo.Name))
+                {
+                    writer.WriteOffsetValue(0);
+                }
+                else
+                {
+                    writer.WriteObjectOffset(NextFileInfo);
+                }
+            }
+            else
+            {
+                writer.WriteStringOffset(StringBinaryFormat.NullTerminated, NextDependencyName);
+            }
         }
+    }
+
+    [StructLayout(LayoutKind.Explicit, Size = 24)]
+    public struct UnknownUnion
+    {
+        [FieldOffset(0)] public string Name;
+        [FieldOffset(0)] public FileInfo FileInfo;
+
+        public UnknownUnion(string value) : this() => Name = value;
+        public UnknownUnion(FileInfo value) : this() => FileInfo = value;
+
+        public void Set(string value) => Name = value;
+        public void Set(FileInfo value) => FileInfo = value;
+
+        public static implicit operator UnknownUnion(string value) => new(value);
+        public static implicit operator UnknownUnion(FileInfo value) => new(value);
+
+        public static implicit operator string(UnknownUnion value) => value.Name;
+        public static implicit operator FileInfo(UnknownUnion value) => value.FileInfo;
     }
 }
