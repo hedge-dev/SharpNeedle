@@ -35,7 +35,7 @@ public struct BinaryList<T> : IBinarySerializable, IList<T> where T : IBinarySer
     {
         if (Items == null)
         {
-            writer.Write(0);
+            writer.WriteOffsetValue(0);
             writer.WriteOffsetValue(0);
             return;
         }
