@@ -99,7 +99,11 @@ public class MasterLevel : BinaryResource
             HasFilesAndDependencies = reader.Read<bool>();
             HasFiles = reader.Read<bool>();
 
-            reader.Align(16);
+            reader.Align(8);
+
+            reader.Skip(8); // Potential Runtime Field
+
+            reader.Align(8);
         }
 
         public void Write(BinaryObjectWriter writer)
@@ -133,7 +137,11 @@ public class MasterLevel : BinaryResource
             writer.Write(HasFilesAndDependencies);
             writer.Write(HasFiles);
 
-            writer.Align(16);
+            writer.Align(8);
+
+            writer.Skip(8); // Potential Runtime Field
+
+            writer.Align(8);
         }
     }
 
