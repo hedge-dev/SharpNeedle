@@ -1,7 +1,7 @@
 ﻿namespace SharpNeedle.SonicTeam;
 using BINA;
 
-[NeedleResource("st/pointcloud", @"\.pc(model|col)$")]
+[NeedleResource("st/pointcloud", @"\.pc(model|col|rt)$")]
 public class PointCloud : BinaryResource
 {
     public new static readonly uint Signature = BinaryHelper.MakeSignature<uint>("CPIC");
@@ -54,7 +54,7 @@ public class PointCloud : BinaryResource
         public string ResourceName { get; set; }
         public Vector3 Position { get; set; }
         public Vector3 Rotation { get; set; }
-        public int Field28 { get; set; } // Always 1
+        public int Field28 { get; set; }
         public Vector3 Scale { get; set; }
 
         public void Read(BinaryObjectReader reader, bool isLast = false)
