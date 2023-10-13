@@ -1,6 +1,12 @@
 ﻿// Program for quickly writing temporary things
-using System.Diagnostics;
-using SharpNeedle.SurfRide.Draw;
+using SharpNeedle.HedgehogEngine.Mirage;
 
-var forcesSrd = ResourceUtility.Open<SrdProject>(@"F:\SWIF\Forces\PC\ui_stage_sonic_en\ui_cockpitindicator.swif");
-forcesSrd.Write("ui_cockpitindicator.swif");
+var parameters = new ShaderParameter();
+parameters.Read(@"SurfRide3DTransform.vsparam");
+parameters.AddFloat4Usage("g_Screen_Size", 0xF4);
+parameters.Save();
+
+foreach (var usage in parameters.AllUsages())
+{
+    Console.WriteLine($"{usage} : {usage.Type.ToString().ToLower()}");
+}
