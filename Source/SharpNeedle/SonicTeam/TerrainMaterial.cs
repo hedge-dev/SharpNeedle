@@ -50,8 +50,8 @@ public class TerrainMaterial : BinaryResource
         public string DetailNormalMap { get; set; }
         public string DetailHeightMap { get; set; }
         public string BaseAlbedoMap { get; set; }
-        public string Field34 { get; set; } // BaseNormalMap?
-        public string BasePRMMap { get; set; }
+        public string BaseNormalMap { get; set; }
+        public string BaseParameterMap { get; set; }
 
         public void Read(BinaryObjectReader reader)
         {
@@ -66,8 +66,8 @@ public class TerrainMaterial : BinaryResource
             DetailNormalMap = reader.ReadStringOffset(StringBinaryFormat.NullTerminated);
             DetailHeightMap = reader.ReadStringOffset(StringBinaryFormat.NullTerminated);
             BaseAlbedoMap = reader.ReadStringOffset(StringBinaryFormat.NullTerminated);
-            Field34 = reader.ReadStringOffset(StringBinaryFormat.NullTerminated);
-            BasePRMMap = reader.ReadStringOffset(StringBinaryFormat.NullTerminated);
+            BaseNormalMap = reader.ReadStringOffset(StringBinaryFormat.NullTerminated);
+            BaseParameterMap = reader.ReadStringOffset(StringBinaryFormat.NullTerminated);
         }
 
         public void Write(BinaryObjectWriter writer)
@@ -83,8 +83,8 @@ public class TerrainMaterial : BinaryResource
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, DetailNormalMap, -1, 1);
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, DetailHeightMap, -1, 1);
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, BaseAlbedoMap, -1, 1);
-            writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Field34, -1, 1);
-            writer.WriteStringOffset(StringBinaryFormat.NullTerminated, BasePRMMap, -1, 1);
+            writer.WriteStringOffset(StringBinaryFormat.NullTerminated, BaseNormalMap, -1, 1);
+            writer.WriteStringOffset(StringBinaryFormat.NullTerminated, BaseParameterMap, -1, 1);
         }
     }
 }
