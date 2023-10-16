@@ -1,7 +1,6 @@
-﻿using SharpNeedle.SurfRide.Draw.Animations;
-using static SharpNeedle.Glitter.EmitterParameter.IShapeParameter;
+﻿namespace SharpNeedle.Glitter;
 
-namespace SharpNeedle.Glitter;
+using static SharpNeedle.Glitter.EmitterParameter.IShapeParameter;
 
 public class EmitterParameter : IBinarySerializable<EffectParameter>
 {

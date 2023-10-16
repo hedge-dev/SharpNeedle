@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using System.Reflection.PortableExecutable;
-
-namespace SharpNeedle.Glitter;
+﻿namespace SharpNeedle.Glitter;
 
 public class EffectParameter : IBinarySerializable<Effect>
 {

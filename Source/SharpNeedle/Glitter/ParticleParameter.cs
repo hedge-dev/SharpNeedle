@@ -1,6 +1,4 @@
-﻿using System.Reflection.PortableExecutable;
-
-namespace SharpNeedle.Glitter;
+﻿namespace SharpNeedle.Glitter;
 
 public class ParticleParameter : IBinarySerializable<EmitterParameter>
 {

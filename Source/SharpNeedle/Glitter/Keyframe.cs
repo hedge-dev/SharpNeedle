@@ -1,6 +1,4 @@
-﻿using SharpNeedle.Ninja.Csd.Motions;
-
-namespace SharpNeedle.Glitter;
+﻿namespace SharpNeedle.Glitter;
 
 public class Keyframe : IBinarySerializable
 {

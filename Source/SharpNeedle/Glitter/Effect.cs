@@ -1,12 +1,12 @@
-﻿using SharpNeedle.BINA;
+﻿namespace SharpNeedle.Glitter;
 
-namespace SharpNeedle.Glitter;
+using SharpNeedle.BINA;
 
 [NeedleResource("glitter/effect", @"\.(gle|effect)$")]
 public class Effect : BinaryResource
 {
     public new static readonly uint Signature = BinaryHelper.MakeSignature<uint>("FIRG");
-    public uint Version { get; set; }
+    public uint Version { get; set; } = 0x01060000;
     public LinkedList<EffectParameter> Parameters { get; set; } = new();
     
     public override void Read(BinaryObjectReader reader)
