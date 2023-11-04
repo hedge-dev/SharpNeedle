@@ -1,4 +1,5 @@
 ﻿namespace SharpNeedle.HedgehogEngine;
+using System.Drawing;
 using System.IO;
 
 // Based on Skyth's HedgeGI: https://github.com/blueskythlikesclouds/HedgeGI/blob/master/Source/HedgeGI/MetaInstancer.cpp
@@ -8,8 +9,9 @@ public class MetaInstancer : ResourceBase, IBinarySerializable
     public static readonly uint Signature = BinaryHelper.MakeSignature<uint>("MTI ");
     public static readonly uint InstanceSize = 24U;
     public static readonly uint HeaderSize = 32U;
+	
     public uint FormatVersion { get; set; } = 1;
-    public List<Instance> Instances { get; set; } = new List<Instance>();
+    public List<Instance> Instances { get; set; } = new();
     
     public override void Read(IFile file)
     {
@@ -27,9 +29,7 @@ public class MetaInstancer : ResourceBase, IBinarySerializable
 
     public void Read(BinaryObjectReader reader)
     {
-        int sig = reader.ReadNative<int>();
-        if(sig != Signature)
-            throw new BadImageFormatException($"Signature mismatch. Expected: {Signature}. Got: {sig}");
+        reader.EnsureSignatureNative(Signature);
 
         FormatVersion = reader.Read<uint>();
         int instanceCount = reader.Read<int>();
@@ -49,6 +49,7 @@ public class MetaInstancer : ResourceBase, IBinarySerializable
     public void Write(BinaryObjectWriter writer)
     {
         writer.WriteNative(Signature);
+
         writer.Write(FormatVersion);
         writer.Write(Instances.Count);
         writer.Write(InstanceSize);
@@ -61,20 +62,17 @@ public class MetaInstancer : ResourceBase, IBinarySerializable
 
     public class Instance : IBinarySerializable
     {
-        public Vector3 Position;
-        public byte Type;
-        public byte Sway;
+        public Vector3 Position { get; set; }
+        public byte Type { get; set; }
+        public byte Sway { get; set; }
 
-        public byte PitchAfterSway;
-        public byte YawAfterSway;
+        public byte PitchAfterSway { get; set; }
+        public byte YawAfterSway { get; set; }
 
-        public short PitchBeforeSway;
-        public short YawBeforeSway;
+        public short PitchBeforeSway { get; set; }
+        public short YawBeforeSway { get; set; }
 
-        public byte ColorA;
-        public byte ColorR;
-        public byte ColorG;
-        public byte ColorB;
+        public Color Color { get; set; }
 
         public void Read(BinaryObjectReader reader)
         {
@@ -88,10 +86,7 @@ public class MetaInstancer : ResourceBase, IBinarySerializable
             PitchBeforeSway = reader.Read<short>();
             YawBeforeSway = reader.Read<short>();
 
-            ColorA = reader.Read<byte>();
-            ColorR = reader.Read<byte>();
-            ColorG = reader.Read<byte>();
-            ColorB = reader.Read<byte>();
+            Color = Color.FromArgb(reader.Read<int>());
         }
 
         public void Write(BinaryObjectWriter writer)
@@ -106,10 +101,7 @@ public class MetaInstancer : ResourceBase, IBinarySerializable
             writer.Write(PitchBeforeSway);
             writer.Write(YawBeforeSway);
 
-            writer.Write(ColorA);
-            writer.Write(ColorR);
-            writer.Write(ColorG);
-            writer.Write(ColorB);
+            writer.Write(Color.ToArgb());
         }
     }
 }
