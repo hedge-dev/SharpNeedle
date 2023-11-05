@@ -1,5 +1,6 @@
 ﻿namespace SharpNeedle.HedgehogEngine;
-using System.Drawing;
+
+using SharpNeedle;
 using System.IO;
 
 // Based on Skyth's HedgeGI: https://github.com/blueskythlikesclouds/HedgeGI/blob/master/Source/HedgeGI/MetaInstancer.cpp
@@ -9,7 +10,7 @@ public class MetaInstancer : ResourceBase, IBinarySerializable
     public static readonly uint Signature = BinaryHelper.MakeSignature<uint>("MTI ");
     public static readonly uint InstanceSize = 24U;
     public static readonly uint HeaderSize = 32U;
-	
+
     public uint FormatVersion { get; set; } = 1;
     public List<Instance> Instances { get; set; } = new();
     
@@ -30,8 +31,8 @@ public class MetaInstancer : ResourceBase, IBinarySerializable
     public void Read(BinaryObjectReader reader)
     {
         reader.EnsureSignatureNative(Signature);
-
         FormatVersion = reader.Read<uint>();
+
         int instanceCount = reader.Read<int>();
         int instanceSize = reader.Read<int>();
 
@@ -49,8 +50,8 @@ public class MetaInstancer : ResourceBase, IBinarySerializable
     public void Write(BinaryObjectWriter writer)
     {
         writer.WriteNative(Signature);
-
         writer.Write(FormatVersion);
+
         writer.Write(Instances.Count);
         writer.Write(InstanceSize);
 
@@ -72,7 +73,7 @@ public class MetaInstancer : ResourceBase, IBinarySerializable
         public short PitchBeforeSway { get; set; }
         public short YawBeforeSway { get; set; }
 
-        public Color Color { get; set; }
+        public Color<byte> Color { get; set; }
 
         public void Read(BinaryObjectReader reader)
         {
@@ -86,7 +87,8 @@ public class MetaInstancer : ResourceBase, IBinarySerializable
             PitchBeforeSway = reader.Read<short>();
             YawBeforeSway = reader.Read<short>();
 
-            Color = Color.FromArgb(reader.Read<int>());
+            byte colorA = reader.Read<byte>();
+            Color = new Color<byte>(reader.Read<byte>(), reader.Read<byte>(), reader.Read<byte>(), colorA);
         }
 
         public void Write(BinaryObjectWriter writer)
@@ -101,7 +103,10 @@ public class MetaInstancer : ResourceBase, IBinarySerializable
             writer.Write(PitchBeforeSway);
             writer.Write(YawBeforeSway);
 
-            writer.Write(Color.ToArgb());
+            writer.Write(Color.A);
+            writer.Write(Color.R);
+            writer.Write(Color.G);
+            writer.Write(Color.B);
         }
     }
 }
