@@ -16,7 +16,6 @@ public class TerrainMaterial : BinaryResource
     public override void Read(BinaryObjectReader reader)
     {
         reader.EnsureSignature(Signature);
-
         FormatVersion = reader.Read<uint>();
 
         var instancesOffset = reader.ReadOffsetValue();
@@ -30,8 +29,7 @@ public class TerrainMaterial : BinaryResource
 
     public override void Write(BinaryObjectWriter writer)
     {
-        writer.WriteNative(Signature);
-
+        writer.Write(Signature);
         writer.Write(FormatVersion);
 
         writer.WriteObjectCollectionOffset(Layers);
