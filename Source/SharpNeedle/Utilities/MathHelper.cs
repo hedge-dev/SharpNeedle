@@ -175,4 +175,34 @@ public static class MathHelper
             MathF.Asin(2.0f * test / unit),
             MathF.Atan2(2.0f * (quaternion.X * quaternion.W + quaternion.Y * quaternion.Z), -sqx + sqy - sqz + sqw));
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static float ToDegrees(this float radian)
+    {
+        return radian * 180.0f / MathF.PI;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static float ToRadians(this float degree)
+    {
+        return degree * MathF.PI / 180.0f;
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static Vector3 ToRadians(this Vector3 degreeVector)
+    {
+        return new Vector3(
+            degreeVector.X.ToRadians(),
+            degreeVector.Y.ToRadians(),
+            degreeVector.Z.ToRadians());
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static Vector3 ToDegrees(this Vector3 radianVector)
+    {
+        return new Vector3(
+            radianVector.X.ToDegrees(),
+            radianVector.Y.ToDegrees(),
+            radianVector.Z.ToDegrees());
+    }
 }
