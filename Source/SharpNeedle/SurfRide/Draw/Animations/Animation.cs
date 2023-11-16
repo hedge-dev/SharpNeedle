@@ -1,17 +1,18 @@
-﻿namespace SharpNeedle.SurfRide.Draw;
+﻿namespace SharpNeedle.SurfRide.Draw.Animations;
 
 public class Animation : List<Motion>, IBinarySerializable<ChunkBinaryOptions>
 {
+    public Layer Layer { get; set; }
     public string Name { get; set; }
     public int ID { get; set; }
     public uint EndFrame { get; set; }
     public bool IsLooping { get; set; }
     public UserData UserData { get; set; }
-    public Layer Layer { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
         Layer = (Layer)options.Data;
+        options.Data = this;
 
         Clear();
         if (options.Version >= 3)
@@ -44,8 +45,6 @@ public class Animation : List<Motion>, IBinarySerializable<ChunkBinaryOptions>
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
-        Layer = (Layer)options.Data;
-
         if (options.Version >= 3)
             writer.Align(8);
         

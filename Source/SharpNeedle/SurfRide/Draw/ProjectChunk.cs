@@ -59,6 +59,8 @@ public class ProjectNode : IBinarySerializable<ChunkBinaryOptions>
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
+        options.Data = this;
+
         Name = reader.ReadStringOffset();
         var sceneCount = reader.Read<ushort>();
         Field06 = reader.Read<short>();
@@ -83,6 +85,8 @@ public class ProjectNode : IBinarySerializable<ChunkBinaryOptions>
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
+        options.Data = this;
+
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         writer.Write((ushort)Scenes.Count);
         writer.Write(Field06);

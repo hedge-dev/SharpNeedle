@@ -9,4 +9,5 @@ public struct ChunkBinaryOptions
 {
     public ChunkHeader? Header;
     public uint Version;
+    public IBinarySerializable<ChunkBinaryOptions> Data;
 }

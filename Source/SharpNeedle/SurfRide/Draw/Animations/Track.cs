@@ -1,4 +1,4 @@
-﻿namespace SharpNeedle.SurfRide.Draw;
+﻿namespace SharpNeedle.SurfRide.Draw.Animations;
 
 public class Track : List<KeyFrame>, IBinarySerializable<ChunkBinaryOptions>
 {
@@ -33,52 +33,4 @@ public class Track : List<KeyFrame>, IBinarySerializable<ChunkBinaryOptions>
         
         writer.WriteObjectCollectionOffset(Flags, this);
     }
-}
-
-public enum FCurveType : short
-{
-    Tx,
-    Ty,
-    Tz,
-    Rx,
-    Ry,
-    Rz,
-    Sx,
-    Sy,
-    Sz,
-    MaterialColor,
-    Display,
-    Width,
-    Height,
-    VertexColorTopLeft,
-    VertexColorTopRight,
-    VertexColorBottomLeft,
-    VertexColorBottomRight,
-    CropIndex0,
-    CropIndex1,
-    IlluminationColor = 20,
-    MaterialColorR,
-    MaterialColorG,
-    MaterialColorB,
-    MaterialColorA,
-    VertexColorTopLeftR,
-    VertexColorTopLeftG,
-    VertexColorTopLeftB,
-    VertexColorTopLeftA,
-    VertexColorTopRightR,
-    VertexColorTopRightG,
-    VertexColorTopRightB,
-    VertexColorTopRightA,
-    VertexColorBottomLeftR,
-    VertexColorBottomLeftG,
-    VertexColorBottomLeftB,
-    VertexColorBottomLeftA,
-    VertexColorBottomRightR,
-    VertexColorBottomRightG,
-    VertexColorBottomRightB,
-    VertexColorBottomRightA,
-    IlluminationColorR,
-    IlluminationColorG,
-    IlluminationColorB,
-    IlluminationColorA
 }

@@ -13,9 +13,13 @@ public class Scene : IBinarySerializable<ChunkBinaryOptions>
     public List<Layer> Layers { get; set; } = new();
     public List<Camera> Cameras { get; set; } = new();
     public UserData UserData { get; set; }
+    public ProjectNode Project { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
+        Project = (ProjectNode)options.Data;
+        options.Data = this;
+
         if (options.Version >= 3)
             reader.Align(8);
         
@@ -48,6 +52,9 @@ public class Scene : IBinarySerializable<ChunkBinaryOptions>
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
+        Project = (ProjectNode)options.Data;
+        options.Data = this;
+
         if (options.Version >= 3)
             writer.Align(8);
         

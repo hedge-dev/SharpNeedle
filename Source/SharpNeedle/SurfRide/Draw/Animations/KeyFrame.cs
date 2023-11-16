@@ -1,4 +1,4 @@
-﻿namespace SharpNeedle.SurfRide.Draw;
+﻿namespace SharpNeedle.SurfRide.Draw.Animations;
 
 public class KeyFrame : IBinarySerializable<int>
 {
@@ -39,14 +39,6 @@ public class KeyFrame : IBinarySerializable<int>
         if (interpolation == InterpolationType.Individual)
             writer.Write(Field10);
     }
-}
-
-public enum InterpolationType
-{
-    Constant,
-    Linear,
-    Hermite,
-    Individual
 }
 
 [StructLayout(LayoutKind.Explicit, Size = 4)]

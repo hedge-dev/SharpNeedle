@@ -12,4 +12,3 @@ public interface IImageDataBase : ICastData
     public ImageCastSurface Surface { get; set; }
     public IEffectData Effect { get; set; }
 }
-public interface ICastData : IBinarySerializable<ChunkBinaryOptions> { }

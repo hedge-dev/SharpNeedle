@@ -19,10 +19,10 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
     public Vector2 BottomRight { get; set; }
     public uint Field2C { get; set; }
     public BitSet<uint> InheritanceFlags { get; set; }
-    public uint Field38 { get; set; }
+    public BitSet<uint> Flags { get; set; }
     public string Text { get; set; }
     public string FontName { get; set; }
-    public uint Field4C { get; set; }
+    public float Field4C { get; set; }
     public uint Width { get; set; }
     public uint Height { get; set; }
     public uint Field58 { get; set; }
@@ -61,13 +61,13 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
         Field2C = reader.Read<uint>();
         Info = reader.ReadValueOffset<CastInfo>();
         InheritanceFlags = reader.Read<BitSet<uint>>();
-        Field38 = reader.Read<uint>();
+        Flags = reader.Read<BitSet<uint>>();
         SpriteIndices = reader.ReadArrayOffset<int>(reader.Read<int>());
 
         Text = reader.ReadStringOffset();
         FontName = reader.ReadStringOffset();
         
-        Field4C = reader.Read<uint>();
+        Field4C = reader.Read<float>();
 
         if (family.Scene.Version >= 3)
         {
@@ -96,7 +96,7 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
         writer.Write(Field2C);
         writer.WriteValueOffset(Info);
         writer.Write(InheritanceFlags);
-        writer.Write(Field38);
+        writer.Write(Flags);
 
         writer.Write(SpriteIndices.Length);
         writer.WriteArrayOffset(SpriteIndices);

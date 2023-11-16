@@ -221,7 +221,7 @@ public class Family : IBinarySerializable<Scene>, IList<Cast>
         set => Children[index] = value;
     }
 
-    internal struct TreeDescriptorNode
+    public struct TreeDescriptorNode
     {
         public int ChildIndex;
         public int SiblingIndex;

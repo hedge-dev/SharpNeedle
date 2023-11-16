@@ -12,7 +12,7 @@ public class ImageCastData : IImageDataBase
     public IEffectData Effect { get; set; }
     public ImageCastSurface Surface { get; set; } = new();
     public ImageCastSurface Surface1 { get; set; } = new();
-    public FontData FontData { get; set; }
+    public TextData TextData { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
@@ -41,7 +41,7 @@ public class ImageCastData : IImageDataBase
             reader.ReadOffsetValue();
         
         if ((Flags & CastAttribute.UseFont) == CastAttribute.UseFont)
-            FontData = reader.ReadObjectOffset<FontData, ChunkBinaryOptions>(options);
+            TextData = reader.ReadObjectOffset<TextData, ChunkBinaryOptions>(options);
         else
             reader.ReadOffsetValue();
 
@@ -78,8 +78,8 @@ public class ImageCastData : IImageDataBase
         else
             writer.WriteOffsetValue(0);
         
-        if (FontData != null)
-            writer.WriteObjectOffset(FontData, options);
+        if (TextData != null)
+            writer.WriteObjectOffset(TextData, options);
         else
             writer.WriteOffsetValue(0);
 
@@ -91,28 +91,30 @@ public class ImageCastData : IImageDataBase
     }
 }
 
-public class FontData : IBinarySerializable<ChunkBinaryOptions>
+public class TextData : IBinarySerializable<ChunkBinaryOptions>
 {
     public uint Field00 { get; set; }
-    public uint FontListIndex { get; set; }
+    public int FontIndex { get; set; }
     public Vector2 Scale { get; set; }
-    public uint Field14 { get; set; }
+    public short Field14 { get; set; }
+    public short Field16 { get; set; }
     public uint Field18 { get; set; }
     public short SpaceCorrection { get; set; }
     public ushort Field1E { get; set; }
-    public string Characters { get; set; }
+    public string Text { get; set; }
     public Font Font { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
         Field00 = reader.Read<uint>();
-        FontListIndex = reader.Read<uint>();
+        FontIndex = reader.Read<int>();
         if (options.Version >= 3)
             reader.Align(8);
-        
-        Characters = reader.ReadStringOffset();
+
+        Text = reader.ReadStringOffset();
         Scale = reader.Read<Vector2>();
-        Field14 = reader.Read<uint>();
+        Field14 = reader.Read<short>();
+        Field16 = reader.Read<short>();
         Field18 = reader.Read<uint>();
         SpaceCorrection = reader.Read<short>();
         Field1E = reader.Read<ushort>();
@@ -125,13 +127,14 @@ public class FontData : IBinarySerializable<ChunkBinaryOptions>
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
         writer.Write(Field00);
-        writer.Write(FontListIndex);
+        writer.Write(FontIndex);
         if (options.Version >= 3)
             writer.Align(8);
         
-        writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Characters);
+        writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Text);
         writer.Write(Scale);
         writer.Write(Field14);
+        writer.Write(Field16);
         writer.Write(Field18);
         writer.Write(SpaceCorrection);
         writer.Write(Field1E);
