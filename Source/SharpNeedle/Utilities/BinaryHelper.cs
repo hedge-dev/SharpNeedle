@@ -207,5 +207,5 @@ public static class BinaryHelper
     }
 
     public static void WriteArrayFixedLength<T>(this BinaryObjectWriter writer, T[] array, int length) where T : unmanaged
-        => WriteArrayFixed(writer, array.AsSpan(), length);
+        => WriteArrayFixedLength(writer, array.AsSpan(), length);
 }
