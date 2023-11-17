@@ -197,4 +197,15 @@ public static class BinaryHelper
 
     public static SeekToken At(this BinaryValueWriter reader)
         => new SeekToken(reader.GetBaseStream(), reader.Position, SeekOrigin.Begin);
+
+	public static void WriteArrayFixedLength<T>(this BinaryObjectWriter writer, Span<T> array, int length) where T : unmanaged
+    {
+        if (array.Length != length)
+            throw new IndexOutOfRangeException($"Fixed array length mismatch. Expected: {length}. Got: {array.Length}");
+
+        writer.WriteArray((ReadOnlySpan<T>)array);
+    }
+
+    public static void WriteArrayFixedLength<T>(this BinaryObjectWriter writer, T[] array, int length) where T : unmanaged
+        => WriteArrayFixed(writer, array.AsSpan(), length);
 }
