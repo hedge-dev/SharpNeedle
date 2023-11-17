@@ -170,8 +170,32 @@ public struct MeshSlot
         Type = type;
     }
 
-    public override string ToString()
+    public readonly override string ToString()
         => Name ?? Type.ToString();
+
+    public readonly override bool Equals(object obj)
+    {
+        if (obj is Mesh.Type type)
+        {
+            return this == type;
+        }
+        else if (obj is MeshSlot slot)
+        {
+            if (slot.Type == Mesh.Type.Special && Type == Mesh.Type.Special)
+            {
+                return slot.Name == Name;
+            }
+
+            return slot.Type == Type;
+        }
+
+        return false;
+    }
+
+    public readonly override int GetHashCode()
+    {
+        return Type == Mesh.Type.Special ? Name.GetHashCode() : Type.GetHashCode();
+    }
 
     public static bool operator ==(MeshSlot lhs, Mesh.Type rhs)
         => lhs.Type == rhs;
