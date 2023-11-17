@@ -1,4 +1,6 @@
-﻿namespace SharpNeedle.SurfRide.Draw.Extensions;
+﻿using SharpNeedle.Ninja.Csd;
+
+namespace SharpNeedle.SurfRide.Draw.Extensions;
 
 public static class LayerExtensions
 {
@@ -7,6 +9,10 @@ public static class LayerExtensions
         var parentPrio = parent.Priority;
         parent.Priority = child.Priority;
         child.Priority = parentPrio;
+
+        var parentVisibility = parent.Cell.IsVisible;
+        parent.Cell.IsVisible = child.Cell.IsVisible;
+        child.Cell.IsVisible = parentVisibility;
 
         // Remove the Children from the Parent cast to separate the hierarchy
         parent.Children.Remove(child);
@@ -110,6 +116,7 @@ public static class LayerExtensions
         if (parent.Children.Count == 0)
             parent.ChildIndex = -1;
         // TODO: change sibling index of the cast before to the next cast
+
 
         cast.Cell.Translation = GetAbsolutePosition(cast.Cell.Translation / 2.0f, parent);
         cast.Cell.Translation = GetRelativePosition(cast.Cell.Translation, target);
