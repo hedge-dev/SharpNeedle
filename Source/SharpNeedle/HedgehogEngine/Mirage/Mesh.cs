@@ -1,9 +1,9 @@
 ﻿namespace SharpNeedle.HedgehogEngine.Mirage;
+using System.IO;
 
 public class Mesh : IBinarySerializable, IDisposable, ICloneable<Mesh>
 {
-    public Material Material { get; set; }
-    public string MaterialName { get; set; }
+    public ResourceReference<Material> Material { get; set; }
     public ushort[] Faces { get; set; }
     public uint VertexSize { get; set; }
     public uint VertexCount { get; set; }
@@ -16,7 +16,7 @@ public class Mesh : IBinarySerializable, IDisposable, ICloneable<Mesh>
     public void Read(BinaryObjectReader reader)
     {
         Elements ??= new List<VertexElement>();
-        MaterialName = reader.ReadStringOffset();
+        Material = reader.ReadStringOffset();
 
         Faces = reader.ReadArrayOffset<ushort>(reader.Read<int>());
         VertexCount = reader.Read<uint>();
@@ -43,7 +43,7 @@ public class Mesh : IBinarySerializable, IDisposable, ICloneable<Mesh>
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.WriteStringOffset(StringBinaryFormat.NullTerminated, MaterialName);
+        writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Path.GetFileNameWithoutExtension(Material.Name));
         writer.Write(Faces.Length);
         writer.WriteArrayOffset(Faces);
 
@@ -93,10 +93,10 @@ public class Mesh : IBinarySerializable, IDisposable, ICloneable<Mesh>
 
     public void ResolveDependencies(IResourceResolver resolver)
     {
-        if (Material != null)
+        if (Material.IsValid())
             return;
 
-        Material = resolver.Open<Material>($"{MaterialName}.material");
+        Material = resolver.Open<Material>($"{Material.Name}.material");
     }
 
     public Mesh Clone()
@@ -106,7 +106,7 @@ public class Mesh : IBinarySerializable, IDisposable, ICloneable<Mesh>
             BoneIndices = BoneIndices,
             Elements = Elements,
             Faces = Faces,
-            MaterialName = MaterialName,
+            Material = Material,
             Slot = Slot,
             Textures = Textures,
             VertexCount = VertexCount,
@@ -125,8 +125,8 @@ public class Mesh : IBinarySerializable, IDisposable, ICloneable<Mesh>
 
     public void Dispose()
     {
-        Material?.Dispose();
-        Material = null;
+        Material.Resource?.Dispose();
+        Material = default;
         Vertices = null;
         Elements = null;
     }
