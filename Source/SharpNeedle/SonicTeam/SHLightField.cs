@@ -8,7 +8,7 @@ using Utilities;
 public class SHLightField : BinaryResource
 {
     public uint FormatVersion { get; set; } = 1;
-    public float[] Field04 { get; set; } = new float[36];
+    public float[] DefaultProbeLightingData { get; set; } = new float[36];
     public List<Node> Nodes { get; set; } = new ();
 
     public SHLightField()
@@ -21,7 +21,7 @@ public class SHLightField : BinaryResource
         bool inMeters = Path.GetExtension(BaseFile.Name) == ".lf";
 
         FormatVersion = reader.Read<uint>();
-        reader.ReadArray<float>(36, Field04);
+        reader.ReadArray<float>(36, DefaultProbeLightingData);
 
         int probeCount = reader.Read<int>();
         Nodes.AddRange(reader.ReadObjectArrayOffset<Node, bool>(inMeters, probeCount));
@@ -32,7 +32,7 @@ public class SHLightField : BinaryResource
         bool inMeters = Path.GetExtension(BaseFile.Name) == ".lf";
 
         writer.Write(FormatVersion);
-        writer.WriteArrayFixedLength(Field04, 36);
+        writer.WriteArrayFixedLength(DefaultProbeLightingData, 36);
 
         writer.Write(Nodes.Count);
         writer.WriteObjectCollectionOffset(inMeters, Nodes);
@@ -58,9 +58,9 @@ public class SHLightField : BinaryResource
             ProbeCountY = reader.Read<int>();
             ProbeCountZ = reader.Read<int>();
 
-            Position = inMeters ? reader.Read<Vector3>() * 10 : reader.Read<Vector3>();
+            Position = inMeters ? reader.Read<Vector3>() : reader.Read<Vector3>() / 10;
             Rotation = reader.Read<Vector3>();
-            Scale = inMeters ? reader.Read<Vector3>() * 10 : reader.Read<Vector3>();
+            Scale = inMeters ? reader.Read<Vector3>() : reader.Read<Vector3>() / 10;
         }
 
         public void Write(BinaryObjectWriter writer, bool inMeters = false)
@@ -71,9 +71,9 @@ public class SHLightField : BinaryResource
             writer.Write(ProbeCountY);
             writer.Write(ProbeCountZ);
 
-            writer.Write(inMeters ? Position / 10 : Position);
+            writer.Write(inMeters ? Position : Position * 10);
             writer.Write(Rotation);
-            writer.Write(inMeters ? Scale / 10 : Scale);
+            writer.Write(inMeters ? Scale : Scale * 10);
         }
     }
 }
