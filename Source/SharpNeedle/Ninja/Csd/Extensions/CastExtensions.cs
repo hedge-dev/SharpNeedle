@@ -158,29 +158,55 @@ public static class CastExtensions
                 (!cast.InheritanceFlags.Test(11) && cast.Parent != null && cast.Parent.InheritanceFlags.Test(11)))
                 srdCast.Flags |= SurfRide.Draw.CastNode.CastNodeAttribute.LocalScale;
 
-            if (cast.Parent != null && !cast.InheritanceFlags.Test(10) && cast.Parent.InheritanceFlags.Test(10) && cast.InheritanceFlags.Test(11))
+            if (cast.Parent != null && !cast.InheritanceFlags.Test(10) && cast.InheritanceFlags.Test(11))
             {
-                if ((parentCastInfo.Scale.X != 1 && parentCastInfo.Scale.Y == 1) || (parentCastInfo.Scale.X == 1 && parentCastInfo.Scale.Y != 1))
+                if (cast.Info.Scale.X != 1 && cast.Info.Scale.Y == 1 && parentCastInfo.Scale.Y == cast.Info.Scale.Y)
                 {
                     srdCast.Flags |= SurfRide.Draw.CastNode.CastNodeAttribute.LocalScale;
                 }
                 else
                 {
-                    castScale.X /= parentCastInfo.Scale.X;
-                    parentCastInfo.Scale.X /= parentCastInfo.Scale.X;
+                    if (parentCastInfo.Scale.Y == cast.Info.Scale.Y)
+                    {
+                        srdCast.Flags |= SurfRide.Draw.CastNode.CastNodeAttribute.LocalScale;
+                    }
+                    else if (parentCastInfo.Scale.X != 0)
+                    {
+                        castScale.X /= parentCastInfo.Scale.X;
+                        parentCastInfo.Scale.X /= parentCastInfo.Scale.X;
+                    }
+                    else if (parentCastInfo.Scale.Y != 0)
+                    {
+                        srdCast.Flags |= SurfRide.Draw.CastNode.CastNodeAttribute.LocalScale;
+                        castScale.Y *= parentCastInfo.Scale.Y;
+                        parentCastInfo.Scale = castScale;
+                    }
                 }
             }
 
-            if (cast.Parent != null && cast.InheritanceFlags.Test(10) && cast.Parent.InheritanceFlags.Test(11) && !cast.InheritanceFlags.Test(11))
+            if (cast.Parent != null && cast.InheritanceFlags.Test(10) && !cast.InheritanceFlags.Test(11))
             {
-                if ((parentCastInfo.Scale.X != 1 && parentCastInfo.Scale.Y == 1) || (parentCastInfo.Scale.X == 1 && parentCastInfo.Scale.Y != 1))
+                if (cast.Info.Scale.X == 1 && cast.Info.Scale.Y != 1 && parentCastInfo.Scale.X == cast.Info.Scale.X)
                 {
                     srdCast.Flags |= SurfRide.Draw.CastNode.CastNodeAttribute.LocalScale;
                 }
                 else
                 {
-                    castScale.Y /= parentCastInfo.Scale.Y;
-                    parentCastInfo.Scale.Y /= parentCastInfo.Scale.Y;
+                    if (parentCastInfo.Scale.X == cast.Info.Scale.X)
+                    {
+                        srdCast.Flags |= SurfRide.Draw.CastNode.CastNodeAttribute.LocalScale;
+                    }
+                    else if (parentCastInfo.Scale.Y != 0)
+                    {
+                        castScale.Y /= parentCastInfo.Scale.Y;
+                        parentCastInfo.Scale.Y /= parentCastInfo.Scale.Y;
+                    }
+                    else if (parentCastInfo.Scale.X != 0)
+                    {
+                        srdCast.Flags |= SurfRide.Draw.CastNode.CastNodeAttribute.LocalScale;
+                        castScale.X *= parentCastInfo.Scale.X;
+                        parentCastInfo.Scale = castScale;
+                    }
                 }
             }
 

@@ -186,9 +186,10 @@ public class CastNode : IBinarySerializable<ChunkBinaryOptions>, IList<CastNode>
         ImageCast = 1,
         SliceCast = 2,
         ReferenceCast = 3,
-        BlendMaterialColor = 32,
-        BlendDisplayFlag = 64,
-        HasIlluminationColor = 256,
-        LocalScale = 512
+        BlendMaterialColor = 0x20,
+        BlendDisplayFlag = 0x40,
+        BlendIlluminationColor = 0x80,
+        HasIlluminationColor = 0x100,
+        LocalScale = 0x10000
     }
 }

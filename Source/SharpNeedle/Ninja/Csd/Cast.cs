@@ -211,3 +211,23 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
         return Name;
     }
 }
+
+[Flags]
+public enum CastInheritanceFlags : uint
+{
+    Rotation = 1,
+    Color = 3,
+    TranslationX = 8,
+    TranslationY,
+    ScaleX,
+    ScaleY
+}
+
+[Flags]
+public enum CastFlags : uint
+{
+    Additive,
+    MirrorX = 10,
+    MirrorY,
+    LinearFiltering
+}
