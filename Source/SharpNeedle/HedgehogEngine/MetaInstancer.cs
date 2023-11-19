@@ -16,15 +16,18 @@ public class MetaInstancer : ResourceBase, IBinarySerializable
     
     public override void Read(IFile file)
     {
-        using var reader = new BinaryObjectReader(file.Open(), StreamOwnership.Transfer, Endianness.Big);
+        BaseFile = file;
+        Name = Path.GetFileNameWithoutExtension(file.Name);
 
+        using var reader = new BinaryObjectReader(file.Open(), StreamOwnership.Transfer, Endianness.Big);
         Read(reader);
     }
 
     public override void Write(IFile file)
     {
-        using var writer = new BinaryObjectWriter(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness.Big);
+        BaseFile = file;
 
+        using var writer = new BinaryObjectWriter(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness.Big);
         Write(writer);
     }
 
