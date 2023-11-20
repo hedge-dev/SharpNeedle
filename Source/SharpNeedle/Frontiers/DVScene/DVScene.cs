@@ -16,12 +16,15 @@ public class DVScene : ResourceBase, IBinarySerializable
 
     public DVScene() 
     {
-        // Register encoding for Shift-JIS strings
+        // Register encoding provider for Shift-JIS strings
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
 
     public override void Read(IFile file)
     {
+        BaseFile = file;
+        Name = Path.GetFileNameWithoutExtension(file.Name);
+
         using var reader = new BinaryObjectReader(file.Open(), StreamOwnership.Transfer, Endianness.Little);
         reader.OffsetBinaryFormat = OffsetBinaryFormat.U32;
 
@@ -30,6 +33,8 @@ public class DVScene : ResourceBase, IBinarySerializable
 
     public override void Write(IFile file)
     {
+        BaseFile = file;
+
         using var writer = new BinaryObjectWriter(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness.Little);
         writer.OffsetBinaryFormat = OffsetBinaryFormat.U32;
 
@@ -109,11 +114,11 @@ public class DVScene : ResourceBase, IBinarySerializable
     {
         long resourcesOffsetPos = writer.Position + 4;
 
-        writer.Skip(32);
+        writer.WriteNulls(32);
         long dataPos = writer.Position;
 
         {
-            writer.Skip(12);
+            writer.WriteNulls(12);
             writer.Write(Duration);
             writer.Write(Field10);
 
@@ -123,11 +128,11 @@ public class DVScene : ResourceBase, IBinarySerializable
             long unknownList3OffsetPos = writer.Position + 12;
             long unknownList4OffsetPos = writer.Position + 16;
             long rootNodeOffsetPos = writer.Position + 20;
-            writer.Skip(24);
+            writer.WriteNulls(24);
 
             writer.Write(Field2C);
             writer.Write(Field30);
-            writer.Skip(12);
+            writer.WriteNulls(12);
 
             {
                 long unknownList0Pos = writer.Position;
@@ -136,7 +141,7 @@ public class DVScene : ResourceBase, IBinarySerializable
                 writer.Seek(unknownList0Pos, SeekOrigin.Begin);
 
                 writer.Write(UnknownList0.Count);
-                writer.Skip(12);
+                writer.WriteNulls(12);
                 writer.WriteCollection(UnknownList0);
             }
 
@@ -146,7 +151,7 @@ public class DVScene : ResourceBase, IBinarySerializable
                 writer.Write((int)(unknownList1Pos - dataPos));
                 writer.Seek(unknownList1Pos, SeekOrigin.Begin);
 
-                writer.Skip(16);
+                writer.WriteNulls(16);
             }
 
             {
@@ -155,7 +160,7 @@ public class DVScene : ResourceBase, IBinarySerializable
                 writer.Write((int)(unknownList2Pos - dataPos));
                 writer.Seek(unknownList2Pos, SeekOrigin.Begin);
 
-                writer.Skip(16);
+                writer.WriteNulls(16);
             }
 
             {
@@ -165,7 +170,7 @@ public class DVScene : ResourceBase, IBinarySerializable
                 writer.Seek(unknownList3Pos, SeekOrigin.Begin);
 
                 writer.Write(UnknownList1.Count);
-                writer.Skip(12);
+                writer.WriteNulls(12);
                 writer.WriteCollection(UnknownList1);
             }
 
@@ -175,7 +180,7 @@ public class DVScene : ResourceBase, IBinarySerializable
                 writer.Write((int)(unknownList4Pos - dataPos));
                 writer.Seek(unknownList4Pos, SeekOrigin.Begin);
 
-                writer.Skip(16);
+                writer.WriteNulls(16);
             }
 
             {
@@ -195,9 +200,7 @@ public class DVScene : ResourceBase, IBinarySerializable
             writer.Seek(resourcesPos, SeekOrigin.Begin);
 
             writer.Write(Resources.Count);
-            writer.Write(0);
-            writer.Write(0);
-            writer.Write(0);
+            writer.WriteNulls(12);
 
             writer.WriteObjectCollection(Resources);
         }

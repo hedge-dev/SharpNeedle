@@ -133,7 +133,7 @@ public class DVModelData : DVNodeData
         writer.WriteDVString(modelName, 64);
         writer.WriteDVString(skeletonName, 64);
 
-        writer.Skip(140);
+        writer.WriteNulls(140);
     }
 }
 
@@ -168,10 +168,10 @@ public class DVMotionData : DVNodeData
         writer.Write(Field04);
         writer.Write(Field08);
         writer.Write(Field0C);
-        writer.WriteDVString(Field10);
+        writer.WriteDVString(Field10, 8);
         writer.Write(Field18);
 
-        writer.Skip(20);
+        writer.WriteNulls(20);
     }
 }
 
@@ -239,6 +239,10 @@ public class DVParameterData : DVNodeData
 
         switch ((ParameterType)Type)
         {
+            case ParameterType.Effect:
+                Attribute = new DVEffectAttribute(reader);
+                break;
+
             case ParameterType.CullDisabled:
                 Attribute = new DVCullDisabledAttribute(reader);
                 break;
@@ -265,6 +269,14 @@ public class DVParameterData : DVNodeData
 
             case ParameterType.Sound:
                 Attribute = new DVSoundAttribute(reader);
+                break;
+
+            case ParameterType.QTE:
+                Attribute = new DVQTEAttribute(reader);
+                break;
+
+            case ParameterType.TimescaleChange:
+                Attribute = new DVTimescaleAttribute(reader);
                 break;
 
             case ParameterType.MovieDisplay:

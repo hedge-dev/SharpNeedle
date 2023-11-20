@@ -32,7 +32,7 @@ public class DVResource : IBinarySerializable
         writer.Write(Field18);
         writer.WriteDVString(Name, 64);
 
-        writer.Skip(724);
+        writer.WriteNulls(724);
     }
 }
 

@@ -4,7 +4,6 @@ public class DVNode : IBinarySerializable
 {
     public DVGuid GUID { get; set; }
     public int Type { get; set; }
-    public int DataSize { get; set; }
     public List<DVNode> Children { get; set; } = new();
     public int Field1C { get; set; }
     public int Field20 { get; set; }
@@ -18,7 +17,7 @@ public class DVNode : IBinarySerializable
     {
         GUID = reader.Read<DVGuid>();
         Type = reader.Read<int>();
-        DataSize = reader.Read<int>();
+        int dataSize = reader.Read<int>();
 
         int childCount = reader.Read<int>();
         Field1C = reader.Read<int>();
@@ -59,11 +58,11 @@ public class DVNode : IBinarySerializable
                 break;
 
             case 12:
-                Data = new DVParameterData(reader, DataSize);
+                Data = new DVParameterData(reader, dataSize);
                 break;
 
             default:
-                reader.Skip(DataSize * 4);
+                reader.Skip(dataSize * 4);
                 break;
         }
 
@@ -74,9 +73,13 @@ public class DVNode : IBinarySerializable
     {
         writer.Write(GUID);
         writer.Write(Type);
-        writer.Write(DataSize);
+
+        long dataSizePos = writer.Position;
+        writer.WriteNulls(4);
+
         writer.Write(Children.Count);
         writer.Write(Field1C);
+
         writer.Write(Field20);
         writer.Write(Field24);
         writer.Write(Field28);
@@ -84,7 +87,13 @@ public class DVNode : IBinarySerializable
 
         writer.WriteDVString(Name, 64);
 
+        long dataStart = writer.Position;
         Data.Write(writer);
+        long dataEnd = writer.Position;
+
+        writer.Seek(dataSizePos, System.IO.SeekOrigin.Begin);
+        writer.Write((int)(dataEnd - dataStart) / 4);
+        writer.Seek(dataEnd, System.IO.SeekOrigin.Begin);
 
         writer.WriteObjectCollection(Children);
     }
