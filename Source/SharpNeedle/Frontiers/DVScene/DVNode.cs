@@ -58,7 +58,7 @@ public class DVNode : IBinarySerializable
                 break;
 
             case 12:
-                Data = new DVParameterData(reader, dataSize);
+                Data = new DVAttributeData(reader, dataSize);
                 break;
 
             default:

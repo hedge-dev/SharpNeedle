@@ -111,8 +111,9 @@ public class DVCameraMotionData : DVNodeData
 public class DVModelData : DVNodeData
 {
     public int Field00 { get; set; }
-    public string modelName { get; set; }
-    public string skeletonName { get; set; }
+    public string ModelName { get; set; }
+    public string SkeletonName { get; set; }
+    public string Field84 { get; set; }
 
     public DVModelData() { }
     public DVModelData(BinaryObjectReader reader)
@@ -121,19 +122,21 @@ public class DVModelData : DVNodeData
     public override void Read(BinaryObjectReader reader)
     {
         Field00 = reader.Read<int>();
-        modelName = reader.ReadDVString(64);
-        skeletonName = reader.ReadDVString(64);
+        ModelName = reader.ReadDVString(64);
+        SkeletonName = reader.ReadDVString(64);
+        Field84 = reader.ReadDVString(64);
 
-        reader.Skip(140);
+        reader.Skip(76);
     }
 
     public override void Write(BinaryObjectWriter writer)
     {
         writer.Write(Field00);
-        writer.WriteDVString(modelName, 64);
-        writer.WriteDVString(skeletonName, 64);
+        writer.WriteDVString(ModelName, 64);
+        writer.WriteDVString(SkeletonName, 64);
+        writer.WriteDVString(Field84, 64);
 
-        writer.WriteNulls(140);
+        writer.WriteNulls(76);
     }
 }
 
@@ -206,8 +209,10 @@ public class DVNodeAttachData : DVNodeData
     }
 }
 
-public class DVParameterData : DVNodeData
+public class DVAttributeData : DVNodeData
 {
+    private int UnknownDataSize;
+
     public int Type { get; set; }
     public float StartTime { get; set; }
     public float EndTime { get; set; }
@@ -216,13 +221,12 @@ public class DVParameterData : DVNodeData
     public int Field14 { get; set; }
     public int Field18 { get; set; }
     public int Field1C { get; set; }
-    public DVNodeData Attribute { get; set; }
-    public uint[] Data { get; set; }
-
-    public DVParameterData() { }
-    public DVParameterData(BinaryObjectReader reader, int size)
+    public DVAttribute Attribute { get; set; }
+    
+    public DVAttributeData() { }
+    public DVAttributeData(BinaryObjectReader reader, int size)
     {
-        Data = new uint[size - 8];
+        UnknownDataSize = size - 8;
         Read(reader);
     }
 
@@ -237,54 +241,78 @@ public class DVParameterData : DVNodeData
         Field18 = reader.Read<int>();
         Field1C = reader.Read<int>();
 
-        switch ((ParameterType)Type)
+        switch ((AttributeType)Type)
         {
-            case ParameterType.Effect:
+            case AttributeType.DrawingOff:
+                Attribute = new DVDrawingOffAttribute(reader);
+                break;
+
+            case AttributeType.PathAdjust:
+                Attribute = new DVPathAdjustAttribute(reader);
+                break;
+
+            case AttributeType.Effect:
                 Attribute = new DVEffectAttribute(reader);
                 break;
 
-            case ParameterType.CullDisabled:
+            case AttributeType.CullDisabled:
                 Attribute = new DVCullDisabledAttribute(reader);
                 break;
 
-            case ParameterType.GameCamera:
+            case AttributeType.UVAnimation:
+                Attribute = new DVUVAnimAttribute(reader);
+                break;
+
+            case AttributeType.MaterialAnimation:
+                Attribute = new DVMaterialAnimAttribute(reader);
+                break;
+
+            case AttributeType.GameCamera:
                 Attribute = new DVGameCameraAttribute(reader);
                 break;
 
-            case ParameterType.ChromaticAberration:
+            case AttributeType.ChromaticAberration:
                 Attribute = new DVChromaAberrAttribute(reader);
                 break;
 
-            case ParameterType.Fade:
+            case AttributeType.Fade:
                 Attribute = new DVFadeAttribute(reader);
                 break;
 
-            case ParameterType.Letterbox:
+            case AttributeType.Letterbox:
                 Attribute = new DVLetterboxAttribute(reader);
                 break;
 
-            case ParameterType.Subtitle:
+            case AttributeType.BossCutoff:
+                Attribute = new DVBossCutoffAttribute(reader);
+                break;
+
+            case AttributeType.Subtitle:
                 Attribute = new DVSubtitleAttribute(reader);
                 break;
 
-            case ParameterType.Sound:
+            case AttributeType.Sound:
                 Attribute = new DVSoundAttribute(reader);
                 break;
 
-            case ParameterType.QTE:
+            case AttributeType.QTE:
                 Attribute = new DVQTEAttribute(reader);
                 break;
 
-            case ParameterType.TimescaleChange:
+            case AttributeType.Aura:
+                Attribute = new DVAuraAttribute(reader);
+                break;
+
+            case AttributeType.TimescaleChange:
                 Attribute = new DVTimescaleAttribute(reader);
                 break;
 
-            case ParameterType.MovieDisplay:
+            case AttributeType.MovieDisplay:
                 Attribute = new DVMovieDisplayAttribute(reader);
                 break;
 
             default:
-                reader.ReadArray<uint>(Data.Length, Data);
+                Attribute = new DVUnknownAttribute(reader, UnknownDataSize);
                 break;
         }
     }
@@ -302,8 +330,6 @@ public class DVParameterData : DVNodeData
         
         if(Attribute != null)
             Attribute.Write(writer);
-        else
-            writer.WriteArray(Data);
     }
 }
 
@@ -315,5 +341,5 @@ public enum NodeType
     Model = 8,
     Motion = 10,
     NodeAttachment = 11,
-    Parameter = 12
+    Attribute = 12
 }

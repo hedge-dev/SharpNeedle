@@ -9,6 +9,7 @@ public class DVScene : ResourceBase, IBinarySerializable
     public int Field10 { get; set; }
     public List<float> UnknownList0 { get; set; } = new();
     public List<float> UnknownList1 { get; set; } = new();
+    //public List<float> UnknownList2 { get; set; } = new();
     public DVNode RootNode { get; set; } = new();
     public float Field2C { get; set; }
     public float Field30 { get; set; }
@@ -68,7 +69,8 @@ public class DVScene : ResourceBase, IBinarySerializable
             reader.ReadOffset(() =>
             {
                 int unknownCount = reader.Read<int>();
-                reader.Skip(12);
+                int unknownSize = reader.Read<int>();
+                reader.Skip(8);
             });
 
             reader.ReadOffset(() =>

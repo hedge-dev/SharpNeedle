@@ -1,6 +1,86 @@
 ﻿namespace SharpNeedle.Frontiers.DVScene;
 
-public class DVFadeAttribute : DVNodeData
+public abstract class DVAttribute : IBinarySerializable
+{
+    public abstract void Read(BinaryObjectReader reader);
+
+    public abstract void Write(BinaryObjectWriter writer);
+}
+
+public class DVCullDisabledAttribute : DVAttribute
+{
+    public DVCullDisabledAttribute() { }
+    public DVCullDisabledAttribute(BinaryObjectReader reader)
+        => Read(reader);
+
+    public override void Read(BinaryObjectReader reader) { }
+
+    public override void Write(BinaryObjectWriter writer) { }
+}
+
+public class DVMovieDisplayAttribute : DVAttribute
+{
+    public DVMovieDisplayAttribute() { }
+    public DVMovieDisplayAttribute(BinaryObjectReader reader) { }
+
+    public override void Read(BinaryObjectReader reader) { }
+    public override void Write(BinaryObjectWriter writer) { }
+}
+
+public class DVUnknownAttribute : DVAttribute
+{
+    public uint[] Data { get; set; }
+    public int Size { get; set; }
+
+    public DVUnknownAttribute() { }
+    public DVUnknownAttribute(BinaryObjectReader reader, int size) 
+    {
+        Size = size;
+        Data = new uint[Size];
+
+        Read(reader);
+    }
+
+    public override void Read(BinaryObjectReader reader) 
+    {
+        reader.ReadArray<uint>(Size, Data);
+    }
+
+    public override void Write(BinaryObjectWriter writer) 
+    {
+        writer.WriteArrayFixedLength(Data, Size);
+    }
+}
+
+class DVDrawingOffAttribute : DVAttribute
+{
+    public int Field00 { get; set; }
+    public int Field04 { get; set; }
+    public int Field08 { get; set; }
+    public int Field0C { get; set; }
+
+    public DVDrawingOffAttribute() { }
+    public DVDrawingOffAttribute(BinaryObjectReader reader)
+        => Read(reader);
+
+    public override void Read(BinaryObjectReader reader)
+    {
+        Field00 = reader.Read<int>();
+        Field04 = reader.Read<int>();
+        Field08 = reader.Read<int>();
+        Field0C = reader.Read<int>();
+    }
+
+    public override void Write(BinaryObjectWriter writer)
+    {
+        writer.Write(Field00);
+        writer.Write(Field04);
+        writer.Write(Field08);
+        writer.Write(Field0C);
+    }
+}
+
+public class DVFadeAttribute : DVAttribute
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
@@ -31,18 +111,7 @@ public class DVFadeAttribute : DVNodeData
     }
 }
 
-public class DVCullDisabledAttribute : DVNodeData
-{
-    public DVCullDisabledAttribute() { }
-    public DVCullDisabledAttribute(BinaryObjectReader reader)
-        => Read(reader);
-
-    public override void Read(BinaryObjectReader reader) { }
-
-    public override void Write(BinaryObjectWriter writer) { }
-}
-
-public class DVEffectAttribute : DVNodeData
+public class DVEffectAttribute : DVAttribute
 {
     public Matrix4x4 LocalTransform { get; set; }
     public int Field40 { get; set; }
@@ -94,9 +163,9 @@ public class DVEffectAttribute : DVNodeData
     }
 }
 
-public class DVLetterboxAttribute : DVNodeData
+public class DVLetterboxAttribute : DVAttribute
 {
-    public float[] Values = new float[32];
+    public float[] Values { get; set; } = new float[32];
 
     public DVLetterboxAttribute() { }
     public DVLetterboxAttribute(BinaryObjectReader reader)
@@ -113,33 +182,75 @@ public class DVLetterboxAttribute : DVNodeData
     }
 }
 
-public class DVUVAnimAttribute : DVNodeData
+public class DVUVAnimAttribute : DVAttribute
 {
+    public int Field00 { get; set; }
+    public string Name { get; set; }
+    public int Field44 { get; set; }
+    public float Field48 { get; set; }
+    public int Field4C { get; set; }
+    public int Field50 { get; set; }
+
+    public DVUVAnimAttribute() { }
+    public DVUVAnimAttribute(BinaryObjectReader reader)
+        => Read(reader);
+
     public override void Read(BinaryObjectReader reader)
     {
-
+        Field00 = reader.Read<int>();
+        Name = reader.ReadDVString(64);
+        Field44 = reader.Read<int>();
+        Field48 = reader.Read<float>();
+        Field4C = reader.Read<int>();
+        Field50 = reader.Read<int>();
     }
 
     public override void Write(BinaryObjectWriter writer)
     {
-
+        writer.Write(Field00);
+        writer.WriteDVString(Name, 64);
+        writer.Write(Field44);
+        writer.Write(Field48);
+        writer.Write(Field4C);
+        writer.Write(Field50);
     }
 }
 
-public class DVMaterialAnimAttribute : DVNodeData
+public class DVMaterialAnimAttribute : DVAttribute
 {
+    public int Field00 { get; set; }
+    public string Name { get; set; }
+    public int Field44 { get; set; }
+    public float Field48 { get; set; }
+    public int Field4C { get; set; }
+    public int Field50 { get; set; }
+
+    public DVMaterialAnimAttribute() { }
+    public DVMaterialAnimAttribute(BinaryObjectReader reader)
+        => Read(reader);
+
     public override void Read(BinaryObjectReader reader)
     {
-
+        Field00 = reader.Read<int>();
+        Name = reader.ReadDVString(64);
+        Field44 = reader.Read<int>();
+        Field48 = reader.Read<float>();
+        Field4C = reader.Read<int>();
+        Field50 = reader.Read<int>();
     }
 
     public override void Write(BinaryObjectWriter writer)
     {
-
+        writer.Write(Field00);
+        writer.WriteDVString(Name, 64);
+        writer.Write(Field44);
+        writer.Write(Field48);
+        writer.Write(Field4C);
+        writer.Write(Field50);
     }
 }
 
-public class DVChromaAberrAttribute : DVNodeData
+public class DVChromaAberrAttribute : DVAttribute
 {
     public float[] Values = new float[49];
 
@@ -158,11 +269,11 @@ public class DVChromaAberrAttribute : DVNodeData
     }
 }
 
-public class DVSoundAttribute : DVNodeData
+public class DVSoundAttribute : DVAttribute
 {
-    public string CueName;
-    public int Field40;
-    public int Field44;
+    public string CueName { get; set; }
+    public int Field40 { get; set; }
+    public int Field44 { get; set; }
 
     public DVSoundAttribute() { }
     public DVSoundAttribute(BinaryObjectReader reader)
@@ -183,34 +294,34 @@ public class DVSoundAttribute : DVNodeData
     }
 }
 
-public class DVGameCameraAttribute : DVNodeData
+public class DVGameCameraAttribute : DVAttribute
 {
-    public int Field00;
-    public int Field04;
-    public int Field08;
-    public int Field0C;
-    public float Field10;
-    public float Field14;
-    public float Field18;
-    public int Field1C;
-    public int Field20;
-    public int Field24;
-    public float Field28;
-    public float Field2C;
-    public float Field30;
-    public int Field34;
-    public int Field38;
-    public int Field3C;
-    public int Field40;
-    public float Field44;
-    public int Field48;
-    public int Field4C;
-    public float NearCullingPlane;
-    public float FarCullingPlane;
-    public float Field58;
-    public int Field5C;
-    public int Field60;
-    public int Field64;
+    public int Field00 { get; set; }
+    public int Field04 { get; set; }
+    public int Field08 { get; set; }
+    public int Field0C { get; set; }
+    public float Field10 { get; set; }
+    public float Field14 { get; set; }
+    public float Field18 { get; set; }
+    public int Field1C { get; set; }
+    public int Field20 { get; set; }
+    public int Field24 { get; set; }
+    public float Field28 { get; set; }
+    public float Field2C { get; set; }
+    public float Field30 { get; set; }
+    public int Field34 { get; set; }
+    public int Field38 { get; set; }
+    public int Field3C { get; set; }
+    public int Field40 { get; set; }
+    public float Field44 { get; set; }
+    public int Field48 { get; set; }
+    public int Field4C { get; set; }
+    public float NearCullingPlane { get; set; }
+    public float FarCullingPlane { get; set; }
+    public float Field58 { get; set; }
+    public int Field5C { get; set; }
+    public int Field60 { get; set; }
+    public int Field64 { get; set; }
 
     public DVGameCameraAttribute() { }
     public DVGameCameraAttribute(BinaryObjectReader reader)
@@ -277,16 +388,7 @@ public class DVGameCameraAttribute : DVNodeData
     }
 }
 
-public class DVMovieDisplayAttribute : DVNodeData
-{
-    public DVMovieDisplayAttribute() { }
-    public DVMovieDisplayAttribute(BinaryObjectReader reader) { }
-
-    public override void Read(BinaryObjectReader reader) { }
-    public override void Write(BinaryObjectWriter writer) { }
-}
-
-public class DVSubtitleAttribute : DVNodeData
+public class DVSubtitleAttribute : DVAttribute
 {
     public string CellName { get; set; }
     public SubtitleLanguage Language { get; set; }
@@ -327,7 +429,7 @@ public class DVSubtitleAttribute : DVNodeData
     }
 }
 
-public class DVQTEAttribute : DVNodeData
+public class DVQTEAttribute : DVAttribute
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
@@ -437,12 +539,12 @@ public class DVQTEAttribute : DVNodeData
     }
 }
 
-public class DVTimescaleAttribute : DVNodeData
+public class DVTimescaleAttribute : DVAttribute
 {
-    public int Field00;
-    public float Scale;
-    public int Field08;
-    public int Field0C;
+    public int Field00 { get; set; }
+    public float Scale { get; set; }
+    public int Field08 { get; set; }
+    public int Field0C { get; set; }
 
     public DVTimescaleAttribute() { }
     public DVTimescaleAttribute(BinaryObjectReader reader)
@@ -464,8 +566,172 @@ public class DVTimescaleAttribute : DVNodeData
         writer.Write(Field0C);
     }
 }
+/*
+public class DVVignetteAttribute : DVAttribute
+{
+    public int Field00;
+    public int Field04;
+    public float Field08;
+    public float Field0C;
 
-public enum ParameterType
+    public float[] FieldC8 = new float[32];
+
+    public DVVignetteAttribute() { }
+    public DVVignetteAttribute(BinaryObjectReader reader)
+        => Read(reader);
+
+    public override void Read(BinaryObjectReader reader)
+    {
+        Field00 = reader.Read<int>();
+        Field04 = reader.Read<int>();
+        Field08 = reader.Read<float>();
+        Field0C = reader.Read<float>();
+
+        reader.ReadArray<float>(32, FieldC8);
+    }
+
+    public override void Write(BinaryObjectWriter writer)
+    {
+        writer.Write(Field00);
+        writer.Write(Field04);
+        writer.Write(Field08);
+        writer.Write(Field0C);
+
+        writer.WriteArrayFixedLength(FieldC8, 32);
+    }
+}
+*/
+
+public class DVPathAdjustAttribute : DVAttribute
+{
+    public Matrix4x4 LocalTransform { get; set; }
+    public int Field40 { get; set; }
+    public int Field44 { get; set; }
+    public int Field48 { get; set; }
+    public int Field4C { get; set; }
+
+    public DVPathAdjustAttribute() { }
+    public DVPathAdjustAttribute(BinaryObjectReader reader)
+        => Read(reader);
+
+    public override void Read(BinaryObjectReader reader)
+    {
+        LocalTransform = reader.Read<Matrix4x4>();
+        Field40 = reader.Read<int>();
+        Field44 = reader.Read<int>();
+        Field48 = reader.Read<int>();
+        Field4C = reader.Read<int>();
+    }
+
+    public override void Write(BinaryObjectWriter writer)
+    {
+        writer.Write(LocalTransform);
+        writer.Write(Field40);
+        writer.Write(Field44);
+        writer.Write(Field48);
+        writer.Write(Field4C);
+    }
+}
+
+public class DVBossCutoffAttribute : DVAttribute
+{
+    public int Field00 { get; set; }
+    public int Field04 { get; set; }
+
+    public DVBossCutoffAttribute() { }
+    public DVBossCutoffAttribute(BinaryObjectReader reader)
+        => Read(reader);
+
+    public override void Read(BinaryObjectReader reader)
+    {
+        Field00 = reader.Read<int>();
+        Field04 = reader.Read<int>();
+    }
+
+    public override void Write(BinaryObjectWriter writer)
+    {
+        writer.Write(Field00);
+        writer.Write(Field04);
+    }
+}
+
+public class DVAuraAttribute : DVAttribute
+{
+    public int Field00 { get; set; }
+    public int Field04 { get; set; }
+    public int Field08 { get; set; }
+    public int Field0C { get; set; }
+    public float Field10 { get; set; }
+    public int Field14 { get; set; }
+    public int Field18 { get; set; }
+    public int Field1C { get; set; }
+    public int Field20 { get; set; }
+    public int Field24 { get; set; }
+    public int Field28 { get; set; }
+    public int Field2C { get; set; }
+    public int Field30 { get; set; }
+    public float Field34 { get; set; }
+    public int Field38 { get; set; }
+    public int Field3C { get; set; }
+    public int Field40 { get; set; }
+    public int Field44 { get; set; }
+    public int Field48 { get; set; }
+    public float[] Values { get; set; } = new float[32];
+
+    public DVAuraAttribute() { }
+    public DVAuraAttribute(BinaryObjectReader reader)
+        => Read(reader);
+
+    public override void Read(BinaryObjectReader reader)
+    {
+        Field00 = reader.Read<int>();
+        Field04 = reader.Read<int>();
+        Field08 = reader.Read<int>();
+        Field0C = reader.Read<int>();
+        Field10 = reader.Read<float>();
+        Field14 = reader.Read<int>();
+        Field18 = reader.Read<int>();
+        Field1C = reader.Read<int>();
+        Field20 = reader.Read<int>();
+        Field24 = reader.Read<int>();
+        Field28 = reader.Read<int>();
+        Field2C = reader.Read<int>();
+        Field30 = reader.Read<int>();
+        Field34 = reader.Read<float>();
+        Field38 = reader.Read<int>();
+        Field3C = reader.Read<int>();
+        Field40 = reader.Read<int>();
+        Field44 = reader.Read<int>();
+        Field48 = reader.Read<int>();
+        reader.ReadArray<float>(32, Values);
+    }
+
+    public override void Write(BinaryObjectWriter writer)
+    {
+        writer.Write(Field00);
+        writer.Write(Field04);
+        writer.Write(Field08);
+        writer.Write(Field0C);
+        writer.Write(Field10);
+        writer.Write(Field14);
+        writer.Write(Field18);
+        writer.Write(Field1C);
+        writer.Write(Field20);
+        writer.Write(Field24);
+        writer.Write(Field28);
+        writer.Write(Field2C);
+        writer.Write(Field30);
+        writer.Write(Field34);
+        writer.Write(Field38);
+        writer.Write(Field3C);
+        writer.Write(Field40);
+        writer.Write(Field44);
+        writer.Write(Field48);
+        writer.WriteArrayFixedLength(Values, 32);
+    }
+}
+
+public enum AttributeType
 {
     ParameterSpecifiedCamera = 1,
     DrawingOff = 3,
