@@ -19,7 +19,10 @@ public class TransitionTable : Dictionary<string, string>, IBinarySerializable
 
         writer.WriteOffset(() =>
         {
-            foreach (var pair in this)
+            var transitions = this.ToList();
+            transitions.Sort((x, y) => string.Compare(x.Key, y.Key, StringComparison.InvariantCulture));
+
+            foreach (var pair in transitions)
             {
                 writer.WriteStringOffset(StringBinaryFormat.NullTerminated, pair.Key);
                 writer.WriteStringOffset(StringBinaryFormat.NullTerminated, pair.Value);
