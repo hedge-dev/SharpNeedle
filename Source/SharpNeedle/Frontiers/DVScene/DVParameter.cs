@@ -1,16 +1,16 @@
 ﻿namespace SharpNeedle.Frontiers.DVScene;
 
-public abstract class DVAttribute : IBinarySerializable
+public abstract class DVParameter : IBinarySerializable
 {
     public abstract void Read(BinaryObjectReader reader);
 
     public abstract void Write(BinaryObjectWriter writer);
 }
 
-public class DVCullDisabledAttribute : DVAttribute
+public class DVCullDisabledParameter : DVParameter
 {
-    public DVCullDisabledAttribute() { }
-    public DVCullDisabledAttribute(BinaryObjectReader reader)
+    public DVCullDisabledParameter() { }
+    public DVCullDisabledParameter(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader) { }
@@ -18,22 +18,22 @@ public class DVCullDisabledAttribute : DVAttribute
     public override void Write(BinaryObjectWriter writer) { }
 }
 
-public class DVMovieDisplayAttribute : DVAttribute
+public class DVMovieDisplayParameter : DVParameter
 {
-    public DVMovieDisplayAttribute() { }
-    public DVMovieDisplayAttribute(BinaryObjectReader reader) { }
+    public DVMovieDisplayParameter() { }
+    public DVMovieDisplayParameter(BinaryObjectReader reader) { }
 
     public override void Read(BinaryObjectReader reader) { }
     public override void Write(BinaryObjectWriter writer) { }
 }
 
-public class DVUnknownAttribute : DVAttribute
+public class DVUnknownParameter : DVParameter
 {
     public uint[] Data { get; set; }
     public int Size { get; set; }
 
-    public DVUnknownAttribute() { }
-    public DVUnknownAttribute(BinaryObjectReader reader, int size) 
+    public DVUnknownParameter() { }
+    public DVUnknownParameter(BinaryObjectReader reader, int size) 
     {
         Size = size;
         Data = new uint[Size];
@@ -52,15 +52,15 @@ public class DVUnknownAttribute : DVAttribute
     }
 }
 
-class DVDrawingOffAttribute : DVAttribute
+class DVDrawingOffParameter : DVParameter
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
     public int Field08 { get; set; }
     public int Field0C { get; set; }
 
-    public DVDrawingOffAttribute() { }
-    public DVDrawingOffAttribute(BinaryObjectReader reader)
+    public DVDrawingOffParameter() { }
+    public DVDrawingOffParameter(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -80,7 +80,7 @@ class DVDrawingOffAttribute : DVAttribute
     }
 }
 
-public class DVFadeAttribute : DVAttribute
+public class DVFadeParameter : DVParameter
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
@@ -88,8 +88,8 @@ public class DVFadeAttribute : DVAttribute
     public int Field0C { get; set; }
     public float[] Values { get; set; } = new float[32];
 
-    public DVFadeAttribute() { }
-    public DVFadeAttribute(BinaryObjectReader reader)
+    public DVFadeParameter() { }
+    public DVFadeParameter(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -111,7 +111,7 @@ public class DVFadeAttribute : DVAttribute
     }
 }
 
-public class DVEffectAttribute : DVAttribute
+public class DVEffectParameter : DVParameter
 {
     public Matrix4x4 LocalTransform { get; set; }
     public int Field40 { get; set; }
@@ -126,8 +126,8 @@ public class DVEffectAttribute : DVAttribute
     public int FieldA0 { get; set; }
     public float[] FieldA4 { get; set; } = new float[128];
 
-    public DVEffectAttribute() { }
-    public DVEffectAttribute(BinaryObjectReader reader)
+    public DVEffectParameter() { }
+    public DVEffectParameter(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -163,12 +163,12 @@ public class DVEffectAttribute : DVAttribute
     }
 }
 
-public class DVLetterboxAttribute : DVAttribute
+public class DVLetterboxParameter : DVParameter
 {
     public float[] Values { get; set; } = new float[32];
 
-    public DVLetterboxAttribute() { }
-    public DVLetterboxAttribute(BinaryObjectReader reader)
+    public DVLetterboxParameter() { }
+    public DVLetterboxParameter(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -182,7 +182,7 @@ public class DVLetterboxAttribute : DVAttribute
     }
 }
 
-public class DVUVAnimAttribute : DVAttribute
+public class DVUVAnimParameter : DVParameter
 {
     public int Field00 { get; set; }
     public string Name { get; set; }
@@ -191,8 +191,8 @@ public class DVUVAnimAttribute : DVAttribute
     public int Field4C { get; set; }
     public int Field50 { get; set; }
 
-    public DVUVAnimAttribute() { }
-    public DVUVAnimAttribute(BinaryObjectReader reader)
+    public DVUVAnimParameter() { }
+    public DVUVAnimParameter(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -216,7 +216,7 @@ public class DVUVAnimAttribute : DVAttribute
     }
 }
 
-public class DVMaterialAnimAttribute : DVAttribute
+public class DVMaterialAnimParameter : DVParameter
 {
     public int Field00 { get; set; }
     public string Name { get; set; }
@@ -225,8 +225,8 @@ public class DVMaterialAnimAttribute : DVAttribute
     public int Field4C { get; set; }
     public int Field50 { get; set; }
 
-    public DVMaterialAnimAttribute() { }
-    public DVMaterialAnimAttribute(BinaryObjectReader reader)
+    public DVMaterialAnimParameter() { }
+    public DVMaterialAnimParameter(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -250,12 +250,12 @@ public class DVMaterialAnimAttribute : DVAttribute
     }
 }
 
-public class DVChromaAberrAttribute : DVAttribute
+public class DVChromaAberrParameter : DVParameter
 {
     public float[] Values = new float[49];
 
-    public DVChromaAberrAttribute() { }
-    public DVChromaAberrAttribute(BinaryObjectReader reader)
+    public DVChromaAberrParameter() { }
+    public DVChromaAberrParameter(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -269,14 +269,14 @@ public class DVChromaAberrAttribute : DVAttribute
     }
 }
 
-public class DVSoundAttribute : DVAttribute
+public class DVSoundParameter : DVParameter
 {
     public string CueName { get; set; }
     public int Field40 { get; set; }
     public int Field44 { get; set; }
 
-    public DVSoundAttribute() { }
-    public DVSoundAttribute(BinaryObjectReader reader)
+    public DVSoundParameter() { }
+    public DVSoundParameter(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -294,7 +294,7 @@ public class DVSoundAttribute : DVAttribute
     }
 }
 
-public class DVGameCameraAttribute : DVAttribute
+public class DVGameCameraParameter : DVParameter
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
@@ -323,8 +323,8 @@ public class DVGameCameraAttribute : DVAttribute
     public int Field60 { get; set; }
     public int Field64 { get; set; }
 
-    public DVGameCameraAttribute() { }
-    public DVGameCameraAttribute(BinaryObjectReader reader)
+    public DVGameCameraParameter() { }
+    public DVGameCameraParameter(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -388,14 +388,14 @@ public class DVGameCameraAttribute : DVAttribute
     }
 }
 
-public class DVSubtitleAttribute : DVAttribute
+public class DVSubtitleParameter : DVParameter
 {
     public string CellName { get; set; }
     public SubtitleLanguage Language { get; set; }
     public int Field14 { get; set; }
 
-    public DVSubtitleAttribute() { }
-    public DVSubtitleAttribute(BinaryObjectReader reader)
+    public DVSubtitleParameter() { }
+    public DVSubtitleParameter(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -429,7 +429,7 @@ public class DVSubtitleAttribute : DVAttribute
     }
 }
 
-public class DVQTEAttribute : DVAttribute
+public class DVQTEParameter : DVParameter
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
@@ -437,7 +437,7 @@ public class DVQTEAttribute : DVAttribute
     public float Field0C { get; set; }
     public float Field10 { get; set; }
     public float Field14 { get; set; }
-    public int Field18 { get; set; }
+    public float Field18 { get; set; }
     public int Field1C { get; set; }
     public int Field20 { get; set; }
     public int Field24 { get; set; }
@@ -461,9 +461,13 @@ public class DVQTEAttribute : DVAttribute
     public int Field6C { get; set; }
     public float Field70 { get; set; }
     public float Field74 { get; set; }
+    public float Field78 { get; set; }
+    public float Field7C { get; set; }
+    public int[] Field80 { get; set; } = new int[48];
+    public string Field140 { get; set; }
 
-    public DVQTEAttribute() { }
-    public DVQTEAttribute(BinaryObjectReader reader)
+    public DVQTEParameter() { }
+    public DVQTEParameter(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -474,7 +478,7 @@ public class DVQTEAttribute : DVAttribute
         Field0C = reader.Read<float>();
         Field10 = reader.Read<float>();
         Field14 = reader.Read<float>();
-        Field18 = reader.Read<int>();
+        Field18 = reader.Read<float>();
         Field1C = reader.Read<int>();
         Field20 = reader.Read<int>();
         Field24 = reader.Read<int>();
@@ -498,8 +502,11 @@ public class DVQTEAttribute : DVAttribute
         Field6C = reader.Read<int>();
         Field70 = reader.Read<float>();
         Field74 = reader.Read<float>();
+        Field78 = reader.Read<float>();
+        Field7C = reader.Read<float>();
+        reader.ReadArray<int>(48, Field80);
 
-        reader.Skip(264);
+        Field140 = reader.ReadDVString(64);
     }
 
     public override void Write(BinaryObjectWriter writer)
@@ -534,20 +541,23 @@ public class DVQTEAttribute : DVAttribute
         writer.Write(Field6C);
         writer.Write(Field70);
         writer.Write(Field74);
+        writer.Write(Field78);
+        writer.Write(Field7C);
+        writer.WriteArrayFixedLength(Field80, 48);
 
-        writer.WriteNulls(264);
+        writer.WriteDVString(Field140, 64);
     }
 }
 
-public class DVTimescaleAttribute : DVAttribute
+public class DVTimescaleParameter : DVParameter
 {
     public int Field00 { get; set; }
     public float Scale { get; set; }
     public int Field08 { get; set; }
     public int Field0C { get; set; }
 
-    public DVTimescaleAttribute() { }
-    public DVTimescaleAttribute(BinaryObjectReader reader)
+    public DVTimescaleParameter() { }
+    public DVTimescaleParameter(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -567,7 +577,7 @@ public class DVTimescaleAttribute : DVAttribute
     }
 }
 /*
-public class DVVignetteAttribute : DVAttribute
+public class DVVignetteParameter : DVParameter
 {
     public int Field00;
     public int Field04;
@@ -576,8 +586,8 @@ public class DVVignetteAttribute : DVAttribute
 
     public float[] FieldC8 = new float[32];
 
-    public DVVignetteAttribute() { }
-    public DVVignetteAttribute(BinaryObjectReader reader)
+    public DVVignetteParameter() { }
+    public DVVignetteParameter(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -602,7 +612,7 @@ public class DVVignetteAttribute : DVAttribute
 }
 */
 
-public class DVPathAdjustAttribute : DVAttribute
+public class DVPathAdjustParameter : DVParameter
 {
     public Matrix4x4 LocalTransform { get; set; }
     public int Field40 { get; set; }
@@ -610,8 +620,8 @@ public class DVPathAdjustAttribute : DVAttribute
     public int Field48 { get; set; }
     public int Field4C { get; set; }
 
-    public DVPathAdjustAttribute() { }
-    public DVPathAdjustAttribute(BinaryObjectReader reader)
+    public DVPathAdjustParameter() { }
+    public DVPathAdjustParameter(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -633,13 +643,13 @@ public class DVPathAdjustAttribute : DVAttribute
     }
 }
 
-public class DVBossCutoffAttribute : DVAttribute
+public class DVBossCutoffParameter : DVParameter
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
 
-    public DVBossCutoffAttribute() { }
-    public DVBossCutoffAttribute(BinaryObjectReader reader)
+    public DVBossCutoffParameter() { }
+    public DVBossCutoffParameter(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -655,7 +665,7 @@ public class DVBossCutoffAttribute : DVAttribute
     }
 }
 
-public class DVAuraAttribute : DVAttribute
+public class DVAuraParameter : DVParameter
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
@@ -678,8 +688,8 @@ public class DVAuraAttribute : DVAttribute
     public int Field48 { get; set; }
     public float[] Values { get; set; } = new float[32];
 
-    public DVAuraAttribute() { }
-    public DVAuraAttribute(BinaryObjectReader reader)
+    public DVAuraParameter() { }
+    public DVAuraParameter(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -731,7 +741,7 @@ public class DVAuraAttribute : DVAttribute
     }
 }
 
-public enum AttributeType
+public enum ParameterType
 {
     ParameterSpecifiedCamera = 1,
     DrawingOff = 3,

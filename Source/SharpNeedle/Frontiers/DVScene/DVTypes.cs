@@ -1,13 +1,5 @@
 ﻿namespace SharpNeedle.Frontiers.DVScene;
 
-public struct DVGuid
-{
-    public uint G0;
-    public uint G4;
-    public uint G8;
-    public uint GC;
-}
-
 public static class DVString
 {
     public static string ReadDVString(this BinaryObjectReader reader, int fixedLength = 64)

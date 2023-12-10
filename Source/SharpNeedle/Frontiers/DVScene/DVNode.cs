@@ -2,7 +2,7 @@
 
 public class DVNode : IBinarySerializable
 {
-    public DVGuid GUID { get; set; }
+    public Guid GUID { get; set; }
     public int Type { get; set; }
     public List<DVNode> Children { get; set; } = new();
     public int Field1C { get; set; }
@@ -13,9 +13,27 @@ public class DVNode : IBinarySerializable
     public string Name { get; set; }
     public DVNodeData Data { get; set; } = new DVTransformData();
 
+    public DVNode() { }
+
+    public DVNode(string name)
+    {
+        Name = name;
+        GUID = Guid.NewGuid();
+    }
+
+    public DVNode(string name, NodeType type) : this(name)
+    {
+        Type = (int)type;
+    }
+
+    public DVNode(string name, NodeType type, DVNodeData data) : this(name, type)
+    {
+        Data = data;
+    }
+
     public void Read(BinaryObjectReader reader)
     {
-        GUID = reader.Read<DVGuid>();
+        GUID = reader.Read<Guid>();
         Type = reader.Read<int>();
         int dataSize = reader.Read<int>();
 
@@ -29,36 +47,36 @@ public class DVNode : IBinarySerializable
 
         Name = reader.ReadDVString(64);
 
-        switch (Type)
+        switch ((NodeType)Type)
         {
-            case 1:
+            case NodeType.Transform:
                 Data = new DVTransformData(reader);
                 break;
 
-            case 3:
+            case NodeType.Camera:
                 Data = new DVCameraData(reader);
                 break;
 
-            case 4:
+            case NodeType.CameraMotion:
                 Data = new DVCameraMotionData(reader);
                 break;
 
-            case 5:
-            case 8:
+            case NodeType.Model:
+            case NodeType.Model2:
                 Data = new DVModelData(reader);
                 break;
 
-            case 6:
-            case 10:
+            case NodeType.Motion:
+            case NodeType.Motion2:
                 Data = new DVMotionData(reader);
                 break;
 
-            case 11:
+            case NodeType.NodeAttachment:
                 Data = new DVNodeAttachData(reader);
                 break;
 
-            case 12:
-                Data = new DVAttributeData(reader, dataSize);
+            case NodeType.Parameter:
+                Data = new DVParameterData(reader, dataSize);
                 break;
 
             default:

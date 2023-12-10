@@ -8,8 +8,8 @@ public class DVScene : ResourceBase, IBinarySerializable
     public float Duration { get; set; }
     public int Field10 { get; set; }
     public List<float> UnknownList0 { get; set; } = new();
+    public List<DVSegment> Segments { get; set; } = new();
     public List<float> UnknownList1 { get; set; } = new();
-    //public List<float> UnknownList2 { get; set; } = new();
     public DVNode RootNode { get; set; } = new();
     public float Field2C { get; set; }
     public float Field30 { get; set; }
@@ -68,9 +68,12 @@ public class DVScene : ResourceBase, IBinarySerializable
 
             reader.ReadOffset(() =>
             {
-                int unknownCount = reader.Read<int>();
-                int unknownSize = reader.Read<int>();
+                int segmentCount = reader.Read<int>();
+                int segmentChunkSize = reader.Read<int>();
+
                 reader.Skip(8);
+
+                Segments.AddRange(reader.ReadObjectArray<DVSegment>(segmentCount));
             });
 
             reader.ReadOffset(() =>
@@ -125,7 +128,7 @@ public class DVScene : ResourceBase, IBinarySerializable
             writer.Write(Field10);
 
             long unknownList0OffsetPos = writer.Position;
-            long unknownList1OffsetPos = writer.Position + 4;
+            long segmentsOffsetPos = writer.Position + 4;
             long unknownList2OffsetPos = writer.Position + 8;
             long unknownList3OffsetPos = writer.Position + 12;
             long unknownList4OffsetPos = writer.Position + 16;
@@ -148,12 +151,22 @@ public class DVScene : ResourceBase, IBinarySerializable
             }
 
             {
-                long unknownList1Pos = writer.Position;
-                writer.Seek(unknownList1OffsetPos, SeekOrigin.Begin);
-                writer.Write((int)(unknownList1Pos - dataPos));
-                writer.Seek(unknownList1Pos, SeekOrigin.Begin);
+                long segmentsPos = writer.Position;
+                writer.Seek(segmentsOffsetPos, SeekOrigin.Begin);
+                writer.Write((int)(segmentsPos - dataPos));
+                writer.Seek(segmentsPos, SeekOrigin.Begin);
 
-                writer.WriteNulls(16);
+                writer.Write(Segments.Count);
+                long segmentChunkSizePos = writer.Position;
+                writer.WriteNulls(12);
+                
+                writer.WriteObjectCollection(Segments);
+
+                long segmentChunkEndPos = writer.Position;
+                long segmentChunkSize = segmentChunkEndPos - (segmentChunkSizePos + 12);
+                writer.Seek(segmentChunkSizePos, SeekOrigin.Begin);
+                writer.Write((int)segmentChunkSize);
+                writer.Seek(segmentChunkEndPos, SeekOrigin.Begin);
             }
 
             {
@@ -207,6 +220,4 @@ public class DVScene : ResourceBase, IBinarySerializable
             writer.WriteObjectCollection(Resources);
         }
     }
-
-   
 }

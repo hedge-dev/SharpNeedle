@@ -209,7 +209,7 @@ public class DVNodeAttachData : DVNodeData
     }
 }
 
-public class DVAttributeData : DVNodeData
+public class DVParameterData : DVNodeData
 {
     private int UnknownDataSize;
 
@@ -221,13 +221,25 @@ public class DVAttributeData : DVNodeData
     public int Field14 { get; set; }
     public int Field18 { get; set; }
     public int Field1C { get; set; }
-    public DVAttribute Attribute { get; set; }
+    public DVParameter Parameter { get; set; }
     
-    public DVAttributeData() { }
-    public DVAttributeData(BinaryObjectReader reader, int size)
+    public DVParameterData() { }
+    public DVParameterData(BinaryObjectReader reader, int size)
     {
         UnknownDataSize = size - 8;
         Read(reader);
+    }
+
+    public DVParameterData(ParameterType type, float startTime, float endTime)
+    {
+        Type = (int)type;
+        StartTime = startTime;
+        EndTime = endTime;
+    }
+
+    public DVParameterData(ParameterType type, float startTime, float endTime, DVParameter parameter) : this(type, startTime, endTime)
+    {
+        Parameter = parameter;
     }
 
     public override void Read(BinaryObjectReader reader)
@@ -241,78 +253,78 @@ public class DVAttributeData : DVNodeData
         Field18 = reader.Read<int>();
         Field1C = reader.Read<int>();
 
-        switch ((AttributeType)Type)
+        switch ((ParameterType)Type)
         {
-            case AttributeType.DrawingOff:
-                Attribute = new DVDrawingOffAttribute(reader);
+            case ParameterType.DrawingOff:
+                Parameter = new DVDrawingOffParameter(reader);
                 break;
 
-            case AttributeType.PathAdjust:
-                Attribute = new DVPathAdjustAttribute(reader);
+            case ParameterType.PathAdjust:
+                Parameter = new DVPathAdjustParameter(reader);
                 break;
 
-            case AttributeType.Effect:
-                Attribute = new DVEffectAttribute(reader);
+            case ParameterType.Effect:
+                Parameter = new DVEffectParameter(reader);
                 break;
 
-            case AttributeType.CullDisabled:
-                Attribute = new DVCullDisabledAttribute(reader);
+            case ParameterType.CullDisabled:
+                Parameter = new DVCullDisabledParameter(reader);
                 break;
 
-            case AttributeType.UVAnimation:
-                Attribute = new DVUVAnimAttribute(reader);
+            case ParameterType.UVAnimation:
+                Parameter = new DVUVAnimParameter(reader);
                 break;
 
-            case AttributeType.MaterialAnimation:
-                Attribute = new DVMaterialAnimAttribute(reader);
+            case ParameterType.MaterialAnimation:
+                Parameter = new DVMaterialAnimParameter(reader);
                 break;
 
-            case AttributeType.GameCamera:
-                Attribute = new DVGameCameraAttribute(reader);
+            case ParameterType.GameCamera:
+                Parameter = new DVGameCameraParameter(reader);
                 break;
 
-            case AttributeType.ChromaticAberration:
-                Attribute = new DVChromaAberrAttribute(reader);
+            case ParameterType.ChromaticAberration:
+                Parameter = new DVChromaAberrParameter(reader);
                 break;
 
-            case AttributeType.Fade:
-                Attribute = new DVFadeAttribute(reader);
+            case ParameterType.Fade:
+                Parameter = new DVFadeParameter(reader);
                 break;
 
-            case AttributeType.Letterbox:
-                Attribute = new DVLetterboxAttribute(reader);
+            case ParameterType.Letterbox:
+                Parameter = new DVLetterboxParameter(reader);
                 break;
 
-            case AttributeType.BossCutoff:
-                Attribute = new DVBossCutoffAttribute(reader);
+            case ParameterType.BossCutoff:
+                Parameter = new DVBossCutoffParameter(reader);
                 break;
 
-            case AttributeType.Subtitle:
-                Attribute = new DVSubtitleAttribute(reader);
+            case ParameterType.Subtitle:
+                Parameter = new DVSubtitleParameter(reader);
                 break;
 
-            case AttributeType.Sound:
-                Attribute = new DVSoundAttribute(reader);
+            case ParameterType.Sound:
+                Parameter = new DVSoundParameter(reader);
                 break;
 
-            case AttributeType.QTE:
-                Attribute = new DVQTEAttribute(reader);
+            case ParameterType.QTE:
+                Parameter = new DVQTEParameter(reader);
                 break;
 
-            case AttributeType.Aura:
-                Attribute = new DVAuraAttribute(reader);
+            case ParameterType.Aura:
+                Parameter = new DVAuraParameter(reader);
                 break;
 
-            case AttributeType.TimescaleChange:
-                Attribute = new DVTimescaleAttribute(reader);
+            case ParameterType.TimescaleChange:
+                Parameter = new DVTimescaleParameter(reader);
                 break;
 
-            case AttributeType.MovieDisplay:
-                Attribute = new DVMovieDisplayAttribute(reader);
+            case ParameterType.MovieDisplay:
+                Parameter = new DVMovieDisplayParameter(reader);
                 break;
 
             default:
-                Attribute = new DVUnknownAttribute(reader, UnknownDataSize);
+                Parameter = new DVUnknownParameter(reader, UnknownDataSize);
                 break;
         }
     }
@@ -328,8 +340,8 @@ public class DVAttributeData : DVNodeData
         writer.Write(Field18);
         writer.Write(Field1C);
         
-        if(Attribute != null)
-            Attribute.Write(writer);
+        if(Parameter != null)
+            Parameter.Write(writer);
     }
 }
 
@@ -338,8 +350,10 @@ public enum NodeType
     Transform = 1,
     Camera = 3,
     CameraMotion = 4,
-    Model = 8,
-    Motion = 10,
+    Model = 5,
+    Motion = 6,
+    Model2 = 8,
+    Motion2 = 10,
     NodeAttachment = 11,
-    Attribute = 12
+    Parameter = 12
 }
