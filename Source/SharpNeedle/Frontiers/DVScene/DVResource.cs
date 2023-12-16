@@ -32,7 +32,7 @@ public class DVResource : IBinarySerializable
 
         Field14 = reader.Read<int>();
         Field18 = reader.Read<int>();
-        Name = reader.ReadDVString(788);
+        Name = reader.ReadString(StringBinaryFormat.FixedLength, 788);
     }
 
     public void Write(BinaryObjectWriter writer)
@@ -41,7 +41,7 @@ public class DVResource : IBinarySerializable
         writer.Write(((int)ResType << 1) | (IsRenderable ? 1 : 0));
         writer.Write(Field14);
         writer.Write(Field18);
-        writer.WriteDVString(Name, 788);
+        writer.WriteString(StringBinaryFormat.FixedLength, Name, 788);
     }
 }
 

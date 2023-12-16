@@ -283,6 +283,10 @@ public class DVParameterData : DVNodeData
                 Parameter = new DVGameCameraParameter(reader);
                 break;
 
+            case ParameterType.DepthOfField:
+                Parameter = new DVDOFParameter(reader);
+                break;
+
             case ParameterType.ChromaticAberration:
                 Parameter = new DVChromaAberrParameter(reader);
                 break;
