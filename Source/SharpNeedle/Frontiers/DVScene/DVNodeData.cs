@@ -291,6 +291,10 @@ public class DVParameterData : DVNodeData
                 Parameter = new DVChromaAberrParameter(reader);
                 break;
 
+            case ParameterType.Vignette:
+                Parameter = new DVVignetteParameter(reader);
+                break;
+
             case ParameterType.Fade:
                 Parameter = new DVFadeParameter(reader);
                 break;
