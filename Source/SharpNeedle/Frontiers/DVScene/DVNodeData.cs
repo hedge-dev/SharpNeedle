@@ -279,6 +279,10 @@ public class DVParameterData : DVNodeData
                 Parameter = new DVMaterialAnimParameter(reader);
                 break;
 
+            case ParameterType.CompositeAnimation:
+                Parameter = new DVCompositeAnimationParameter(reader);
+                break;
+
             case ParameterType.GameCamera:
                 Parameter = new DVGameCameraParameter(reader);
                 break;
@@ -319,6 +323,10 @@ public class DVParameterData : DVNodeData
                 Parameter = new DVQTEParameter(reader);
                 break;
 
+            case ParameterType.ASMForcedOverwrite:
+                Parameter = new DVASMParameter(reader);
+                break;
+
             case ParameterType.Aura:
                 Parameter = new DVAuraParameter(reader);
                 break;
@@ -329,6 +337,10 @@ public class DVParameterData : DVNodeData
 
             case ParameterType.MovieDisplay:
                 Parameter = new DVMovieDisplayParameter(reader);
+                break;
+
+            case ParameterType.TheEndCable:
+                Parameter = new DVTheEndCableParameter(reader);
                 break;
 
             default:

@@ -491,8 +491,8 @@ public class DVQTEParameter : DVParameter
     public float Field10 { get; set; }
     public float Field14 { get; set; }
     public float Field18 { get; set; }
-    public int Field1C { get; set; }
-    public int Field20 { get; set; }
+    public float Field1C { get; set; }
+    public float Field20 { get; set; }
     public int Field24 { get; set; }
     public int Field28 { get; set; }
     public int Field2C { get; set; }
@@ -861,21 +861,21 @@ public class DVAuraParameter : DVParameter
     public int Field08 { get; set; }
     public int Field0C { get; set; }
     public float Field10 { get; set; }
-    public int Field14 { get; set; }
-    public int Field18 { get; set; }
-    public int Field1C { get; set; }
-    public int Field20 { get; set; }
+    public float Field14 { get; set; }
+    public float Field18 { get; set; }
+    public float Field1C { get; set; }
+    public float Field20 { get; set; }
     public int Field24 { get; set; }
     public int Field28 { get; set; }
     public int Field2C { get; set; }
     public int Field30 { get; set; }
     public float Field34 { get; set; }
-    public int Field38 { get; set; }
-    public int Field3C { get; set; }
-    public int Field40 { get; set; }
-    public int Field44 { get; set; }
+    public float Field38 { get; set; }
+    public float Field3C { get; set; }
+    public float Field40 { get; set; }
+    public float Field44 { get; set; }
     public int Field48 { get; set; }
-    public float[] Values { get; set; } = new float[32];
+    public float[] ValuesTimeline { get; set; } = new float[32];
 
     public DVAuraParameter() { }
     public DVAuraParameter(BinaryObjectReader reader)
@@ -888,21 +888,21 @@ public class DVAuraParameter : DVParameter
         Field08 = reader.Read<int>();
         Field0C = reader.Read<int>();
         Field10 = reader.Read<float>();
-        Field14 = reader.Read<int>();
-        Field18 = reader.Read<int>();
-        Field1C = reader.Read<int>();
-        Field20 = reader.Read<int>();
+        Field14 = reader.Read<float>();
+        Field18 = reader.Read<float>();
+        Field1C = reader.Read<float>();
+        Field20 = reader.Read<float>();
         Field24 = reader.Read<int>();
         Field28 = reader.Read<int>();
         Field2C = reader.Read<int>();
         Field30 = reader.Read<int>();
         Field34 = reader.Read<float>();
-        Field38 = reader.Read<int>();
-        Field3C = reader.Read<int>();
-        Field40 = reader.Read<int>();
-        Field44 = reader.Read<int>();
+        Field38 = reader.Read<float>();
+        Field3C = reader.Read<float>();
+        Field40 = reader.Read<float>();
+        Field44 = reader.Read<float>();
         Field48 = reader.Read<int>();
-        reader.ReadArray<float>(32, Values);
+        reader.ReadArray<float>(32, ValuesTimeline);
     }
 
     public override void Write(BinaryObjectWriter writer)
@@ -926,7 +926,7 @@ public class DVAuraParameter : DVParameter
         writer.Write(Field40);
         writer.Write(Field44);
         writer.Write(Field48);
-        writer.WriteArrayFixedLength(Values, 32);
+        writer.WriteArrayFixedLength(ValuesTimeline, 32);
     }
 }
 
@@ -1009,6 +1009,112 @@ public class DVDOFParameter : DVParameter
     }
 }
 
+public class DVTheEndCableParameter : DVParameter
+{
+    public int Field00 { get; set; }
+    public int Field04 { get; set; }
+    public float[] Field08 { get; set; } = new float[1024];
+
+    public DVTheEndCableParameter() { }
+    public DVTheEndCableParameter(BinaryObjectReader reader)
+        => Read(reader);
+
+    public override void Read(BinaryObjectReader reader)
+    {
+        Field00 = reader.Read<int>();
+        Field04 = reader.Read<int>();
+        reader.ReadArray<float>(1024, Field08);
+    }
+
+    public override void Write(BinaryObjectWriter writer)
+    {
+        writer.Write(Field00);
+        writer.Write(Field04);
+        writer.WriteArrayFixedLength(Field08, 1024);
+    }
+}
+
+public class DVCompositeAnimationParameter : DVParameter
+{
+    public int Field00 { get; set; }
+    public string Field04 { get; set; }
+    public Animation[] Animations { get; set; } = new Animation[16];
+    public int Field450 { get; set; }
+
+    public DVCompositeAnimationParameter() { }
+    public DVCompositeAnimationParameter(BinaryObjectReader reader)
+        => Read(reader);
+
+    public override void Read(BinaryObjectReader reader)
+    {
+        Field00 = reader.Read<int>();
+        Field04 = reader.ReadString(StringBinaryFormat.FixedLength, 12);
+        Animations = reader.ReadObjectArray<Animation>(16);
+        Field450 = reader.Read<int>();
+    }
+
+    public override void Write(BinaryObjectWriter writer)
+    {
+        writer.Write(Field00);
+        writer.WriteString(StringBinaryFormat.FixedLength, Field04, 12);
+        writer.WriteObjectCollection(Animations);
+        writer.Write(Field450);
+    }
+
+    public class Animation : IBinarySerializable
+    {
+        public int Type { get; set; }
+        public string Name { get; set; }
+
+        public Animation() 
+        {
+            Type = (int)AnimationType.None;
+            Name = "";
+        }
+
+        public void Read(BinaryObjectReader reader)
+        {
+            Type = reader.Read<int>();
+            Name = reader.ReadString(StringBinaryFormat.FixedLength, 64);
+        }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            writer.Write(Type);
+            writer.WriteString(StringBinaryFormat.FixedLength, Name, 64);
+        }
+    }
+
+    public enum AnimationType
+    {
+        None = 0,
+        PXD = 1,
+        UV = 2
+    }
+}
+
+public class DVASMParameter : DVParameter
+{
+    public string Field00 { get; set; }
+    public string Field40 { get; set; }
+
+    public DVASMParameter() { }
+    public DVASMParameter(BinaryObjectReader reader)
+        => Read(reader);
+
+    public override void Read(BinaryObjectReader reader)
+    {
+        Field00 = reader.ReadString(StringBinaryFormat.FixedLength, 64);
+        Field40 = reader.ReadString(StringBinaryFormat.FixedLength, 64);
+    }
+
+    public override void Write(BinaryObjectWriter writer)
+    {
+        writer.WriteString(StringBinaryFormat.FixedLength, Field00, 64);
+        writer.WriteString(StringBinaryFormat.FixedLength, Field40, 64);
+    }
+}
+
 public enum ParameterType
 {
     ParameterSpecifiedCamera = 1,
@@ -1044,6 +1150,7 @@ public enum ParameterType
     Subtitle = 1015,
     Sound = 1016,
     Time = 1017,
+    LookAtIK = 1019,
     CameraBlur = 1020,
     GeneralPurposeTrigger = 1021,
     DitherDepth = 1023,

@@ -3,7 +3,7 @@
 public class DVResource : IBinarySerializable
 {
     public Guid GUID { get; set; }
-    public bool IsRenderable { get; set; }
+    public bool UnknownFlag { get; set; }
     public ResourceType ResType { get; set; }
     public int Field14 { get; set; }
     public int Field18 { get; set; }
@@ -27,7 +27,7 @@ public class DVResource : IBinarySerializable
         GUID = reader.Read<Guid>();
 
         int resourceFlags = reader.Read<int>();
-        IsRenderable = (resourceFlags & 1) == 1;
+        UnknownFlag = (resourceFlags & 1) == 1;
         ResType = (ResourceType)(resourceFlags >> 1);
 
         Field14 = reader.Read<int>();
@@ -38,7 +38,7 @@ public class DVResource : IBinarySerializable
     public void Write(BinaryObjectWriter writer)
     {
         writer.Write(GUID);
-        writer.Write(((int)ResType << 1) | (IsRenderable ? 1 : 0));
+        writer.Write(((int)ResType << 1) | (UnknownFlag ? 1 : 0));
         writer.Write(Field14);
         writer.Write(Field18);
         writer.WriteString(StringBinaryFormat.FixedLength, Name, 788);

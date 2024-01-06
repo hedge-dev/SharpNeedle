@@ -7,10 +7,8 @@ public class DVSegment : IBinarySerializable
     public int StartFrame { get; set; }
     public int EndFrame { get; set; }
     public int Field10 { get; set; }
-    public int DataSize { get; set; }
-    public int Field18 { get; set; }
+    public int SceneEndFrame { get; set; }
     public int Field1C { get; set; }
-    public int UnknownCount { get; set; }
     public int Field24 { get; set; }
     public int Field28 { get; set; }
     public int Field2C { get; set; }
@@ -29,20 +27,20 @@ public class DVSegment : IBinarySerializable
         StartFrame = reader.Read<int>();
         EndFrame = reader.Read<int>();
         Field10 = reader.Read<int>();
-        DataSize = reader.Read<int>();
-        Field18 = reader.Read<int>();
+        int dataSize = reader.Read<int>();
+        SceneEndFrame = reader.Read<int>();
         Field1C = reader.Read<int>();
-        UnknownCount = reader.Read<int>();
+        int unknownCount = reader.Read<int>();
         Field24 = reader.Read<int>();
         Field28 = reader.Read<int>();
         Field2C = reader.Read<int>();
         Name = reader.ReadString(StringBinaryFormat.FixedLength, 32);
 
-        UnknownArray = new int[UnknownCount];
-        reader.ReadArray<int>(UnknownCount, UnknownArray);
+        UnknownArray = new int[unknownCount];
+        reader.ReadArray<int>(unknownCount, UnknownArray);
 
-        Data = new byte[DataSize];
-        reader.ReadArray<byte>(DataSize, Data);
+        Data = new byte[dataSize];
+        reader.ReadArray<byte>(dataSize, Data);
     }
 
     public void Write(BinaryObjectWriter writer)
@@ -52,16 +50,16 @@ public class DVSegment : IBinarySerializable
         writer.Write(StartFrame);
         writer.Write(EndFrame);
         writer.Write(Field10);
-        writer.Write(DataSize);
-        writer.Write(Field18);
+        writer.Write(Data.Length);
+        writer.Write(SceneEndFrame);
         writer.Write(Field1C);
-        writer.Write(UnknownCount);
+        writer.Write(UnknownArray.Length);
         writer.Write(Field24);
         writer.Write(Field28);
         writer.Write(Field2C);
         writer.WriteString(StringBinaryFormat.FixedLength, Name, 32);
 
-        writer.WriteArrayFixedLength(UnknownArray, UnknownCount);
-        writer.WriteArrayFixedLength(Data, DataSize);
+        writer.WriteArray(UnknownArray);
+        writer.WriteArray(Data);
     }
 }
