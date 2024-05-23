@@ -101,6 +101,8 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
             using var token = new SeekToken(writer.GetBaseStream(), DataOffset - 8, SeekOrigin.Begin);
             var offsets = writer.OffsetHandler.OffsetPositions.ToArray();
 
+            writer.PopOffsetOrigin();
+
             writer.WriteOffset(() =>
             {
                 // Offsets are relative to beginning of data
@@ -109,7 +111,6 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
             });
 
             writer.Write(offsets.Length);
-            writer.PopOffsetOrigin();
         }
 
         using var endToken = writer.At();
