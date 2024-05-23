@@ -208,4 +208,10 @@ public static class BinaryHelper
 
     public static void WriteArrayFixedLength<T>(this BinaryObjectWriter writer, T[] array, int length) where T : unmanaged
         => WriteArrayFixedLength(writer, array.AsSpan(), length);
+		
+	public static void WriteNulls(this BinaryObjectWriter writer, int length)
+	{
+		Span<byte> nulls = length <= 1024 ? stackalloc byte[length] : new byte[length];
+		writer.WriteArray(nulls);
+	}
 }
