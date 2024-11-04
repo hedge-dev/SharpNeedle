@@ -245,6 +245,39 @@ public class DivPAnimMaterial : IDivDataBlock
     }
 }
 
+public class DivPAnimVis : IDivDataBlock
+{
+    public int Field00 { get; set; }
+    public string Name { get; set; }
+    public int Field44 { get; set; }
+    public float Field48 { get; set; }
+    public int Field4C { get; set; }
+    public int Field50 { get; set; }
+
+    public DivPAnimVis() { }
+    public DivPAnimVis(BinaryObjectReader reader, GameType game)
+        => Read(reader, game);
+
+    public void Read(BinaryObjectReader reader, GameType game)
+    {
+        Field00 = reader.Read<int>();
+        Name = reader.ReadDivString(64);
+        Field44 = reader.Read<int>();
+        Field48 = reader.Read<float>();
+        Field4C = reader.Read<int>();
+        Field50 = reader.Read<int>();
+    }
+
+    public void Write(BinaryObjectWriter writer, GameType game)
+    {
+        writer.Write(Field00);
+        writer.WriteDivString(Name, 64);
+        writer.Write(Field44);
+        writer.Write(Field48);
+        writer.Write(Field4C);
+        writer.Write(Field50);
+    }
+}
 public class DivPChromaAberr : IDivDataBlock
 {
     public float Field00 { get; set; }
@@ -538,8 +571,11 @@ public class DivPQTE : IDivDataBlock
     public float Field74 { get; set; }
     public float Field78 { get; set; }
     public float Field7C { get; set; }
-    public int[] Field80 { get; set; } = new int[48];
+    public int[] Field80 { get; set; } = new int[32];
+    public string Field100 { get; set; }
     public string Field140 { get; set; }
+    public string Field180 { get; set; }
+    public uint Field1C0 { get; set; }
 
     public DivPQTE() { }
     public DivPQTE(BinaryObjectReader reader, GameType game)
@@ -579,9 +615,16 @@ public class DivPQTE : IDivDataBlock
         Field74 = reader.Read<float>();
         Field78 = reader.Read<float>();
         Field7C = reader.Read<float>();
-        reader.ReadArray<int>(48, Field80);
+        reader.ReadArray<int>(32, Field80);
 
-        Field140 = reader.ReadDivString(64);
+        Field100 = reader.ReadString(StringBinaryFormat.FixedLength, 64);
+        Field140 = reader.ReadString(StringBinaryFormat.FixedLength, 64);
+
+        if (game == GameType.ShadowGenerations)
+        {
+            Field180 = reader.ReadString(StringBinaryFormat.FixedLength, 64);
+            Field1C0 = reader.Read<uint>();
+        }
     }
 
     public void Write(BinaryObjectWriter writer, GameType game)
@@ -618,9 +661,16 @@ public class DivPQTE : IDivDataBlock
         writer.Write(Field74);
         writer.Write(Field78);
         writer.Write(Field7C);
-        writer.WriteArrayFixedLength(Field80, 48);
+        writer.WriteArrayFixedLength(Field80, 32);
 
-        writer.WriteDivString(Field140, 64);
+        writer.WriteString(StringBinaryFormat.FixedLength, Field100, 64);
+        writer.WriteString(StringBinaryFormat.FixedLength, Field140, 64);
+
+        if (game == GameType.ShadowGenerations)
+        {
+            writer.WriteString(StringBinaryFormat.FixedLength, Field180, 64);
+            writer.Write(Field1C0);
+        }
     }
 }
 
@@ -854,25 +904,44 @@ public class DivPPathAdjust : IDivDataBlock
     }
 }
 
-public class DivPBossCutoff : IDivDataBlock
+public class DivPBossName : IDivDataBlock
 {
     public int Field00 { get; set; }
-    public int Field04 { get; set; }
+    public int NameType { get; set; }
 
-    public DivPBossCutoff() { }
-    public DivPBossCutoff(BinaryObjectReader reader, GameType game)
+    public DivPBossName() { }
+    public DivPBossName(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
     {
         Field00 = reader.Read<int>();
-        Field04 = reader.Read<int>();
+        NameType = reader.Read<int>();
     }
 
     public void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.Write(Field00);
-        writer.Write(Field04);
+        writer.Write(NameType);
+    }
+
+    enum FrontiersNames
+    { 
+        Giant = 0,
+        Dragon,
+        Knight,
+        Rifle,
+        TheEnd,
+        RifleBeast
+    }
+
+    enum ShadowGensNames
+    {
+        Biolizard = 0,
+        MetalOverlord,
+        Mephiles,
+        DevilDoom,
+        PerfectBlackDoom
     }
 }
 
@@ -1480,6 +1549,71 @@ public class DivPTimeStop : IDivDataBlock
     }
 }
 
+public class DivPControllerVibration : IDivDataBlock
+{
+    public int Field00 { get; set; }
+    public string Group { get; set; }
+    public string Mode { get; set; }
+    public uint Field84 { get; set; }
+    public uint Field88 { get; set; }
+    public uint Field8C { get; set; }
+
+    public DivPControllerVibration() { }
+    public DivPControllerVibration(BinaryObjectReader reader, GameType game)
+        => Read(reader, game);
+
+    public void Read(BinaryObjectReader reader, GameType game)
+    {
+        Field00 = reader.Read<int>();
+        Group = reader.ReadString(StringBinaryFormat.FixedLength, 64);
+        Mode = reader.ReadString(StringBinaryFormat.FixedLength, 64);
+        Field84 = reader.Read<uint>();
+        Field88 = reader.Read<uint>();
+        Field8C = reader.Read<uint>();
+    }
+
+    public void Write(BinaryObjectWriter writer, GameType game)
+    {
+        writer.Write(Field00);
+        writer.WriteString(StringBinaryFormat.FixedLength, Group, 64);
+        writer.WriteString(StringBinaryFormat.FixedLength, Mode, 64);
+        writer.Write(Field84);
+        writer.Write(Field88);
+        writer.Write(Field8C);
+    }
+}
+
+public class DivPTimeStopControl : IDivDataBlock
+{
+    public int Behavior { get; set; }
+    public float Field04 { get; set; }
+    public float TransitionDuration { get; set; }
+
+    public DivPTimeStopControl() { }
+    public DivPTimeStopControl(BinaryObjectReader reader, GameType game)
+        => Read(reader, game);
+
+    public void Read(BinaryObjectReader reader, GameType game)
+    {
+        Behavior = reader.Read<int>();
+        Field04 = reader.Read<float>();
+        TransitionDuration = reader.Read<float>();
+    }
+
+    public void Write(BinaryObjectWriter writer, GameType game)
+    {
+        writer.Write(Behavior);
+        writer.Write(Field04);
+        writer.Write(TransitionDuration);
+    }
+
+    public enum BehaviorMode
+    {
+        End = 1,
+        Begin = 2,
+    }
+}
+
 // < 1000 values appear to be shared between games, the others are game-specific.
 public enum ParameterType
 {
@@ -1518,7 +1652,7 @@ enum FrontiersParams
     Fade = 1010,
     Letterbox = 1011,
     ModelClipping = 1012,
-    BossCutoff = 1014,
+    BossName = 1014,
     Subtitle = 1015,
     Sound = 1016,
     Time = 1017,
@@ -1547,7 +1681,7 @@ enum ShadowGensParams
     ChromaticAberration = 1010,
     Vignette = 1011,
     Fade = 1012,
-    BossCutoff = 1016,
+    BossName = 1016,
     Subtitle = 1017,
     Sound = 1018,
     CameraBlur = 1022,
@@ -1555,5 +1689,8 @@ enum ShadowGensParams
     QTE = 1026,
     TimescaleChange = 1030,
     TimeStop = 1041,
+    TimeStopControl = 1042,
+    TimeStopObjectBehavior = 1043,
+    ShadowAfterimage = 1044,
     DepthOfFieldNew = 1047,
 }

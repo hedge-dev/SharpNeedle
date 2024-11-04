@@ -6,14 +6,18 @@ using System.IO;
 [NeedleResource("st/dv-scene", @"\.dvscene$")]
 public class DivScene : ResourceBase, IBinarySerializable
 {
-    public float Duration { get; set; }
-    public int Field10 { get; set; }
-    public List<float> UnknownList0 { get; set; } = new();
+    public float StartFrame { get; set; }
+    public float EndFrame { get; set; }
+    public int NodeDrawCount { get; set; }
+    public List<float> Cuts { get; set; } = new();
     public List<DivPage> Pages { get; set; } = new();
-    public List<float> UnknownList1 { get; set; } = new();
+    public List<float> ResourceCuts { get; set; } = new();
     public DivNode RootNode { get; set; } = new();
-    public float Field2C { get; set; }
-    public float Field30 { get; set; }
+    public float ChainCameraIn { get; set; }
+    public float ChainCameraOut { get; set; }
+    int Type { get; set; }
+    int SkipPointTick { get; set; }
+
     public List<DivResource> Resources { get; set; } = new();
 
     public DivScene() 
@@ -24,6 +28,8 @@ public class DivScene : ResourceBase, IBinarySerializable
 
     public override void Read(IFile file)
         => Read(file, GameType.Common);
+    public void Read(string path, GameType game)
+      => Read(FileSystem.Open(path), game);
 
     public void Read(IFile file, GameType game)
     {
@@ -54,7 +60,6 @@ public class DivScene : ResourceBase, IBinarySerializable
 
     public void Read(BinaryObjectReader reader, GameType game)
     {
-        // Header
         long dataOffset = reader.ReadOffsetValue();
         long resourcesOffset = reader.ReadOffsetValue();
         reader.Skip(24);
@@ -63,24 +68,25 @@ public class DivScene : ResourceBase, IBinarySerializable
 
         reader.Seek(dataOffset + 32, SeekOrigin.Begin);
         {
-            reader.Skip(12);
+            reader.Skip(8);
 
-            Duration = reader.Read<float>();
-            Field10 = reader.Read<int>();
+            StartFrame = reader.Read<float>();
+            EndFrame = reader.Read<float>();
+            NodeDrawCount = reader.Read<int>();
 
             reader.ReadOffset(() =>
             {
-                int triggerCount = reader.Read<int>();
-                reader.Skip(12);
+                int cutCount = reader.Read<int>();
+                int allocSize = reader.Read<int>();
+                reader.Skip(8);
 
-                reader.ReadCollection(triggerCount, UnknownList0);
+                reader.ReadCollection(cutCount, Cuts);
             });
 
             reader.ReadOffset(() =>
             {
                 int pageCount = reader.Read<int>();
-                int pageChunkSize = reader.Read<int>();
-
+                int allocSize = reader.Read<int>();
                 reader.Skip(8);
 
                 Pages.AddRange(reader.ReadObjectArray<DivPage>(pageCount));
@@ -89,21 +95,24 @@ public class DivScene : ResourceBase, IBinarySerializable
             reader.ReadOffset(() =>
             {
                 int unknownCount = reader.Read<int>();
-                reader.Skip(12);
+                int allocSize = reader.Read<int>();
+                reader.Skip(8);
+            });
+
+            reader.ReadOffset(() =>
+            {
+                int resourceCutCount = reader.Read<int>();
+                int allocSize = reader.Read<int>();
+                reader.Skip(8);
+
+                reader.ReadCollection(resourceCutCount, ResourceCuts);
             });
 
             reader.ReadOffset(() =>
             {
                 int unknownCount = reader.Read<int>();
-                reader.Skip(12);
-
-                reader.ReadCollection(unknownCount, UnknownList1);
-            });
-
-            reader.ReadOffset(() =>
-            {
-                int unknownCount = reader.Read<int>();
-                reader.Skip(12);
+                int allocSize = reader.Read<int>();
+                reader.Skip(8);
             });
 
             reader.ReadOffset(() =>
@@ -111,15 +120,19 @@ public class DivScene : ResourceBase, IBinarySerializable
                 RootNode.Read(reader, game);
             });
 
-            Field2C = reader.Read<float>();
-            Field30 = reader.Read<float>();
-            reader.Skip(12);
+            ChainCameraIn = reader.Read<float>();
+            ChainCameraOut = reader.Read<float>();
+            Type = reader.Read<int>();
+            SkipPointTick = reader.Read<int>();
+
+            reader.Skip(4);
         }
 
         reader.ReadAtOffset(resourcesOffset, () =>
         {
             int resourceCount = reader.Read<int>();
-            reader.Skip(12);
+            int allocSize = reader.Read<int>();
+            reader.Skip(8);
 
             Resources.AddRange(reader.ReadObjectArray<DivResource>(resourceCount));
         });
@@ -130,44 +143,47 @@ public class DivScene : ResourceBase, IBinarySerializable
 
     public void Write(BinaryObjectWriter writer, GameType game)
     {
-        long resourcesOffsetPos = writer.Position + 4;
+        var resourcesOffsetPos = writer.Position + 4;
 
         writer.WriteNulls(32);
-        long dataPos = writer.Position;
+        var posStart = writer.Position;
 
         {
-            writer.WriteNulls(12);
-            writer.Write(Duration);
-            writer.Write(Field10);
+            writer.WriteNulls(8);
+            writer.Write(StartFrame);
+            writer.Write(EndFrame);
+            writer.Write(NodeDrawCount);
 
-            long unknownList0OffsetPos = writer.Position;
-            long pagesOffsetPos = writer.Position + 4;
+            long posCutsOffset = writer.Position;
+            long posPagesOffset = writer.Position + 4;
             long unknownList2OffsetPos = writer.Position + 8;
-            long unknownList3OffsetPos = writer.Position + 12;
+            long posResourceCutsOffset = writer.Position + 12;
             long unknownList4OffsetPos = writer.Position + 16;
             long rootNodeOffsetPos = writer.Position + 20;
             writer.WriteNulls(24);
 
-            writer.Write(Field2C);
-            writer.Write(Field30);
-            writer.WriteNulls(12);
+            writer.Write(ChainCameraIn);
+            writer.Write(ChainCameraOut);
+            writer.Write(Type);
+            writer.Write(SkipPointTick);
+            writer.WriteNulls(4);
 
             {
-                long unknownList0Pos = writer.Position;
-                writer.Seek(unknownList0OffsetPos, SeekOrigin.Begin);
-                writer.Write((int)(unknownList0Pos - dataPos));
-                writer.Seek(unknownList0Pos, SeekOrigin.Begin);
+                var posCuts = writer.Position;
+                writer.Seek(posCutsOffset, SeekOrigin.Begin);
+                writer.Write((int)(posCuts - posStart));
+                writer.Seek(posCuts, SeekOrigin.Begin);
 
-                writer.Write(UnknownList0.Count);
+                writer.Write(Cuts.Count);
                 writer.WriteNulls(12);
-                writer.WriteCollection(UnknownList0);
+                writer.WriteCollection(Cuts);
             }
 
             {
-                long pagesPos = writer.Position;
-                writer.Seek(pagesOffsetPos, SeekOrigin.Begin);
-                writer.Write((int)(pagesPos - dataPos));
-                writer.Seek(pagesPos, SeekOrigin.Begin);
+                long posPages = writer.Position;
+                writer.Seek(posPagesOffset, SeekOrigin.Begin);
+                writer.Write((int)(posPages - posStart));
+                writer.Seek(posPages, SeekOrigin.Begin);
 
                 writer.Write(Pages.Count);
                 long pageChunkSizePos = writer.Position;
@@ -185,47 +201,47 @@ public class DivScene : ResourceBase, IBinarySerializable
             {
                 long unknownList2Pos = writer.Position;
                 writer.Seek(unknownList2OffsetPos, SeekOrigin.Begin);
-                writer.Write((int)(unknownList2Pos - dataPos));
+                writer.Write((int)(unknownList2Pos - posStart));
                 writer.Seek(unknownList2Pos, SeekOrigin.Begin);
 
                 writer.WriteNulls(16);
             }
 
             {
-                long unknownList3Pos = writer.Position;
-                writer.Seek(unknownList3OffsetPos, SeekOrigin.Begin);
-                writer.Write((int)(unknownList3Pos - dataPos));
-                writer.Seek(unknownList3Pos, SeekOrigin.Begin);
+                long posResourceCuts = writer.Position;
+                writer.Seek(posResourceCutsOffset, SeekOrigin.Begin);
+                writer.Write((int)(posResourceCuts - posStart));
+                writer.Seek(posResourceCuts, SeekOrigin.Begin);
 
-                writer.Write(UnknownList1.Count);
+                writer.Write(ResourceCuts.Count);
                 writer.WriteNulls(12);
-                writer.WriteCollection(UnknownList1);
+                writer.WriteCollection(ResourceCuts);
             }
 
             {
                 long unknownList4Pos = writer.Position;
                 writer.Seek(unknownList4OffsetPos, SeekOrigin.Begin);
-                writer.Write((int)(unknownList4Pos - dataPos));
+                writer.Write((int)(unknownList4Pos - posStart));
                 writer.Seek(unknownList4Pos, SeekOrigin.Begin);
 
                 writer.WriteNulls(16);
             }
 
             {
-                long rootNodePos = writer.Position;
+                var posRootNode = writer.Position;
                 writer.Seek(rootNodeOffsetPos, SeekOrigin.Begin);
-                writer.Write((int)(rootNodePos - dataPos));
-                writer.Seek(rootNodePos, SeekOrigin.Begin);
+                writer.Write((int)(posRootNode - posStart));
+                writer.Seek(posRootNode, SeekOrigin.Begin);
 
                 RootNode.Write(writer, game);
             }
         }
 
         {
-            long resourcesPos = writer.Position;
+            long posResources = writer.Position;
             writer.Seek(resourcesOffsetPos, SeekOrigin.Begin);
-            writer.Write((int)(resourcesPos - dataPos));
-            writer.Seek(resourcesPos, SeekOrigin.Begin);
+            writer.Write((int)(posResources - posStart));
+            writer.Seek(posResources, SeekOrigin.Begin);
 
             writer.Write(Resources.Count);
             writer.WriteNulls(12);
