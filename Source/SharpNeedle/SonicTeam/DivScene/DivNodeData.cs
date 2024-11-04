@@ -271,8 +271,8 @@ public class DivDParameter : IDivDataBlock
                 Parameter = new DivPLetterbox(reader, GameType.Frontiers);
                 break;
 
-            case FrontiersParams.BossCutoff:
-                Parameter = new DivPBossCutoff(reader, GameType.Frontiers);
+            case FrontiersParams.BossName:
+                Parameter = new DivPBossName(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.Subtitle:
@@ -345,6 +345,10 @@ public class DivDParameter : IDivDataBlock
     {
         switch ((ShadowGensParams)type)
         {
+            case ShadowGensParams.BossName:
+                Parameter = new DivPBossName(reader, GameType.ShadowGenerations);
+                break;
+
             case ShadowGensParams.Subtitle:
                 Parameter = new DivPSubtitle(reader, GameType.ShadowGenerations);
                 break;
@@ -353,8 +357,16 @@ public class DivDParameter : IDivDataBlock
                 Parameter = new DivPSound(reader, GameType.ShadowGenerations);
                 break;
 
+            case ShadowGensParams.QTE:
+                Parameter = new DivPQTE(reader, GameType.ShadowGenerations);
+                break;
+
             case ShadowGensParams.TimeStop:
                 Parameter = new DivPTimeStop(reader, GameType.ShadowGenerations);
+                break;
+
+            case ShadowGensParams.TimeStopControl:
+                Parameter = new DivPTimeStopControl(reader, GameType.ShadowGenerations);
                 break;
 
             default:
@@ -416,6 +428,10 @@ public class DivDParameter : IDivDataBlock
                     Parameter = new DivPAnimUV(reader, GameType.Common);
                     break;
 
+                case ParameterType.VisibilityAnimation:
+                    Parameter = new DivPAnimVis(reader, GameType.Common);
+                    break;
+
                 case ParameterType.MaterialAnimation:
                     Parameter = new DivPAnimMaterial(reader, GameType.Common);
                     break;
@@ -426,6 +442,10 @@ public class DivDParameter : IDivDataBlock
 
                 case ParameterType.GameCamera:
                     Parameter = new DivPGameCamera(reader, GameType.Common);
+                    break;
+
+                case ParameterType.ControllerVibration:
+                    Parameter = new DivPControllerVibration(reader, GameType.Common);
                     break;
 
                 case ParameterType.MaterialParameter:
