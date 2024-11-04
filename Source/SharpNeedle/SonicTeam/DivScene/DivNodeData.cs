@@ -7,7 +7,7 @@ public abstract class DivNodeData : IBinarySerializable
     public abstract void Write(BinaryObjectWriter writer);
 }
 
-public class DivTransformData : DivNodeData
+public class DivDPath : DivNodeData
 {
     public Matrix4x4 Transform { get; set; }
     public int Field40 { get; set; }
@@ -15,8 +15,8 @@ public class DivTransformData : DivNodeData
     public int Field48 { get; set; }
     public int Field4C { get; set; }
 
-    public DivTransformData() { }
-    public DivTransformData(BinaryObjectReader reader)
+    public DivDPath() { }
+    public DivDPath(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -38,7 +38,7 @@ public class DivTransformData : DivNodeData
     }
 }
 
-public class DivCameraData : DivNodeData
+public class DivDCamera : DivNodeData
 {
     public int Field00 { get; set; }
     public int FrameCount { get; set; }
@@ -47,8 +47,8 @@ public class DivCameraData : DivNodeData
     public List<float> FrameTimes { get; set; } = new List<float>();
     public List<float> FrameData { get; set; } = new List<float>();
 
-    public DivCameraData() { }
-    public DivCameraData(BinaryObjectReader reader)
+    public DivDCamera() { }
+    public DivDCamera(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -80,15 +80,15 @@ public class DivCameraData : DivNodeData
     }
 }
 
-public class DivCameraMotionData : DivNodeData
+public class DivDCameraMotion : DivNodeData
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
     public int Field08 { get; set; }
     public int Field0C { get; set; }
 
-    public DivCameraMotionData() { }
-    public DivCameraMotionData(BinaryObjectReader reader)
+    public DivDCameraMotion() { }
+    public DivDCameraMotion(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -108,15 +108,15 @@ public class DivCameraMotionData : DivNodeData
     }
 }
 
-public class DivModelData : DivNodeData
+public class DivDModel : DivNodeData
 {
     public int Field00 { get; set; }
     public string ModelName { get; set; }
     public string SkeletonName { get; set; }
     public string Field84 { get; set; }
 
-    public DivModelData() { }
-    public DivModelData(BinaryObjectReader reader)
+    public DivDModel() { }
+    public DivDModel(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -140,7 +140,7 @@ public class DivModelData : DivNodeData
     }
 }
 
-public class DivMotionData : DivNodeData
+public class DivDMotionModel : DivNodeData
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
@@ -149,8 +149,8 @@ public class DivMotionData : DivNodeData
     public string Field10 { get; set; }
     public float Field18 { get; set; }
 
-    public DivMotionData() { }
-    public DivMotionData(BinaryObjectReader reader)
+    public DivDMotionModel() { }
+    public DivDMotionModel(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -178,7 +178,7 @@ public class DivMotionData : DivNodeData
     }
 }
 
-public class DivNodeAttachData : DivNodeData
+public class DivDAttachment : DivNodeData
 {
     public int Field00 { get; set; }
     public string NodeName { get; set; }
@@ -186,8 +186,8 @@ public class DivNodeAttachData : DivNodeData
     public int Field48 { get; set; }
     public int Field4C { get; set; }
 
-    public DivNodeAttachData() { }
-    public DivNodeAttachData(BinaryObjectReader reader)
+    public DivDAttachment() { }
+    public DivDAttachment(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -209,7 +209,7 @@ public class DivNodeAttachData : DivNodeData
     }
 }
 
-public class DivParameterData : DivNodeData
+public class DivDParameter : DivNodeData
 {
     private int UnknownDataSize;
 
@@ -223,21 +223,21 @@ public class DivParameterData : DivNodeData
     public int Field1C { get; set; }
     public DivParameter Parameter { get; set; }
     
-    public DivParameterData() { }
-    public DivParameterData(BinaryObjectReader reader, int size)
+    public DivDParameter() { }
+    public DivDParameter(BinaryObjectReader reader, int size)
     {
         UnknownDataSize = size - 8;
         Read(reader);
     }
 
-    public DivParameterData(ParameterType type, float startTime, float endTime)
+    public DivDParameter(ParameterType type, float startTime, float endTime)
     {
         Type = (int)type;
         StartTime = startTime;
         EndTime = endTime;
     }
 
-    public DivParameterData(ParameterType type, float startTime, float endTime, DivParameter parameter) : this(type, startTime, endTime)
+    public DivDParameter(ParameterType type, float startTime, float endTime, DivParameter parameter) : this(type, startTime, endTime)
     {
         Parameter = parameter;
     }
@@ -247,159 +247,109 @@ public class DivParameterData : DivNodeData
         switch ((FrontiersParams)type)
         {
             case FrontiersParams.DepthOfField:
-                Parameter = new DivDOFParameter(reader);
+                Parameter = new DivPDOF(reader);
                 break;
 
             case FrontiersParams.ColorCorrection:
-                Parameter = new DivColorCorrectionParameter(reader);
+                Parameter = new DivPColorCorrection(reader);
                 break;
 
             case FrontiersParams.CameraExposure:
-                Parameter = new DivCameraExposureParameter(reader);
+                Parameter = new DivPCameraExposure(reader);
                 break;
 
             case FrontiersParams.ShadowResolution:
-                Parameter = new DivShadowResolutionParameter(reader);
+                Parameter = new DivPShadowRes(reader);
                 break;
 
             case FrontiersParams.ChromaticAberration:
-                Parameter = new DivChromaAberrParameter(reader);
+                Parameter = new DivPChromaAberr(reader);
                 break;
 
             case FrontiersParams.Vignette:
-                Parameter = new DivVignetteParameter(reader);
+                Parameter = new DivPVignette(reader);
                 break;
 
             case FrontiersParams.Fade:
-                Parameter = new DivFadeParameter(reader);
+                Parameter = new DivPFade(reader);
                 break;
 
             case FrontiersParams.Letterbox:
-                Parameter = new DivLetterboxParameter(reader);
+                Parameter = new DivPLetterbox(reader);
                 break;
 
             case FrontiersParams.BossCutoff:
-                Parameter = new DivBossCutoffParameter(reader);
+                Parameter = new DivPBossCutoff(reader);
                 break;
 
             case FrontiersParams.Subtitle:
-                Parameter = new DivSubtitleParameter(reader);
+                Parameter = new DivPSubtitle(reader);
                 break;
 
             case FrontiersParams.Sound:
-                Parameter = new DivSoundParameter(reader);
+                Parameter = new DivPSound(reader);
                 break;
 
             case FrontiersParams.Time:
-                Parameter = new DivTimeParameter(reader);
+                Parameter = new DivPTime(reader);
                 break;
 
             case FrontiersParams.CameraBlur:
-                Parameter = new DivCameraBlurParameter(reader);
+                Parameter = new DivPCameraBlur(reader);
                 break;
 
             case FrontiersParams.GeneralPurposeTrigger:
-                Parameter = new DivGeneralPurposeTriggerParameter(reader);
+                Parameter = new DivPGeneralTrigger(reader);
                 break;
 
             case FrontiersParams.DitherDepth:
-                Parameter = new DivDitherDepthParameter(reader);
+                Parameter = new DivPDitherDepth(reader);
                 break;
 
             case FrontiersParams.QTE:
-                Parameter = new DivQTEParameter(reader);
+                Parameter = new DivPQTE(reader);
                 break;
 
             case FrontiersParams.ASMForcedOverwrite:
-                Parameter = new DivASMParameter(reader);
+                Parameter = new DivPAnimStateMachine(reader);
                 break;
 
             case FrontiersParams.Aura:
-                Parameter = new DivAuraParameter(reader);
+                Parameter = new DivPAura(reader);
                 break;
 
             case FrontiersParams.TimescaleChange:
-                Parameter = new DivTimescaleParameter(reader);
+                Parameter = new DivPTimescale(reader);
                 break;
 
             case FrontiersParams.CyberNoise:
-                Parameter = new DivCyberNoiseParameter(reader);
+                Parameter = new DivPCyberNoise(reader);
                 break;
 
             case FrontiersParams.MovieDisplay:
-                Parameter = new DivMovieDisplayParameter(reader);
+                Parameter = new DivPMovieDisplay(reader);
                 break;
 
             case FrontiersParams.Weather:
-                Parameter = new DivWeatherParameter(reader);
+                Parameter = new DivPWeather(reader);
                 break;
 
             case FrontiersParams.TheEndCable:
-                Parameter = new DivTheEndCableParameter(reader);
+                Parameter = new DivPTheEndCable(reader);
                 break;
 
             case FrontiersParams.FinalBossLighting:
-                Parameter = new DivFinalBossLightingParameter(reader);
+                Parameter = new DivPFinalBossLighting(reader);
                 break;
 
             default:
-                Parameter = new DivUnknownParameter(reader, UnknownDataSize);
+                Parameter = new DivPUnknown(reader, UnknownDataSize);
                 break;
         }
     }
 
     public void ReadShadowGensParameter(BinaryObjectReader reader, int type)
     {
-        switch ((ShadowGensParams)type)
-        {
-            case ShadowGensParams.DepthOfField:
-                Parameter = new DivDOFParameter(reader);
-                break;
-
-            case ShadowGensParams.ChromaticAberration:
-                Parameter = new DivChromaAberrParameter(reader);
-                break;
-
-            case ShadowGensParams.Vignette:
-                Parameter = new DivVignetteParameter(reader);
-                break;
-
-            case ShadowGensParams.Fade:
-                Parameter = new DivFadeParameter(reader);
-                break;
-
-            case ShadowGensParams.BossCutoff:
-                Parameter = new DivBossCutoffParameter(reader);
-                break;
-
-            case ShadowGensParams.Subtitle:
-                Parameter = new DivSubtitleParameter(reader);
-                break;
-
-            case ShadowGensParams.Sound:
-                Parameter = new DivSoundParameter(reader);
-                break;
-
-            case ShadowGensParams.CameraBlur:
-                Parameter = new DivCameraBlurParameter(reader);
-                break;
-
-            case ShadowGensParams.GeneralPurposeTrigger:
-                Parameter = new DivGeneralPurposeTriggerParameter(reader);
-                break;
-
-            case ShadowGensParams.QTE:
-                Parameter = new DivQTEParameter(reader);
-                break;
-
-            case ShadowGensParams.TimescaleChange:
-                Parameter = new DivTimescaleParameter(reader);
-                break;
-
-            default:
-                Parameter = new DivUnknownParameter(reader, UnknownDataSize);
-                break;
-        }
     }
 
     public void ReadGameSpecificParameter(BinaryObjectReader reader, GameType game, int type)
@@ -415,7 +365,7 @@ public class DivParameterData : DivNodeData
                 break;
 
             default:
-                Parameter = new DivUnknownParameter(reader, UnknownDataSize);
+                Parameter = new DivPUnknown(reader, UnknownDataSize);
                 break;
         }
     }
@@ -436,39 +386,39 @@ public class DivParameterData : DivNodeData
             switch ((ParameterType)Type)
             {
                 case ParameterType.DrawingOff:
-                    Parameter = new DivDrawingOffParameter(reader);
+                    Parameter = new DivPDrawingOff(reader);
                     break;
 
                 case ParameterType.PathAdjust:
-                    Parameter = new DivPathAdjustParameter(reader);
+                    Parameter = new DivPPathAdjust(reader);
                     break;
 
                 case ParameterType.Effect:
-                    Parameter = new DivEffectParameter(reader);
+                    Parameter = new DivPEffect(reader);
                     break;
 
                 case ParameterType.CullDisabled:
-                    Parameter = new DivCullDisabledParameter(reader);
+                    Parameter = new DivPCullDisabled(reader);
                     break;
 
                 case ParameterType.UVAnimation:
-                    Parameter = new DivUVAnimParameter(reader);
+                    Parameter = new DivPAnimUV(reader);
                     break;
 
                 case ParameterType.MaterialAnimation:
-                    Parameter = new DivMaterialAnimParameter(reader);
+                    Parameter = new DivPAnimMaterial(reader);
                     break;
 
                 case ParameterType.CompositeAnimation:
-                    Parameter = new DivCompositeAnimationParameter(reader);
+                    Parameter = new DivPCompositeAnim(reader);
                     break;
 
                 case ParameterType.GameCamera:
-                    Parameter = new DivGameCameraParameter(reader);
+                    Parameter = new DivPGameCamera(reader);
                     break;
 
                 default:
-                    Parameter = new DivUnknownParameter(reader, UnknownDataSize);
+                    Parameter = new DivPUnknown(reader, UnknownDataSize);
                     break;
             }
         } 
@@ -496,13 +446,23 @@ public class DivParameterData : DivNodeData
 
 public enum NodeType
 {
-    Transform = 1,
+    Root = 0,
+    Path = 1,
+    PathMotion = 2,
     Camera = 3,
     CameraMotion = 4,
-    Model = 5,
-    Motion = 6,
-    Model2 = 8,
-    Motion2 = 10,
-    NodeAttachment = 11,
-    Parameter = 12
+    Character = 5,
+    CharacterMotion = 6,
+    CharacterBehavior = 7,
+    ModelCustom = 8,
+    Asset = 9,
+    ModelMotion = 10,
+    Attachment = 11,
+    Parameter = 12,
+    Stage = 13,
+    StageScenarioFlag = 14,
+    InstanceMotion = 15,
+    InstanceMotionData = 16,
+    FolderCondition = 17,
+    CharacterBehaviorSimpleTalk = 18,
 }

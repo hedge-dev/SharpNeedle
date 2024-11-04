@@ -2,6 +2,7 @@
 
 using System.IO;
 
+// Reference: https://github.com/ik-01/DiEventRangers/tree/main
 [NeedleResource("st/dv-scene", @"\.dvscene$")]
 public class DivScene : ResourceBase, IBinarySerializable
 {

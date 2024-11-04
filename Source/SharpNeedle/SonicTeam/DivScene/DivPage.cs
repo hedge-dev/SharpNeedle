@@ -2,10 +2,10 @@
 
 public class DivPage : IBinarySerializable
 {
-    public int Field00 { get; set; }
-    public int Field04 { get; set; }
-    public int StartFrame { get; set; }
-    public int EndFrame { get; set; }
+    public uint Version { get; set; }
+    public uint Flag { get; set; }
+    public uint StartFrame { get; set; }
+    public uint EndFrame { get; set; }
     public int Field10 { get; set; }
     public int SceneEndFrame { get; set; }
     public int Field1C { get; set; }
@@ -22,10 +22,10 @@ public class DivPage : IBinarySerializable
 
     public void Read(BinaryObjectReader reader)
     {
-        Field00 = reader.Read<int>();
-        Field04 = reader.Read<int>();
-        StartFrame = reader.Read<int>();
-        EndFrame = reader.Read<int>();
+        Version = reader.Read<uint>();
+        Flag = reader.Read<uint>();
+        StartFrame = reader.Read<uint>();
+        EndFrame = reader.Read<uint>();
         Field10 = reader.Read<int>();
         int dataSize = reader.Read<int>();
         SceneEndFrame = reader.Read<int>();
@@ -45,8 +45,8 @@ public class DivPage : IBinarySerializable
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.Write(Field00);
-        writer.Write(Field04);
+        writer.Write(Version);
+        writer.Write(Flag);
         writer.Write(StartFrame);
         writer.Write(EndFrame);
         writer.Write(Field10);
