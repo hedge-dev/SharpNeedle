@@ -11,7 +11,7 @@ public class DivNode : IBinarySerializable
     public int Field28 { get; set; }
     public int Field2C { get; set; }
     public string Name { get; set; }
-    public DivNodeData Data { get; set; } = new DivTransformData();
+    public DivNodeData Data { get; set; } = new DivDPath();
 
     public DivNode() { }
 
@@ -49,34 +49,34 @@ public class DivNode : IBinarySerializable
 
         switch ((NodeType)Type)
         {
-            case NodeType.Transform:
-                Data = new DivTransformData(reader);
+            case NodeType.Path:
+                Data = new DivDPath(reader);
                 break;
 
             case NodeType.Camera:
-                Data = new DivCameraData(reader);
+                Data = new DivDCamera(reader);
                 break;
 
             case NodeType.CameraMotion:
-                Data = new DivCameraMotionData(reader);
+                Data = new DivDCameraMotion(reader);
                 break;
 
-            case NodeType.Model:
-            case NodeType.Model2:
-                Data = new DivModelData(reader);
+            case NodeType.ModelCustom:
+            case NodeType.Character:
+                Data = new DivDModel(reader);
                 break;
 
-            case NodeType.Motion:
-            case NodeType.Motion2:
-                Data = new DivMotionData(reader);
+            case NodeType.CharacterMotion:
+            case NodeType.ModelMotion:
+                Data = new DivDMotionModel(reader);
                 break;
 
-            case NodeType.NodeAttachment:
-                Data = new DivNodeAttachData(reader);
+            case NodeType.Attachment:
+                Data = new DivDAttachment(reader);
                 break;
 
             case NodeType.Parameter:
-                Data = new DivParameterData(reader, dataSize);
+                Data = new DivDParameter(reader, dataSize);
                 break;
 
             default:

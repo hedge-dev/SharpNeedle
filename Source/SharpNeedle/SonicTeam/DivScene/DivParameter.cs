@@ -7,33 +7,13 @@ public abstract class DivParameter : IBinarySerializable
     public abstract void Write(BinaryObjectWriter writer);
 }
 
-public class DivCullDisabledParameter : DivParameter
-{
-    public DivCullDisabledParameter() { }
-    public DivCullDisabledParameter(BinaryObjectReader reader)
-        => Read(reader);
-
-    public override void Read(BinaryObjectReader reader) { }
-
-    public override void Write(BinaryObjectWriter writer) { }
-}
-
-public class DivMovieDisplayParameter : DivParameter
-{
-    public DivMovieDisplayParameter() { }
-    public DivMovieDisplayParameter(BinaryObjectReader reader) { }
-
-    public override void Read(BinaryObjectReader reader) { }
-    public override void Write(BinaryObjectWriter writer) { }
-}
-
-public class DivUnknownParameter : DivParameter
+public class DivPUnknown : DivParameter
 {
     public byte[] Data { get; set; }
     public int Size { get; set; }
 
-    public DivUnknownParameter() { }
-    public DivUnknownParameter(BinaryObjectReader reader, int size) 
+    public DivPUnknown() { }
+    public DivPUnknown(BinaryObjectReader reader, int size) 
     {
         Size = size;
         Data = new byte[Size * 4];
@@ -52,15 +32,35 @@ public class DivUnknownParameter : DivParameter
     }
 }
 
-class DivDrawingOffParameter : DivParameter
+public class DivPCullDisabled : DivParameter
+{
+    public DivPCullDisabled() { }
+    public DivPCullDisabled(BinaryObjectReader reader)
+        => Read(reader);
+
+    public override void Read(BinaryObjectReader reader) { }
+
+    public override void Write(BinaryObjectWriter writer) { }
+}
+
+public class DivPMovieDisplay : DivParameter
+{
+    public DivPMovieDisplay() { }
+    public DivPMovieDisplay(BinaryObjectReader reader) { }
+
+    public override void Read(BinaryObjectReader reader) { }
+    public override void Write(BinaryObjectWriter writer) { }
+}
+
+class DivPDrawingOff : DivParameter
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
     public int Field08 { get; set; }
     public int Field0C { get; set; }
 
-    public DivDrawingOffParameter() { }
-    public DivDrawingOffParameter(BinaryObjectReader reader)
+    public DivPDrawingOff() { }
+    public DivPDrawingOff(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -80,7 +80,7 @@ class DivDrawingOffParameter : DivParameter
     }
 }
 
-public class DivFadeParameter : DivParameter
+public class DivPFade : DivParameter
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
@@ -88,8 +88,8 @@ public class DivFadeParameter : DivParameter
     public int Field0C { get; set; }
     public float[] ValuesTimeline { get; set; } = new float[32];
 
-    public DivFadeParameter() { }
-    public DivFadeParameter(BinaryObjectReader reader)
+    public DivPFade() { }
+    public DivPFade(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -111,7 +111,7 @@ public class DivFadeParameter : DivParameter
     }
 }
 
-public class DivEffectParameter : DivParameter
+public class DivPEffect : DivParameter
 {
     public Matrix4x4 LocalTransform { get; set; }
     public int Field40 { get; set; }
@@ -126,8 +126,8 @@ public class DivEffectParameter : DivParameter
     public int FieldA0 { get; set; }
     public float[] FieldA4 { get; set; } = new float[128];
 
-    public DivEffectParameter() { }
-    public DivEffectParameter(BinaryObjectReader reader)
+    public DivPEffect() { }
+    public DivPEffect(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -163,12 +163,12 @@ public class DivEffectParameter : DivParameter
     }
 }
 
-public class DivLetterboxParameter : DivParameter
+public class DivPLetterbox : DivParameter
 {
     public float[] Values { get; set; } = new float[32];
 
-    public DivLetterboxParameter() { }
-    public DivLetterboxParameter(BinaryObjectReader reader)
+    public DivPLetterbox() { }
+    public DivPLetterbox(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -182,7 +182,7 @@ public class DivLetterboxParameter : DivParameter
     }
 }
 
-public class DivUVAnimParameter : DivParameter
+public class DivPAnimUV : DivParameter
 {
     public int Field00 { get; set; }
     public string Name { get; set; }
@@ -191,8 +191,8 @@ public class DivUVAnimParameter : DivParameter
     public int Field4C { get; set; }
     public int Field50 { get; set; }
 
-    public DivUVAnimParameter() { }
-    public DivUVAnimParameter(BinaryObjectReader reader)
+    public DivPAnimUV() { }
+    public DivPAnimUV(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -216,7 +216,7 @@ public class DivUVAnimParameter : DivParameter
     }
 }
 
-public class DivMaterialAnimParameter : DivParameter
+public class DivPAnimMaterial : DivParameter
 {
     public int Field00 { get; set; }
     public string Name { get; set; }
@@ -225,8 +225,8 @@ public class DivMaterialAnimParameter : DivParameter
     public int Field4C { get; set; }
     public int Field50 { get; set; }
 
-    public DivMaterialAnimParameter() { }
-    public DivMaterialAnimParameter(BinaryObjectReader reader)
+    public DivPAnimMaterial() { }
+    public DivPAnimMaterial(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -250,7 +250,7 @@ public class DivMaterialAnimParameter : DivParameter
     }
 }
 
-public class DivChromaAberrParameter : DivParameter
+public class DivPChromaAberr : DivParameter
 {
     public float Field00 { get; set; }
     public float Field04 { get; set; }
@@ -271,8 +271,8 @@ public class DivChromaAberrParameter : DivParameter
     public float Field40 { get; set; }
     public float[] ValuesTimeline { get; set; } = new float[32];
 
-    public DivChromaAberrParameter() { }
-    public DivChromaAberrParameter(BinaryObjectReader reader)
+    public DivPChromaAberr() { }
+    public DivPChromaAberr(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -322,14 +322,14 @@ public class DivChromaAberrParameter : DivParameter
     }
 }
 
-public class DivSoundParameter : DivParameter
+public class DivPSound : DivParameter
 {
     public string CueName { get; set; }
     public int Field40 { get; set; }
     public int Field44 { get; set; }
 
-    public DivSoundParameter() { }
-    public DivSoundParameter(BinaryObjectReader reader)
+    public DivPSound() { }
+    public DivPSound(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -347,7 +347,7 @@ public class DivSoundParameter : DivParameter
     }
 }
 
-public class DivGameCameraParameter : DivParameter
+public class DivPGameCamera : DivParameter
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
@@ -376,8 +376,8 @@ public class DivGameCameraParameter : DivParameter
     public int Field60 { get; set; }
     public int Field64 { get; set; }
 
-    public DivGameCameraParameter() { }
-    public DivGameCameraParameter(BinaryObjectReader reader)
+    public DivPGameCamera() { }
+    public DivPGameCamera(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -441,14 +441,14 @@ public class DivGameCameraParameter : DivParameter
     }
 }
 
-public class DivSubtitleParameter : DivParameter
+public class DivPSubtitle : DivParameter
 {
     public string CellName { get; set; }
     public SubtitleLanguage Language { get; set; }
     public int Field14 { get; set; }
 
-    public DivSubtitleParameter() { }
-    public DivSubtitleParameter(BinaryObjectReader reader)
+    public DivPSubtitle() { }
+    public DivPSubtitle(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -476,13 +476,13 @@ public class DivSubtitleParameter : DivParameter
         Portuguese = 6,
         Russian = 7,
         Japanese = 8,
-        Chinese1 = 9,
-        Chinese2 = 10,
+        Chinese = 9,
+        ChineseSimplified = 10,
         Korean = 11
     }
 }
 
-public class DivQTEParameter : DivParameter
+public class DivPQTE : DivParameter
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
@@ -519,8 +519,8 @@ public class DivQTEParameter : DivParameter
     public int[] Field80 { get; set; } = new int[48];
     public string Field140 { get; set; }
 
-    public DivQTEParameter() { }
-    public DivQTEParameter(BinaryObjectReader reader)
+    public DivPQTE() { }
+    public DivPQTE(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -602,15 +602,15 @@ public class DivQTEParameter : DivParameter
     }
 }
 
-public class DivTimescaleParameter : DivParameter
+public class DivPTimescale : DivParameter
 {
     public int Field00 { get; set; }
     public float Scale { get; set; }
     public int Field08 { get; set; }
     public int Field0C { get; set; }
 
-    public DivTimescaleParameter() { }
-    public DivTimescaleParameter(BinaryObjectReader reader)
+    public DivPTimescale() { }
+    public DivPTimescale(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -630,7 +630,7 @@ public class DivTimescaleParameter : DivParameter
     }
 }
 
-public class DivVignetteParameter : DivParameter
+public class DivPVignette : DivParameter
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
@@ -684,8 +684,8 @@ public class DivVignetteParameter : DivParameter
     public float FieldC4 { get; set; }
     public float[] ValuesTimeline { get; set; } = new float[32];
 
-    public DivVignetteParameter() { }
-    public DivVignetteParameter(BinaryObjectReader reader)
+    public DivPVignette() { }
+    public DivPVignette(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -801,7 +801,7 @@ public class DivVignetteParameter : DivParameter
     }
 }
 
-public class DivPathAdjustParameter : DivParameter
+public class DivPPathAdjust : DivParameter
 {
     public Matrix4x4 LocalTransform { get; set; }
     public int Field40 { get; set; }
@@ -809,8 +809,8 @@ public class DivPathAdjustParameter : DivParameter
     public int Field48 { get; set; }
     public int Field4C { get; set; }
 
-    public DivPathAdjustParameter() { }
-    public DivPathAdjustParameter(BinaryObjectReader reader)
+    public DivPPathAdjust() { }
+    public DivPPathAdjust(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -832,13 +832,13 @@ public class DivPathAdjustParameter : DivParameter
     }
 }
 
-public class DivBossCutoffParameter : DivParameter
+public class DivPBossCutoff : DivParameter
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
 
-    public DivBossCutoffParameter() { }
-    public DivBossCutoffParameter(BinaryObjectReader reader)
+    public DivPBossCutoff() { }
+    public DivPBossCutoff(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -854,7 +854,7 @@ public class DivBossCutoffParameter : DivParameter
     }
 }
 
-public class DivAuraParameter : DivParameter
+public class DivPAura : DivParameter
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
@@ -877,8 +877,8 @@ public class DivAuraParameter : DivParameter
     public int Field48 { get; set; }
     public float[] ValuesTimeline { get; set; } = new float[32];
 
-    public DivAuraParameter() { }
-    public DivAuraParameter(BinaryObjectReader reader)
+    public DivPAura() { }
+    public DivPAura(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -930,7 +930,7 @@ public class DivAuraParameter : DivParameter
     }
 }
 
-public class DivDOFParameter : DivParameter
+public class DivPDOF : DivParameter
 {
     public int Field00 { get; set; }
     public float Field04 { get; set; }
@@ -954,8 +954,8 @@ public class DivDOFParameter : DivParameter
     public int Field4C { get; set; }
     public float[] ValuesTimeline { get; set; } = new float[32];
 
-    public DivDOFParameter() { }
-    public DivDOFParameter(BinaryObjectReader reader)
+    public DivPDOF() { }
+    public DivPDOF(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -1009,14 +1009,14 @@ public class DivDOFParameter : DivParameter
     }
 }
 
-public class DivTheEndCableParameter : DivParameter
+public class DivPTheEndCable : DivParameter
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
     public float[] Field08 { get; set; } = new float[1024];
 
-    public DivTheEndCableParameter() { }
-    public DivTheEndCableParameter(BinaryObjectReader reader)
+    public DivPTheEndCable() { }
+    public DivPTheEndCable(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -1034,15 +1034,15 @@ public class DivTheEndCableParameter : DivParameter
     }
 }
 
-public class DivCompositeAnimationParameter : DivParameter
+public class DivPCompositeAnim : DivParameter
 {
     public int Field00 { get; set; }
     public string Field04 { get; set; }
     public Animation[] Animations { get; set; } = new Animation[16];
     public int Field450 { get; set; }
 
-    public DivCompositeAnimationParameter() { }
-    public DivCompositeAnimationParameter(BinaryObjectReader reader)
+    public DivPCompositeAnim() { }
+    public DivPCompositeAnim(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -1093,13 +1093,13 @@ public class DivCompositeAnimationParameter : DivParameter
     }
 }
 
-public class DivASMParameter : DivParameter
+public class DivPAnimStateMachine : DivParameter
 {
     public string Field00 { get; set; }
     public string Field40 { get; set; }
 
-    public DivASMParameter() { }
-    public DivASMParameter(BinaryObjectReader reader)
+    public DivPAnimStateMachine() { }
+    public DivPAnimStateMachine(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -1114,13 +1114,13 @@ public class DivASMParameter : DivParameter
         writer.WriteString(StringBinaryFormat.FixedLength, Field40, 64);
     }
 }
-public class DivGeneralPurposeTriggerParameter : DivParameter
+public class DivPGeneralTrigger : DivParameter
 {
     public uint Field00 { get; set; }
     public string TriggerName { get; set; }
 
-    public DivGeneralPurposeTriggerParameter() { }
-    public DivGeneralPurposeTriggerParameter(BinaryObjectReader reader)
+    public DivPGeneralTrigger() { }
+    public DivPGeneralTrigger(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -1136,7 +1136,7 @@ public class DivGeneralPurposeTriggerParameter : DivParameter
     }
 }
 
-public class DivCameraBlurParameter : DivParameter
+public class DivPCameraBlur : DivParameter
 {
     public uint Field00 { get; set; }
     public uint Field04 { get; set; }
@@ -1144,8 +1144,8 @@ public class DivCameraBlurParameter : DivParameter
     public float[] ValuesTimeline { get; set; } = new float[32];
     public uint Flags { get; set; }
 
-    public DivCameraBlurParameter() { }
-    public DivCameraBlurParameter(BinaryObjectReader reader)
+    public DivPCameraBlur() { }
+    public DivPCameraBlur(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -1167,12 +1167,12 @@ public class DivCameraBlurParameter : DivParameter
     }
 }   
 
-public class DivShadowResolutionParameter : DivParameter
+public class DivPShadowRes : DivParameter
 {
     public Vector2Int Resolution { get; set; }
 
-    public DivShadowResolutionParameter() { }
-    public DivShadowResolutionParameter(BinaryObjectReader reader)
+    public DivPShadowRes() { }
+    public DivPShadowRes(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -1186,7 +1186,7 @@ public class DivShadowResolutionParameter : DivParameter
     }
 }
 
-public class DivTimeParameter : DivParameter
+public class DivPTime : DivParameter
 {
     public uint Field00 { get; set; }
     public uint Field04 { get; set; }
@@ -1199,8 +1199,8 @@ public class DivTimeParameter : DivParameter
     public uint Field20 { get; set; }
     public float[] ValuesTimeline { get; set; } = new float[32];
 
-    public DivTimeParameter() { }
-    public DivTimeParameter(BinaryObjectReader reader)
+    public DivPTime() { }
+    public DivPTime(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -1232,13 +1232,13 @@ public class DivTimeParameter : DivParameter
     }
 }
 
-public class DivWeatherParameter : DivParameter
+public class DivPWeather : DivParameter
 {
     public uint Field00 { get; set; }
     public float[] ValuesTimeline { get; set; } = new float[32];
 
-    public DivWeatherParameter() { }
-    public DivWeatherParameter(BinaryObjectReader reader)
+    public DivPWeather() { }
+    public DivPWeather(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -1254,10 +1254,10 @@ public class DivWeatherParameter : DivParameter
     }
 }
 
-public class DivFinalBossLightingParameter : DivParameter
+public class DivPFinalBossLighting : DivParameter
 {
-    public DivFinalBossLightingParameter() { }
-    public DivFinalBossLightingParameter(BinaryObjectReader reader)
+    public DivPFinalBossLighting() { }
+    public DivPFinalBossLighting(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader) { }
@@ -1265,13 +1265,13 @@ public class DivFinalBossLightingParameter : DivParameter
     public override void Write(BinaryObjectWriter writer) { }
 }
 
-public class DivCyberNoiseParameter : DivParameter
+public class DivPCyberNoise : DivParameter
 {
     public uint Field00 { get; set; }
     public float[] ValuesTimeline { get; set; } = new float[32];
 
-    public DivCyberNoiseParameter() { }
-    public DivCyberNoiseParameter(BinaryObjectReader reader)
+    public DivPCyberNoise() { }
+    public DivPCyberNoise(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader) 
@@ -1287,13 +1287,13 @@ public class DivCyberNoiseParameter : DivParameter
     }
 }
 
-public class DivDitherDepthParameter : DivParameter
+public class DivPDitherDepth : DivParameter
 {
     public uint Field00 { get; set; }
     public float Field04 { get; set; }
 
-    public DivDitherDepthParameter() { }
-    public DivDitherDepthParameter(BinaryObjectReader reader)
+    public DivPDitherDepth() { }
+    public DivPDitherDepth(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -1309,7 +1309,7 @@ public class DivDitherDepthParameter : DivParameter
     }
 }
 
-public class DivCameraExposureParameter : DivParameter
+public class DivPCameraExposure : DivParameter
 {
     public uint Field00 { get; set; }
     public float Field04 { get; set; }
@@ -1321,8 +1321,8 @@ public class DivCameraExposureParameter : DivParameter
     public uint Field1C { get; set; }
     public float[] ValuesTimeline { get; set; } = new float[32];
 
-    public DivCameraExposureParameter() { }
-    public DivCameraExposureParameter(BinaryObjectReader reader)
+    public DivPCameraExposure() { }
+    public DivPCameraExposure(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)
@@ -1352,7 +1352,7 @@ public class DivCameraExposureParameter : DivParameter
     }
 }
 
-public class DivColorCorrectionParameter : DivParameter
+public class DivPColorCorrection : DivParameter
 {
     public uint Field00 { get; set; }
     public float Field04 { get; set; }
@@ -1364,8 +1364,8 @@ public class DivColorCorrectionParameter : DivParameter
     public uint Field1C { get; set; }
     public float[] ValuesTimeline { get; set; } = new float[32];
 
-    public DivColorCorrectionParameter() { }
-    public DivColorCorrectionParameter(BinaryObjectReader reader)
+    public DivPColorCorrection() { }
+    public DivPColorCorrection(BinaryObjectReader reader)
         => Read(reader);
 
     public override void Read(BinaryObjectReader reader)

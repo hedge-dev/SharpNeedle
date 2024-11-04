@@ -3,9 +3,8 @@
 public class DivResource : IBinarySerializable
 {
     public Guid GUID { get; set; }
-    public bool UnknownFlag { get; set; }
     public ResourceType ResType { get; set; }
-    public int Field14 { get; set; }
+    public uint Flags { get; set; }
     public int Field18 { get; set; }
     public string Name { get; set; }
 
@@ -25,12 +24,8 @@ public class DivResource : IBinarySerializable
     public void Read(BinaryObjectReader reader)
     {
         GUID = reader.Read<Guid>();
-
-        int resourceFlags = reader.Read<int>();
-        UnknownFlag = (resourceFlags & 1) == 1;
-        ResType = (ResourceType)(resourceFlags >> 1);
-
-        Field14 = reader.Read<int>();
+        ResType = (ResourceType)reader.Read<int>();
+        Flags = reader.Read<uint>();
         Field18 = reader.Read<int>();
         Name = reader.ReadString(StringBinaryFormat.FixedLength, 788);
     }
@@ -38,8 +33,8 @@ public class DivResource : IBinarySerializable
     public void Write(BinaryObjectWriter writer)
     {
         writer.Write(GUID);
-        writer.Write(((int)ResType << 1) | (UnknownFlag ? 1 : 0));
-        writer.Write(Field14);
+        writer.Write((int)ResType);
+        writer.Write(Flags);
         writer.Write(Field18);
         writer.WriteString(StringBinaryFormat.FixedLength, Name, 788);
     }
@@ -48,7 +43,13 @@ public class DivResource : IBinarySerializable
 public enum ResourceType
 {
     None = 0,
-    AnimationStateMachine = 1,
-    CameraAnimation = 2,
-    AnimationPxd = 3,
+    Texture = 1,
+    Character = 2,
+    Model = 3,
+    MotionCamera = 4,
+    MotionPath = 5,
+    MotionModel = 6,
+    MotionCharacter = 7,
+    EquipModel = 8,
+    Behavior = 9,
 }
