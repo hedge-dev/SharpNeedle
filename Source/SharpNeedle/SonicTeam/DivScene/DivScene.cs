@@ -23,6 +23,9 @@ public class DivScene : ResourceBase, IBinarySerializable
     }
 
     public override void Read(IFile file)
+        => Read(file, GameType.Common);
+
+    public void Read(IFile file, GameType game)
     {
         BaseFile = file;
         Name = Path.GetFileNameWithoutExtension(file.Name);
@@ -30,20 +33,26 @@ public class DivScene : ResourceBase, IBinarySerializable
         using var reader = new BinaryObjectReader(file.Open(), StreamOwnership.Transfer, Endianness.Little);
         reader.OffsetBinaryFormat = OffsetBinaryFormat.U32;
 
-        Read(reader);
+        Read(reader, game);
     }
 
     public override void Write(IFile file)
+        => Write(file, GameType.Common);
+
+    public void Write(IFile file, GameType game)
     {
         BaseFile = file;
 
         using var writer = new BinaryObjectWriter(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness.Little);
         writer.OffsetBinaryFormat = OffsetBinaryFormat.U32;
 
-        Write(writer);
+        Write(writer, game);
     }
 
     public void Read(BinaryObjectReader reader)
+        => Read(reader, GameType.Common);
+
+    public void Read(BinaryObjectReader reader, GameType game)
     {
         // Header
         long dataOffset = reader.ReadOffsetValue();
@@ -99,7 +108,7 @@ public class DivScene : ResourceBase, IBinarySerializable
 
             reader.ReadOffset(() =>
             {
-                RootNode.Read(reader);
+                RootNode.Read(reader, game);
             });
 
             Field2C = reader.Read<float>();
@@ -117,6 +126,9 @@ public class DivScene : ResourceBase, IBinarySerializable
     }
 
     public void Write(BinaryObjectWriter writer)
+        => Write(writer, GameType.Common);
+
+    public void Write(BinaryObjectWriter writer, GameType game)
     {
         long resourcesOffsetPos = writer.Position + 4;
 
@@ -205,7 +217,7 @@ public class DivScene : ResourceBase, IBinarySerializable
                 writer.Write((int)(rootNodePos - dataPos));
                 writer.Seek(rootNodePos, SeekOrigin.Begin);
 
-                RootNode.Write(writer);
+                RootNode.Write(writer, game);
             }
         }
 
@@ -225,6 +237,7 @@ public class DivScene : ResourceBase, IBinarySerializable
 
 public enum GameType
 { 
+    Common,
     Frontiers,
-    ShadowGenerations
+    ShadowGenerations,
 }

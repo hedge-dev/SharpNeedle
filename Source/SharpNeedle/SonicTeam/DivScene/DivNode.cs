@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.SonicTeam.DivScene;
 
-public class DivNode : IBinarySerializable
+public class DivNode : IDivDataBlock
 {
     public Guid GUID { get; set; }
     public int Type { get; set; }
@@ -11,7 +11,7 @@ public class DivNode : IBinarySerializable
     public int Field28 { get; set; }
     public int Field2C { get; set; }
     public string Name { get; set; }
-    public DivNodeData Data { get; set; } = new DivDPath();
+    public IDivDataBlock Data { get; set; } = new DivDPath();
 
     public DivNode() { }
 
@@ -26,12 +26,15 @@ public class DivNode : IBinarySerializable
         Type = (int)type;
     }
 
-    public DivNode(string name, NodeType type, DivNodeData data) : this(name, type)
+    public DivNode(string name, NodeType type, IDivDataBlock data) : this(name, type)
     {
         Data = data;
     }
 
-    public void Read(BinaryObjectReader reader)
+    public DivNode(BinaryObjectReader reader, GameType game)
+        => Read(reader, game);
+
+    public void Read(BinaryObjectReader reader, GameType game)
     {
         GUID = reader.Read<Guid>();
         Type = reader.Read<int>();
@@ -50,33 +53,33 @@ public class DivNode : IBinarySerializable
         switch ((NodeType)Type)
         {
             case NodeType.Path:
-                Data = new DivDPath(reader);
+                Data = new DivDPath(reader, game);
                 break;
 
             case NodeType.Camera:
-                Data = new DivDCamera(reader);
+                Data = new DivDCamera(reader, game);
                 break;
 
             case NodeType.CameraMotion:
-                Data = new DivDCameraMotion(reader);
+                Data = new DivDCameraMotion(reader, game);
                 break;
 
             case NodeType.ModelCustom:
             case NodeType.Character:
-                Data = new DivDModel(reader);
+                Data = new DivDModel(reader, game);
                 break;
 
             case NodeType.CharacterMotion:
             case NodeType.ModelMotion:
-                Data = new DivDMotionModel(reader);
+                Data = new DivDMotionModel(reader, game);
                 break;
 
             case NodeType.Attachment:
-                Data = new DivDAttachment(reader);
+                Data = new DivDAttachment(reader, game);
                 break;
 
             case NodeType.Parameter:
-                Data = new DivDParameter(reader, dataSize);
+                Data = new DivDParameter(reader, game, dataSize);
                 break;
 
             default:
@@ -84,10 +87,11 @@ public class DivNode : IBinarySerializable
                 break;
         }
 
-        Children.AddRange(reader.ReadObjectArray<DivNode>(childCount));
+        for(int i=0; i<childCount; i++)
+            Children.Add(new DivNode(reader, game));
     }
 
-    public void Write(BinaryObjectWriter writer)
+    public void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.Write(GUID);
         writer.Write(Type);
@@ -106,13 +110,14 @@ public class DivNode : IBinarySerializable
         writer.WriteDivString(Name, 64);
 
         long dataStart = writer.Position;
-        Data.Write(writer);
+        Data.Write(writer, game);
         long dataEnd = writer.Position;
 
         writer.Seek(dataSizePos, System.IO.SeekOrigin.Begin);
         writer.Write((int)(dataEnd - dataStart) / 4);
         writer.Seek(dataEnd, System.IO.SeekOrigin.Begin);
 
-        writer.WriteObjectCollection(Children);
+        foreach (var child in Children)
+            child.Write(writer, game);
     }
 }
