@@ -1,5 +1,11 @@
 ﻿namespace SharpNeedle.SonicTeam.DivScene;
 
+public interface IDivDataBlock
+{
+    void Read(BinaryObjectReader reader, GameType game);
+    void Write(BinaryObjectWriter writer, GameType game);
+}
+
 public static class DivString
 {
     public static string ReadDivString(this BinaryObjectReader reader, int fixedLength = 64)
