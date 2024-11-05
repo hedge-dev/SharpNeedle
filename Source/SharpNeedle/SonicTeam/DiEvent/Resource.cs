@@ -1,6 +1,6 @@
-﻿namespace SharpNeedle.SonicTeam.DivScene;
+﻿namespace SharpNeedle.SonicTeam.DiEvent;
 
-public class DivResource : IBinarySerializable
+public class Resource : IBinarySerializable
 {
     public Guid GUID { get; set; }
     public ResourceType ResType { get; set; }
@@ -8,15 +8,15 @@ public class DivResource : IBinarySerializable
     public int Field18 { get; set; }
     public string Name { get; set; }
 
-    public DivResource() { }
+    public Resource() { }
 
-    public DivResource(string name) 
+    public Resource(string name) 
     {
         Name = name;
         GUID = Guid.NewGuid();
     }
 
-    public DivResource(string name, ResourceType type) : this(name)
+    public Resource(string name, ResourceType type) : this(name)
     {
         ResType = type;
     }

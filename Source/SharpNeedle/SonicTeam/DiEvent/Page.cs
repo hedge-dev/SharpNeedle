@@ -1,6 +1,6 @@
-﻿namespace SharpNeedle.SonicTeam.DivScene;
+﻿namespace SharpNeedle.SonicTeam.DiEvent;
 
-public class DivPage : IBinarySerializable
+public class Page : IBinarySerializable
 {
     public uint Version { get; set; }
     public uint Flag { get; set; }

@@ -1,17 +1,17 @@
-﻿namespace SharpNeedle.SonicTeam.DivScene;
+﻿namespace SharpNeedle.SonicTeam.DiEvent;
 
-public class DivPUnknown : IDivDataBlock
+public class UnknownParam : IDataBlock
 {
     public byte[] Data { get; set; }
     public int Size { get; set; }
 
-    public DivPUnknown() { }
-    public DivPUnknown(BinaryObjectReader reader, GameType game, int size) 
+    public UnknownParam() { }
+    public UnknownParam(BinaryObjectReader reader, int size) 
     {
         Size = size;
         Data = new byte[Size * 4];
 
-        Read(reader, game);
+        Read(reader, GameType.Common);
     }
 
     public void Read(BinaryObjectReader reader, GameType game) 
@@ -25,37 +25,17 @@ public class DivPUnknown : IDivDataBlock
     }
 }
 
-public class DivPCullDisabled : IDivDataBlock
-{
-    public DivPCullDisabled() { }
-    public DivPCullDisabled(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+// Common parameters
 
-    public void Read(BinaryObjectReader reader, GameType game) { }
-
-    public void Write(BinaryObjectWriter writer, GameType game) { }
-}
-
-public class DivPMovieDisplay : IDivDataBlock
-{
-    public DivPMovieDisplay() { }
-    public DivPMovieDisplay(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
-
-    public void Read(BinaryObjectReader reader, GameType game) { }
-
-    public void Write(BinaryObjectWriter writer, GameType game) { }
-}
-
-class DivPDrawingOff : IDivDataBlock
+class DrawOffParam : IDataBlock
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
     public int Field08 { get; set; }
     public int Field0C { get; set; }
 
-    public DivPDrawingOff() { }
-    public DivPDrawingOff(BinaryObjectReader reader, GameType game)
+    public DrawOffParam() { }
+    public DrawOffParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
@@ -75,38 +55,38 @@ class DivPDrawingOff : IDivDataBlock
     }
 }
 
-public class DivPFade : IDivDataBlock
+public class PathAdjustParam : IDataBlock
 {
-    public int Field00 { get; set; }
-    public int Field04 { get; set; }
-    public int Field08 { get; set; }
-    public int Field0C { get; set; }
-    public float[] ValuesTimeline { get; set; } = new float[32];
+    public Matrix4x4 LocalTransform { get; set; }
+    public int Field40 { get; set; }
+    public int Field44 { get; set; }
+    public int Field48 { get; set; }
+    public int Field4C { get; set; }
 
-    public DivPFade() { }
-    public DivPFade(BinaryObjectReader reader, GameType game)
+    public PathAdjustParam() { }
+    public PathAdjustParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
     {
-        Field00 = reader.Read<int>();
-        Field04 = reader.Read<int>();
-        Field08 = reader.Read<int>();
-        Field0C = reader.Read<int>();
-        reader.ReadArray<float>(32, ValuesTimeline);
+        LocalTransform = reader.Read<Matrix4x4>();
+        Field40 = reader.Read<int>();
+        Field44 = reader.Read<int>();
+        Field48 = reader.Read<int>();
+        Field4C = reader.Read<int>();
     }
 
     public void Write(BinaryObjectWriter writer, GameType game)
     {
-        writer.Write(Field00);
-        writer.Write(Field04);
-        writer.Write(Field08);
-        writer.Write(Field0C);
-        writer.WriteArrayFixedLength(ValuesTimeline, 32);
+        writer.Write(LocalTransform);
+        writer.Write(Field40);
+        writer.Write(Field44);
+        writer.Write(Field48);
+        writer.Write(Field4C);
     }
 }
 
-public class DivPEffect : IDivDataBlock
+public class EffectParam : IDataBlock
 {
     public Matrix4x4 LocalTransform { get; set; }
     public int Field40 { get; set; }
@@ -119,17 +99,17 @@ public class DivPEffect : IDivDataBlock
     public int Field98 { get; set; }
     public int Field9C { get; set; }
     public int FieldA0 { get; set; }
-    public float[] FieldA4 { get; set; } = new float[128];
+    public float[] AnimationData { get; set; } = new float[128];
 
-    public DivPEffect() { }
-    public DivPEffect(BinaryObjectReader reader, GameType game)
+    public EffectParam() { }
+    public EffectParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
     {
         LocalTransform = reader.Read<Matrix4x4>();
         Field40 = reader.Read<int>();
-        Name = reader.ReadDivString(64);
+        Name = reader.ReadDiString(64);
         Field84 = reader.Read<int>();
         Field88 = reader.Read<int>();
         Field8C = reader.Read<int>();
@@ -138,14 +118,14 @@ public class DivPEffect : IDivDataBlock
         Field98 = reader.Read<int>();
         Field9C = reader.Read<int>();
         FieldA0 = reader.Read<int>();
-        reader.ReadArray<float>(128, FieldA4);
+        reader.ReadArray<float>(128, AnimationData);
     }
 
     public void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.Write(LocalTransform);
         writer.Write(Field40);
-        writer.WriteDivString(Name);
+        writer.WriteDiString(Name);
         writer.Write(Field84);
         writer.Write(Field88);
         writer.Write(Field8C);
@@ -154,30 +134,22 @@ public class DivPEffect : IDivDataBlock
         writer.Write(Field98);
         writer.Write(Field9C);
         writer.Write(FieldA0);
-        writer.WriteArrayFixedLength(FieldA4, 128);
+        writer.WriteArrayFixedLength(AnimationData, 128);
     }
 }
 
-public class DivPLetterbox : IDivDataBlock
+public class CullDisabledParam : IDataBlock
 {
-    public float[] Values { get; set; } = new float[32];
-
-    public DivPLetterbox() { }
-    public DivPLetterbox(BinaryObjectReader reader, GameType game)
+    public CullDisabledParam() { }
+    public CullDisabledParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
-    public void Read(BinaryObjectReader reader, GameType game)
-    {
-        reader.ReadArray<float>(32, Values);
-    }
+    public void Read(BinaryObjectReader reader, GameType game) { }
 
-    public void Write(BinaryObjectWriter writer, GameType game)
-    {
-        writer.WriteArrayFixedLength(Values, 32);
-    }
+    public void Write(BinaryObjectWriter writer, GameType game) { }
 }
 
-public class DivPAnimUV : IDivDataBlock
+public class UVAnimParam : IDataBlock
 {
     public int Field00 { get; set; }
     public string Name { get; set; }
@@ -186,14 +158,14 @@ public class DivPAnimUV : IDivDataBlock
     public int Field4C { get; set; }
     public int Field50 { get; set; }
 
-    public DivPAnimUV() { }
-    public DivPAnimUV(BinaryObjectReader reader, GameType game)
+    public UVAnimParam() { }
+    public UVAnimParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
     {
         Field00 = reader.Read<int>();
-        Name = reader.ReadDivString(64);
+        Name = reader.ReadDiString(64);
         Field44 = reader.Read<int>();
         Field48 = reader.Read<float>();
         Field4C = reader.Read<int>();
@@ -203,7 +175,7 @@ public class DivPAnimUV : IDivDataBlock
     public void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.Write(Field00);
-        writer.WriteDivString(Name, 64);
+        writer.WriteDiString(Name, 64);
         writer.Write(Field44);
         writer.Write(Field48);
         writer.Write(Field4C);
@@ -211,7 +183,7 @@ public class DivPAnimUV : IDivDataBlock
     }
 }
 
-public class DivPAnimMaterial : IDivDataBlock
+public class VisibilityAnimParam : IDataBlock
 {
     public int Field00 { get; set; }
     public string Name { get; set; }
@@ -220,14 +192,14 @@ public class DivPAnimMaterial : IDivDataBlock
     public int Field4C { get; set; }
     public int Field50 { get; set; }
 
-    public DivPAnimMaterial() { }
-    public DivPAnimMaterial(BinaryObjectReader reader, GameType game)
+    public VisibilityAnimParam() { }
+    public VisibilityAnimParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
     {
         Field00 = reader.Read<int>();
-        Name = reader.ReadDivString(64);
+        Name = reader.ReadDiString(64);
         Field44 = reader.Read<int>();
         Field48 = reader.Read<float>();
         Field4C = reader.Read<int>();
@@ -237,7 +209,7 @@ public class DivPAnimMaterial : IDivDataBlock
     public void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.Write(Field00);
-        writer.WriteDivString(Name, 64);
+        writer.WriteDiString(Name, 64);
         writer.Write(Field44);
         writer.Write(Field48);
         writer.Write(Field4C);
@@ -245,7 +217,7 @@ public class DivPAnimMaterial : IDivDataBlock
     }
 }
 
-public class DivPAnimVis : IDivDataBlock
+public class MaterialAnimParam : IDataBlock
 {
     public int Field00 { get; set; }
     public string Name { get; set; }
@@ -254,14 +226,14 @@ public class DivPAnimVis : IDivDataBlock
     public int Field4C { get; set; }
     public int Field50 { get; set; }
 
-    public DivPAnimVis() { }
-    public DivPAnimVis(BinaryObjectReader reader, GameType game)
+    public MaterialAnimParam() { }
+    public MaterialAnimParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
     {
         Field00 = reader.Read<int>();
-        Name = reader.ReadDivString(64);
+        Name = reader.ReadDiString(64);
         Field44 = reader.Read<int>();
         Field48 = reader.Read<float>();
         Field4C = reader.Read<int>();
@@ -271,111 +243,76 @@ public class DivPAnimVis : IDivDataBlock
     public void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.Write(Field00);
-        writer.WriteDivString(Name, 64);
+        writer.WriteDiString(Name, 64);
         writer.Write(Field44);
         writer.Write(Field48);
         writer.Write(Field4C);
         writer.Write(Field50);
     }
 }
-public class DivPChromaAberr : IDivDataBlock
-{
-    public float Field00 { get; set; }
-    public float Field04 { get; set; }
-    public float Field08 { get; set; }
-    public float Field0C { get; set; }
-    public float Field10 { get; set; }
-    public float Field14 { get; set; }
-    public float Field18 { get; set; }
-    public float Field1C { get; set; }
-    public float Field20 { get; set; }
-    public float Field24 { get; set; }
-    public float Field28 { get; set; }
-    public float Field2C { get; set; }
-    public float Field30 { get; set; }
-    public float Field34 { get; set; }
-    public float Field38 { get; set; }
-    public float Field3C { get; set; }
-    public float Field40 { get; set; }
-    public float[] ValuesTimeline { get; set; } = new float[32];
 
-    public DivPChromaAberr() { }
-    public DivPChromaAberr(BinaryObjectReader reader, GameType game)
+public class CompositeAnimParam : IDataBlock
+{
+    public int Field00 { get; set; }
+    public string StateName { get; set; }
+    public Animation[] Animations { get; set; } = new Animation[16];
+    public int ActiveAnimCount { get; set; }
+
+    public CompositeAnimParam() { }
+    public CompositeAnimParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
     {
-        Field00 = reader.Read<float>();
-        Field04 = reader.Read<float>();
-        Field08 = reader.Read<float>();
-        Field0C = reader.Read<float>();
-        Field10 = reader.Read<float>();
-        Field14 = reader.Read<float>();
-        Field18 = reader.Read<float>();
-        Field1C = reader.Read<float>();
-        Field20 = reader.Read<float>();
-        Field24 = reader.Read<float>();
-        Field28 = reader.Read<float>();
-        Field2C = reader.Read<float>();
-        Field30 = reader.Read<float>();
-        Field34 = reader.Read<float>();
-        Field38 = reader.Read<float>();
-        Field3C = reader.Read<float>();
-        Field40 = reader.Read<float>();
-
-        reader.ReadArray<float>(32, ValuesTimeline);
+        Field00 = reader.Read<int>();
+        StateName = reader.ReadString(StringBinaryFormat.FixedLength, 12);
+        Animations = reader.ReadObjectArray<Animation>(16);
+        ActiveAnimCount = reader.Read<int>();
     }
 
     public void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.Write(Field00);
-        writer.Write(Field04);
-        writer.Write(Field08);
-        writer.Write(Field0C);
-        writer.Write(Field10);
-        writer.Write(Field14);
-        writer.Write(Field18);
-        writer.Write(Field1C);
-        writer.Write(Field20);
-        writer.Write(Field24);
-        writer.Write(Field28);
-        writer.Write(Field2C);
-        writer.Write(Field30);
-        writer.Write(Field34);
-        writer.Write(Field38);
-        writer.Write(Field3C);
-        writer.Write(Field40);
+        writer.WriteString(StringBinaryFormat.FixedLength, StateName, 12);
+        writer.WriteObjectCollection(Animations);
+        writer.Write(ActiveAnimCount);
+    }
 
-        writer.WriteArrayFixedLength(ValuesTimeline, 32);
+    public class Animation : IBinarySerializable
+    {
+        public int Type { get; set; }
+        public string Name { get; set; }
+
+        public Animation()
+        {
+            Type = (int)AnimationType.None;
+            Name = "";
+        }
+
+        public void Read(BinaryObjectReader reader)
+        {
+            Type = reader.Read<int>();
+            Name = reader.ReadString(StringBinaryFormat.FixedLength, 64);
+        }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            writer.Write(Type);
+            writer.WriteString(StringBinaryFormat.FixedLength, Name, 64);
+        }
+    }
+
+    public enum AnimationType
+    {
+        None = 0,
+        PXD = 1,
+        UV = 2,
+        Visibility = 3,
+        Material = 4,
     }
 }
 
-public class DivPSound : IDivDataBlock
-{
-    public string CueName { get; set; }
-    public int Field40 { get; set; }
-    public int Field44 { get; set; }
-
-    public DivPSound() { }
-    public DivPSound(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
-
-    public void Read(BinaryObjectReader reader, GameType game)
-    {
-        CueName = reader.ReadDivString(64);
-        Field40 = reader.Read<int>();
-        Field44 = reader.Read<int>();
-    }
-
-    public void Write(BinaryObjectWriter writer, GameType game)
-    {
-        writer.WriteDivString(CueName);
-        writer.Write(Field40);
-        writer.Write(Field44);
-    }
-}
-
-public class DivPGameCamera : IDivDataBlock
+public class GameCameraParam : IDataBlock
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
@@ -404,8 +341,8 @@ public class DivPGameCamera : IDivDataBlock
     public int Field60 { get; set; }
     public int Field64 { get; set; }
 
-    public DivPGameCamera() { }
-    public DivPGameCamera(BinaryObjectReader reader, GameType game)
+    public GameCameraParam() { }
+    public GameCameraParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
@@ -469,7 +406,302 @@ public class DivPGameCamera : IDivDataBlock
     }
 }
 
-public class DivPSubtitle : IDivDataBlock
+public class ControllerVibrationParam : IDataBlock
+{
+    public int Field00 { get; set; }
+    public string Group { get; set; }
+    public string Mode { get; set; }
+    public uint Field84 { get; set; }
+    public uint Field88 { get; set; }
+    public uint Field8C { get; set; }
+
+    public ControllerVibrationParam() { }
+    public ControllerVibrationParam(BinaryObjectReader reader, GameType game)
+        => Read(reader, game);
+
+    public void Read(BinaryObjectReader reader, GameType game)
+    {
+        Field00 = reader.Read<int>();
+        Group = reader.ReadString(StringBinaryFormat.FixedLength, 64);
+        Mode = reader.ReadString(StringBinaryFormat.FixedLength, 64);
+        Field84 = reader.Read<uint>();
+        Field88 = reader.Read<uint>();
+        Field8C = reader.Read<uint>();
+    }
+
+    public void Write(BinaryObjectWriter writer, GameType game)
+    {
+        writer.Write(Field00);
+        writer.WriteString(StringBinaryFormat.FixedLength, Group, 64);
+        writer.WriteString(StringBinaryFormat.FixedLength, Mode, 64);
+        writer.Write(Field84);
+        writer.Write(Field88);
+        writer.Write(Field8C);
+    }
+}
+
+public class MaterialParameterParam : IDataBlock
+{
+    public string MaterialName { get; set; }
+    public string ParamName { get; set; }
+    public uint Type { get; set; }
+    public uint[] UnknownData { get; set; } = new uint[40];
+
+    public MaterialParameterParam() { }
+    public MaterialParameterParam(BinaryObjectReader reader, GameType game)
+        => Read(reader, game);
+
+    public void Read(BinaryObjectReader reader, GameType game)
+    {
+        MaterialName = reader.ReadString(StringBinaryFormat.FixedLength, 64);
+        ParamName = reader.ReadString(StringBinaryFormat.FixedLength, 64);
+        Type = reader.Read<uint>();
+        reader.ReadArray<uint>(40, UnknownData);
+    }
+
+    public void Write(BinaryObjectWriter writer, GameType game)
+    {
+        writer.WriteString(StringBinaryFormat.FixedLength, MaterialName, 64);
+        writer.WriteString(StringBinaryFormat.FixedLength, ParamName, 64);
+        writer.Write(Type);
+        writer.WriteArrayFixedLength(UnknownData, 40);
+    }
+
+    public enum ParamType
+    {
+        Float = 3
+    }
+}
+
+// Game-specific
+
+public class DOFParam : IDataBlock
+{
+    public int Field00 { get; set; }
+    public Endpoint EndpointA { get; set; } = new Endpoint();
+    public Endpoint EndpointB { get; set; } = new Endpoint();
+    public float Field24 { get; set; }
+    public float Field28 { get; set; }
+    public int Field2C { get; set; }
+    public int Field30 { get; set; }
+    public float Field34 { get; set; }
+    public int Field38 { get; set; }
+    public int Field3C { get; set; }
+    public int Field40 { get; set; }
+    public int Field44 { get; set; }
+    public int Field48 { get; set; }
+    public int Field4C { get; set; }
+    public float[] CurveData { get; set; } = new float[32];
+
+    public DOFParam() { }
+    public DOFParam(BinaryObjectReader reader, GameType game)
+        => Read(reader, game);
+
+    public void Read(BinaryObjectReader reader, GameType game)
+    {
+        Field00 = reader.Read<int>();
+        EndpointA = reader.ReadObject<Endpoint>();
+        EndpointB = reader.ReadObject<Endpoint>();
+        Field24 = reader.Read<float>();
+        Field28 = reader.Read<float>();
+        Field2C = reader.Read<int>();
+        Field30 = reader.Read<int>();
+        Field34 = reader.Read<float>();
+        Field38 = reader.Read<int>();
+        Field3C = reader.Read<int>();
+        Field40 = reader.Read<int>();
+        Field44 = reader.Read<int>();
+        Field48 = reader.Read<int>();
+        Field4C = reader.Read<int>();
+        reader.ReadArray<float>(32, CurveData);
+    }
+
+    public void Write(BinaryObjectWriter writer, GameType game)
+    {
+        writer.Write(Field00);
+        writer.WriteObject(EndpointA);
+        writer.WriteObject(EndpointB);
+        writer.Write(Field24);
+        writer.Write(Field28);
+        writer.Write(Field2C);
+        writer.Write(Field30);
+        writer.Write(Field34);
+        writer.Write(Field38);
+        writer.Write(Field3C);
+        writer.Write(Field40);
+        writer.Write(Field44);
+        writer.Write(Field48);
+        writer.Write(Field4C);
+        writer.WriteArrayFixedLength(CurveData, 32);
+    }
+
+    public class Endpoint : IBinarySerializable
+    {
+        public float Focus { get; set; }
+        public float FocusRange { get; set; }
+        public float Near { get; set; }
+        public float Far { get; set; }
+
+        public Endpoint() { }
+
+        public Endpoint(BinaryObjectReader reader)
+            => Read(reader);
+
+        public void Read(BinaryObjectReader reader)
+        {
+            Focus = reader.Read<float>();
+            FocusRange = reader.Read<float>();
+            Near = reader.Read<float>();
+            Far = reader.Read<float>();
+        }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            writer.Write(Focus);
+            writer.Write(FocusRange);
+            writer.Write(Near);
+            writer.Write(Far);
+        }
+    }
+}
+
+public class MovieDisplayParam : IDataBlock
+{
+    public MovieDisplayParam() { }
+    public MovieDisplayParam(BinaryObjectReader reader, GameType game)
+        => Read(reader, game);
+
+    public void Read(BinaryObjectReader reader, GameType game) { }
+
+    public void Write(BinaryObjectWriter writer, GameType game) { }
+}
+
+public class FadeParam : IDataBlock
+{
+    Color<uint> Color {  get; set; }
+    public float[] CurveData { get; set; } = new float[32];
+
+    public FadeParam() { }
+    public FadeParam(BinaryObjectReader reader, GameType game)
+        => Read(reader, game);
+
+    public void Read(BinaryObjectReader reader, GameType game)
+    {
+        Color = reader.Read<Color<uint>>();
+        reader.ReadArray<float>(32, CurveData);
+    }
+
+    public void Write(BinaryObjectWriter writer, GameType game)
+    {
+        writer.Write(Color);
+        writer.WriteArrayFixedLength(CurveData, 32);
+    }
+}
+
+public class LetterboxParam : IDataBlock
+{
+    public float[] CurveData { get; set; } = new float[32];
+
+    public LetterboxParam() { }
+    public LetterboxParam(BinaryObjectReader reader, GameType game)
+        => Read(reader, game);
+
+    public void Read(BinaryObjectReader reader, GameType game)
+    {
+        reader.ReadArray<float>(32, CurveData);
+    }
+
+    public void Write(BinaryObjectWriter writer, GameType game)
+    {
+        writer.WriteArrayFixedLength(CurveData, 32);
+    }
+}
+
+public class ChromaAberrationParam : IDataBlock
+{
+    public Endpoint EndpointA { get; set; } = new Endpoint();
+    public float Field20 { get; set; }
+    public Endpoint EndpointB { get; set; } = new Endpoint();
+    public float[] CurveData { get; set; } = new float[32];
+
+    public ChromaAberrationParam() { }
+    public ChromaAberrationParam(BinaryObjectReader reader, GameType game)
+        => Read(reader, game);
+
+    public void Read(BinaryObjectReader reader, GameType game)
+    {
+        EndpointA.Read(reader);
+        Field20 = reader.Read<float>();
+        EndpointB.Read(reader);
+
+        reader.ReadArray<float>(32, CurveData);
+    }
+
+    public void Write(BinaryObjectWriter writer, GameType game)
+    {
+        EndpointA.Write(writer);
+        writer.Write(Field20);
+        EndpointB.Write(writer);
+
+        writer.WriteArrayFixedLength(CurveData, 32);
+    }
+
+    public class Endpoint
+    {
+        public Color<float> ColorOffset { get; set; }
+        public float SphereCurve { get; set; }
+        public Vector2 Scale { get; set; }
+        public Vector2 Position { get; set; }
+
+        public Endpoint() { }
+
+        public Endpoint(BinaryObjectReader reader)
+            => Read(reader);
+
+        public void Read(BinaryObjectReader reader)
+        {
+            ColorOffset = new Color<float>(reader.Read<float>(), reader.Read<float>(), reader.Read<float>(), 1.0f);
+            SphereCurve = reader.Read<float>();
+            Scale = reader.Read<Vector2>();
+            Position = reader.Read<Vector2>();
+        }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            writer.Write(new Vector3(ColorOffset.R, ColorOffset.G, ColorOffset.B));
+            writer.Write(SphereCurve);
+            writer.Write(Scale);
+            writer.Write(Position);
+        }
+    }
+}
+
+public class SoundParam : IDataBlock
+{
+    public string CueName { get; set; }
+    public int Field40 { get; set; }
+    public int Field44 { get; set; }
+
+    public SoundParam() { }
+    public SoundParam(BinaryObjectReader reader, GameType game)
+        => Read(reader, game);
+
+    public void Read(BinaryObjectReader reader, GameType game)
+    {
+        CueName = reader.ReadDiString(64);
+        Field40 = reader.Read<int>();
+        Field44 = reader.Read<int>();
+    }
+
+    public void Write(BinaryObjectWriter writer, GameType game)
+    {
+        writer.WriteDiString(CueName);
+        writer.Write(Field40);
+        writer.Write(Field44);
+    }
+}
+
+public class SubtitleParam : IDataBlock
 {
     public string CellName { get; set; }
     public SubtitleLanguage Language { get; set; }
@@ -478,24 +710,24 @@ public class DivPSubtitle : IDivDataBlock
     public int Field28 { get; set; }
     public string CellName2 { get; set; }
 
-    public DivPSubtitle() { }
-    public DivPSubtitle(BinaryObjectReader reader, GameType game)
+    public SubtitleParam() { }
+    public SubtitleParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
     {
         if(game == GameType.ShadowGenerations)
         {
-            CellName = reader.ReadDivString(32);
+            CellName = reader.ReadDiString(32);
             Language = (SubtitleLanguage)reader.Read<int>();
             Field14 = reader.Read<int>();
             Field24 = reader.Read<int>();
             Field28 = reader.Read<int>();
-            CellName2 = reader.ReadDivString(32);
+            CellName2 = reader.ReadDiString(32);
         }
         else
         {
-            CellName = reader.ReadDivString(16);
+            CellName = reader.ReadDiString(16);
             Language = (SubtitleLanguage)reader.Read<int>();
             Field14 = reader.Read<int>();
         }
@@ -505,16 +737,16 @@ public class DivPSubtitle : IDivDataBlock
     {
         if (game == GameType.ShadowGenerations)
         {
-            writer.WriteDivString(CellName, 32);
+            writer.WriteDiString(CellName, 32);
             writer.Write((int)Language);
             writer.Write(Field14);
             writer.Write(Field24);
             writer.Write(Field28);
-            writer.WriteDivString(CellName2, 32);
+            writer.WriteDiString(CellName2, 32);
         }
         else
         {
-            writer.WriteDivString(CellName, 16);
+            writer.WriteDiString(CellName, 16);
             writer.Write((int)Language);
             writer.Write(Field14);
         }
@@ -537,7 +769,7 @@ public class DivPSubtitle : IDivDataBlock
     }
 }
 
-public class DivPQTE : IDivDataBlock
+public class QTEParam : IDataBlock
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
@@ -577,8 +809,8 @@ public class DivPQTE : IDivDataBlock
     public string Field180 { get; set; }
     public uint Field1C0 { get; set; }
 
-    public DivPQTE() { }
-    public DivPQTE(BinaryObjectReader reader, GameType game)
+    public QTEParam() { }
+    public QTEParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
@@ -674,15 +906,15 @@ public class DivPQTE : IDivDataBlock
     }
 }
 
-public class DivPTimescale : IDivDataBlock
+public class TimescaleParam : IDataBlock
 {
     public int Field00 { get; set; }
     public float Scale { get; set; }
     public int Field08 { get; set; }
     public int Field0C { get; set; }
 
-    public DivPTimescale() { }
-    public DivPTimescale(BinaryObjectReader reader, GameType game)
+    public TimescaleParam() { }
+    public TimescaleParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
@@ -702,7 +934,7 @@ public class DivPTimescale : IDivDataBlock
     }
 }
 
-public class DivPVignette : IDivDataBlock
+public class VignetteParam : IDataBlock
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
@@ -756,8 +988,8 @@ public class DivPVignette : IDivDataBlock
     public float FieldC4 { get; set; }
     public float[] ValuesTimeline { get; set; } = new float[32];
 
-    public DivPVignette() { }
-    public DivPVignette(BinaryObjectReader reader, GameType game)
+    public VignetteParam() { }
+    public VignetteParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
@@ -873,44 +1105,13 @@ public class DivPVignette : IDivDataBlock
     }
 }
 
-public class DivPPathAdjust : IDivDataBlock
-{
-    public Matrix4x4 LocalTransform { get; set; }
-    public int Field40 { get; set; }
-    public int Field44 { get; set; }
-    public int Field48 { get; set; }
-    public int Field4C { get; set; }
-
-    public DivPPathAdjust() { }
-    public DivPPathAdjust(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
-
-    public void Read(BinaryObjectReader reader, GameType game)
-    {
-        LocalTransform = reader.Read<Matrix4x4>();
-        Field40 = reader.Read<int>();
-        Field44 = reader.Read<int>();
-        Field48 = reader.Read<int>();
-        Field4C = reader.Read<int>();
-    }
-
-    public void Write(BinaryObjectWriter writer, GameType game)
-    {
-        writer.Write(LocalTransform);
-        writer.Write(Field40);
-        writer.Write(Field44);
-        writer.Write(Field48);
-        writer.Write(Field4C);
-    }
-}
-
-public class DivPBossName : IDivDataBlock
+public class BossNameParam : IDataBlock
 {
     public int Field00 { get; set; }
     public int NameType { get; set; }
 
-    public DivPBossName() { }
-    public DivPBossName(BinaryObjectReader reader, GameType game)
+    public BossNameParam() { }
+    public BossNameParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
@@ -925,7 +1126,7 @@ public class DivPBossName : IDivDataBlock
         writer.Write(NameType);
     }
 
-    enum FrontiersNames
+    public enum FrontiersNames
     { 
         Giant = 0,
         Dragon,
@@ -935,7 +1136,7 @@ public class DivPBossName : IDivDataBlock
         RifleBeast
     }
 
-    enum ShadowGensNames
+    public enum ShadowGensNames
     {
         Biolizard = 0,
         MetalOverlord,
@@ -945,7 +1146,7 @@ public class DivPBossName : IDivDataBlock
     }
 }
 
-public class DivPAura : IDivDataBlock
+public class AuraParam : IDataBlock
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
@@ -968,8 +1169,8 @@ public class DivPAura : IDivDataBlock
     public int Field48 { get; set; }
     public float[] ValuesTimeline { get; set; } = new float[32];
 
-    public DivPAura() { }
-    public DivPAura(BinaryObjectReader reader, GameType game)
+    public AuraParam() { }
+    public AuraParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
@@ -1021,93 +1222,14 @@ public class DivPAura : IDivDataBlock
     }
 }
 
-public class DivPDOF : IDivDataBlock
-{
-    public int Field00 { get; set; }
-    public float Field04 { get; set; }
-    public float Field08 { get; set; }
-    public float Field0C { get; set; }
-    public float Field10 { get; set; }
-    public float Field14 { get; set; }
-    public float Field18 { get; set; }
-    public float Field1C { get; set; }
-    public float Field20 { get; set; }
-    public float Field24 { get; set; }
-    public float Field28 { get; set; }
-    public int Field2C { get; set; }
-    public int Field30 { get; set; }
-    public float Field34 { get; set; }
-    public int Field38 { get; set; }
-    public int Field3C { get; set; }
-    public int Field40 { get; set; }
-    public int Field44 { get; set; }
-    public int Field48 { get; set; }
-    public int Field4C { get; set; }
-    public float[] ValuesTimeline { get; set; } = new float[32];
-
-    public DivPDOF() { }
-    public DivPDOF(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
-
-    public void Read(BinaryObjectReader reader, GameType game)
-    {
-        Field00 = reader.Read<int>();
-        Field04 = reader.Read<float>();
-        Field08 = reader.Read<float>();
-        Field0C = reader.Read<float>();
-        Field10 = reader.Read<float>();
-        Field14 = reader.Read<float>();
-        Field18 = reader.Read<float>();
-        Field1C = reader.Read<float>();
-        Field20 = reader.Read<float>();
-        Field24 = reader.Read<float>();
-        Field28 = reader.Read<float>();
-        Field2C = reader.Read<int>();
-        Field30 = reader.Read<int>();
-        Field34 = reader.Read<float>();
-        Field38 = reader.Read<int>();
-        Field3C = reader.Read<int>();
-        Field40 = reader.Read<int>();
-        Field44 = reader.Read<int>();
-        Field48 = reader.Read<int>();
-        Field4C = reader.Read<int>();
-        reader.ReadArray<float>(32, ValuesTimeline);
-    }
-
-    public void Write(BinaryObjectWriter writer, GameType game)
-    {
-        writer.Write(Field00);
-        writer.Write(Field04);
-        writer.Write(Field08);
-        writer.Write(Field0C);
-        writer.Write(Field10);
-        writer.Write(Field14);
-        writer.Write(Field18);
-        writer.Write(Field1C);
-        writer.Write(Field20);
-        writer.Write(Field24);
-        writer.Write(Field28);
-        writer.Write(Field2C);
-        writer.Write(Field30);
-        writer.Write(Field34);
-        writer.Write(Field38);
-        writer.Write(Field3C);
-        writer.Write(Field40);
-        writer.Write(Field44);
-        writer.Write(Field48);
-        writer.Write(Field4C);
-        writer.WriteArrayFixedLength(ValuesTimeline, 32);
-    }
-}
-
-public class DivPTheEndCable : IDivDataBlock
+public class TheEndCableParam : IDataBlock
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
     public float[] Field08 { get; set; } = new float[1024];
 
-    public DivPTheEndCable() { }
-    public DivPTheEndCable(BinaryObjectReader reader, GameType game)
+    public TheEndCableParam() { }
+    public TheEndCableParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
@@ -1124,73 +1246,13 @@ public class DivPTheEndCable : IDivDataBlock
         writer.WriteArrayFixedLength(Field08, 1024);
     }
 }
-
-public class DivPCompositeAnim : IDivDataBlock
-{
-    public int Field00 { get; set; }
-    public string Field04 { get; set; }
-    public Animation[] Animations { get; set; } = new Animation[16];
-    public int Field450 { get; set; }
-
-    public DivPCompositeAnim() { }
-    public DivPCompositeAnim(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
-
-    public void Read(BinaryObjectReader reader, GameType game)
-    {
-        Field00 = reader.Read<int>();
-        Field04 = reader.ReadString(StringBinaryFormat.FixedLength, 12);
-        Animations = reader.ReadObjectArray<Animation>(16);
-        Field450 = reader.Read<int>();
-    }
-
-    public void Write(BinaryObjectWriter writer, GameType game)
-    {
-        writer.Write(Field00);
-        writer.WriteString(StringBinaryFormat.FixedLength, Field04, 12);
-        writer.WriteObjectCollection(Animations);
-        writer.Write(Field450);
-    }
-
-    public class Animation : IBinarySerializable
-    {
-        public int Type { get; set; }
-        public string Name { get; set; }
-
-        public Animation() 
-        {
-            Type = (int)AnimationType.None;
-            Name = "";
-        }
-
-        public void Read(BinaryObjectReader reader)
-        {
-            Type = reader.Read<int>();
-            Name = reader.ReadString(StringBinaryFormat.FixedLength, 64);
-        }
-
-        public void Write(BinaryObjectWriter writer)
-        {
-            writer.Write(Type);
-            writer.WriteString(StringBinaryFormat.FixedLength, Name, 64);
-        }
-    }
-
-    public enum AnimationType
-    {
-        None = 0,
-        PXD = 1,
-        UV = 2
-    }
-}
-
-public class DivPAnimStateMachine : IDivDataBlock
+public class ASMParam : IDataBlock
 {
     public string Field00 { get; set; }
     public string Field40 { get; set; }
 
-    public DivPAnimStateMachine() { }
-    public DivPAnimStateMachine(BinaryObjectReader reader, GameType game)
+    public ASMParam() { }
+    public ASMParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
@@ -1205,13 +1267,13 @@ public class DivPAnimStateMachine : IDivDataBlock
         writer.WriteString(StringBinaryFormat.FixedLength, Field40, 64);
     }
 }
-public class DivPGeneralTrigger : IDivDataBlock
+public class GeneralTriggerParam : IDataBlock
 {
     public uint Field00 { get; set; }
     public string TriggerName { get; set; }
 
-    public DivPGeneralTrigger() { }
-    public DivPGeneralTrigger(BinaryObjectReader reader, GameType game)
+    public GeneralTriggerParam() { }
+    public GeneralTriggerParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
@@ -1227,16 +1289,16 @@ public class DivPGeneralTrigger : IDivDataBlock
     }
 }
 
-public class DivPCameraBlur : IDivDataBlock
+public class CameraBlurParam : IDataBlock
 {
     public uint Field00 { get; set; }
     public uint Field04 { get; set; }
     public float Field08 { get; set; }
-    public float[] ValuesTimeline { get; set; } = new float[32];
+    public float[] CurveData { get; set; } = new float[32];
     public uint Flags { get; set; }
 
-    public DivPCameraBlur() { }
-    public DivPCameraBlur(BinaryObjectReader reader, GameType game)
+    public CameraBlurParam() { }
+    public CameraBlurParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
@@ -1244,7 +1306,7 @@ public class DivPCameraBlur : IDivDataBlock
         Field00 = reader.Read<uint>();
         Field04 = reader.Read<uint>();
         Field08 = reader.Read<float>();
-        reader.ReadArray<float>(32, ValuesTimeline);
+        reader.ReadArray<float>(32, CurveData);
         Flags = reader.Read<uint>();
     }
 
@@ -1253,17 +1315,17 @@ public class DivPCameraBlur : IDivDataBlock
         writer.Write(Field00);
         writer.Write(Field04);
         writer.Write(Field08);
-        writer.WriteArrayFixedLength(ValuesTimeline, 32);
+        writer.WriteArrayFixedLength(CurveData, 32);
         writer.Write(Flags);
     }
 }   
 
-public class DivPShadowRes : IDivDataBlock
+public class ShadowResolutionParam : IDataBlock
 {
     public Vector2Int Resolution { get; set; }
 
-    public DivPShadowRes() { }
-    public DivPShadowRes(BinaryObjectReader reader, GameType game)
+    public ShadowResolutionParam() { }
+    public ShadowResolutionParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
@@ -1277,7 +1339,7 @@ public class DivPShadowRes : IDivDataBlock
     }
 }
 
-public class DivPTime : IDivDataBlock
+public class TimeParam : IDataBlock
 {
     public uint Field00 { get; set; }
     public uint Field04 { get; set; }
@@ -1288,10 +1350,10 @@ public class DivPTime : IDivDataBlock
     public uint Field18 { get; set; }
     public uint Field1C { get; set; }
     public uint Field20 { get; set; }
-    public float[] ValuesTimeline { get; set; } = new float[32];
+    public float[] DataCurve { get; set; } = new float[32];
 
-    public DivPTime() { }
-    public DivPTime(BinaryObjectReader reader, GameType game)
+    public TimeParam() { }
+    public TimeParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
@@ -1305,7 +1367,7 @@ public class DivPTime : IDivDataBlock
         Field18 = reader.Read<uint>();
         Field1C = reader.Read<uint>();
         Field20 = reader.Read<uint>();
-        reader.ReadArray<float>(32, ValuesTimeline);
+        reader.ReadArray<float>(32, DataCurve);
     }
 
     public void Write(BinaryObjectWriter writer, GameType game)
@@ -1319,36 +1381,36 @@ public class DivPTime : IDivDataBlock
         writer.Write(Field18);
         writer.Write(Field1C);
         writer.Write(Field20);
-        writer.WriteArrayFixedLength(ValuesTimeline, 32);
+        writer.WriteArrayFixedLength(DataCurve, 32);
     }
 }
 
-public class DivPWeather : IDivDataBlock
+public class WeatherParam : IDataBlock
 {
     public uint Field00 { get; set; }
-    public float[] ValuesTimeline { get; set; } = new float[32];
+    public float[] DataCurve { get; set; } = new float[32];
 
-    public DivPWeather() { }
-    public DivPWeather(BinaryObjectReader reader, GameType game)
+    public WeatherParam() { }
+    public WeatherParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
     {
         Field00 = reader.Read<uint>();
-        reader.ReadArray<float>(32, ValuesTimeline);
+        reader.ReadArray<float>(32, DataCurve);
     }
 
     public void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.Write(Field00);
-        writer.WriteArrayFixedLength(ValuesTimeline, 32);
+        writer.WriteArrayFixedLength(DataCurve, 32);
     }
 }
 
-public class DivPFinalBossLighting : IDivDataBlock
+public class FinalBossLightingParam : IDataBlock
 {
-    public DivPFinalBossLighting() { }
-    public DivPFinalBossLighting(BinaryObjectReader reader, GameType game)
+    public FinalBossLightingParam() { }
+    public FinalBossLightingParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game) { }
@@ -1356,35 +1418,35 @@ public class DivPFinalBossLighting : IDivDataBlock
     public void Write(BinaryObjectWriter writer, GameType game) { }
 }
 
-public class DivPCyberNoise : IDivDataBlock
+public class CyberNoiseParam : IDataBlock
 {
     public uint Field00 { get; set; }
-    public float[] ValuesTimeline { get; set; } = new float[32];
+    public float[] CurveData { get; set; } = new float[32];
 
-    public DivPCyberNoise() { }
-    public DivPCyberNoise(BinaryObjectReader reader, GameType game)
+    public CyberNoiseParam() { }
+    public CyberNoiseParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game) 
     {
         Field00 = reader.Read<uint>();
-        reader.ReadArray<float>(32, ValuesTimeline);
+        reader.ReadArray<float>(32, CurveData);
     }
 
     public void Write(BinaryObjectWriter writer, GameType game) 
     {
         writer.Write(Field00);
-        writer.WriteArrayFixedLength(ValuesTimeline, 32);
+        writer.WriteArrayFixedLength(CurveData, 32);
     }
 }
 
-public class DivPDitherDepth : IDivDataBlock
+public class DitherDepthParam : IDataBlock
 {
     public uint Field00 { get; set; }
     public float Field04 { get; set; }
 
-    public DivPDitherDepth() { }
-    public DivPDitherDepth(BinaryObjectReader reader, GameType game)
+    public DitherDepthParam() { }
+    public DitherDepthParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
@@ -1400,7 +1462,7 @@ public class DivPDitherDepth : IDivDataBlock
     }
 }
 
-public class DivPCameraExposure : IDivDataBlock
+public class CameraExposureParam : IDataBlock
 {
     public uint Field00 { get; set; }
     public float Field04 { get; set; }
@@ -1410,10 +1472,10 @@ public class DivPCameraExposure : IDivDataBlock
     public uint Field14 { get; set; }
     public uint Field18 { get; set; }
     public uint Field1C { get; set; }
-    public float[] ValuesTimeline { get; set; } = new float[32];
+    public float[] CurveData { get; set; } = new float[32];
 
-    public DivPCameraExposure() { }
-    public DivPCameraExposure(BinaryObjectReader reader, GameType game)
+    public CameraExposureParam() { }
+    public CameraExposureParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
@@ -1426,7 +1488,7 @@ public class DivPCameraExposure : IDivDataBlock
         Field14 = reader.Read<uint>();
         Field18 = reader.Read<uint>();
         Field1C = reader.Read<uint>();
-        reader.ReadArray<float>(32, ValuesTimeline);
+        reader.ReadArray<float>(32, CurveData);
     }
 
     public void Write(BinaryObjectWriter writer, GameType game)
@@ -1439,11 +1501,11 @@ public class DivPCameraExposure : IDivDataBlock
         writer.Write(Field14);
         writer.Write(Field18);
         writer.Write(Field1C);
-        writer.WriteArrayFixedLength(ValuesTimeline, 32);
+        writer.WriteArrayFixedLength(CurveData, 32);
     }
 }
 
-public class DivPColorCorrection : IDivDataBlock
+public class ColorCorrectionParam : IDataBlock
 {
     public uint Field00 { get; set; }
     public float Field04 { get; set; }
@@ -1453,10 +1515,10 @@ public class DivPColorCorrection : IDivDataBlock
     public uint Field14 { get; set; }
     public float Field18 { get; set; }
     public uint Field1C { get; set; }
-    public float[] ValuesTimeline { get; set; } = new float[32];
+    public float[] CurveData { get; set; } = new float[32];
 
-    public DivPColorCorrection() { }
-    public DivPColorCorrection(BinaryObjectReader reader, GameType game)
+    public ColorCorrectionParam() { }
+    public ColorCorrectionParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
@@ -1469,7 +1531,7 @@ public class DivPColorCorrection : IDivDataBlock
         Field14 = reader.Read<uint>();
         Field18 = reader.Read<float>();
         Field1C = reader.Read<uint>();
-        reader.ReadArray<float>(32, ValuesTimeline);
+        reader.ReadArray<float>(32, CurveData);
     }
 
     public void Write(BinaryObjectWriter writer, GameType game)
@@ -1482,51 +1544,17 @@ public class DivPColorCorrection : IDivDataBlock
         writer.Write(Field14);
         writer.Write(Field18);
         writer.Write(Field1C);
-        writer.WriteArrayFixedLength(ValuesTimeline, 32);
+        writer.WriteArrayFixedLength(CurveData, 32);
     }
 }
-
-public class DivPMaterialParam : IDivDataBlock
-{
-    public string MaterialName { get; set; }
-    public string ParamName { get; set; }
-    public uint Type { get; set; }
-    public uint[] UnknownData { get; set; } = new uint[40];
-
-    public DivPMaterialParam() { }
-    public DivPMaterialParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
-
-    public void Read(BinaryObjectReader reader, GameType game)
-    {
-        MaterialName = reader.ReadString(StringBinaryFormat.FixedLength, 64);
-        ParamName = reader.ReadString(StringBinaryFormat.FixedLength, 64);
-        Type = reader.Read<uint>();
-        reader.ReadArray<uint>(40, UnknownData);
-    }
-
-    public void Write(BinaryObjectWriter writer, GameType game)
-    {
-        writer.WriteString(StringBinaryFormat.FixedLength, MaterialName, 64);
-        writer.WriteString(StringBinaryFormat.FixedLength, ParamName, 64);
-        writer.Write(Type);
-        writer.WriteArrayFixedLength(UnknownData, 40);
-    }
-
-    public enum ParamType
-    { 
-        Float = 3
-    }
-}
-
-public class DivPTimeStop : IDivDataBlock
+public class TimeStopParam : IDataBlock
 {
     public int Field00 { get; set; }
     public float Field04 { get; set; }
     public float Field08 { get; set; }
 
-    public DivPTimeStop() { }
-    public DivPTimeStop(BinaryObjectReader reader, GameType game)
+    public TimeStopParam() { }
+    public TimeStopParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
@@ -1549,48 +1577,14 @@ public class DivPTimeStop : IDivDataBlock
     }
 }
 
-public class DivPControllerVibration : IDivDataBlock
-{
-    public int Field00 { get; set; }
-    public string Group { get; set; }
-    public string Mode { get; set; }
-    public uint Field84 { get; set; }
-    public uint Field88 { get; set; }
-    public uint Field8C { get; set; }
-
-    public DivPControllerVibration() { }
-    public DivPControllerVibration(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
-
-    public void Read(BinaryObjectReader reader, GameType game)
-    {
-        Field00 = reader.Read<int>();
-        Group = reader.ReadString(StringBinaryFormat.FixedLength, 64);
-        Mode = reader.ReadString(StringBinaryFormat.FixedLength, 64);
-        Field84 = reader.Read<uint>();
-        Field88 = reader.Read<uint>();
-        Field8C = reader.Read<uint>();
-    }
-
-    public void Write(BinaryObjectWriter writer, GameType game)
-    {
-        writer.Write(Field00);
-        writer.WriteString(StringBinaryFormat.FixedLength, Group, 64);
-        writer.WriteString(StringBinaryFormat.FixedLength, Mode, 64);
-        writer.Write(Field84);
-        writer.Write(Field88);
-        writer.Write(Field8C);
-    }
-}
-
-public class DivPTimeStopControl : IDivDataBlock
+public class TimeStopControlParam : IDataBlock
 {
     public int Behavior { get; set; }
     public float Field04 { get; set; }
     public float TransitionDuration { get; set; }
 
-    public DivPTimeStopControl() { }
-    public DivPTimeStopControl(BinaryObjectReader reader, GameType game)
+    public TimeStopControlParam() { }
+    public TimeStopControlParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
@@ -1614,7 +1608,69 @@ public class DivPTimeStopControl : IDivDataBlock
     }
 }
 
-// < 1000 values appear to be shared between games, the others are game-specific.
+public class TimeStopObjectBehaviorParam : IDataBlock
+{
+    public int Mode { get; set; }
+
+    public TimeStopObjectBehaviorParam() { }
+    public TimeStopObjectBehaviorParam(BinaryObjectReader reader, GameType game)
+        => Read(reader, game);
+
+    public void Read(BinaryObjectReader reader, GameType game)
+    {
+        Mode = reader.Read<int>();
+    }
+
+    public void Write(BinaryObjectWriter writer, GameType game)
+    {
+        writer.Write(Mode);
+    }
+}
+
+public class ShadowAfterimageParam : IDataBlock
+{
+    public Color<int> Color { get; set; }
+    public int Field10 { get; set; } // Possibly afterimage count?
+    public int Field14 { get; set; }
+    public int Field18 { get; set; }
+    public int Field1C { get; set; }
+    public int Field20 { get; set; }
+    public float Field24 { get; set; }
+    public float Field28 { get; set; }
+    public int Field2C { get; set; }
+
+    public ShadowAfterimageParam() { }
+    public ShadowAfterimageParam(BinaryObjectReader reader, GameType game)
+        => Read(reader, game);
+
+    public void Read(BinaryObjectReader reader, GameType game)
+    {
+        Color = reader.Read<Color<int>>();
+        Field10 = reader.Read<int>();
+        Field14 = reader.Read<int>();
+        Field18 = reader.Read<int>();
+        Field1C = reader.Read<int>();
+        Field20 = reader.Read<int>();
+        Field24 = reader.Read<float>();
+        Field28 = reader.Read<float>();
+        Field2C = reader.Read<int>();
+    }
+
+    public void Write(BinaryObjectWriter writer, GameType game)
+    {
+        writer.Write(Color);
+        writer.Write(Field10);
+        writer.Write(Field14);
+        writer.Write(Field18);
+        writer.Write(Field1C);
+        writer.Write(Field20);
+        writer.Write(Field24);
+        writer.Write(Field28);
+        writer.Write(Field2C);
+    }
+}
+
+// < 1000 values are shared between games, the others are game-specific.
 public enum ParameterType
 {
     ParameterSpecifiedCamera = 1,
@@ -1676,6 +1732,7 @@ enum FrontiersParams
 
 enum ShadowGensParams
 {
+    Bloom = 1000,
     DepthOfField = 1001,
     HeightFog = 1009,
     ChromaticAberration = 1010,

@@ -1,37 +1,37 @@
-﻿namespace SharpNeedle.SonicTeam.DivScene;
+﻿namespace SharpNeedle.SonicTeam.DiEvent;
 
-public class DivNode : IDivDataBlock
+public class Node : IDataBlock
 {
     public Guid GUID { get; set; }
     public int Type { get; set; }
-    public List<DivNode> Children { get; set; } = new();
-    public int Field1C { get; set; }
-    public int Field20 { get; set; }
+    public List<Node> Children { get; set; } = new();
+    public uint Flags { get; set; }
+    public int Priority { get; set; }
     public int Field24 { get; set; }
     public int Field28 { get; set; }
     public int Field2C { get; set; }
     public string Name { get; set; }
-    public IDivDataBlock Data { get; set; } = new DivDPath();
+    public IDataBlock Data { get; set; } = new PathData();
 
-    public DivNode() { }
+    public Node() { }
 
-    public DivNode(string name)
+    public Node(string name)
     {
         Name = name;
         GUID = Guid.NewGuid();
     }
 
-    public DivNode(string name, NodeType type) : this(name)
+    public Node(string name, NodeType type) : this(name)
     {
         Type = (int)type;
     }
 
-    public DivNode(string name, NodeType type, IDivDataBlock data) : this(name, type)
+    public Node(string name, NodeType type, IDataBlock data) : this(name, type)
     {
         Data = data;
     }
 
-    public DivNode(BinaryObjectReader reader, GameType game)
+    public Node(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
@@ -41,45 +41,45 @@ public class DivNode : IDivDataBlock
         int dataSize = reader.Read<int>();
 
         int childCount = reader.Read<int>();
-        Field1C = reader.Read<int>();
+        Flags = reader.Read<uint>();
 
-        Field20 = reader.Read<int>();
+        Priority = reader.Read<int>();
         Field24 = reader.Read<int>();
         Field28 = reader.Read<int>();
         Field2C = reader.Read<int>();
 
-        Name = reader.ReadDivString(64);
+        Name = reader.ReadDiString(64);
 
         switch ((NodeType)Type)
         {
             case NodeType.Path:
-                Data = new DivDPath(reader, game);
+                Data = new PathData(reader, game);
                 break;
 
             case NodeType.Camera:
-                Data = new DivDCamera(reader, game);
+                Data = new CameraData(reader, game);
                 break;
 
             case NodeType.CameraMotion:
-                Data = new DivDCameraMotion(reader, game);
+                Data = new CameraMotionData(reader, game);
                 break;
 
             case NodeType.ModelCustom:
             case NodeType.Character:
-                Data = new DivDModel(reader, game);
+                Data = new ModelData(reader, game);
                 break;
 
             case NodeType.CharacterMotion:
             case NodeType.ModelMotion:
-                Data = new DivDMotionModel(reader, game);
+                Data = new MotionModelData(reader, game);
                 break;
 
             case NodeType.Attachment:
-                Data = new DivDAttachment(reader, game);
+                Data = new AttachmentData(reader, game);
                 break;
 
             case NodeType.Parameter:
-                Data = new DivDParameter(reader, game, dataSize);
+                Data = new ParameterData(reader, game, dataSize);
                 break;
 
             default:
@@ -88,7 +88,7 @@ public class DivNode : IDivDataBlock
         }
 
         for(int i=0; i<childCount; i++)
-            Children.Add(new DivNode(reader, game));
+            Children.Add(new Node(reader, game));
     }
 
     public void Write(BinaryObjectWriter writer, GameType game)
@@ -100,14 +100,14 @@ public class DivNode : IDivDataBlock
         writer.WriteNulls(4);
 
         writer.Write(Children.Count);
-        writer.Write(Field1C);
+        writer.Write(Flags);
 
-        writer.Write(Field20);
+        writer.Write(Priority);
         writer.Write(Field24);
         writer.Write(Field28);
         writer.Write(Field2C);
 
-        writer.WriteDivString(Name, 64);
+        writer.WriteDiString(Name, 64);
 
         long dataStart = writer.Position;
         Data.Write(writer, game);

@@ -1,14 +1,14 @@
-﻿namespace SharpNeedle.SonicTeam.DivScene;
+﻿namespace SharpNeedle.SonicTeam.DiEvent;
 
-public interface IDivDataBlock
+public interface IDataBlock
 {
     void Read(BinaryObjectReader reader, GameType game);
     void Write(BinaryObjectWriter writer, GameType game);
 }
 
-public static class DivString
+public static class DiString
 {
-    public static string ReadDivString(this BinaryObjectReader reader, int fixedLength = 64)
+    public static string ReadDiString(this BinaryObjectReader reader, int fixedLength = 64)
     {
         // Shift-JIS encoded data
         Span<byte> data = new byte[fixedLength];
@@ -18,7 +18,7 @@ public static class DivString
         return shiftJIS.GetString(data).Replace("\0", string.Empty);
     }
 
-    public static void WriteDivString(this BinaryObjectWriter writer, string value, int fixedLength = 64)
+    public static void WriteDiString(this BinaryObjectWriter writer, string value, int fixedLength = 64)
     {
         // Shift-JIS encoded data
         Span<byte> data = new byte[fixedLength];

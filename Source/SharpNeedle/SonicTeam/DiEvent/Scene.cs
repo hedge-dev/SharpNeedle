@@ -1,26 +1,26 @@
-﻿namespace SharpNeedle.SonicTeam.DivScene;
+﻿namespace SharpNeedle.SonicTeam.DiEvent;
 
 using System.IO;
 
 // Reference: https://github.com/ik-01/DiEventRangers/tree/main
 [NeedleResource("st/dv-scene", @"\.dvscene$")]
-public class DivScene : ResourceBase, IBinarySerializable
+public class Scene : ResourceBase, IBinarySerializable
 {
     public float StartFrame { get; set; }
     public float EndFrame { get; set; }
     public int NodeDrawCount { get; set; }
     public List<float> Cuts { get; set; } = new();
-    public List<DivPage> Pages { get; set; } = new();
+    public List<Page> Pages { get; set; } = new();
     public List<float> ResourceCuts { get; set; } = new();
-    public DivNode RootNode { get; set; } = new();
+    public Node RootNode { get; set; } = new();
     public float ChainCameraIn { get; set; }
     public float ChainCameraOut { get; set; }
     int Type { get; set; }
     int SkipPointTick { get; set; }
 
-    public List<DivResource> Resources { get; set; } = new();
+    public List<Resource> Resources { get; set; } = new();
 
-    public DivScene() 
+    public Scene() 
     {
         // Register encoding provider for Shift-JIS strings
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -89,7 +89,7 @@ public class DivScene : ResourceBase, IBinarySerializable
                 int allocSize = reader.Read<int>();
                 reader.Skip(8);
 
-                Pages.AddRange(reader.ReadObjectArray<DivPage>(pageCount));
+                Pages.AddRange(reader.ReadObjectArray<Page>(pageCount));
             });
 
             reader.ReadOffset(() =>
@@ -134,7 +134,7 @@ public class DivScene : ResourceBase, IBinarySerializable
             int allocSize = reader.Read<int>();
             reader.Skip(8);
 
-            Resources.AddRange(reader.ReadObjectArray<DivResource>(resourceCount));
+            Resources.AddRange(reader.ReadObjectArray<Resource>(resourceCount));
         });
     }
 

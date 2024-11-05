@@ -1,6 +1,6 @@
-﻿namespace SharpNeedle.SonicTeam.DivScene;
+﻿namespace SharpNeedle.SonicTeam.DiEvent;
 
-public class DivDPath : IDivDataBlock
+public class PathData : IDataBlock
 {
     public Matrix4x4 Transform { get; set; }
     public int Field40 { get; set; }
@@ -8,8 +8,8 @@ public class DivDPath : IDivDataBlock
     public int Field48 { get; set; }
     public int Field4C { get; set; }
 
-    public DivDPath() { }
-    public DivDPath(BinaryObjectReader reader, GameType game)
+    public PathData() { }
+    public PathData(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
@@ -31,7 +31,7 @@ public class DivDPath : IDivDataBlock
     }
 }
 
-public class DivDCamera : IDivDataBlock
+public class CameraData : IDataBlock
 {
     public int Field00 { get; set; }
     public int FrameCount { get; set; }
@@ -40,8 +40,8 @@ public class DivDCamera : IDivDataBlock
     public List<float> FrameTimes { get; set; } = new List<float>();
     public List<float> FrameData { get; set; } = new List<float>();
 
-    public DivDCamera() { }
-    public DivDCamera(BinaryObjectReader reader, GameType game)
+    public CameraData() { }
+    public CameraData(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
@@ -73,15 +73,15 @@ public class DivDCamera : IDivDataBlock
     }
 }
 
-public class DivDCameraMotion : IDivDataBlock
+public class CameraMotionData : IDataBlock
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
     public int Field08 { get; set; }
     public int Field0C { get; set; }
 
-    public DivDCameraMotion() { }
-    public DivDCameraMotion(BinaryObjectReader reader, GameType game)
+    public CameraMotionData() { }
+    public CameraMotionData(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
@@ -101,23 +101,23 @@ public class DivDCameraMotion : IDivDataBlock
     }
 }
 
-public class DivDModel : IDivDataBlock
+public class ModelData : IDataBlock
 {
     public int Field00 { get; set; }
     public string ModelName { get; set; }
     public string SkeletonName { get; set; }
     public string Field84 { get; set; }
 
-    public DivDModel() { }
-    public DivDModel(BinaryObjectReader reader, GameType game)
+    public ModelData() { }
+    public ModelData(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
     {
         Field00 = reader.Read<int>();
-        ModelName = reader.ReadDivString(64);
-        SkeletonName = reader.ReadDivString(64);
-        Field84 = reader.ReadDivString(64);
+        ModelName = reader.ReadDiString(64);
+        SkeletonName = reader.ReadDiString(64);
+        Field84 = reader.ReadDiString(64);
 
         reader.Skip(76);
     }
@@ -125,15 +125,15 @@ public class DivDModel : IDivDataBlock
     public void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.Write(Field00);
-        writer.WriteDivString(ModelName, 64);
-        writer.WriteDivString(SkeletonName, 64);
-        writer.WriteDivString(Field84, 64);
+        writer.WriteDiString(ModelName, 64);
+        writer.WriteDiString(SkeletonName, 64);
+        writer.WriteDiString(Field84, 64);
 
         writer.WriteNulls(76);
     }
 }
 
-public class DivDMotionModel : IDivDataBlock
+public class MotionModelData : IDataBlock
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
@@ -142,8 +142,8 @@ public class DivDMotionModel : IDivDataBlock
     public string Field10 { get; set; }
     public float Field18 { get; set; }
 
-    public DivDMotionModel() { }
-    public DivDMotionModel(BinaryObjectReader reader, GameType game)
+    public MotionModelData() { }
+    public MotionModelData(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
@@ -152,7 +152,7 @@ public class DivDMotionModel : IDivDataBlock
         Field04 = reader.Read<int>();
         Field08 = reader.Read<int>();
         Field0C = reader.Read<int>();
-        Field10 = reader.ReadDivString(8);
+        Field10 = reader.ReadDiString(8);
         Field18 = reader.Read<float>();
 
         reader.Skip(20);
@@ -164,14 +164,14 @@ public class DivDMotionModel : IDivDataBlock
         writer.Write(Field04);
         writer.Write(Field08);
         writer.Write(Field0C);
-        writer.WriteDivString(Field10, 8);
+        writer.WriteDiString(Field10, 8);
         writer.Write(Field18);
 
         writer.WriteNulls(20);
     }
 }
 
-public class DivDAttachment : IDivDataBlock
+public class AttachmentData : IDataBlock
 {
     public int Field00 { get; set; }
     public string NodeName { get; set; }
@@ -179,14 +179,14 @@ public class DivDAttachment : IDivDataBlock
     public int Field48 { get; set; }
     public int Field4C { get; set; }
 
-    public DivDAttachment() { }
-    public DivDAttachment(BinaryObjectReader reader, GameType game)
+    public AttachmentData() { }
+    public AttachmentData(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
     public void Read(BinaryObjectReader reader, GameType game)
     {
         Field00 = reader.Read<int>();
-        NodeName = reader.ReadDivString(64);
+        NodeName = reader.ReadDiString(64);
         Field44 = reader.Read<int>();
         Field48 = reader.Read<int>();
         Field4C = reader.Read<int>();
@@ -195,14 +195,14 @@ public class DivDAttachment : IDivDataBlock
     public void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.Write(Field00);
-        writer.WriteDivString(NodeName, 64);
+        writer.WriteDiString(NodeName, 64);
         writer.Write(Field44);
         writer.Write(Field48);
         writer.Write(Field4C);
     }
 }
 
-public class DivDParameter : IDivDataBlock
+public class ParameterData : IDataBlock
 {
     private int UnknownDataSize;
 
@@ -214,23 +214,23 @@ public class DivDParameter : IDivDataBlock
     public int Field14 { get; set; }
     public int Field18 { get; set; }
     public int Field1C { get; set; }
-    public IDivDataBlock Parameter { get; set; }
+    public IDataBlock Parameter { get; set; }
     
-    public DivDParameter() { }
-    public DivDParameter(BinaryObjectReader reader, GameType game, int size)
+    public ParameterData() { }
+    public ParameterData(BinaryObjectReader reader, GameType game, int size)
     {
         UnknownDataSize = size - 8;
         Read(reader, game);
     }
 
-    public DivDParameter(ParameterType type, float startTime, float endTime)
+    public ParameterData(ParameterType type, float startTime, float endTime)
     {
         Type = (int)type;
         StartTime = startTime;
         EndTime = endTime;
     }
 
-    public DivDParameter(ParameterType type, float startTime, float endTime, IDivDataBlock parameter) : this(type, startTime, endTime)
+    public ParameterData(ParameterType type, float startTime, float endTime, IDataBlock parameter) : this(type, startTime, endTime)
     {
         Parameter = parameter;
     }
@@ -240,103 +240,103 @@ public class DivDParameter : IDivDataBlock
         switch ((FrontiersParams)type)
         {
             case FrontiersParams.DepthOfField:
-                Parameter = new DivPDOF(reader, GameType.Frontiers);
+                Parameter = new DOFParam(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.ColorCorrection:
-                Parameter = new DivPColorCorrection(reader, GameType.Frontiers);
+                Parameter = new ColorCorrectionParam(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.CameraExposure:
-                Parameter = new DivPCameraExposure(reader, GameType.Frontiers);
+                Parameter = new CameraExposureParam(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.ShadowResolution:
-                Parameter = new DivPShadowRes(reader, GameType.Frontiers);
+                Parameter = new ShadowResolutionParam(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.ChromaticAberration:
-                Parameter = new DivPChromaAberr(reader, GameType.Frontiers);
+                Parameter = new ChromaAberrationParam(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.Vignette:
-                Parameter = new DivPVignette(reader, GameType.Frontiers);
+                Parameter = new VignetteParam(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.Fade:
-                Parameter = new DivPFade(reader, GameType.Frontiers);
+                Parameter = new FadeParam(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.Letterbox:
-                Parameter = new DivPLetterbox(reader, GameType.Frontiers);
+                Parameter = new LetterboxParam(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.BossName:
-                Parameter = new DivPBossName(reader, GameType.Frontiers);
+                Parameter = new BossNameParam(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.Subtitle:
-                Parameter = new DivPSubtitle(reader, GameType.Frontiers);
+                Parameter = new SubtitleParam(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.Sound:
-                Parameter = new DivPSound(reader, GameType.Frontiers);
+                Parameter = new SoundParam(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.Time:
-                Parameter = new DivPTime(reader, GameType.Frontiers);
+                Parameter = new TimeParam(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.CameraBlur:
-                Parameter = new DivPCameraBlur(reader, GameType.Frontiers);
+                Parameter = new CameraBlurParam(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.GeneralPurposeTrigger:
-                Parameter = new DivPGeneralTrigger(reader, GameType.Frontiers);
+                Parameter = new GeneralTriggerParam(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.DitherDepth:
-                Parameter = new DivPDitherDepth(reader, GameType.Frontiers);
+                Parameter = new DitherDepthParam(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.QTE:
-                Parameter = new DivPQTE(reader, GameType.Frontiers);
+                Parameter = new QTEParam(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.ASMForcedOverwrite:
-                Parameter = new DivPAnimStateMachine(reader, GameType.Frontiers);
+                Parameter = new ASMParam(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.Aura:
-                Parameter = new DivPAura(reader, GameType.Frontiers);
+                Parameter = new AuraParam(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.TimescaleChange:
-                Parameter = new DivPTimescale(reader, GameType.Frontiers);
+                Parameter = new TimescaleParam(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.CyberNoise:
-                Parameter = new DivPCyberNoise(reader, GameType.Frontiers);
+                Parameter = new CyberNoiseParam(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.MovieDisplay:
-                Parameter = new DivPMovieDisplay(reader, GameType.Frontiers);
+                Parameter = new MovieDisplayParam(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.Weather:
-                Parameter = new DivPWeather(reader, GameType.Frontiers);
+                Parameter = new WeatherParam(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.TheEndCable:
-                Parameter = new DivPTheEndCable(reader, GameType.Frontiers);
+                Parameter = new TheEndCableParam(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.FinalBossLighting:
-                Parameter = new DivPFinalBossLighting(reader, GameType.Frontiers);
+                Parameter = new FinalBossLightingParam(reader, GameType.Frontiers);
                 break;
 
             default:
-                Parameter = new DivPUnknown(reader, GameType.Frontiers, UnknownDataSize);
+                Parameter = new UnknownParam(reader, UnknownDataSize);
                 break;
         }
     }
@@ -345,32 +345,44 @@ public class DivDParameter : IDivDataBlock
     {
         switch ((ShadowGensParams)type)
         {
+            case ShadowGensParams.DepthOfField:
+                Parameter = new DOFParam(reader, GameType.ShadowGenerations);
+                break;
+
             case ShadowGensParams.BossName:
-                Parameter = new DivPBossName(reader, GameType.ShadowGenerations);
+                Parameter = new BossNameParam(reader, GameType.ShadowGenerations);
                 break;
 
             case ShadowGensParams.Subtitle:
-                Parameter = new DivPSubtitle(reader, GameType.ShadowGenerations);
+                Parameter = new SubtitleParam(reader, GameType.ShadowGenerations);
                 break;
 
             case ShadowGensParams.Sound:
-                Parameter = new DivPSound(reader, GameType.ShadowGenerations);
+                Parameter = new SoundParam(reader, GameType.ShadowGenerations);
                 break;
 
             case ShadowGensParams.QTE:
-                Parameter = new DivPQTE(reader, GameType.ShadowGenerations);
+                Parameter = new QTEParam(reader, GameType.ShadowGenerations);
                 break;
 
             case ShadowGensParams.TimeStop:
-                Parameter = new DivPTimeStop(reader, GameType.ShadowGenerations);
+                Parameter = new TimeStopParam(reader, GameType.ShadowGenerations);
                 break;
 
             case ShadowGensParams.TimeStopControl:
-                Parameter = new DivPTimeStopControl(reader, GameType.ShadowGenerations);
+                Parameter = new TimeStopControlParam(reader, GameType.ShadowGenerations);
+                break;
+
+            case ShadowGensParams.TimeStopObjectBehavior:
+                Parameter = new TimeStopObjectBehaviorParam(reader, GameType.ShadowGenerations);
+                break;
+
+            case ShadowGensParams.ShadowAfterimage:
+                Parameter = new ShadowAfterimageParam(reader, GameType.ShadowGenerations);
                 break;
 
             default:
-                Parameter = new DivPUnknown(reader, GameType.ShadowGenerations, UnknownDataSize);
+                Parameter = new UnknownParam(reader, UnknownDataSize);
                 break;
         }
     }
@@ -388,7 +400,7 @@ public class DivDParameter : IDivDataBlock
                 break;
 
             default:
-                Parameter = new DivPUnknown(reader, game, UnknownDataSize);
+                Parameter = new UnknownParam(reader, UnknownDataSize);
                 break;
         }
     }
@@ -409,51 +421,51 @@ public class DivDParameter : IDivDataBlock
             switch ((ParameterType)Type)
             {
                 case ParameterType.DrawingOff:
-                    Parameter = new DivPDrawingOff(reader, GameType.Common);
+                    Parameter = new DrawOffParam(reader, GameType.Common);
                     break;
 
                 case ParameterType.PathAdjust:
-                    Parameter = new DivPPathAdjust(reader, GameType.Common);
+                    Parameter = new PathAdjustParam(reader, GameType.Common);
                     break;
 
                 case ParameterType.Effect:
-                    Parameter = new DivPEffect(reader, GameType.Common);
+                    Parameter = new EffectParam(reader, GameType.Common);
                     break;
 
                 case ParameterType.CullDisabled:
-                    Parameter = new DivPCullDisabled(reader, GameType.Common);
+                    Parameter = new CullDisabledParam(reader, GameType.Common);
                     break;
 
                 case ParameterType.UVAnimation:
-                    Parameter = new DivPAnimUV(reader, GameType.Common);
+                    Parameter = new UVAnimParam(reader, GameType.Common);
                     break;
 
                 case ParameterType.VisibilityAnimation:
-                    Parameter = new DivPAnimVis(reader, GameType.Common);
+                    Parameter = new VisibilityAnimParam(reader, GameType.Common);
                     break;
 
                 case ParameterType.MaterialAnimation:
-                    Parameter = new DivPAnimMaterial(reader, GameType.Common);
+                    Parameter = new MaterialAnimParam(reader, GameType.Common);
                     break;
 
                 case ParameterType.CompositeAnimation:
-                    Parameter = new DivPCompositeAnim(reader, GameType.Common);
+                    Parameter = new CompositeAnimParam(reader, GameType.Common);
                     break;
 
                 case ParameterType.GameCamera:
-                    Parameter = new DivPGameCamera(reader, GameType.Common);
+                    Parameter = new GameCameraParam(reader, GameType.Common);
                     break;
 
                 case ParameterType.ControllerVibration:
-                    Parameter = new DivPControllerVibration(reader, GameType.Common);
+                    Parameter = new ControllerVibrationParam(reader, GameType.Common);
                     break;
 
                 case ParameterType.MaterialParameter:
-                    Parameter = new DivPMaterialParam(reader, GameType.Common);
+                    Parameter = new MaterialParameterParam(reader, GameType.Common);
                     break;
 
                 default:
-                    Parameter = new DivPUnknown(reader, GameType.Common, UnknownDataSize);
+                    Parameter = new UnknownParam(reader, UnknownDataSize);
                     break;
             }
         } 
