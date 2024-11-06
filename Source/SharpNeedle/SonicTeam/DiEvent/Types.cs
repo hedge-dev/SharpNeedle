@@ -1,11 +1,5 @@
 ﻿namespace SharpNeedle.SonicTeam.DiEvent;
 
-public interface IDataBlock
-{
-    void Read(BinaryObjectReader reader, GameType game);
-    void Write(BinaryObjectWriter writer, GameType game);
-}
-
 public static class DiString
 {
     public static string ReadDiString(this BinaryObjectReader reader, int fixedLength = 64)
