@@ -1,6 +1,13 @@
 ﻿namespace SharpNeedle.SonicTeam.DiEvent;
 
-public class PathData : IDataBlock
+public abstract class BaseNodeData : IBinarySerializable<GameType>
+{
+    public virtual void Read(BinaryObjectReader reader, GameType type) { }
+
+    public virtual void Write(BinaryObjectWriter writer, GameType game) { }
+}
+
+public class PathData : BaseNodeData
 {
     public Matrix4x4 Transform { get; set; }
     public int Field40 { get; set; }
@@ -12,7 +19,7 @@ public class PathData : IDataBlock
     public PathData(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
-    public void Read(BinaryObjectReader reader, GameType game)
+    public override void Read(BinaryObjectReader reader, GameType game)
     {
         Transform = reader.Read<Matrix4x4>();
         Field40 = reader.Read<int>();
@@ -21,7 +28,7 @@ public class PathData : IDataBlock
         Field4C = reader.Read<int>();
     }
 
-    public void Write(BinaryObjectWriter writer, GameType game)
+    public override void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.Write(Transform);
         writer.Write(Field40);
@@ -31,7 +38,7 @@ public class PathData : IDataBlock
     }
 }
 
-public class CameraData : IDataBlock
+public class CameraData : BaseNodeData
 {
     public int Field00 { get; set; }
     public int FrameCount { get; set; }
@@ -44,7 +51,7 @@ public class CameraData : IDataBlock
     public CameraData(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
-    public void Read(BinaryObjectReader reader, GameType game)
+    public override void Read(BinaryObjectReader reader, GameType game)
     {
         Field00 = reader.Read<int>();
         FrameCount = reader.Read<int>();
@@ -58,7 +65,7 @@ public class CameraData : IDataBlock
         }
     }
 
-    public void Write(BinaryObjectWriter writer, GameType game)
+    public override void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.Write(Field00);
         writer.Write(FrameCount);
@@ -73,7 +80,7 @@ public class CameraData : IDataBlock
     }
 }
 
-public class CameraMotionData : IDataBlock
+public class CameraMotionData : BaseNodeData
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
@@ -84,7 +91,7 @@ public class CameraMotionData : IDataBlock
     public CameraMotionData(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
-    public void Read(BinaryObjectReader reader, GameType game)
+    public override void Read(BinaryObjectReader reader, GameType game)
     {
         Field00 = reader.Read<int>();
         Field04 = reader.Read<int>();
@@ -92,7 +99,7 @@ public class CameraMotionData : IDataBlock
         Field0C = reader.Read<int>();
     }
 
-    public void Write(BinaryObjectWriter writer, GameType game)
+    public override void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.Write(Field00);
         writer.Write(Field04);
@@ -101,7 +108,7 @@ public class CameraMotionData : IDataBlock
     }
 }
 
-public class ModelData : IDataBlock
+public class ModelData : BaseNodeData
 {
     public int Field00 { get; set; }
     public string ModelName { get; set; }
@@ -112,7 +119,7 @@ public class ModelData : IDataBlock
     public ModelData(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
-    public void Read(BinaryObjectReader reader, GameType game)
+    public override void Read(BinaryObjectReader reader, GameType game)
     {
         Field00 = reader.Read<int>();
         ModelName = reader.ReadDiString(64);
@@ -122,7 +129,7 @@ public class ModelData : IDataBlock
         reader.Skip(76);
     }
 
-    public void Write(BinaryObjectWriter writer, GameType game)
+    public override void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.Write(Field00);
         writer.WriteDiString(ModelName, 64);
@@ -133,7 +140,7 @@ public class ModelData : IDataBlock
     }
 }
 
-public class MotionModelData : IDataBlock
+public class MotionModelData : BaseNodeData
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
@@ -146,7 +153,7 @@ public class MotionModelData : IDataBlock
     public MotionModelData(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
-    public void Read(BinaryObjectReader reader, GameType game)
+    public override void Read(BinaryObjectReader reader, GameType game)
     {
         Field00 = reader.Read<int>();
         Field04 = reader.Read<int>();
@@ -158,7 +165,7 @@ public class MotionModelData : IDataBlock
         reader.Skip(20);
     }
 
-    public void Write(BinaryObjectWriter writer, GameType game)
+    public override void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.Write(Field00);
         writer.Write(Field04);
@@ -171,7 +178,7 @@ public class MotionModelData : IDataBlock
     }
 }
 
-public class AttachmentData : IDataBlock
+public class AttachmentData : BaseNodeData
 {
     public int Field00 { get; set; }
     public string NodeName { get; set; }
@@ -183,7 +190,7 @@ public class AttachmentData : IDataBlock
     public AttachmentData(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
-    public void Read(BinaryObjectReader reader, GameType game)
+    public override void Read(BinaryObjectReader reader, GameType game)
     {
         Field00 = reader.Read<int>();
         NodeName = reader.ReadDiString(64);
@@ -192,7 +199,7 @@ public class AttachmentData : IDataBlock
         Field4C = reader.Read<int>();
     }
 
-    public void Write(BinaryObjectWriter writer, GameType game)
+    public override void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.Write(Field00);
         writer.WriteDiString(NodeName, 64);
@@ -202,11 +209,10 @@ public class AttachmentData : IDataBlock
     }
 }
 
-public class ParameterData : IDataBlock
+public class ParameterData : BaseNodeData
 {
     private int UnknownDataSize;
 
-    public int Type { get; set; }
     public float StartTime { get; set; }
     public float EndTime { get; set; }
     public int Field0C { get; set; }
@@ -214,7 +220,7 @@ public class ParameterData : IDataBlock
     public int Field14 { get; set; }
     public int Field18 { get; set; }
     public int Field1C { get; set; }
-    public IDataBlock Parameter { get; set; }
+    public BaseParam Parameter { get; set; }
     
     public ParameterData() { }
     public ParameterData(BinaryObjectReader reader, GameType game, int size)
@@ -223,14 +229,13 @@ public class ParameterData : IDataBlock
         Read(reader, game);
     }
 
-    public ParameterData(ParameterType type, float startTime, float endTime)
+    public ParameterData(float startTime, float endTime)
     {
-        Type = (int)type;
         StartTime = startTime;
         EndTime = endTime;
     }
 
-    public ParameterData(ParameterType type, float startTime, float endTime, IDataBlock parameter) : this(type, startTime, endTime)
+    public ParameterData(float startTime, float endTime, BaseParam parameter) : this(startTime, endTime)
     {
         Parameter = parameter;
     }
@@ -304,7 +309,7 @@ public class ParameterData : IDataBlock
                 break;
 
             case FrontiersParams.ASMForcedOverwrite:
-                Parameter = new ASMParam(reader, GameType.Frontiers);
+                Parameter = new ASMOverrideParam(reader, GameType.Frontiers);
                 break;
 
             case FrontiersParams.Aura:
@@ -336,7 +341,7 @@ public class ParameterData : IDataBlock
                 break;
 
             default:
-                Parameter = new UnknownParam(reader, UnknownDataSize);
+                Parameter = new UnknownParam(reader, UnknownDataSize, type);
                 break;
         }
     }
@@ -347,6 +352,10 @@ public class ParameterData : IDataBlock
         {
             case ShadowGensParams.DepthOfField:
                 Parameter = new DOFParam(reader, GameType.ShadowGenerations);
+                break;
+
+            case ShadowGensParams.Fade:
+                Parameter = new FadeParam(reader, GameType.ShadowGenerations);
                 break;
 
             case ShadowGensParams.BossName:
@@ -361,8 +370,16 @@ public class ParameterData : IDataBlock
                 Parameter = new SoundParam(reader, GameType.ShadowGenerations);
                 break;
 
+            case ShadowGensParams.GeneralPurposeTrigger:
+                Parameter = new GeneralTriggerParam(reader, GameType.ShadowGenerations);
+                break;
+
             case ShadowGensParams.QTE:
                 Parameter = new QTEParam(reader, GameType.ShadowGenerations);
+                break;
+
+            case ShadowGensParams.MovieDisplay:
+                Parameter = new MovieDisplayParam(reader, GameType.ShadowGenerations);
                 break;
 
             case ShadowGensParams.TimeStop:
@@ -381,8 +398,12 @@ public class ParameterData : IDataBlock
                 Parameter = new ShadowAfterimageParam(reader, GameType.ShadowGenerations);
                 break;
 
+            case ShadowGensParams.FalloffToggle:
+                Parameter = new FalloffToggleParam(reader, GameType.ShadowGenerations);
+                break;
+
             default:
-                Parameter = new UnknownParam(reader, UnknownDataSize);
+                Parameter = new UnknownParam(reader, UnknownDataSize, type);
                 break;
         }
     }
@@ -400,14 +421,14 @@ public class ParameterData : IDataBlock
                 break;
 
             default:
-                Parameter = new UnknownParam(reader, UnknownDataSize);
+                Parameter = new UnknownParam(reader, UnknownDataSize, type);
                 break;
         }
     }
 
-    public void Read(BinaryObjectReader reader, GameType game)
+    public override void Read(BinaryObjectReader reader, GameType game)
     {
-        Type = reader.Read<int>();
+        int type = reader.Read<int>();
         StartTime = reader.Read<float>();
         EndTime = reader.Read<float>();
         Field0C = reader.Read<int>();
@@ -416,9 +437,9 @@ public class ParameterData : IDataBlock
         Field18 = reader.Read<int>();
         Field1C = reader.Read<int>();
 
-        if(Type < 1000)
+        if(type < 1000)
         {
-            switch ((ParameterType)Type)
+            switch ((ParameterType)type)
             {
                 case ParameterType.DrawingOff:
                     Parameter = new DrawOffParam(reader, GameType.Common);
@@ -426,6 +447,14 @@ public class ParameterData : IDataBlock
 
                 case ParameterType.PathAdjust:
                     Parameter = new PathAdjustParam(reader, GameType.Common);
+                    break;
+
+                case ParameterType.CameraShake:
+                    Parameter = new CameraShakeParam(reader, GameType.Common);
+                    break;
+
+                case ParameterType.CameraShakeLoop:
+                    Parameter = new CameraShakeLoopParam(reader, GameType.Common);
                     break;
 
                 case ParameterType.Effect:
@@ -452,6 +481,10 @@ public class ParameterData : IDataBlock
                     Parameter = new CompositeAnimParam(reader, GameType.Common);
                     break;
 
+                case ParameterType.SonicCamera:
+                    Parameter = new SonicCameraParam(reader, GameType.Common);
+                    break;
+
                 case ParameterType.GameCamera:
                     Parameter = new GameCameraParam(reader, GameType.Common);
                     break;
@@ -465,19 +498,21 @@ public class ParameterData : IDataBlock
                     break;
 
                 default:
-                    Parameter = new UnknownParam(reader, UnknownDataSize);
+                    Parameter = new UnknownParam(reader, UnknownDataSize, type);
                     break;
             }
         } 
         else
         {
-            ReadGameSpecificParameter(reader, game, Type);
+            ReadGameSpecificParameter(reader, game, type);
         }
     }
 
-    public void Write(BinaryObjectWriter writer, GameType game)
+    public override void Write(BinaryObjectWriter writer, GameType game)
     {
-        writer.Write(Type);
+        int type = (Parameter == null) ? 0 : Parameter.GetTypeID(game);
+
+        writer.Write(type);
         writer.Write(StartTime);
         writer.Write(EndTime);
         writer.Write(Field0C);
@@ -485,9 +520,9 @@ public class ParameterData : IDataBlock
         writer.Write(Field14);
         writer.Write(Field18);
         writer.Write(Field1C);
-        
-        if(Parameter != null)
-            Parameter.Write(writer, game);
+
+        if (Parameter != null)
+            writer.WriteObject(Parameter, game);
     }
 }
 

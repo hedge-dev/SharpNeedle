@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.SonicTeam.DiEvent;
 
-public class Node : IDataBlock
+public class Node : IBinarySerializable<GameType>
 {
     public Guid GUID { get; set; }
     public int Type { get; set; }
@@ -11,7 +11,7 @@ public class Node : IDataBlock
     public int Field28 { get; set; }
     public int Field2C { get; set; }
     public string Name { get; set; }
-    public IDataBlock Data { get; set; } = new PathData();
+    public BaseNodeData Data { get; set; } = new PathData();
 
     public Node() { }
 
@@ -26,7 +26,7 @@ public class Node : IDataBlock
         Type = (int)type;
     }
 
-    public Node(string name, NodeType type, IDataBlock data) : this(name, type)
+    public Node(string name, NodeType type, BaseNodeData data) : this(name, type)
     {
         Data = data;
     }
@@ -87,8 +87,7 @@ public class Node : IDataBlock
                 break;
         }
 
-        for(int i=0; i<childCount; i++)
-            Children.Add(new Node(reader, game));
+        Children.AddRange(reader.ReadObjectArray<Node, GameType>(game, childCount));
     }
 
     public void Write(BinaryObjectWriter writer, GameType game)
@@ -117,7 +116,6 @@ public class Node : IDataBlock
         writer.Write((int)(dataEnd - dataStart) / 4);
         writer.Seek(dataEnd, System.IO.SeekOrigin.Begin);
 
-        foreach (var child in Children)
-            child.Write(writer, game);
+        writer.WriteObjectCollection(game, Children);
     }
 }

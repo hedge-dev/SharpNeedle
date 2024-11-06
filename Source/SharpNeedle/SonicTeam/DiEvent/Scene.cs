@@ -4,7 +4,7 @@ using System.IO;
 
 // Reference: https://github.com/ik-01/DiEventRangers/tree/main
 [NeedleResource("st/dv-scene", @"\.dvscene$")]
-public class Scene : ResourceBase, IBinarySerializable
+public class Scene : ResourceBase, IBinarySerializable<GameType>
 {
     public float StartFrame { get; set; }
     public float EndFrame { get; set; }
@@ -28,6 +28,7 @@ public class Scene : ResourceBase, IBinarySerializable
 
     public override void Read(IFile file)
         => Read(file, GameType.Common);
+
     public void Read(string path, GameType game)
       => Read(FileSystem.Open(path), game);
 
@@ -54,9 +55,6 @@ public class Scene : ResourceBase, IBinarySerializable
 
         Write(writer, game);
     }
-
-    public void Read(BinaryObjectReader reader)
-        => Read(reader, GameType.Common);
 
     public void Read(BinaryObjectReader reader, GameType game)
     {
@@ -138,9 +136,6 @@ public class Scene : ResourceBase, IBinarySerializable
         });
     }
 
-    public void Write(BinaryObjectWriter writer)
-        => Write(writer, GameType.Common);
-
     public void Write(BinaryObjectWriter writer, GameType game)
     {
         var resourcesOffsetPos = writer.Position + 4;
@@ -153,7 +148,7 @@ public class Scene : ResourceBase, IBinarySerializable
             writer.Write(StartFrame);
             writer.Write(EndFrame);
             writer.Write(NodeDrawCount);
-
+            
             long posCutsOffset = writer.Position;
             long posPagesOffset = writer.Position + 4;
             long unknownList2OffsetPos = writer.Position + 8;
@@ -161,7 +156,7 @@ public class Scene : ResourceBase, IBinarySerializable
             long unknownList4OffsetPos = writer.Position + 16;
             long rootNodeOffsetPos = writer.Position + 20;
             writer.WriteNulls(24);
-
+            
             writer.Write(ChainCameraIn);
             writer.Write(ChainCameraOut);
             writer.Write(Type);
@@ -172,41 +167,43 @@ public class Scene : ResourceBase, IBinarySerializable
                 var posCuts = writer.Position;
                 writer.Seek(posCutsOffset, SeekOrigin.Begin);
                 writer.Write((int)(posCuts - posStart));
-                writer.Seek(posCuts, SeekOrigin.Begin);
 
+                writer.Seek(posCuts, SeekOrigin.Begin);
                 writer.Write(Cuts.Count);
                 writer.WriteNulls(12);
                 writer.WriteCollection(Cuts);
             }
-
+            
             {
                 long posPages = writer.Position;
                 writer.Seek(posPagesOffset, SeekOrigin.Begin);
                 writer.Write((int)(posPages - posStart));
+
                 writer.Seek(posPages, SeekOrigin.Begin);
-
                 writer.Write(Pages.Count);
-                long pageChunkSizePos = writer.Position;
+                long pageAllocSizePos = writer.Position;
                 writer.WriteNulls(12);
-                
+
+                long pageChunkStartPos = writer.Position;
                 writer.WriteObjectCollection(Pages);
-
                 long pageChunkEndPos = writer.Position;
-                long pageChunkSize = pageChunkEndPos - (pageChunkSizePos + 12);
-                writer.Seek(pageChunkSizePos, SeekOrigin.Begin);
+
+                long pageChunkSize = pageChunkEndPos - pageChunkStartPos;
+                writer.Seek(pageAllocSizePos, SeekOrigin.Begin);
                 writer.Write((int)pageChunkSize);
-                writer.Seek(pageChunkSize, SeekOrigin.Begin);
+
+                writer.Seek(pageChunkEndPos, SeekOrigin.Begin);
             }
-
+            
             {
-                long unknownList2Pos = writer.Position;
+                long posUnknownList2 = writer.Position;
                 writer.Seek(unknownList2OffsetPos, SeekOrigin.Begin);
-                writer.Write((int)(unknownList2Pos - posStart));
-                writer.Seek(unknownList2Pos, SeekOrigin.Begin);
+                writer.Write((int)(posUnknownList2 - posStart));
 
+                writer.Seek(posUnknownList2, SeekOrigin.Begin);
                 writer.WriteNulls(16);
             }
-
+            
             {
                 long posResourceCuts = writer.Position;
                 writer.Seek(posResourceCutsOffset, SeekOrigin.Begin);
@@ -217,7 +214,7 @@ public class Scene : ResourceBase, IBinarySerializable
                 writer.WriteNulls(12);
                 writer.WriteCollection(ResourceCuts);
             }
-
+            
             {
                 long unknownList4Pos = writer.Position;
                 writer.Seek(unknownList4OffsetPos, SeekOrigin.Begin);
