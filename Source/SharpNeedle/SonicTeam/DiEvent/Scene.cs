@@ -46,6 +46,9 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
     public override void Write(IFile file)
         => Write(file, GameType.Common);
 
+    public void Write(string path, GameType game)
+       => Write(FileSystem.Create(path), game);
+
     public void Write(IFile file, GameType game)
     {
         BaseFile = file;
@@ -216,10 +219,10 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
             }
             
             {
-                long unknownList4Pos = writer.Position;
+                long posUnknownList4 = writer.Position;
                 writer.Seek(unknownList4OffsetPos, SeekOrigin.Begin);
-                writer.Write((int)(unknownList4Pos - posStart));
-                writer.Seek(unknownList4Pos, SeekOrigin.Begin);
+                writer.Write((int)(posUnknownList4 - posStart));
+                writer.Seek(posUnknownList4, SeekOrigin.Begin);
 
                 writer.WriteNulls(16);
             }
