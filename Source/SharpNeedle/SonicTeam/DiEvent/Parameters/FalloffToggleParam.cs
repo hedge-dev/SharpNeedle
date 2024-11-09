@@ -8,12 +8,12 @@ public class FalloffToggleParam : BaseParam
     public FalloffToggleParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
-    public void Read(BinaryObjectReader reader, GameType game)
+    public override void Read(BinaryObjectReader reader, GameType game)
     {
         Intensity = reader.Read<float>();
     }
 
-    public void Write(BinaryObjectWriter writer, GameType game)
+    public override void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.Write(Intensity);
     }

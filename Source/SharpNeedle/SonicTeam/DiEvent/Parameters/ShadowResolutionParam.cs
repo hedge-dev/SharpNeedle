@@ -8,12 +8,12 @@ public class ShadowResolutionParam : BaseParam
     public ShadowResolutionParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
-    public void Read(BinaryObjectReader reader, GameType game)
+    public override void Read(BinaryObjectReader reader, GameType game)
     {
         Resolution = reader.Read<Vector2Int>();
     }
 
-    public void Write(BinaryObjectWriter writer, GameType game)
+    public override void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.Write(Resolution);
     }
