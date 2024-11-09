@@ -13,7 +13,7 @@ public class SubtitleParam : BaseParam
     public SubtitleParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
-    public void Read(BinaryObjectReader reader, GameType game)
+    public override void Read(BinaryObjectReader reader, GameType game)
     {
         if (game == GameType.ShadowGenerations)
         {
@@ -32,7 +32,7 @@ public class SubtitleParam : BaseParam
         }
     }
 
-    public void Write(BinaryObjectWriter writer, GameType game)
+    public override void Write(BinaryObjectWriter writer, GameType game)
     {
         if (game == GameType.ShadowGenerations)
         {

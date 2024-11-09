@@ -8,12 +8,12 @@ public class TimeStopObjectBehaviorParam : BaseParam
     public TimeStopObjectBehaviorParam(BinaryObjectReader reader, GameType game)
         => Read(reader, game);
 
-    public void Read(BinaryObjectReader reader, GameType game)
+    public override void Read(BinaryObjectReader reader, GameType game)
     {
         Mode = reader.Read<int>();
     }
 
-    public void Write(BinaryObjectWriter writer, GameType game)
+    public override void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.Write(Mode);
     }
