@@ -1,6 +1,6 @@
-﻿using System.IO;
+﻿namespace SharpNeedle.HedgehogEngine.Needle.TextureStreaming;
 
-namespace SharpNeedle.HedgehogEngine.Needle.TextureStreaming;
+using System.IO;
 
 public class Info : ResourceBase, IBinarySerializable
 {
@@ -70,7 +70,7 @@ public class Info : ResourceBase, IBinarySerializable
     public byte[] UnpackDDS(Package package)
     {
         string entryName = Path.GetFileNameWithoutExtension(Name);
-        if(!package.TryFind(entryName, out Package.EntryInfo entry))
+        if(!package.TryFindEntry(entryName, out Package.EntryInfo entry))
         {
             throw new InvalidDataException($"Package \"{package.Name}\" has no entry for info \"{entryName}\"");
         }

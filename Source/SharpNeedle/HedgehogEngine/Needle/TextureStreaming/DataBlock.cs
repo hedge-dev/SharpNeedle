@@ -1,6 +1,6 @@
-﻿using System.IO;
+﻿namespace SharpNeedle.HedgehogEngine.Needle.TextureStreaming;
 
-namespace SharpNeedle.HedgehogEngine.Needle.TextureStreaming;
+using System.IO;
 
 public class DataBlock : IBinarySerializable
 {

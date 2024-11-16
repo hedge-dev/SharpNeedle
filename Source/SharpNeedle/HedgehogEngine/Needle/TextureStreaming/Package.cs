@@ -1,18 +1,28 @@
-﻿using SharpNeedle.Utilities;
-using System.IO;
+﻿namespace SharpNeedle.HedgehogEngine.Needle.TextureStreaming;
 
-namespace SharpNeedle.HedgehogEngine.Needle.TextureStreaming;
+using System.IO;
 
 public class Package : ResourceBase, IBinarySerializable, IStreamable
 {
     public struct EntryInfo : IBinarySerializable
     {
+        private string _name;
+
         public int Hash { get; set; }
         public int BlockIndex { get; set; }
         public int MipLevels { get; set; }
         public ushort Width { get; set; }
         public ushort Height { get; set; }
-        public string Name { get; set; }
+
+        public string Name
+        {
+            readonly get => _name;
+            set
+            {
+                _name = value;
+                Hash = ComputeHash(value);
+            }
+        }
 
         public void Read(BinaryObjectReader reader)
         {
@@ -53,39 +63,30 @@ public class Package : ResourceBase, IBinarySerializable, IStreamable
     }
 
 
-    public List<EntryInfo> Entries { get; set; }
+    public List<EntryInfo> Entries { get; set; } = [];
 
-    public List<DataBlock> Blocks { get; set; }
+    public List<DataBlock> Blocks { get; set; } = [];
 
     public Stream BaseStream { get; private set; }
 
 
-    public EntryInfo this[string name]
+    public EntryInfo FindEntry(string name)
     {
-        get
+        if(!TryFindEntry(name, out EntryInfo result))
         {
-            if(!TryFind(name, out EntryInfo result))
-            {
-                throw new KeyNotFoundException($"Package has no entry with the name \"{name}\"!");
-            }
-
-            return result;
+            throw new KeyNotFoundException($"Package has no entry with the name \"{name}\"!");
         }
+
+        return result;
     }
 
-
-    public Package()
+    public bool TryFindEntry(string name, out EntryInfo entry)
     {
-        Entries = [];
-        Blocks = [];
-    }
+        int hash = EntryInfo.ComputeHash(name);
 
-
-    public bool TryFind(string name, out EntryInfo entry)
-    {
         foreach(EntryInfo currentEntry in Entries)
         {
-            if(currentEntry.Name == name)
+            if(currentEntry.Hash == hash)
             {
                 entry = currentEntry;
                 return true;
