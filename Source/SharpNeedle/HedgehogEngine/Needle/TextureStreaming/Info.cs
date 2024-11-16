@@ -82,11 +82,7 @@ public class Info : ResourceBase, IBinarySerializable
         for(int i = 0; i < entry.MipLevels; i++)
         {
             DataBlock block = package.Blocks[entry.BlockIndex + i];
-
-            Stream stream = block.DataStream ?? package.BaseStream;
-
-            stream.Seek(block.Position, SeekOrigin.Begin);
-            result.Write(stream.ReadBytes((int)block.Length));
+            result.Write(block.DataStream.ReadAllBytes());
         }
 
         result.Flush();

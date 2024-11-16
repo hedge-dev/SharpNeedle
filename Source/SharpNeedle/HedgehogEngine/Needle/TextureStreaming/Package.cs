@@ -31,7 +31,7 @@ public class Package : ResourceBase, IBinarySerializable, IStreamable
             MipLevels = reader.ReadInt32();
             Width = reader.ReadUInt16();
             Height = reader.ReadUInt16();
-            Name = reader.ReadStringOffset();
+            _name = reader.ReadStringOffset();
         }
 
         public void Write(BinaryObjectWriter writer)
@@ -192,7 +192,7 @@ public class Package : ResourceBase, IBinarySerializable, IStreamable
     {
         foreach(DataBlock block in Blocks)
         {
-            block.EnsureData(this, false);
+            block.EnsureData();
         }
 
         BaseFile?.Dispose();
