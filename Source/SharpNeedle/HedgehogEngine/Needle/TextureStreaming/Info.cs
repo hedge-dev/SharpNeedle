@@ -57,7 +57,7 @@ public class Info : ResourceBase, IBinarySerializable
         writer.WriteInt32(1);
         writer.WriteInt32(0);
 
-        writer.WriteInt32(PackageName.Length);
+        writer.WriteInt32(PackageName.Length + 1);
         writer.WriteInt32(Mip4x4.Length);
         writer.WriteInt32(Mip4x4Index);
 
