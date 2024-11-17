@@ -1,19 +1,19 @@
 ﻿namespace SharpNeedle.HedgehogEngine.Mirage;
 using System.IO;
 
-public class Mesh : IBinarySerializable, IDisposable, ICloneable<Mesh>
+public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
 {
     public ResourceReference<Material> Material { get; set; }
     public ushort[] Faces { get; set; }
     public uint VertexSize { get; set; }
     public uint VertexCount { get; set; }
     public byte[] Vertices { get; set; }
-    public byte[] BoneIndices { get; set; }
+    public short[] BoneIndices { get; set; }
     public List<VertexElement> Elements { get; set; }
     public List<TextureUnit> Textures { get; set; }
     public MeshSlot Slot { get; set; }
 
-    public void Read(BinaryObjectReader reader)
+    public void Read(BinaryObjectReader reader, uint version)
     {
         Elements ??= new List<VertexElement>();
         Material = reader.ReadStringOffset();
@@ -36,12 +36,16 @@ public class Mesh : IBinarySerializable, IDisposable, ICloneable<Mesh>
             }
         });
 
-        BoneIndices = reader.ReadArrayOffset<byte>(reader.Read<int>());
+        if(version >= 6)
+            BoneIndices = reader.ReadArrayOffset<short>(reader.Read<int>());
+        else
+            BoneIndices = reader.ReadArrayOffset<byte>(reader.Read<int>()).Select(Convert.ToInt16).ToArray();
+
         Textures = reader.ReadObject<BinaryList<BinaryPointer<TextureUnit>>>().Unwind();
         SwapVertexEndianness();
     }
 
-    public void Write(BinaryObjectWriter writer)
+    public void Write(BinaryObjectWriter writer, uint version)
     {
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Path.GetFileNameWithoutExtension(Material.Name));
         writer.Write(Faces.Length);
@@ -69,7 +73,11 @@ public class Mesh : IBinarySerializable, IDisposable, ICloneable<Mesh>
         });
 
         writer.Write(BoneIndices.Length);
-        writer.WriteArrayOffset(BoneIndices);
+
+        if(version >= 6)
+            writer.WriteArrayOffset(BoneIndices);
+        else
+            writer.WriteArrayOffset(BoneIndices.Select(Convert.ToByte).ToArray());
 
         writer.Write(Textures.Count);
         writer.WriteOffset(() =>

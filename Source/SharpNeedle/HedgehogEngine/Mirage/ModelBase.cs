@@ -23,13 +23,9 @@ public abstract class ModelBase : SampleChunkResource
     protected void CommonRead(BinaryObjectReader reader)
     {
         if (DataVersion >= 5)
-            Groups = reader.ReadObject<BinaryList<BinaryPointer<MeshGroup>>>().Unwind();
+            Groups = reader.ReadObject<BinaryList<BinaryPointer<MeshGroup, uint>, uint>, uint>(DataVersion).Unwind();
         else
-        {
-            var group = new MeshGroup();
-            group.Read(reader, false);
-            Groups = new List<MeshGroup> { group };
-        }
+            Groups = new List<MeshGroup> { reader.ReadObject<MeshGroup, uint>(DataVersion) };
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -41,19 +37,19 @@ public abstract class ModelBase : SampleChunkResource
             writer.WriteOffset(() =>
             {
                 foreach (var group in Groups)
-                    writer.WriteObjectOffset(group);
+                    writer.WriteObjectOffset(group, DataVersion);
             });
         }
         else
         {
             if (Groups.Count == 1)
-                Groups[0].Write(writer, false);
+                writer.WriteObject(Groups[0], DataVersion);
             else
             {
                 var dummyMeshGroup = new MeshGroup();
                 dummyMeshGroup.Capacity = Groups.Sum(x => x.Count);
                 dummyMeshGroup.AddRange(Groups.SelectMany(x => x));
-                dummyMeshGroup.Write(writer, false);
+                writer.WriteObject(dummyMeshGroup, DataVersion);
             }
         }
     }
