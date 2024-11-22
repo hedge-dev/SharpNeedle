@@ -1,17 +1,16 @@
 ﻿namespace SharpNeedle.HedgehogEngine.Mirage;
 
-public class MeshGroup : List<Mesh>, IBinarySerializable, IDisposable, ICloneable<MeshGroup>
+public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICloneable<MeshGroup>
 {
     public string Name { get; set; }
 
-    public void Read(BinaryObjectReader reader)
-        => Read(reader, true);
-
-    public void Read(BinaryObjectReader reader, bool readSpecial)
+    public void Read(BinaryObjectReader reader, uint version)
     {
-        var opaqMeshes = reader.ReadObject<BinaryList<BinaryPointer<Mesh>>>();
-        var transMeshes = reader.ReadObject<BinaryList<BinaryPointer<Mesh>>>();
-        var punchMeshes = reader.ReadObject<BinaryList<BinaryPointer<Mesh>>>();
+        bool readSpecial = version >= 5;
+
+        var opaqMeshes = reader.ReadObject<BinaryList<BinaryPointer<Mesh, uint>, uint>, uint>(version);
+        var transMeshes = reader.ReadObject<BinaryList<BinaryPointer<Mesh, uint>, uint>, uint>(version);
+        var punchMeshes = reader.ReadObject<BinaryList<BinaryPointer<Mesh, uint>, uint>, uint>(version);
 
         Clear();
 
@@ -65,7 +64,7 @@ public class MeshGroup : List<Mesh>, IBinarySerializable, IDisposable, ICloneabl
 
         Name = reader.ReadString(StringBinaryFormat.NullTerminated);
 
-        void AddMeshes(BinaryList<BinaryPointer<Mesh>> meshes, MeshSlot slot)
+        void AddMeshes(BinaryList<BinaryPointer<Mesh, uint>, uint> meshes, MeshSlot slot)
         {
             foreach (var mesh in meshes)
             {
@@ -75,11 +74,10 @@ public class MeshGroup : List<Mesh>, IBinarySerializable, IDisposable, ICloneabl
         }
     }
 
-    public void Write(BinaryObjectWriter writer)
-        => Write(writer, true);
-
-    public void Write(BinaryObjectWriter writer, bool writeSpecial)
+    public void Write(BinaryObjectWriter writer, uint version)
     {
+        bool writeSpecial = version >= 5;
+
         WriteMeshes(this.Where(x => x.Slot == Mesh.Type.Opaque));
         WriteMeshes(this.Where(x => x.Slot == Mesh.Type.Transparent));
         WriteMeshes(this.Where(x => x.Slot == Mesh.Type.PunchThrough));
@@ -135,7 +133,7 @@ public class MeshGroup : List<Mesh>, IBinarySerializable, IDisposable, ICloneabl
             writer.WriteOffset(() =>
             {
                 foreach (var mesh in meshes)
-                    writer.WriteObjectOffset(mesh);
+                    writer.WriteObjectOffset(mesh, version);
             });
         }
     }

@@ -184,6 +184,15 @@ public static class BinaryHelper
         return result;
     }
 
+    public static List<T> Unwind<T, TContext>(this BinaryList<BinaryPointer<T, TContext>, TContext> list) where T : IBinarySerializable<TContext>, new()
+    {
+        var result = new List<T>(list.Count);
+        foreach (var item in list)
+            result.Add(item);
+
+        return result;
+    }
+
     public static unsafe T* Pointer<T>(this T[] data) where T : unmanaged
     {
         if (data == null || data.Length == 0)
