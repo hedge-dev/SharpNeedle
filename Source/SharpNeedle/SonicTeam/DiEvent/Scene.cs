@@ -17,8 +17,9 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
     public float ChainCameraOut { get; set; }
     int Type { get; set; }
     int SkipPointTick { get; set; }
-
     public List<Resource> Resources { get; set; } = new();
+
+    private GameType LastGame { get; set; } = GameType.Common;
 
     public Scene() 
     {
@@ -40,11 +41,15 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
         using var reader = new BinaryObjectReader(file.Open(), StreamOwnership.Transfer, Endianness.Little);
         reader.OffsetBinaryFormat = OffsetBinaryFormat.U32;
 
+        LastGame = game;
         Read(reader, game);
     }
 
     public override void Write(IFile file)
-        => Write(file, GameType.Common);
+        => Write(file, LastGame);
+
+    public void Write(string path, GameType game)
+       => Write(FileSystem.Create(path), game);
 
     public void Write(IFile file, GameType game)
     {
@@ -53,6 +58,7 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
         using var writer = new BinaryObjectWriter(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness.Little);
         writer.OffsetBinaryFormat = OffsetBinaryFormat.U32;
 
+        LastGame = game;
         Write(writer, game);
     }
 
@@ -216,10 +222,10 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
             }
             
             {
-                long unknownList4Pos = writer.Position;
+                long posUnknownList4 = writer.Position;
                 writer.Seek(unknownList4OffsetPos, SeekOrigin.Begin);
-                writer.Write((int)(unknownList4Pos - posStart));
-                writer.Seek(unknownList4Pos, SeekOrigin.Begin);
+                writer.Write((int)(posUnknownList4 - posStart));
+                writer.Seek(posUnknownList4, SeekOrigin.Begin);
 
                 writer.WriteNulls(16);
             }
