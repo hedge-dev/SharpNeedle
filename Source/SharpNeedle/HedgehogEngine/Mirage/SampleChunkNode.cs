@@ -2,7 +2,6 @@
 
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Reflection.Metadata.Ecma335;
 
 public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
 {
