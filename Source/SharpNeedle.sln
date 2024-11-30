@@ -13,6 +13,20 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SharpNeedle.Shared", "Sharp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpNeedle.Bodge", "SharpNeedle.Bodge\SharpNeedle.Bodge.csproj", "{C7790A5E-6CF8-477A-BBA6-E8E1A141CE3C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BA111117-7F73-4655-83BD-81B9217292B4}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		..\.gitignore = ..\.gitignore
+		..\LICENSE.md = ..\LICENSE.md
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resharper", "Resharper", "{DC4696CE-D5AD-4A66-85B1-92B97EA97FF0}"
+	ProjectSection(SolutionItems) = preProject
+		SharpNeedle.DotSettings = SharpNeedle.DotSettings
+		SharpNeedle.sln.DotSettings = SharpNeedle.sln.DotSettings
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +52,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DC4696CE-D5AD-4A66-85B1-92B97EA97FF0} = {BA111117-7F73-4655-83BD-81B9217292B4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BA26E972-8B3E-4055-971D-AADB739D23BA}
