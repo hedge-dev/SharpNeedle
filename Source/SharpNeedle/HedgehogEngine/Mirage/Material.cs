@@ -166,6 +166,12 @@ public class Material : SampleChunkResource
 
         void WriteParameters<T>(Dictionary<string, Parameter<T>> parameters) where T : unmanaged
         {
+            if(parameters.Count == 0)
+            {
+                writer.Write(0);
+                return;
+            }
+
             foreach (var parameter in parameters)
                 parameter.Value.Name = parameter.Key;
 
