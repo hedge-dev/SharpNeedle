@@ -28,11 +28,14 @@ public class GIMipLevelLimitation : SampleChunkResource
     {
         get
         {
-            switch (index)
+            switch(index)
             {
-                case 0: return Level0;
-                case 1: return Level1;
-                case 2: return Level2;
+                case 0:
+                    return Level0;
+                case 1:
+                    return Level1;
+                case 2:
+                    return Level2;
                 default:
                     throw new IndexOutOfRangeException($"{index} >= 3");
             }
@@ -40,11 +43,17 @@ public class GIMipLevelLimitation : SampleChunkResource
 
         set
         {
-            switch (index)
+            switch(index)
             {
-                case 0: Level0 = value; break;
-                case 1: Level1 = value; break;
-                case 2: Level2 = value; break;
+                case 0:
+                    Level0 = value;
+                    break;
+                case 1:
+                    Level1 = value;
+                    break;
+                case 2:
+                    Level2 = value;
+                    break;
                 default:
                     throw new IndexOutOfRangeException($"{index} >= 3");
             }

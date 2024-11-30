@@ -4,7 +4,7 @@ using System.IO;
 public class DataChunk<T> : DataChunk, IChunk where T : IBinarySerializable
 {
     public T Data { get; set; }
-    
+
     public DataChunk(T data)
     {
         Data = data;
@@ -12,7 +12,7 @@ public class DataChunk<T> : DataChunk, IChunk where T : IBinarySerializable
 
     public void Read(BinaryObjectReader reader, ChunkParseOptions options)
     {
-        if (options.Owner.Version.IsV1)
+        if(options.Owner.Version.IsV1)
         {
             Data.Read(reader);
             return;
@@ -23,53 +23,46 @@ public class DataChunk<T> : DataChunk, IChunk where T : IBinarySerializable
         Signature = options.Header.Value.Signature;
         BinaryHelper.EnsureSignature(Signature, true, BinSignature, AltBinSignature);
 
-        var strTableOffset = reader.Read<uint>();
-        var strTableSize = reader.Read<uint>();
-        var offTableSize = reader.Read<int>();
+        uint strTableOffset = reader.Read<uint>();
+        uint strTableSize = reader.Read<uint>();
+        int offTableSize = reader.Read<int>();
 
-        var dataOffset = reader.Read<ushort>();
+        ushort dataOffset = reader.Read<ushort>();
         reader.Skip(2);
 
         reader.Skip(dataOffset);
         reader.PushOffsetOrigin();
         Data.Read(reader);
 
-        reader.ReadAtOffset(strTableOffset + strTableSize, () =>
-        {
-            Offsets = OffsetTable.FromBytes(reader.ReadArray<byte>(offTableSize));
-        });
+        reader.ReadAtOffset(strTableOffset + strTableSize, () => Offsets = OffsetTable.FromBytes(reader.ReadArray<byte>(offTableSize)));
     }
 
     public void Write(BinaryObjectWriter writer, ChunkParseOptions options)
     {
-        if (options.Owner.Version.IsV1)
+        if(options.Owner.Version.IsV1)
         {
             Data.Write(writer);
             return;
         }
-        
-        var dataStream = new MemoryStream();
-        var dataWriter = new BinaryObjectWriter(dataStream, StreamOwnership.Transfer, writer.Endianness, writer.Encoding, writer.FilePath);
+
+        MemoryStream dataStream = new();
+        BinaryObjectWriter dataWriter = new(dataStream, StreamOwnership.Transfer, writer.Endianness, writer.Encoding, writer.FilePath);
         dataWriter.OffsetBinaryFormat = writer.OffsetBinaryFormat;
         Data.Write(dataWriter);
         dataWriter.Flush();
 
-        Offsets = new OffsetTable();
-        foreach (var offset in dataWriter.OffsetHandler.OffsetPositions)
-        {
-            Offsets.Add(offset);
-        }
+        Offsets = [.. dataWriter.OffsetHandler.OffsetPositions];
 
         dataWriter.Seek(0, SeekOrigin.End);
         dataWriter.Align(4);
 
-        var baseSize = dataWriter.Length;
-        var table = Offsets.Encode();
+        long baseSize = dataWriter.Length;
+        byte[] table = Offsets.Encode();
         dataWriter.Write(0); // Dummy string table
         dataWriter.WriteArray(table.AsSpan());
 
         writer.WriteNative(Signature);
-        
+
         writer.Write((int)(baseSize + table.Length + 0x34)); // Size
         writer.Write((int)baseSize); // String Table
         writer.Write(4); // String Table Size

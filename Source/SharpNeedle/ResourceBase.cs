@@ -9,17 +9,23 @@ public abstract class ResourceBase : IResource
     public abstract void Read(IFile file);
     public abstract void Write(IFile file);
 
-    public virtual IEnumerable<ResourceDependency> GetDependencies() => Enumerable.Empty<ResourceDependency>();
+    public virtual IEnumerable<ResourceDependency> GetDependencies()
+    {
+        return [];
+    }
+
     public virtual void ResolveDependencies(IResourceResolver dir) { }
-    public virtual void WriteDependencies(IDirectory dir) {}
+    public virtual void WriteDependencies(IDirectory dir) { }
 
     /// <summary>
     /// Write file to the original location it was read from
     /// </summary>
     public void Save()
     {
-        if (this is IStreamable streamable)
+        if(this is IStreamable streamable)
+        {
             streamable.LoadToMemory();
+        }
 
         Write(BaseFile);
         WriteDependencies(BaseFile.Parent);
@@ -32,14 +38,18 @@ public abstract class ResourceBase : IResource
 
     protected virtual void Dispose(bool disposing)
     {
-        if (disposing)
+        if(disposing)
+        {
             BaseFile?.Dispose();
+        }
     }
 
     public void Dispose()
     {
-        if (Disposed)
+        if(Disposed)
+        {
             return;
+        }
 
         Disposed = true;
         Dispose(true);

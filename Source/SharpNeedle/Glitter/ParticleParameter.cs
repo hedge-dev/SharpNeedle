@@ -85,9 +85,9 @@ public class ParticleParameter : IBinarySerializable<EmitterParameter>
     public Vector3 ExternalAccelerationRandomMargin { get; set; }
     public MaterialParameter Material { get; set; }
     public MeshParameter Mesh { get; set; }
-    public List<Color<float>> ColorTables { get; set; } = new();
-    public List<Color<float>> ColorTable2s { get; set; } = new();
-    public List<AnimationParameter> Animations { get;set; } = new(30);
+    public List<Color<float>> ColorTables { get; set; } = [];
+    public List<Color<float>> ColorTable2s { get; set; } = [];
+    public List<AnimationParameter> Animations { get; set; } = new(30);
 
     public void Read(BinaryObjectReader reader, EmitterParameter parent)
     {
@@ -114,12 +114,16 @@ public class ParticleParameter : IBinarySerializable<EmitterParameter>
         MultiPurposeColor = reader.Read<Vector4>().AsColor();
 
         long colorTableOffset = reader.ReadOffsetValue();
-        if (colorTableOffset != 0)
+        if(colorTableOffset != 0)
+        {
             ColorTables.AddRange(reader.ReadArrayAtOffset<Color<float>>(colorTableOffset, reader.Read<int>()));
+        }
 
         long colorTable2Offset = reader.ReadOffsetValue();
-        if (colorTable2Offset != 0)
+        if(colorTable2Offset != 0)
+        {
             ColorTable2s.AddRange(reader.ReadArrayAtOffset<Color<float>>(colorTable2Offset, reader.Read<int>()));
+        }
 
         reader.Align(16);
         InitialSize = reader.Read<Vector3>();
@@ -188,8 +192,10 @@ public class ParticleParameter : IBinarySerializable<EmitterParameter>
         Field1A0 = reader.Read<int>();
 
         long materialOffset = reader.ReadOffsetValue();
-        if (materialOffset != 0)
+        if(materialOffset != 0)
+        {
             Material = reader.ReadObjectAtOffset<MaterialParameter>(materialOffset);
+        }
 
         BlendMode = reader.Read<EBlendMode>();
         CompositeMode = reader.Read<ECompositeMode>();
@@ -198,8 +204,10 @@ public class ParticleParameter : IBinarySerializable<EmitterParameter>
         TextureAddressMode = reader.Read<ETextureAddressMode>();
 
         Field1BC = (int)reader.ReadOffsetValue();
-        if (ParticleType == EParticleType.Mesh && Field1BC != 0)
+        if(ParticleType == EParticleType.Mesh && Field1BC != 0)
+        {
             Mesh = reader.ReadObjectAtOffset<MeshParameter>(Field1BC);
+        }
 
         Field1C0 = reader.Read<int>();
         Field1C4 = reader.Read<int>();
@@ -216,18 +224,22 @@ public class ParticleParameter : IBinarySerializable<EmitterParameter>
 
         Flags = reader.Read<int>();
 
-        for (int i = 0; i < Animations.Capacity; i++)
+        for(int i = 0; i < Animations.Capacity; i++)
         {
             Animations.Add(new());
 
             long animationOffset = reader.ReadOffsetValue();
-            if (animationOffset != 0)
+            if(animationOffset != 0)
+            {
                 Animations[i] = reader.ReadObjectAtOffset<AnimationParameter>(animationOffset);
+            }
         }
 
         long nextOffset = reader.ReadOffsetValue();
-        if (nextOffset != 0)
+        if(nextOffset != 0)
+        {
             parent.Particles.AddLast(reader.ReadObjectAtOffset<ParticleParameter>(nextOffset));
+        }
     }
 
     public void Write(BinaryObjectWriter writer, EmitterParameter parent)
@@ -256,15 +268,19 @@ public class ParticleParameter : IBinarySerializable<EmitterParameter>
 
         writer.WriteOffset(() =>
         {
-            foreach (var colorTable in ColorTables)
+            foreach(Color<float> colorTable in ColorTables)
+            {
                 writer.Write(colorTable);
+            }
         });
         writer.Write(ColorTables.Count);
 
         writer.WriteOffset(() =>
         {
-            foreach (var colorTable2 in ColorTable2s)
+            foreach(Color<float> colorTable2 in ColorTable2s)
+            {
                 writer.Write(colorTable2);
+            }
         });
         writer.Write(ColorTable2s.Count);
 
@@ -293,7 +309,7 @@ public class ParticleParameter : IBinarySerializable<EmitterParameter>
         writer.Align(16);
 
         writer.Write(EmitterTranslationEffectRatio);
-        
+
         writer.Write(LocusInterval);
 
         writer.Write(Field118);
@@ -334,10 +350,14 @@ public class ParticleParameter : IBinarySerializable<EmitterParameter>
         writer.Write(Field19C);
         writer.Write(Field1A0);
 
-        if (Material != null)
+        if(Material != null)
+        {
             writer.WriteObjectOffset(Material);
+        }
         else
+        {
             writer.WriteOffsetValue(0);
+        }
 
         writer.Write(BlendMode);
         writer.Write(CompositeMode);
@@ -345,10 +365,14 @@ public class ParticleParameter : IBinarySerializable<EmitterParameter>
         writer.Write(SecondaryBlend);
         writer.Write(TextureAddressMode);
 
-        if (ParticleType == EParticleType.Mesh && Mesh != null)
+        if(ParticleType == EParticleType.Mesh && Mesh != null)
+        {
             writer.WriteObjectOffset(Mesh);
+        }
         else
+        {
             writer.WriteOffsetValue(Field1BC);
+        }
 
         writer.Write(Field1C0);
         writer.Write(Field1C4);
@@ -365,18 +389,26 @@ public class ParticleParameter : IBinarySerializable<EmitterParameter>
 
         writer.Write(Flags);
 
-        foreach (var animation in Animations)
+        foreach(AnimationParameter animation in Animations)
         {
-            if (animation.Keyframes.Count != 0)
+            if(animation.Keyframes.Count != 0)
+            {
                 writer.WriteObjectOffset(animation);
+            }
             else
+            {
                 writer.WriteOffsetValue(0);
+            }
         }
 
-        if (parent.Particles.Find(this).Next != null)
+        if(parent.Particles.Find(this).Next != null)
+        {
             writer.WriteObjectOffset(parent.Particles.Find(this).Next.Value, parent, 16);
+        }
         else
+        {
             writer.WriteOffsetValue(0);
+        }
     }
 
     public enum EParticleType : int

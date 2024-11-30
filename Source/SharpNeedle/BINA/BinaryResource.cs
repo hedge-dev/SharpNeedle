@@ -20,15 +20,15 @@ public abstract class BinaryResource : ResourceBase, IBinarySerializable
     {
         BaseFile = file;
         Name = Path.GetFileNameWithoutExtension(file.Name);
-        using var reader = new BinaryObjectReader(file.Open(), StreamOwnership.Transfer, Endianness.Little);
+        using BinaryObjectReader reader = new(file.Open(), StreamOwnership.Transfer, Endianness.Little);
 
         Chunks.Clear();
-        var signature = reader.ReadNative<uint>();
-        var isV2 = BinaryHelper.EnsureSignature(signature, false, Signature);
-        if (isV2)
+        uint signature = reader.ReadNative<uint>();
+        bool isV2 = BinaryHelper.EnsureSignature(signature, false, Signature);
+        if(isV2)
         {
             Version = reader.ReadObject<Version>();
-            if (Version.Is64Bit)
+            if(Version.Is64Bit)
             {
                 reader.OffsetBinaryFormat = OffsetBinaryFormat.U64;
             }
@@ -36,22 +36,22 @@ public abstract class BinaryResource : ResourceBase, IBinarySerializable
             reader.Endianness = Version.Endianness;
 
             Size = reader.Read<uint>();
-            var chunkCount = reader.Read<ushort>();
+            ushort chunkCount = reader.Read<ushort>();
             reader.Skip(2);
 
-            var options = new ChunkParseOptions()
+            ChunkParseOptions options = new()
             {
                 Owner = this
             };
 
-            for (int i = 0; i < chunkCount; i++)
+            for(int i = 0; i < chunkCount; i++)
             {
-                var header = reader.ReadObject<ChunkHeader>();
+                ChunkHeader header = reader.ReadObject<ChunkHeader>();
                 options.Header = header;
 
-                if (header.Signature == DataChunk.BinSignature || header.Signature == DataChunk.AltBinSignature)
+                if(header.Signature == DataChunk.BinSignature || header.Signature == DataChunk.AltBinSignature)
                 {
-                    var chunk = new DataChunk<IBinarySerializable>(this);
+                    DataChunk<IBinarySerializable> chunk = new(this);
                     chunk.Read(reader, options);
                     Chunks.Add(chunk);
                     continue;
@@ -62,8 +62,8 @@ public abstract class BinaryResource : ResourceBase, IBinarySerializable
         }
         else
         {
-            var offTableOffset = reader.ReadNative<int>();
-            var offTableSize = reader.ReadNative<int>();
+            int offTableOffset = reader.ReadNative<int>();
+            int offTableSize = reader.ReadNative<int>();
             reader.Skip(8);
 
             Version = reader.ReadObject<Version>();
@@ -73,14 +73,14 @@ public abstract class BinaryResource : ResourceBase, IBinarySerializable
 
             reader.Endianness = Version.Endianness;
 
-            if (Version.Endianness != BinaryHelper.PlatformEndianness)
+            if(Version.Endianness != BinaryHelper.PlatformEndianness)
             {
                 offTableOffset = BinaryPrimitives.ReverseEndianness(offTableOffset);
                 offTableSize = BinaryPrimitives.ReverseEndianness(offTableSize);
                 Size = BinaryPrimitives.ReverseEndianness(signature);
             }
-            
-            var chunk = new DataChunk<IBinarySerializable>(this)
+
+            DataChunk<IBinarySerializable> chunk = new(this)
             {
                 Offsets = OffsetTable.FromBytes(reader.ReadArrayAtOffset<byte>(offTableOffset, offTableSize))
             };
@@ -93,22 +93,26 @@ public abstract class BinaryResource : ResourceBase, IBinarySerializable
     public override void Write(IFile file)
     {
         BaseFile = file;
-        using var writer = new BinaryObjectWriter(file.Open(FileAccess.Write), StreamOwnership.Transfer, Version.Endianness);
-        if (Version.Is64Bit)
+        using BinaryObjectWriter writer = new(file.Open(FileAccess.Write), StreamOwnership.Transfer, Version.Endianness);
+        if(Version.Is64Bit)
         {
             writer.OffsetBinaryFormat = OffsetBinaryFormat.U64;
         }
 
-        if (Version.IsV1)
+        if(Version.IsV1)
+        {
             WriteV1(writer);
+        }
         else
+        {
             WriteV2(writer);
+        }
     }
 
     private void WriteV1(BinaryObjectWriter writer)
     {
-        var begin = writer.Position;
-        var sizeToken = writer.At();
+        long begin = writer.Position;
+        SeekToken sizeToken = writer.At();
         writer.Write(0);
         writer.Write(0L); // Offset table
         writer.Write(0L); // what
@@ -118,26 +122,28 @@ public abstract class BinaryResource : ResourceBase, IBinarySerializable
         writer.Write(0);
         writer.PushOffsetOrigin();
 
-        var options = new ChunkParseOptions
+        ChunkParseOptions options = new()
         {
             Owner = this
         };
 
-        foreach (var chunk in Chunks)
+        foreach(IChunk chunk in Chunks)
+        {
             chunk.Write(writer, options);
+        }
 
         writer.Flush();
-        var endToken = writer.At(writer.Length, SeekOrigin.End);
+        SeekToken endToken = writer.At(writer.Length, SeekOrigin.End);
         sizeToken.Dispose();
 
-        var offTable = new OffsetTable();
-        var origin = writer.OffsetHandler.OffsetOrigin;
-        foreach (var offset in writer.OffsetHandler.OffsetPositions)
+        OffsetTable offTable = [];
+        long origin = writer.OffsetHandler.OffsetOrigin;
+        foreach(long offset in writer.OffsetHandler.OffsetPositions)
         {
             offTable.Add(offset - origin);
         }
 
-        var offTableEncoded = offTable.Encode();
+        byte[] offTableEncoded = offTable.Encode();
         writer.Skip(4); // Skip size for now
         writer.WriteArrayOffset(offTableEncoded);
         writer.Write(offTableEncoded.Length);
@@ -154,23 +160,25 @@ public abstract class BinaryResource : ResourceBase, IBinarySerializable
 
     private void WriteV2(BinaryObjectWriter writer)
     {
-        var begin = writer.Position;
+        long begin = writer.Position;
         writer.WriteNative(Signature);
         writer.WriteObject(Version);
 
-        var sizeToken = writer.At();
+        SeekToken sizeToken = writer.At();
         writer.Write(0);
         writer.Write((short)Chunks.Count);
         writer.Align(4);
 
-        var options = new ChunkParseOptions
+        ChunkParseOptions options = new()
         {
             Owner = this
         };
-        foreach (var chunk in Chunks)
+        foreach(IChunk chunk in Chunks)
+        {
             writer.WriteObject(chunk, options);
+        }
 
-        using var end = writer.At(writer.Length, SeekOrigin.Begin);
+        using SeekToken end = writer.At(writer.Length, SeekOrigin.Begin);
         sizeToken.Dispose();
 
         writer.Write((int)((long)end - begin));

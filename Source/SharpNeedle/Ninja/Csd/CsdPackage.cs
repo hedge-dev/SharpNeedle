@@ -5,31 +5,32 @@ using System.IO;
 public class CsdPackage : ResourceBase, IBinarySerializable
 {
     public static readonly uint Signature = BinaryHelper.MakeSignature<uint>("FAPC");
-    public List<byte[]> Files { get; set; } = new();
+    public List<byte[]> Files { get; set; } = [];
     public Endianness Endianness { get; set; } = BinaryHelper.PlatformEndianness;
 
     public Stream GetStream(int idx, bool writable = false, bool expandable = false)
     {
-        if (!writable)
+        if(!writable)
+        {
             return new MemoryStream(Files[idx]);
+        }
 
-        if (!expandable)
+        if(!expandable)
+        {
             return new MemoryStream(Files[idx], true);
+        }
 
         // Make a new buffer because we want to expand it
-        var stream = new WrappedStream<MemoryStream>(new MemoryStream(Files[idx].Length));
+        WrappedStream<MemoryStream> stream = new(new MemoryStream(Files[idx].Length));
         stream.Write(Files[idx]);
-        stream.OnClosing += (x) =>
-        {
-            Files[idx] = x.ToArray();
-        };
+        stream.OnClosing += (x) => Files[idx] = x.ToArray();
 
         return stream;
     }
 
     public int Add()
     {
-        Add(Array.Empty<byte>());
+        Add([]);
         return Files.Count - 1;
     }
 
@@ -42,25 +43,27 @@ public class CsdPackage : ResourceBase, IBinarySerializable
     {
         Name = file.Name;
         BaseFile = file;
-        using var reader = new BinaryObjectReader(file.Open(), StreamOwnership.Transfer, Endianness.Little);
+        using BinaryObjectReader reader = new(file.Open(), StreamOwnership.Transfer, Endianness.Little);
         Read(reader);
     }
 
     public override void Write(IFile file)
     {
         BaseFile = file;
-        using var writer = new BinaryObjectWriter(file.Open(), StreamOwnership.Retain, Endianness.Little);
+        using BinaryObjectWriter writer = new(file.Open(), StreamOwnership.Retain, Endianness.Little);
         Write(writer);
     }
 
     public void Read(BinaryObjectReader reader)
     {
-        var sig = reader.ReadNative<uint>();
-        if (sig == BinaryPrimitives.ReverseEndianness(Signature))
+        uint sig = reader.ReadNative<uint>();
+        if(sig == BinaryPrimitives.ReverseEndianness(Signature))
+        {
             Endianness = Endianness.Big;
+        }
 
         reader.Endianness = Endianness;
-        while (reader.Position < reader.Length)
+        while(reader.Position < reader.Length)
         {
             Files.Add(reader.ReadArray<byte>(reader.Read<int>()));
         }
@@ -70,7 +73,7 @@ public class CsdPackage : ResourceBase, IBinarySerializable
     {
         writer.Endianness = Endianness;
         writer.Write(Signature);
-        foreach (var file in Files)
+        foreach(byte[] file in Files)
         {
             writer.Write(file.Length);
             writer.WriteArray(file);

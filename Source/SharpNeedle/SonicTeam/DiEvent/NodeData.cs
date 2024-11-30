@@ -17,7 +17,9 @@ public class PathData : BaseNodeData
 
     public PathData() { }
     public PathData(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -44,12 +46,14 @@ public class CameraData : BaseNodeData
     public int FrameCount { get; set; }
     public int Field08 { get; set; }
     public int Field0C { get; set; }
-    public List<float> FrameTimes { get; set; } = new List<float>();
-    public List<float> FrameData { get; set; } = new List<float>();
+    public List<float> FrameTimes { get; set; } = [];
+    public List<float> FrameData { get; set; } = [];
 
     public CameraData() { }
     public CameraData(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -72,7 +76,7 @@ public class CameraData : BaseNodeData
         writer.Write(Field08);
         writer.Write(Field0C);
 
-        if (FrameCount > 0)
+        if(FrameCount > 0)
         {
             writer.WriteCollection(FrameTimes);
             writer.WriteCollection(FrameData);
@@ -89,7 +93,9 @@ public class CameraMotionData : BaseNodeData
 
     public CameraMotionData() { }
     public CameraMotionData(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -117,7 +123,9 @@ public class ModelData : BaseNodeData
 
     public ModelData() { }
     public ModelData(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -151,7 +159,9 @@ public class MotionModelData : BaseNodeData
 
     public MotionModelData() { }
     public MotionModelData(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -188,7 +198,9 @@ public class AttachmentData : BaseNodeData
 
     public AttachmentData() { }
     public AttachmentData(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -221,7 +233,7 @@ public class ParameterData : BaseNodeData
     public int Field18 { get; set; }
     public int Field1C { get; set; }
     public BaseParam Parameter { get; set; }
-    
+
     public ParameterData() { }
     public ParameterData(BinaryObjectReader reader, GameType game, int size)
     {
@@ -242,7 +254,7 @@ public class ParameterData : BaseNodeData
 
     public void ReadFrontiersParameter(BinaryObjectReader reader, int type)
     {
-        switch ((FrontiersParams)type)
+        switch((FrontiersParams)type)
         {
             case FrontiersParams.DepthOfField:
                 Parameter = new DOFParam(reader, GameType.Frontiers);
@@ -348,7 +360,7 @@ public class ParameterData : BaseNodeData
 
     public void ReadShadowGensParameter(BinaryObjectReader reader, int type)
     {
-        switch ((ShadowGensParams)type)
+        switch((ShadowGensParams)type)
         {
             case ShadowGensParams.DepthOfField:
                 Parameter = new DOFParam(reader, GameType.ShadowGenerations);
@@ -439,7 +451,7 @@ public class ParameterData : BaseNodeData
 
         if(type < 1000)
         {
-            switch ((ParameterType)type)
+            switch((ParameterType)type)
             {
                 case ParameterType.DrawingOff:
                     Parameter = new DrawOffParam(reader, GameType.Common);
@@ -501,7 +513,7 @@ public class ParameterData : BaseNodeData
                     Parameter = new UnknownParam(reader, UnknownDataSize, type);
                     break;
             }
-        } 
+        }
         else
         {
             ReadGameSpecificParameter(reader, game, type);
@@ -521,8 +533,10 @@ public class ParameterData : BaseNodeData
         writer.Write(Field18);
         writer.Write(Field1C);
 
-        if (Parameter != null)
+        if(Parameter != null)
+        {
             writer.WriteObject(Parameter, game);
+        }
     }
 }
 

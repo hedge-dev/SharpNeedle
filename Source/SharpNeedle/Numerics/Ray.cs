@@ -11,59 +11,65 @@ public struct Ray : IIntersectable<Sphere>, IIntersectable<AABB>
         Origin = origin;
         Direction = direction;
     }
-    
-    public Vector3? Intersection(AABB aabb)
+
+    public readonly Vector3? Intersection(AABB aabb)
     {
-        var tmin = Vector3.Dot(aabb.Min - Origin, Direction);
-        var tmax = Vector3.Dot(aabb.Max - Origin, Direction);
-        var t1 = Math.Min(tmin, tmax);
-        var t2 = Math.Max(tmin, tmax);
-        if (t1 > 0 && t2 > 0)
-            return Origin + Direction * t1;
+        float tmin = Vector3.Dot(aabb.Min - Origin, Direction);
+        float tmax = Vector3.Dot(aabb.Max - Origin, Direction);
+        float t1 = Math.Min(tmin, tmax);
+        float t2 = Math.Max(tmin, tmax);
+        if(t1 > 0 && t2 > 0)
+        {
+            return Origin + (Direction * t1);
+        }
 
         return null;
     }
 
-    public Vector3? Intersection(Sphere sphere)
+    public readonly Vector3? Intersection(Sphere sphere)
     {
-        var a = Vector3.Dot(Direction, Direction);
-        var b = 2 * Vector3.Dot(Direction, Origin - sphere.Center);
-        var c = Vector3.Dot(Origin - sphere.Center, Origin - sphere.Center) - sphere.Radius * sphere.Radius;
+        float a = Vector3.Dot(Direction, Direction);
+        float b = 2 * Vector3.Dot(Direction, Origin - sphere.Center);
+        float c = Vector3.Dot(Origin - sphere.Center, Origin - sphere.Center) - (sphere.Radius * sphere.Radius);
 
-        var discriminant = b * b - 4 * a * c;
+        float discriminant = (b * b) - (4 * a * c);
 
-        if (discriminant < 0)
+        if(discriminant < 0)
+        {
             return null;
+        }
 
-        var t = (-b - MathF.Sqrt(discriminant)) / (2 * a);
+        float t = (-b - MathF.Sqrt(discriminant)) / (2 * a);
 
-        return Origin + Direction * t;
+        return Origin + (Direction * t);
     }
 
-    public bool Intersects(Sphere sphere)
+    public readonly bool Intersects(Sphere sphere)
     {
-        var a = Vector3.Dot(Direction, Direction);
-        var b = 2 * Vector3.Dot(Direction, Origin - sphere.Center);
-        var c = Vector3.Dot(Origin - sphere.Center, Origin - sphere.Center) - sphere.Radius * sphere.Radius;
+        float a = Vector3.Dot(Direction, Direction);
+        float b = 2 * Vector3.Dot(Direction, Origin - sphere.Center);
+        float c = Vector3.Dot(Origin - sphere.Center, Origin - sphere.Center) - (sphere.Radius * sphere.Radius);
 
-        var discriminant = b * b - 4 * a * c;
+        float discriminant = (b * b) - (4 * a * c);
 
         return discriminant >= 0;
     }
 
-    public bool Intersects(AABB aabb)
+    public readonly bool Intersects(AABB aabb)
     {
-        var tmin = Vector3.Dot(aabb.Min - Origin, Direction) / Vector3.Dot(Direction, Direction);
-        var tmax = Vector3.Dot(aabb.Max - Origin, Direction) / Vector3.Dot(Direction, Direction);
+        float tmin = Vector3.Dot(aabb.Min - Origin, Direction) / Vector3.Dot(Direction, Direction);
+        float tmax = Vector3.Dot(aabb.Max - Origin, Direction) / Vector3.Dot(Direction, Direction);
 
-        if (tmin > tmax)
+        if(tmin > tmax)
+        {
             (tmin, tmax) = (tmax, tmin);
+        }
 
         return tmin <= tmax;
     }
 
-    public Vector3 PointAt(float t)
+    public readonly Vector3 PointAt(float t)
     {
-        return Origin + t * Direction;
+        return Origin + (t * Direction);
     }
 }

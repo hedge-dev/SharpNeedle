@@ -10,17 +10,21 @@ public class TerrainModel : ModelBase
         get => Flags.HasFlag(TerrainFlags.Instanced);
         set
         {
-            if (value)
+            if(value)
+            {
                 Flags |= TerrainFlags.Instanced;
+            }
             else
+            {
                 Flags &= ~TerrainFlags.Instanced;
+            }
         }
     }
 
     public override void Read(BinaryObjectReader reader)
     {
         CommonRead(reader);
-        if (DataVersion >= 5)
+        if(DataVersion >= 5)
         {
             Name = reader.ReadStringOffset();
             Flags = reader.Read<TerrainFlags>();
@@ -30,7 +34,7 @@ public class TerrainModel : ModelBase
     public override void Write(BinaryObjectWriter writer)
     {
         CommonWrite(writer);
-        if (DataVersion >= 5)
+        if(DataVersion >= 5)
         {
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
             writer.Write(Flags);

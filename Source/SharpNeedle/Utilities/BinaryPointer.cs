@@ -12,24 +12,37 @@ public struct BinaryPointer<T> : IBinarySerializable where T : IBinarySerializab
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Read(BinaryObjectReader reader)
     {
-        var offset = reader.ReadOffsetValue();
-        if (offset == 0)
+        long offset = reader.ReadOffsetValue();
+        if(offset == 0)
+        {
             return;
+        }
 
         Value = reader.ReadObjectAtOffset<T>(offset);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Write(BinaryObjectWriter writer)
+    public readonly void Write(BinaryObjectWriter writer)
     {
-        if (Value is null)
+        if(Value is null)
+        {
             writer.WriteOffsetValue(0);
+        }
         else
+        {
             writer.WriteObjectOffset(Value);
+        }
     }
 
-    public static implicit operator T(BinaryPointer<T> self) => self.Value;
-    public static implicit operator BinaryPointer<T>(T value) => new(value);
+    public static implicit operator T(BinaryPointer<T> self)
+    {
+        return self.Value;
+    }
+
+    public static implicit operator BinaryPointer<T>(T value)
+    {
+        return new(value);
+    }
 }
 
 public struct BinaryPointer<T, TContext> : IBinarySerializable<TContext> where T : IBinarySerializable<TContext>, new()
@@ -44,22 +57,35 @@ public struct BinaryPointer<T, TContext> : IBinarySerializable<TContext> where T
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Read(BinaryObjectReader reader, TContext context)
     {
-        var offset = reader.ReadOffsetValue();
-        if (offset == 0)
+        long offset = reader.ReadOffsetValue();
+        if(offset == 0)
+        {
             return;
+        }
 
         Value = reader.ReadObjectAtOffset<T, TContext>(offset, context);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Write(BinaryObjectWriter writer, TContext context)
+    public readonly void Write(BinaryObjectWriter writer, TContext context)
     {
-        if (Value is null)
+        if(Value is null)
+        {
             writer.WriteOffsetValue(0);
+        }
         else
+        {
             writer.WriteObjectOffset(Value, context);
+        }
     }
 
-    public static implicit operator T(BinaryPointer<T, TContext> self) => self.Value;
-    public static implicit operator BinaryPointer<T, TContext>(T value) => new(value);
+    public static implicit operator T(BinaryPointer<T, TContext> self)
+    {
+        return self.Value;
+    }
+
+    public static implicit operator BinaryPointer<T, TContext>(T value)
+    {
+        return new(value);
+    }
 }

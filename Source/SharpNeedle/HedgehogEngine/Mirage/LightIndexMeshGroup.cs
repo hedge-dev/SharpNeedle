@@ -4,9 +4,9 @@ public class LightIndexMeshGroup : List<LightIndexMesh>, IBinarySerializable
 {
     public void Read(BinaryObjectReader reader)
     {
-        var opaqMeshes = reader.ReadObject<BinaryList<BinaryPointer<LightIndexMesh>>>();
-        var transMeshes = reader.ReadObject<BinaryList<BinaryPointer<LightIndexMesh>>>();
-        var punchMeshes = reader.ReadObject<BinaryList<BinaryPointer<LightIndexMesh>>>();
+        BinaryList<BinaryPointer<LightIndexMesh>> opaqMeshes = reader.ReadObject<BinaryList<BinaryPointer<LightIndexMesh>>>();
+        BinaryList<BinaryPointer<LightIndexMesh>> transMeshes = reader.ReadObject<BinaryList<BinaryPointer<LightIndexMesh>>>();
+        BinaryList<BinaryPointer<LightIndexMesh>> punchMeshes = reader.ReadObject<BinaryList<BinaryPointer<LightIndexMesh>>>();
 
         Capacity = opaqMeshes.Count + transMeshes.Count + punchMeshes.Count;
         AddMeshes(opaqMeshes, Mesh.Type.Opaque);
@@ -15,7 +15,7 @@ public class LightIndexMeshGroup : List<LightIndexMesh>, IBinarySerializable
 
         void AddMeshes(BinaryList<BinaryPointer<LightIndexMesh>> meshes, MeshSlot slot)
         {
-            foreach (var mesh in meshes)
+            foreach(BinaryPointer<LightIndexMesh> mesh in meshes)
             {
                 mesh.Value.Slot = slot;
                 Add(mesh);
@@ -34,8 +34,10 @@ public class LightIndexMeshGroup : List<LightIndexMesh>, IBinarySerializable
             writer.Write(meshes.Count());
             writer.WriteOffset(() =>
             {
-                foreach (var mesh in meshes)
+                foreach(LightIndexMesh mesh in meshes)
+                {
                     writer.WriteObjectOffset(mesh);
+                }
             });
         }
     }

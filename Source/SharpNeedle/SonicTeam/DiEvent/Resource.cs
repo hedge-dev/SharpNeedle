@@ -10,7 +10,7 @@ public class Resource : IBinarySerializable
 
     public Resource() { }
 
-    public Resource(string name) 
+    public Resource(string name)
     {
         Name = name;
         GUID = Guid.NewGuid();

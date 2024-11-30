@@ -2,10 +2,10 @@
 
 public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> where T : IBinarySerializable, new()
 {
-    internal static readonly NameIndexPair.Comparer NameIndexPairComparer = new NameIndexPair.Comparer();
+    internal static readonly NameIndexPair.Comparer NameIndexPairComparer = new();
 
-    private List<T> Items { get; } = new();
-    private List<NameIndexPair> NameTable { get; } = new();
+    private List<T> Items { get; } = [];
+    private List<NameIndexPair> NameTable { get; } = [];
     public int Count => Items.Count;
     public ICollection<string> Keys => NameTable.Select(x => x.Name).ToList();
     public ICollection<T> Values => Items;
@@ -13,16 +13,20 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
 
     public void Insert(string key, T value, int index)
     {
-        var nameIdx = NameTable.BinarySearch(new NameIndexPair(key, 0), NameIndexPairComparer);
-        if (nameIdx >= 0)
+        int nameIdx = NameTable.BinarySearch(new NameIndexPair(key, 0), NameIndexPairComparer);
+        if(nameIdx >= 0)
+        {
             throw new Exception($"Key {key} already exists");
+        }
 
         // Fix indices then insert
-        var table = CollectionsMarshal.AsSpan(NameTable);
-        for (int i = 0; i < table.Length; i++)
+        Span<NameIndexPair> table = CollectionsMarshal.AsSpan(NameTable);
+        for(int i = 0; i < table.Length; i++)
         {
-            if (table[i].Index >= index)
+            if(table[i].Index >= index)
+            {
                 table[i].Index++;
+            }
         }
 
         Items.Insert(index, value);
@@ -47,12 +51,16 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
 
     public void CopyTo(KeyValuePair<string, T>[] array, int arrayIndex)
     {
-        if (Count > array.Length - arrayIndex)
+        if(Count > array.Length - arrayIndex)
+        {
             throw new ArgumentException("Array is not large enough");
-        
+        }
+
         int i = 0;
-        foreach (var pair in this)
+        foreach(KeyValuePair<string, T> pair in this)
+        {
             array[i++ + arrayIndex] = pair;
+        }
     }
 
     public bool Remove(KeyValuePair<string, T> item)
@@ -62,8 +70,8 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
 
     public void Read(BinaryObjectReader reader)
     {
-        var count = reader.Read<int>();
-        if (count == 0)
+        int count = reader.Read<int>();
+        if(count == 0)
         {
             reader.Skip(reader.GetOffsetSize() * 2);
             return;
@@ -75,14 +83,14 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
 
     public void Write(BinaryObjectWriter writer)
     {
-        if (Items?.Count is null or 0)
+        if(Items?.Count is null or 0)
         {
             writer.Write(0);
             writer.WriteOffsetValue(0);
             writer.WriteOffsetValue(0);
             return;
         }
-        
+
         writer.Write(NameTable.Count);
         writer.WriteObjectCollectionOffset(Items);
         writer.WriteObjectCollectionOffset(NameTable);
@@ -90,25 +98,29 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
 
     public int Find(string key)
     {
-        var result = NameTable.BinarySearch(new NameIndexPair(key, 0), NameIndexPairComparer);
-        if (result < 0)
+        int result = NameTable.BinarySearch(new NameIndexPair(key, 0), NameIndexPairComparer);
+        if(result < 0)
+        {
             return -1;
-        
+        }
+
         return NameTable[result].Index;
     }
 
     public void Add(string key, T value)
     {
-        if (Items.Count == 0)
+        if(Items.Count == 0)
         {
             Items.Add(value);
             NameTable.Add(new(key, 0));
             return;
         }
-        
-        var index = NameTable.BinarySearch(new NameIndexPair(key, 0), NameIndexPairComparer);
-        if (index >= 0)
+
+        int index = NameTable.BinarySearch(new NameIndexPair(key, 0), NameIndexPairComparer);
+        if(index >= 0)
+        {
             throw new ArgumentException($"Key {key} already exists");
+        }
 
         Items.Add(value);
         NameTable.Insert(~index, new NameIndexPair(key, Items.Count - 1));
@@ -121,9 +133,11 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
 
     public bool Remove(string key)
     {
-        var index = NameTable.BinarySearch(new NameIndexPair(key, 0), NameIndexPairComparer);
-        if (index < 0)
+        int index = NameTable.BinarySearch(new NameIndexPair(key, 0), NameIndexPairComparer);
+        if(index < 0)
+        {
             return false;
+        }
 
         Items.RemoveAt(NameTable[index].Index);
         PostRemove(NameTable[index].Index);
@@ -133,9 +147,11 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
 
     public bool RemoveAt(int idx)
     {
-        var index = NameTable.FindIndex(x => x.Index == idx);
-        if (index == -1)
+        int index = NameTable.FindIndex(x => x.Index == idx);
+        if(index == -1)
+        {
             return false;
+        }
 
         NameTable.RemoveAt(index);
         Items.RemoveAt(idx);
@@ -145,18 +161,20 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
 
     private void PostRemove(int idx)
     {
-        var table = CollectionsMarshal.AsSpan(NameTable);
-        for (int i = 0; i < table.Length; i++)
+        Span<NameIndexPair> table = CollectionsMarshal.AsSpan(NameTable);
+        for(int i = 0; i < table.Length; i++)
         {
-            if (table[i].Index > idx)
+            if(table[i].Index > idx)
+            {
                 table[i].Index--;
+            }
         }
     }
 
     public bool TryGetValue(string key, out T value)
     {
-        var index = NameTable.BinarySearch(new NameIndexPair(key, 0), NameIndexPairComparer);
-        if (index < 0)
+        int index = NameTable.BinarySearch(new NameIndexPair(key, 0), NameIndexPairComparer);
+        if(index < 0)
         {
             value = default;
             return false;
@@ -180,11 +198,11 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
 
     public IEnumerator<KeyValuePair<string, T>> GetEnumerator()
     {
-        for (int i = 0; i < Items.Count; i++)
+        for(int i = 0; i < Items.Count; i++)
         {
-            for (int j = 0; j < NameTable.Count; j++)
+            for(int j = 0; j < NameTable.Count; j++)
             {
-                if (NameTable[j].Index == i)
+                if(NameTable[j].Index == i)
                 {
                     yield return new KeyValuePair<string, T>(NameTable[j].Name, Items[i]);
                     break;

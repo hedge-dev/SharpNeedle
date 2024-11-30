@@ -1,10 +1,10 @@
-﻿using System.IO;
+﻿namespace SharpNeedle.IO;
 
-namespace SharpNeedle.IO;
+using System.IO;
 
 public class VirtualFile : IFile
 {
-    private string mName;
+    private string _mName;
 
     IDirectory IFile.Parent => Parent;
     public string Path { get; internal set; }
@@ -13,24 +13,28 @@ public class VirtualFile : IFile
     public DateTime LastModified { get; set; }
     public Stream BaseStream { get; set; }
 
-    private bool mLeaveOpen = true;
+    private bool _mLeaveOpen = true;
 
     public string Name
     {
-        get => mName;
+        get => _mName;
         set
         {
-            if (mName == value) return;
-            Parent?.FileNameChanged(this, mName, value);
+            if(_mName == value)
+            {
+                return;
+            }
+
+            Parent?.FileNameChanged(this, _mName, value);
             Path = System.IO.Path.Combine(Parent?.Path ?? string.Empty, value);
-            mName = value;
+            _mName = value;
         }
     }
 
     public VirtualFile(string name, Stream baseStream, bool leaveOpen = false)
     {
         Name = name;
-        mLeaveOpen = leaveOpen;
+        _mLeaveOpen = leaveOpen;
         BaseStream = baseStream;
     }
 
@@ -40,13 +44,13 @@ public class VirtualFile : IFile
         Name = name;
         Path = System.IO.Path.Combine(parent.Path, name);
     }
-    
+
     public Stream Open(FileAccess access = FileAccess.Read)
     {
-        if (BaseStream == null)
+        if(BaseStream == null)
         {
             BaseStream = new MemoryStream();
-            mLeaveOpen = false;
+            _mLeaveOpen = false;
         }
 
         BaseStream.Position = 0;
@@ -55,8 +59,14 @@ public class VirtualFile : IFile
 
     public void Dispose()
     {
-        if (!mLeaveOpen) BaseStream.Dispose();
+        if(!_mLeaveOpen)
+        {
+            BaseStream.Dispose();
+        }
     }
 
-    public override string ToString() => Name;
+    public override string ToString()
+    {
+        return Name;
+    }
 }

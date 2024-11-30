@@ -3,7 +3,7 @@
 public struct Singleton<T>
 {
     private static T StaticInstance { get; set; }
-    public T Instance => StaticInstance;
+    public readonly T Instance => StaticInstance;
 
     public Singleton(T instance)
     {
@@ -25,12 +25,26 @@ public struct Singleton<T>
         return StaticInstance is not null;
     }
 
-    public static implicit operator T(Singleton<T> singleton) => GetInstance();
+    public static implicit operator T(Singleton<T> singleton)
+    {
+        return GetInstance();
+    }
 }
 
 public struct Singleton
 {
-    public static T GetInstance<T>() => Singleton<T>.GetInstance();
-    public static void SetInstance<T>(T instance) => Singleton<T>.SetInstance(instance);
-    public static bool HasInstance<T>() => Singleton<T>.HasInstance();
+    public static T GetInstance<T>()
+    {
+        return Singleton<T>.GetInstance();
+    }
+
+    public static void SetInstance<T>(T instance)
+    {
+        Singleton<T>.SetInstance(instance);
+    }
+
+    public static bool HasInstance<T>()
+    {
+        return Singleton<T>.HasInstance();
+    }
 }

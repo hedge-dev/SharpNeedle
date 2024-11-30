@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.HedgehogEngine;
-using System.IO;
 using Mirage;
+using System.IO;
 
 [NeedleResource(ResourceId, ResourceType.Archive, @"\.ar(\.\d+)?$")]
 public class Archive : ResourceBase, IDirectory, IStreamable
@@ -18,21 +18,34 @@ public class Archive : ResourceBase, IDirectory, IStreamable
 
     public bool DeleteFile(string name)
     {
-        var file = Files.FirstOrDefault(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-        if (file == null)
+        IFile file = Files.FirstOrDefault(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        if(file == null)
+        {
             return false;
+        }
 
         return Files.Remove(file);
     }
 
     // Format doesn't support directories
-    public bool DeleteDirectory(string name) => false;
-    public IDirectory OpenDirectory(string name) => null;
-    public IDirectory CreateDirectory(string name) => null;
+    public bool DeleteDirectory(string name)
+    {
+        return false;
+    }
+
+    public IDirectory OpenDirectory(string name)
+    {
+        return null;
+    }
+
+    public IDirectory CreateDirectory(string name)
+    {
+        return null;
+    }
 
     public IFile CreateFile(string name)
     {
-        var file = new ArchiveFile(this)
+        ArchiveFile file = new(this)
         {
             Name = name
         };
@@ -47,10 +60,15 @@ public class Archive : ResourceBase, IDirectory, IStreamable
         return file;
     }
 
-    public IEnumerable<IDirectory> GetDirectories() => Enumerable.Empty<IDirectory>();
+    public IEnumerable<IDirectory> GetDirectories()
+    {
+        return [];
+    }
 
     public IFile GetFile(string name)
-        => Files.FirstOrDefault(x => x.Name == name);
+    {
+        return Files.FirstOrDefault(x => x.Name == name);
+    }
 
     public Stream BaseStream { get; private set; }
 
@@ -62,20 +80,20 @@ public class Archive : ResourceBase, IDirectory, IStreamable
 
         BaseFile = file;
         BaseStream = file.Open();
-        var reader = new BinaryValueReader(file.Open(), StreamOwnership.Retain, Endianness.Little);
+        BinaryValueReader reader = new(file.Open(), StreamOwnership.Retain, Endianness.Little);
         reader.Skip(0xC);
         DataAlignment = reader.Read<int>();
 
-        while (reader.Position < reader.Length)
+        while(reader.Position < reader.Length)
         {
-            var baseOffset = reader.Position;
+            long baseOffset = reader.Position;
 
-            var dataEnd = reader.Read<int>();
-            var dataLength = reader.Read<uint>();
-            var dataStart = reader.Read<int>();
-            var lastModifiedBinary = reader.Read<long>();
-            var lastModified = lastModifiedBinary != 0 ? new DateTime(lastModifiedBinary) : DateTime.Now;
-            var name = reader.ReadString(StringBinaryFormat.NullTerminated);
+            int dataEnd = reader.Read<int>();
+            uint dataLength = reader.Read<uint>();
+            int dataStart = reader.Read<int>();
+            long lastModifiedBinary = reader.Read<long>();
+            DateTime lastModified = lastModifiedBinary != 0 ? new DateTime(lastModifiedBinary) : DateTime.Now;
+            string name = reader.ReadString(StringBinaryFormat.NullTerminated);
 
             reader.Seek(baseOffset + dataEnd, SeekOrigin.Begin);
 
@@ -91,19 +109,19 @@ public class Archive : ResourceBase, IDirectory, IStreamable
 
     public override void Write(IFile file)
     {
-        using var stream = file.Open(FileAccess.Write);
-        var writer = new BinaryObjectWriter(stream, StreamOwnership.Transfer, Endianness.Little, Encoding.ASCII);
+        using Stream stream = file.Open(FileAccess.Write);
+        BinaryObjectWriter writer = new(stream, StreamOwnership.Transfer, Endianness.Little, Encoding.ASCII);
 
         writer.Write(0u);
         writer.Write(0x10u);
         writer.Write(0x14u);
         writer.Write(DataAlignment);
 
-        foreach (var arFile in this)
+        foreach(IFile arFile in this)
         {
-            var curPos = writer.Position;
-            var dataOffset = AlignmentHelper.Align(curPos + 21 + Encoding.UTF8.GetByteCount(arFile.Name), DataAlignment);
-            var blockSize = dataOffset + arFile.Length;
+            long curPos = writer.Position;
+            long dataOffset = AlignmentHelper.Align(curPos + 21 + Encoding.UTF8.GetByteCount(arFile.Name), DataAlignment);
+            long blockSize = dataOffset + arFile.Length;
 
             writer.Write((uint)(blockSize - curPos));
             writer.Write((uint)arFile.Length);
@@ -117,22 +135,24 @@ public class Archive : ResourceBase, IDirectory, IStreamable
 
     public long CalculateFileSize()
     {
-        var size = 0x10L;
+        long size = 0x10L;
 
-        foreach (var file in this)
+        foreach(IFile file in this)
+        {
             size = AlignmentHelper.Align(size + 21 + file.Name.Length, DataAlignment) + file.Length;
+        }
 
         return size;
     }
 
     public PackedFileInfo CalculatePackedInfo()
     {
-        var size = 0x10L;
-        var pfi = new PackedFileInfo();
+        long size = 0x10L;
+        PackedFileInfo pfi = new();
 
-        foreach (var file in this)
+        foreach(IFile file in this)
         {
-            var pfiFile = new PackedFileInfo.File();
+            PackedFileInfo.File pfiFile = new();
             size = AlignmentHelper.Align(size + 21 + pfiFile.Name.Length, DataAlignment);
             pfiFile.Name = file.Name;
             pfiFile.Offset = (uint)size;
@@ -146,10 +166,12 @@ public class Archive : ResourceBase, IDirectory, IStreamable
 
     public void LoadToMemory()
     {
-        foreach (var file in Files)
+        foreach(IFile file in Files)
         {
-            if (file is ArchiveFile aFile)
+            if(file is ArchiveFile aFile)
+            {
                 aFile.EnsureData();
+            }
         }
 
         BaseFile?.Dispose();
@@ -157,18 +179,26 @@ public class Archive : ResourceBase, IDirectory, IStreamable
 
     protected override void Dispose(bool disposing)
     {
-        if (!disposing)
+        if(!disposing)
+        {
             return;
+        }
 
-        foreach (var file in Files)
+        foreach(IFile file in Files)
+        {
             file.Dispose();
+        }
     }
 
     public IEnumerator<IFile> GetEnumerator()
-        => ((IEnumerable<IFile>)Files).GetEnumerator();
+    {
+        return ((IEnumerable<IFile>)Files).GetEnumerator();
+    }
 
     IEnumerator IEnumerable.GetEnumerator()
-        => GetEnumerator();
+    {
+        return GetEnumerator();
+    }
 }
 
 public class ArchiveFile : IFile
@@ -183,16 +213,7 @@ public class ArchiveFile : IFile
     internal long FileOffset { get; set; }
     internal long FileLength { get; set; }
 
-    public long Length
-    {
-        get
-        {
-            if (DataStream != null)
-                return DataStream.Length;
-
-            return FileLength;
-        }
-    }
+    public long Length => DataStream != null ? DataStream.Length : FileLength;
 
 
     public ArchiveFile(Archive parent)
@@ -202,22 +223,26 @@ public class ArchiveFile : IFile
 
     public void EnsureData()
     {
-        if (DataStream != null)
+        if(DataStream != null)
+        {
             return;
+        }
 
-        using var readStream = new SubStream(Parent.BaseStream, FileOffset, FileLength);
+        using SubStream readStream = new(Parent.BaseStream, FileOffset, FileLength);
         DataStream = new MemoryStream((int)FileLength);
         DataStream.Write(readStream.ReadAllBytes().AsSpan());
-        
+
         FileOffset = 0;
     }
 
     public Stream Open(FileAccess access)
     {
-        if (access.HasFlag(FileAccess.Write))
+        if(access.HasFlag(FileAccess.Write))
+        {
             EnsureData();
+        }
 
-        if (DataStream != null)
+        if(DataStream != null)
         {
             DataStream.Position = 0;
             return new WrappedStream<MemoryStream>(DataStream);
@@ -226,7 +251,10 @@ public class ArchiveFile : IFile
         return new SubStream(Parent.BaseStream, FileOffset, FileLength);
     }
 
-    public override string ToString() => Name;
+    public override string ToString()
+    {
+        return Name;
+    }
 
     public void Dispose()
     {

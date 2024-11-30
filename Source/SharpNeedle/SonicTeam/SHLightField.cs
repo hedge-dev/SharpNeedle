@@ -1,7 +1,7 @@
 namespace SharpNeedle.SonicTeam;
 
-using System.IO;
 using BINA;
+using System.IO;
 using Utilities;
 
 [NeedleResource("st/shlf", @"\.(sh?)lf$")]
@@ -9,7 +9,7 @@ public class SHLightField : BinaryResource
 {
     public uint FormatVersion { get; set; } = 1;
     public float[] DefaultProbeLightingData { get; set; } = new float[36];
-    public List<Node> Nodes { get; set; } = new ();
+    public List<Node> Nodes { get; set; } = [];
 
     public SHLightField()
     {

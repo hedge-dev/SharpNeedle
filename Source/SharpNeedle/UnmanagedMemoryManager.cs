@@ -13,7 +13,7 @@ public sealed unsafe class UnmanagedMemoryManager<T> : MemoryManager<T> where T 
 
     public UnmanagedMemoryManager(ReadOnlySpan<T> span)
     {
-        fixed (T* ptr = &MemoryMarshal.GetReference(span))
+        fixed(T* ptr = &MemoryMarshal.GetReference(span))
         {
             Swap(ptr, span.Length);
         }
@@ -21,18 +21,26 @@ public sealed unsafe class UnmanagedMemoryManager<T> : MemoryManager<T> where T 
 
     public void Swap(T* ptr, int length)
     {
-        if (length < 0) throw new ArgumentOutOfRangeException(nameof(length));
+        if(length < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(length));
+        }
 
         mPtr = ptr;
         mLength = length;
     }
 
-    public override Span<T> GetSpan() => new (mPtr, mLength);
+    public override Span<T> GetSpan()
+    {
+        return new(mPtr, mLength);
+    }
 
     public override MemoryHandle Pin(int elementIndex = 0)
     {
-        if (elementIndex < 0 || elementIndex >= mLength)
+        if(elementIndex < 0 || elementIndex >= mLength)
+        {
             throw new ArgumentOutOfRangeException(nameof(elementIndex));
+        }
 
         return new MemoryHandle(mPtr + elementIndex);
     }

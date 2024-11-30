@@ -2,7 +2,7 @@
 
 public interface ITextureList : IList<ITexture>, IChunk
 {
-    
+
 }
 
 public interface ITexture

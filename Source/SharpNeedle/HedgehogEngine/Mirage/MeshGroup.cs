@@ -8,13 +8,13 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
     {
         bool readSpecial = version >= 5;
 
-        var opaqMeshes = reader.ReadObject<BinaryList<BinaryPointer<Mesh, uint>, uint>, uint>(version);
-        var transMeshes = reader.ReadObject<BinaryList<BinaryPointer<Mesh, uint>, uint>, uint>(version);
-        var punchMeshes = reader.ReadObject<BinaryList<BinaryPointer<Mesh, uint>, uint>, uint>(version);
+        BinaryList<BinaryPointer<Mesh, uint>, uint> opaqMeshes = reader.ReadObject<BinaryList<BinaryPointer<Mesh, uint>, uint>, uint>(version);
+        BinaryList<BinaryPointer<Mesh, uint>, uint> transMeshes = reader.ReadObject<BinaryList<BinaryPointer<Mesh, uint>, uint>, uint>(version);
+        BinaryList<BinaryPointer<Mesh, uint>, uint> punchMeshes = reader.ReadObject<BinaryList<BinaryPointer<Mesh, uint>, uint>, uint>(version);
 
         Clear();
 
-        if (!readSpecial)
+        if(!readSpecial)
         {
             Capacity = opaqMeshes.Count + transMeshes.Count + punchMeshes.Count;
             AddMeshes(opaqMeshes, Mesh.Type.Opaque);
@@ -23,7 +23,7 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
             return;
         }
 
-        var specialMeshCount = reader.Read<int>();
+        int specialMeshCount = reader.Read<int>();
         {
             Capacity = opaqMeshes.Count + transMeshes.Count + punchMeshes.Count + specialMeshCount;
             AddMeshes(opaqMeshes, Mesh.Type.Opaque);
@@ -31,30 +31,34 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
             AddMeshes(punchMeshes, Mesh.Type.PunchThrough);
         }
 
-        var slots = new (string Name, int Count)[specialMeshCount];
+        (string Name, int Count)[] slots = new (string Name, int Count)[specialMeshCount];
         reader.ReadOffset(() =>
         {
-            for (int i = 0; i < specialMeshCount; i++)
+            for(int i = 0; i < specialMeshCount; i++)
+            {
                 slots[i] = new(reader.ReadStringOffset(), 0);
+            }
         });
-        
+
         // What the fuck
         reader.ReadOffset(() =>
         {
-            for (int i = 0; i < slots.Length; i++)
+            for(int i = 0; i < slots.Length; i++)
+            {
                 slots[i].Count = reader.ReadValueOffset<int>();
+            }
         });
-        
+
         // It only gets worse
         reader.ReadOffset(() =>
         {
-            foreach (var slot in slots)
+            foreach((string Name, int Count) slot in slots)
             {
                 reader.ReadOffset(() =>
                 {
-                    for (int i = 0; i < slot.Count; i++)
+                    for(int i = 0; i < slot.Count; i++)
                     {
-                        var mesh = reader.ReadObjectOffset<Mesh>();
+                        Mesh mesh = reader.ReadObjectOffset<Mesh>();
                         mesh.Slot = slot.Name;
                         Add(mesh);
                     }
@@ -66,7 +70,7 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
 
         void AddMeshes(BinaryList<BinaryPointer<Mesh, uint>, uint> meshes, MeshSlot slot)
         {
-            foreach (var mesh in meshes)
+            foreach(BinaryPointer<Mesh, uint> mesh in meshes)
             {
                 mesh.Value.Slot = slot;
                 Add(mesh);
@@ -82,48 +86,60 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
         WriteMeshes(this.Where(x => x.Slot == Mesh.Type.Transparent));
         WriteMeshes(this.Where(x => x.Slot == Mesh.Type.PunchThrough));
 
-        if (!writeSpecial)
-            return;
-
-        var specialGroups = new Dictionary<string, List<Mesh>>();
-        foreach (var mesh in this)
+        if(!writeSpecial)
         {
-            if (mesh.Slot != Mesh.Type.Special)
-                continue;
+            return;
+        }
 
-            if (specialGroups.TryGetValue(mesh.Slot.Name, out var meshes))
+        Dictionary<string, List<Mesh>> specialGroups = [];
+        foreach(Mesh mesh in this)
+        {
+            if(mesh.Slot != Mesh.Type.Special)
+            {
+                continue;
+            }
+
+            if(specialGroups.TryGetValue(mesh.Slot.Name, out List<Mesh> meshes))
+            {
                 meshes.Add(mesh);
+            }
             else
-                specialGroups.Add(mesh.Slot.Name, new List<Mesh> { mesh });
+            {
+                specialGroups.Add(mesh.Slot.Name, [mesh]);
+            }
         }
 
         writer.Write(specialGroups.Count);
         writer.WriteOffset(() =>
         {
-            foreach (var group in specialGroups)
+            foreach(KeyValuePair<string, List<Mesh>> group in specialGroups)
+            {
                 writer.WriteStringOffset(StringBinaryFormat.NullTerminated, group.Key);
+            }
         });
 
         writer.WriteOffset(() =>
         {
-            foreach (var group in specialGroups)
+            foreach(KeyValuePair<string, List<Mesh>> group in specialGroups)
+            {
                 writer.WriteValueOffset(group.Value.Count);
+            }
         });
 
         writer.WriteOffset(() =>
         {
-            foreach (var group in specialGroups)
+            foreach(KeyValuePair<string, List<Mesh>> group in specialGroups)
             {
                 writer.WriteOffset(() =>
                 {
-                    foreach (var mesh in group.Value)
+                    foreach(Mesh mesh in group.Value)
                     {
                         writer.WriteObjectOffset(mesh);
                     }
                 });
             }
         });
-        
+
         writer.WriteString(StringBinaryFormat.NullTerminated, Name ?? string.Empty);
         writer.Align(4);
 
@@ -132,36 +148,44 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
             writer.Write(meshes.Count());
             writer.WriteOffset(() =>
             {
-                foreach (var mesh in meshes)
+                foreach(Mesh mesh in meshes)
+                {
                     writer.WriteObjectOffset(mesh, version);
+                }
             });
         }
     }
 
     public void ResolveDependencies(IResourceResolver resolver)
     {
-        foreach (var mesh in this)
+        foreach(Mesh mesh in this)
+        {
             mesh.ResolveDependencies(resolver);
+        }
     }
 
     public void Dispose()
     {
-        foreach (var mesh in this)
+        foreach(Mesh mesh in this)
+        {
             mesh.Dispose();
+        }
 
         Clear();
     }
 
     public MeshGroup Clone()
     {
-        var result = new MeshGroup
+        MeshGroup result = new()
         {
             Name = Name,
             Capacity = Capacity
         };
 
-        foreach (var mesh in this)
+        foreach(Mesh mesh in this)
+        {
             result.Add(mesh);
+        }
 
         return result;
     }

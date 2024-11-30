@@ -18,55 +18,65 @@ public class Scene : IBinarySerializable
         Version = reader.Read<int>();
         Priority = reader.Read<float>();
         FrameRate = reader.Read<float>();
-        var motionBegin = reader.Read<float>();
-        var motionEnd = reader.Read<float>();
+        float motionBegin = reader.Read<float>();
+        float motionEnd = reader.Read<float>();
         Textures = new List<Vector2>(reader.ReadArrayOffset<Vector2>(reader.Read<int>()));
         Sprites = new List<Sprite>(reader.ReadArrayOffset<Sprite>(reader.Read<int>()));
 
-        var familyCount = reader.Read<int>();
+        int familyCount = reader.Read<int>();
         Families = new List<Family>(familyCount);
         reader.ReadOffset(() =>
         {
-            for (int i = 0; i < familyCount; i++)
+            for(int i = 0; i < familyCount; i++)
+            {
                 Families.Add(reader.ReadObject<Family, Scene>(this));
+            }
         });
-        
-        var castInfo = reader.ReadObject<CastInfoTable>();
+
+        CastInfoTable castInfo = reader.ReadObject<CastInfoTable>();
         Motions = reader.ReadObject<CsdDictionary<Motion>>();
 
-        foreach (var motion in Motions)
+        foreach(KeyValuePair<string, Motion> motion in Motions)
+        {
             motion.Value.Attach(this);
+        }
 
-        for (int i = 0; i < Motions.Count; i++)
+        for(int i = 0; i < Motions.Count; i++)
         {
             Motions[i].StartFrame = motionBegin;
             Motions[i].EndFrame = motionEnd;
         }
 
-        if (Version >= 1)
-            AspectRatio = reader.Read<float>();
-
-        if (Version >= 2)
+        if(Version >= 1)
         {
-            var frameInfo = reader.ReadArrayOffset<FrameInfo>(Motions.Count);
-            for (int i = 0; i < Motions.Count; i++)
+            AspectRatio = reader.Read<float>();
+        }
+
+        if(Version >= 2)
+        {
+            (float, float)[] frameInfo = reader.ReadArrayOffset<FrameInfo>(Motions.Count);
+            for(int i = 0; i < Motions.Count; i++)
             {
                 Motions[i].StartFrame = frameInfo[i].Item1;
                 Motions[i].EndFrame = frameInfo[i].Item2;
             }
         }
 
-        if (Version >= 3)
+        if(Version >= 3)
         {
             reader.ReadOffset(() =>
             {
-                for (int i = 0; i < Motions.Count; i++)
+                for(int i = 0; i < Motions.Count; i++)
+                {
                     Motions[i].ReadExtended(reader);
+                }
             });
         }
 
-        foreach (var item in castInfo)
+        foreach((string Name, int FamilyIdx, int CastIdx) item in castInfo)
+        {
             Families[item.FamilyIdx].Casts[item.CastIdx].Name = item.Name;
+        }
     }
 
     public void Write(BinaryObjectWriter writer)
@@ -86,44 +96,52 @@ public class Scene : IBinarySerializable
         writer.Write(Families.Count);
         writer.WriteOffset(() =>
         {
-            foreach (var family in Families)
+            foreach(Family family in Families)
+            {
                 writer.WriteObject(family);
+            }
         });
-        
+
         writer.WriteObject(BuildCastTable());
         writer.WriteObject(Motions);
 
-        if (Version >= 1)
+        if(Version >= 1)
+        {
             writer.Write(AspectRatio);
+        }
 
-        if (Version >= 2)
+        if(Version >= 2)
         {
             writer.WriteOffset(() =>
             {
-                for (int i = 0; i < Motions.Count; i++)
+                for(int i = 0; i < Motions.Count; i++)
+                {
                     writer.Write(new FrameInfo(Motions[i].StartFrame, Motions[i].EndFrame));
+                }
             });
         }
 
-        if (Version >= 3)
+        if(Version >= 3)
         {
             writer.WriteOffset(() =>
             {
-                for (int i = 0; i < Motions.Count; i++)
+                for(int i = 0; i < Motions.Count; i++)
+                {
                     Motions[i].WriteExtended(writer);
+                }
             });
         }
     }
 
     public CastInfoTable BuildCastTable()
     {
-        var result = new CastInfoTable();
-        for (int i = 0; i < Families.Count; i++)
+        CastInfoTable result = [];
+        for(int i = 0; i < Families.Count; i++)
         {
-            var family = Families[i];
-            for (int c = 0; c < family.Casts.Count; c++)
+            Family family = Families[i];
+            for(int c = 0; c < family.Casts.Count; c++)
             {
-                result.Add(new (family.Casts[c].Name, i, c));
+                result.Add(new(family.Casts[c].Name, i, c));
             }
         }
 

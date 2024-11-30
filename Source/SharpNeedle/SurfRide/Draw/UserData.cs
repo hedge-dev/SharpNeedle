@@ -6,18 +6,22 @@ public class UserData : List<Data>, IBinarySerializable<ChunkBinaryOptions>
     {
         Clear();
         Capacity = reader.Read<int>();
-        if (options.Version >= 3)
+        if(options.Version >= 3)
+        {
             reader.Align(8);
-        
+        }
+
         AddRange(reader.ReadObjectArrayOffset<Data, ChunkBinaryOptions>(options, Capacity));
     }
-    
+
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
         writer.Write(Count);
-        if (options.Version >= 3)
+        if(options.Version >= 3)
+        {
             writer.Align(8);
-        
+        }
+
         writer.WriteObjectCollectionOffset(options, this);
     }
 }
@@ -31,15 +35,19 @@ public class Data : IBinarySerializable<ChunkBinaryOptions>
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
-        if (options.Version >= 3)
+        if(options.Version >= 3)
+        {
             reader.Align(8);
-        
+        }
+
         Name = reader.ReadStringOffset();
         Type = reader.Read<int>();
-        if (options.Version >= 3)
+        if(options.Version >= 3)
+        {
             reader.Align(8);
-        
-        switch (Type)
+        }
+
+        switch(Type)
         {
             case 0:
                 Value = reader.ReadValueOffset<bool>();
@@ -60,24 +68,32 @@ public class Data : IBinarySerializable<ChunkBinaryOptions>
                 Value = reader.ReadValueOffset<uint>();
                 break;
         }
-        
-        if (options.Version >= 3)
+
+        if(options.Version >= 3)
+        {
             reader.Align(8);
+        }
         else
+        {
             reader.Align(4);
+        }
     }
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
-        if (options.Version >= 3)
+        if(options.Version >= 3)
+        {
             writer.Align(8);
-        
+        }
+
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         writer.Write(Type);
-        if (options.Version >= 3)
+        if(options.Version >= 3)
+        {
             writer.Align(8);
-        
-        switch (Type)
+        }
+
+        switch(Type)
         {
             case 0:
                 writer.WriteValueOffset(Value.Boolean);
@@ -98,11 +114,15 @@ public class Data : IBinarySerializable<ChunkBinaryOptions>
                 writer.WriteValueOffset(Value.UnsignedInteger);
                 break;
         }
-        
-        if (options.Version >= 3)
+
+        if(options.Version >= 3)
+        {
             writer.Align(8);
+        }
         else
+        {
             writer.Align(4);
+        }
     }
 }
 
@@ -114,23 +134,83 @@ public struct Union
     [FieldOffset(0)] public uint UnsignedInteger;
     [FieldOffset(0)] public float Float;
 
-    public Union(bool value) : this() => Boolean = value;
-    public Union(int value) : this() => Integer = value;
-    public Union(uint value) : this() => UnsignedInteger = value;
-    public Union(float value) : this() => Float = value;
+    public Union(bool value) : this()
+    {
+        Boolean = value;
+    }
 
-    public void Set(bool value) => Boolean = value;
-    public void Set(int value) => Integer = value;
-    public void Set(uint value) => UnsignedInteger = value;
-    public void Set(float value) => Float = value;
+    public Union(int value) : this()
+    {
+        Integer = value;
+    }
 
-    public static implicit operator Union(bool value) => new(value);
-    public static implicit operator Union(int value) => new(value);
-    public static implicit operator Union(uint value) => new(value);
-    public static implicit operator Union(float value) => new(value);
+    public Union(uint value) : this()
+    {
+        UnsignedInteger = value;
+    }
 
-    public static implicit operator bool(Union value) => value.Boolean;
-    public static implicit operator int(Union value) => value.Integer;
-    public static implicit operator uint(Union value) => value.UnsignedInteger;
-    public static implicit operator float(Union value) => value.Float;
+    public Union(float value) : this()
+    {
+        Float = value;
+    }
+
+    public void Set(bool value)
+    {
+        Boolean = value;
+    }
+
+    public void Set(int value)
+    {
+        Integer = value;
+    }
+
+    public void Set(uint value)
+    {
+        UnsignedInteger = value;
+    }
+
+    public void Set(float value)
+    {
+        Float = value;
+    }
+
+    public static implicit operator Union(bool value)
+    {
+        return new(value);
+    }
+
+    public static implicit operator Union(int value)
+    {
+        return new(value);
+    }
+
+    public static implicit operator Union(uint value)
+    {
+        return new(value);
+    }
+
+    public static implicit operator Union(float value)
+    {
+        return new(value);
+    }
+
+    public static implicit operator bool(Union value)
+    {
+        return value.Boolean;
+    }
+
+    public static implicit operator int(Union value)
+    {
+        return value.Integer;
+    }
+
+    public static implicit operator uint(Union value)
+    {
+        return value.UnsignedInteger;
+    }
+
+    public static implicit operator float(Union value)
+    {
+        return value.Float;
+    }
 }

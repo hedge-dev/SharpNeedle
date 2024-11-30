@@ -7,8 +7,8 @@ public struct Version : IBinarySerializable
     public byte Revision;
     public Endianness Endianness;
 
-    public bool IsV1 => Major == 0 && Minor == 0 && Revision == 1;
-    public bool Is64Bit => Major > 2 || ((Major >= 2) && Minor > 0);
+    public readonly bool IsV1 => Major == 0 && Minor == 0 && Revision == 1;
+    public readonly bool Is64Bit => Major > 2 || ((Major >= 2) && Minor > 0);
 
     public Version(byte major, byte minor, byte revision, Endianness endianness)
     {
@@ -20,16 +20,16 @@ public struct Version : IBinarySerializable
 
     public void Read(BinaryObjectReader reader)
     {
-        var ma = reader.Read<byte>();
-        var mi = reader.Read<byte>();
-        var r = reader.Read<byte>();
+        byte ma = reader.Read<byte>();
+        byte mi = reader.Read<byte>();
+        byte r = reader.Read<byte>();
 
         Major = ma < 0x30 ? ma : (byte)(ma - 0x30);
         Minor = mi < 0x30 ? mi : (byte)(mi - 0x30);
         Revision = r < 0x30 ? r : (byte)(r - 0x30);
 
-        var e = reader.Read<byte>();
-        switch (e)
+        byte e = reader.Read<byte>();
+        switch(e)
         {
             case 0x4C:
                 Endianness = Endianness.Little;
@@ -41,9 +41,9 @@ public struct Version : IBinarySerializable
         }
     }
 
-    public void Write(BinaryObjectWriter writer)
+    public readonly void Write(BinaryObjectWriter writer)
     {
-        if (Major == 0)
+        if(Major == 0)
         {
             writer.Write(Major);
             writer.Write(Minor);
@@ -56,7 +56,7 @@ public struct Version : IBinarySerializable
             writer.Write((byte)(Revision + 0x30));
         }
 
-        switch (Endianness)
+        switch(Endianness)
         {
             case Endianness.Little:
                 writer.Write((byte)0x4C);

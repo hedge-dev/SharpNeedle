@@ -7,57 +7,68 @@ public class TerrainBlockSphereTree : SampleChunkResource
 
     public static TerrainBlockSphereTree Build(List<TerrainGroup> groups)
     {
-        var nodes = new List<KeyValuePair<Sphere, (int GroupID, int SubsetID)>>(groups.Capacity);
+        List<KeyValuePair<Sphere, (int GroupID, int SubsetID)>> nodes = new(groups.Capacity);
 
-        for (int groupId = 0; groupId < groups.Count; groupId++)
+        for(int groupId = 0; groupId < groups.Count; groupId++)
         {
-            var group = groups[groupId];
-            for (int subsetID = 0; subsetID < group.Subsets.Count; subsetID++)
+            TerrainGroup group = groups[groupId];
+            for(int subsetID = 0; subsetID < group.Subsets.Count; subsetID++)
             {
-                var set = group.Subsets[subsetID];
+                TerrainGroup.Subset set = group.Subsets[subsetID];
                 nodes.Add(new(set.Bounds, (groupId, subsetID)));
             }
         }
 
-        var tree = new TerrainBlockSphereTree { Root = SphereBVHTree.Build(nodes) };
+        TerrainBlockSphereTree tree = new()
+        { Root = SphereBVHTree.Build(nodes) };
         return tree;
     }
 
     public bool Traverse(Vector3 point, Action<BVHNode<Sphere, (int GroupID, int SubsetID)>> callback)
-        => Root.Traverse(point, callback);
+    {
+        return Root.Traverse(point, callback);
+    }
 
     public bool Traverse(Sphere bounds, Action<BVHNode<Sphere, (int GroupID, int SubsetID)>> callback)
-        => Root.Traverse<Sphere, (int, int), Sphere>(bounds, callback);
+    {
+        return Root.Traverse<Sphere, (int, int), Sphere>(bounds, callback);
+    }
 
     public bool Traverse<TPoint>(TPoint point, Action<BVHNode<Sphere, (int GroupID, int SubsetID)>> callback) where TPoint : IIntersectable<Sphere>
-        => Root.Traverse(point, callback);
+    {
+        return Root.Traverse(point, callback);
+    }
 
     public override void Read(BinaryObjectReader reader)
     {
         reader.Read(out int nodeCount);
-        var nodes = new BinaryNode[nodeCount];
+        BinaryNode[] nodes = new BinaryNode[nodeCount];
         reader.ReadOffset(() =>
         {
-            for (int i = 0; i < nodeCount; i++)
+            for(int i = 0; i < nodeCount; i++)
+            {
                 nodes[i] = reader.ReadObjectOffset<BinaryNode>();
+            }
         });
         reader.Read(out int rootIndex);
         Root = BuildNode(ref nodes[rootIndex]);
 
-        BVHNode<Sphere, (int ,int)> BuildNode(ref BinaryNode node)
+        BVHNode<Sphere, (int, int)> BuildNode(ref BinaryNode node)
         {
-            var result = new BVHNode<Sphere, (int GroupID, int SubsetID)>()
+            BVHNode<Sphere, (int GroupID, int SubsetID)> result = new()
             {
                 Key = node.Bounds
             };
 
-            if (node.Type == NodeType.Branch)
+            if(node.Type == NodeType.Branch)
             {
                 result.Left = BuildNode(ref nodes[node.LeftIndex]);
                 result.Right = BuildNode(ref nodes[node.RightIndex]);
             }
             else
+            {
                 result.Value = new(node.TerrainGroupIndex, node.GroupSubsetIndex);
+            }
 
             return result;
         }
@@ -65,28 +76,28 @@ public class TerrainBlockSphereTree : SampleChunkResource
 
     public override void Write(BinaryObjectWriter writer)
     {
-        var nodes = new List<BinaryNode>();
+        List<BinaryNode> nodes = [];
         BuildNodes(Root, nodes);
 
         writer.Write(nodes.Count);
         writer.WriteOffset(() =>
         {
-            foreach (var node in nodes)
+            foreach(BinaryNode node in nodes)
             {
                 writer.WriteOffset(() => writer.WriteObject(node));
             }
         });
         writer.Write(nodes.Count - 1);
 
-        void BuildNodes(BVHNode<Sphere, (int, int)> node, List<BinaryNode> result)
+        static void BuildNodes(BVHNode<Sphere, (int, int)> node, List<BinaryNode> result)
         {
-            var bNode = new BinaryNode
+            BinaryNode bNode = new()
             {
                 Bounds = node.Key,
                 Type = (NodeType)node.Type
             };
 
-            if (node.Type == BVHNodeType.Leaf)
+            if(node.Type == BVHNodeType.Leaf)
             {
                 bNode.TerrainGroupIndex = node.Value.Item1;
                 bNode.GroupSubsetIndex = node.Value.Item2;
@@ -99,7 +110,7 @@ public class TerrainBlockSphereTree : SampleChunkResource
                 bNode.RightIndex = result.Count;
                 BuildNodes(node.Right, result);
             }
-            
+
             result.Add(bNode);
         }
     }
@@ -124,7 +135,7 @@ public class TerrainBlockSphereTree : SampleChunkResource
             Bounds = reader.ReadValueOffset<Sphere>();
         }
 
-        public void Write(BinaryObjectWriter writer)
+        public readonly void Write(BinaryObjectWriter writer)
         {
             writer.Write(Type);
             writer.Write(LeftIndex);

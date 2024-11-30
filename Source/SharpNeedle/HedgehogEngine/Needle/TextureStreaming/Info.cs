@@ -66,7 +66,7 @@ public class Info : ResourceBase, IBinarySerializable
         writer.WriteBytes(DdsHeader);
     }
 
-    
+
     public byte[] UnpackDDS(Package package)
     {
         string entryName = Path.GetFileNameWithoutExtension(Name);

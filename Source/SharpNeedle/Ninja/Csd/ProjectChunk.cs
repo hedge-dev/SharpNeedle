@@ -31,7 +31,7 @@ public class ProjectChunk : IChunk
         writer.WriteLittle(Signature);
         writer.Write(0); // Size
 
-        var start = writer.At();
+        SeekToken start = writer.At();
         writer.Write(Field08);
         writer.Write(Field0C);
         writer.WriteObjectOffset(Root);
@@ -40,12 +40,12 @@ public class ProjectChunk : IChunk
         writer.WriteObjectOffset(Fonts);
         writer.Flush();
         writer.Align(16);
-        var end = writer.At();
+        SeekToken end = writer.At();
 
-        var size = (long)end - (long)start;
+        long size = (long)end - (long)start;
         writer.At((long)start - sizeof(int), SeekOrigin.Begin);
         writer.Write((int)size);
-        
+
         end.Dispose();
     }
 }

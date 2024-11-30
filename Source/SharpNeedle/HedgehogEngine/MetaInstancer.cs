@@ -12,14 +12,14 @@ public class MetaInstancer : ResourceBase, IBinarySerializable
     public static readonly uint HeaderSize = 32U;
 
     public uint FormatVersion { get; set; } = 1;
-    public List<Instance> Instances { get; set; } = new();
-    
+    public List<Instance> Instances { get; set; } = [];
+
     public override void Read(IFile file)
     {
         BaseFile = file;
         Name = Path.GetFileNameWithoutExtension(file.Name);
 
-        using var reader = new BinaryObjectReader(file.Open(), StreamOwnership.Transfer, Endianness.Big);
+        using BinaryObjectReader reader = new(file.Open(), StreamOwnership.Transfer, Endianness.Big);
         Read(reader);
     }
 
@@ -27,7 +27,7 @@ public class MetaInstancer : ResourceBase, IBinarySerializable
     {
         BaseFile = file;
 
-        using var writer = new BinaryObjectWriter(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness.Big);
+        using BinaryObjectWriter writer = new(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness.Big);
         Write(writer);
     }
 
@@ -39,15 +39,14 @@ public class MetaInstancer : ResourceBase, IBinarySerializable
         int instanceCount = reader.Read<int>();
         int instanceSize = reader.Read<int>();
 
-        if (instanceSize != InstanceSize)
+        if(instanceSize != InstanceSize)
+        {
             throw new BadImageFormatException($"Instance size mismatch. Expected: {InstanceSize}. Got: {instanceSize}");
+        }
 
         reader.Skip(12);
-        
-        reader.ReadOffset(() =>
-        {
-            Instances.AddRange(reader.ReadObjectArray<Instance>(instanceCount));
-        });
+
+        reader.ReadOffset(() => Instances.AddRange(reader.ReadObjectArray<Instance>(instanceCount)));
     }
 
     public void Write(BinaryObjectWriter writer)

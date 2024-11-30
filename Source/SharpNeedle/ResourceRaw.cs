@@ -22,23 +22,26 @@ public class ResourceRaw : IResource
 
     public void Read(IFile file)
     {
-        using var stream = file.Open();
+        using Stream stream = file.Open();
         Name = Path.GetFileNameWithoutExtension(file.Name);
         Data = stream.ReadAllBytes();
     }
 
     public void Write(IFile file)
     {
-        using var stream = file.Open(FileAccess.Write);
+        using Stream stream = file.Open(FileAccess.Write);
         stream.Write(Data, 0, Data.Length);
     }
 
     public void WriteDependencies(IDirectory dir)
     {
-        
+
     }
 
-    public IEnumerable<ResourceDependency> GetDependencies() => Enumerable.Empty<ResourceDependency>();
+    public IEnumerable<ResourceDependency> GetDependencies()
+    {
+        return [];
+    }
 
     public void ResolveDependencies(IResourceResolver dir)
     {
@@ -47,8 +50,10 @@ public class ResourceRaw : IResource
 
     public void Dispose()
     {
-        if (Disposed)
+        if(Disposed)
+        {
             return;
+        }
 
         Disposed = true;
         Data = null;

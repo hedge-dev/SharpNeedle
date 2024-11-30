@@ -4,7 +4,7 @@ public class Node : IBinarySerializable<GameType>
 {
     public Guid GUID { get; set; }
     public int Type { get; set; }
-    public List<Node> Children { get; set; } = new();
+    public List<Node> Children { get; set; } = [];
     public uint Flags { get; set; }
     public int Priority { get; set; }
     public int Field24 { get; set; }
@@ -32,7 +32,9 @@ public class Node : IBinarySerializable<GameType>
     }
 
     public Node(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public void Read(BinaryObjectReader reader, GameType game)
     {
@@ -50,7 +52,7 @@ public class Node : IBinarySerializable<GameType>
 
         Name = reader.ReadDiString(64);
 
-        switch ((NodeType)Type)
+        switch((NodeType)Type)
         {
             case NodeType.Path:
                 Data = new PathData(reader, game);

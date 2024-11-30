@@ -22,8 +22,8 @@ public class ComplexAnimation : AnimationDef
         Animations = reader.ReadObject<BinaryList<SimpleAnimation>>();
         reader.ReadOffset(() =>
         {
-            var type = reader.Read<ComplexDataType>();
-            switch (type)
+            ComplexDataType type = reader.Read<ComplexDataType>();
+            switch(type)
             {
                 case ComplexDataType.SequenceTable:
                     Data = reader.ReadObject<SequenceTable>();

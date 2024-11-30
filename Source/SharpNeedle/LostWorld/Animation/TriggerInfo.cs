@@ -1,6 +1,5 @@
-﻿using System.Globalization;
-
-namespace SharpNeedle.LostWorld.Animation;
+﻿namespace SharpNeedle.LostWorld.Animation;
+using System.Globalization;
 
 public struct TriggerInfo : IBinarySerializable
 {
@@ -21,7 +20,7 @@ public struct TriggerInfo : IBinarySerializable
         writer.Write(ref ID);
         Param.Write(writer);
     }
-    
+
     public struct CallbackParam : IBinarySerializable
     {
         // Combined type and param to one struct for convenience
@@ -57,7 +56,7 @@ public struct TriggerInfo : IBinarySerializable
         public void Read(BinaryObjectReader reader)
         {
             reader.Read(out Type);
-            switch (Type)
+            switch(Type)
             {
                 case TriggerValueType.Enum:
                 case TriggerValueType.Int:
@@ -77,7 +76,7 @@ public struct TriggerInfo : IBinarySerializable
         public void Write(BinaryObjectWriter writer)
         {
             writer.Write(Type);
-            switch (Type)
+            switch(Type)
             {
                 case TriggerValueType.Enum:
                 case TriggerValueType.Int:
@@ -94,9 +93,9 @@ public struct TriggerInfo : IBinarySerializable
             }
         }
 
-        public override string ToString()
+        public override readonly string ToString()
         {
-            switch (Type)
+            switch(Type)
             {
                 case TriggerValueType.Int:
                 case TriggerValueType.Enum:
@@ -112,9 +111,20 @@ public struct TriggerInfo : IBinarySerializable
             return base.ToString();
         }
 
-        public static implicit operator CallbackParam(int value) => new(value);
-        public static implicit operator CallbackParam(float value) => new(value);
-        public static implicit operator CallbackParam(string value) => new(value);
+        public static implicit operator CallbackParam(int value)
+        {
+            return new(value);
+        }
+
+        public static implicit operator CallbackParam(float value)
+        {
+            return new(value);
+        }
+
+        public static implicit operator CallbackParam(string value)
+        {
+            return new(value);
+        }
     }
 }
 

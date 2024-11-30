@@ -11,17 +11,27 @@ public struct Vector2Int
     }
 
     public static Vector2Int operator +(Vector2Int a, Vector2Int b)
-        => new (a.X + b.X, a.Y + b.Y);
+    {
+        return new(a.X + b.X, a.Y + b.Y);
+    }
 
     public static Vector2Int operator -(Vector2Int a, Vector2Int b)
-        => new (a.X - b.X, a.Y - b.Y);
+    {
+        return new(a.X - b.X, a.Y - b.Y);
+    }
 
     public static Vector2Int operator *(Vector2Int a, Vector2Int b)
-        => new (a.X * b.X, a.Y * b.Y);
+    {
+        return new(a.X * b.X, a.Y * b.Y);
+    }
 
     public static Vector2Int operator /(Vector2Int a, Vector2Int b)
-        => new (a.X / b.X, a.Y / b.Y);
+    {
+        return new(a.X / b.X, a.Y / b.Y);
+    }
 
     public static implicit operator Vector2(Vector2Int self)
-        => new(self.X, self.Y);
+    {
+        return new(self.X, self.Y);
+    }
 }

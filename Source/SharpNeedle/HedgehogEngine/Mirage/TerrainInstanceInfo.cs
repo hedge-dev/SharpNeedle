@@ -4,7 +4,7 @@
 public class TerrainInstanceInfo : SampleChunkResource
 {
     public const string Extension = ".terrain-instanceinfo";
-    private string mModelName;
+    private string _mModelName;
 
     public TerrainModel Model { get; set; }
     public Matrix4x4 Transform { get; set; }
@@ -12,12 +12,14 @@ public class TerrainInstanceInfo : SampleChunkResource
 
     public string ModelName
     {
-        get => Model == null ? mModelName : Model.Name;
+        get => Model == null ? _mModelName : Model.Name;
         set
         {
-            mModelName = value;
-            if (Model != null)
+            _mModelName = value;
+            if(Model != null)
+            {
                 Model.Name = value;
+            }
         }
     }
 
@@ -36,22 +38,26 @@ public class TerrainInstanceInfo : SampleChunkResource
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, ModelName);
         writer.WriteValueOffset(Matrix4x4.Transpose(Transform));
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-        if (DataVersion >= 5)
+        if(DataVersion >= 5)
         {
             writer.Write(LightGroups.Count);
             writer.WriteOffset(() =>
             {
-                foreach (var group in LightGroups)
+                foreach(LightIndexMeshGroup group in LightGroups)
+                {
                     writer.WriteObjectOffset(group);
+                }
             });
         }
         else
         {
-            if (LightGroups.Count == 1)
+            if(LightGroups.Count == 1)
+            {
                 LightGroups[0].Write(writer);
+            }
             else
             {
-                var dummyGroup = new LightIndexMeshGroup();
+                LightIndexMeshGroup dummyGroup = [];
                 dummyGroup.Capacity = LightGroups.Sum(x => x.Count);
                 dummyGroup.AddRange(LightGroups.SelectMany(x => x));
                 dummyGroup.Write(writer);
@@ -61,18 +67,23 @@ public class TerrainInstanceInfo : SampleChunkResource
 
     public override void ResolveDependencies(IResourceResolver resolver)
     {
-        if (string.IsNullOrEmpty(mModelName))
+        if(string.IsNullOrEmpty(_mModelName))
+        {
             return;
+        }
 
-        Model = resolver.Open<TerrainModel>($"{mModelName}.terrain-model");
-        mModelName = null;
+        Model = resolver.Open<TerrainModel>($"{_mModelName}.terrain-model");
+        _mModelName = null;
     }
 
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
-        if (!disposing) return;
-        
+        if(!disposing)
+        {
+            return;
+        }
+
         Model?.Dispose();
         Model = null;
     }

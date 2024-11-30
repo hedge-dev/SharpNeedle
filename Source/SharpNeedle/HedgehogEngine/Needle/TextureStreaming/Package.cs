@@ -34,7 +34,7 @@ public class Package : ResourceBase, IBinarySerializable, IStreamable
             _name = reader.ReadStringOffset();
         }
 
-        public void Write(BinaryObjectWriter writer)
+        public readonly void Write(BinaryObjectWriter writer)
         {
             writer.WriteInt32(Hash);
             writer.WriteInt32(BlockIndex);
@@ -50,13 +50,13 @@ public class Package : ResourceBase, IBinarySerializable, IStreamable
 
             foreach(char c in str)
             {
-                hash = hash * 31 + c;
+                hash = (hash * 31) + c;
             }
 
             return hash & 0x7FFFFFFF;
         }
 
-        public override string ToString()
+        public override readonly string ToString()
         {
             return $"{Width}x{Height}(x{MipLevels}) , \"{Name}\"";
         }

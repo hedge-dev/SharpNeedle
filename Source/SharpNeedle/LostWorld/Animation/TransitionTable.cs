@@ -5,11 +5,13 @@ public class TransitionTable : Dictionary<string, string>, IBinarySerializable
     public void Read(BinaryObjectReader reader)
     {
         Clear();
-        var count = reader.Read<int>();
+        int count = reader.Read<int>();
         reader.ReadOffset(() =>
         {
-            for (int i = 0; i < count; i++)
+            for(int i = 0; i < count; i++)
+            {
                 Add(reader.ReadStringOffset(), reader.ReadStringOffset());
+            }
         });
     }
 
@@ -19,10 +21,10 @@ public class TransitionTable : Dictionary<string, string>, IBinarySerializable
 
         writer.WriteOffset(() =>
         {
-            var transitions = this.ToList();
+            List<KeyValuePair<string, string>> transitions = [.. this];
             transitions.Sort((x, y) => string.Compare(x.Key, y.Key, StringComparison.InvariantCulture));
 
-            foreach (var pair in transitions)
+            foreach(KeyValuePair<string, string> pair in transitions)
             {
                 writer.WriteStringOffset(StringBinaryFormat.NullTerminated, pair.Key);
                 writer.WriteStringOffset(StringBinaryFormat.NullTerminated, pair.Value);

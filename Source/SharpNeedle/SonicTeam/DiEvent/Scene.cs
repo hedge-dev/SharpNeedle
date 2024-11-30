@@ -9,48 +9,54 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
     public float StartFrame { get; set; }
     public float EndFrame { get; set; }
     public int NodeDrawCount { get; set; }
-    public List<float> Cuts { get; set; } = new();
-    public List<Page> Pages { get; set; } = new();
-    public List<float> ResourceCuts { get; set; } = new();
+    public List<float> Cuts { get; set; } = [];
+    public List<Page> Pages { get; set; } = [];
+    public List<float> ResourceCuts { get; set; } = [];
     public Node RootNode { get; set; } = new();
     public float ChainCameraIn { get; set; }
     public float ChainCameraOut { get; set; }
     int Type { get; set; }
     int SkipPointTick { get; set; }
 
-    public List<Resource> Resources { get; set; } = new();
+    public List<Resource> Resources { get; set; } = [];
 
-    public Scene() 
+    public Scene()
     {
         // Register encoding provider for Shift-JIS strings
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     }
 
     public override void Read(IFile file)
-        => Read(file, GameType.Common);
+    {
+        Read(file, GameType.Common);
+    }
 
     public void Read(string path, GameType game)
-      => Read(FileSystem.Open(path), game);
+    {
+        Read(FileSystem.Open(path), game);
+    }
 
     public void Read(IFile file, GameType game)
     {
         BaseFile = file;
         Name = Path.GetFileNameWithoutExtension(file.Name);
 
-        using var reader = new BinaryObjectReader(file.Open(), StreamOwnership.Transfer, Endianness.Little);
+        using BinaryObjectReader reader = new(file.Open(), StreamOwnership.Transfer, Endianness.Little);
         reader.OffsetBinaryFormat = OffsetBinaryFormat.U32;
 
         Read(reader, game);
     }
 
     public override void Write(IFile file)
-        => Write(file, GameType.Common);
+    {
+        Write(file, GameType.Common);
+    }
 
     public void Write(IFile file, GameType game)
     {
         BaseFile = file;
 
-        using var writer = new BinaryObjectWriter(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness.Little);
+        using BinaryObjectWriter writer = new(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness.Little);
         writer.OffsetBinaryFormat = OffsetBinaryFormat.U32;
 
         Write(writer, game);
@@ -113,10 +119,7 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
                 reader.Skip(8);
             });
 
-            reader.ReadOffset(() =>
-            {
-                RootNode.Read(reader, game);
-            });
+            reader.ReadOffset(() => RootNode.Read(reader, game));
 
             ChainCameraIn = reader.Read<float>();
             ChainCameraOut = reader.Read<float>();
@@ -138,17 +141,17 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
 
     public void Write(BinaryObjectWriter writer, GameType game)
     {
-        var resourcesOffsetPos = writer.Position + 4;
+        long resourcesOffsetPos = writer.Position + 4;
 
         writer.WriteNulls(32);
-        var posStart = writer.Position;
+        long posStart = writer.Position;
 
         {
             writer.WriteNulls(8);
             writer.Write(StartFrame);
             writer.Write(EndFrame);
             writer.Write(NodeDrawCount);
-            
+
             long posCutsOffset = writer.Position;
             long posPagesOffset = writer.Position + 4;
             long unknownList2OffsetPos = writer.Position + 8;
@@ -156,7 +159,7 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
             long unknownList4OffsetPos = writer.Position + 16;
             long rootNodeOffsetPos = writer.Position + 20;
             writer.WriteNulls(24);
-            
+
             writer.Write(ChainCameraIn);
             writer.Write(ChainCameraOut);
             writer.Write(Type);
@@ -164,7 +167,7 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
             writer.WriteNulls(4);
 
             {
-                var posCuts = writer.Position;
+                long posCuts = writer.Position;
                 writer.Seek(posCutsOffset, SeekOrigin.Begin);
                 writer.Write((int)(posCuts - posStart));
 
@@ -173,7 +176,7 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
                 writer.WriteNulls(12);
                 writer.WriteCollection(Cuts);
             }
-            
+
             {
                 long posPages = writer.Position;
                 writer.Seek(posPagesOffset, SeekOrigin.Begin);
@@ -194,7 +197,7 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
 
                 writer.Seek(pageChunkEndPos, SeekOrigin.Begin);
             }
-            
+
             {
                 long posUnknownList2 = writer.Position;
                 writer.Seek(unknownList2OffsetPos, SeekOrigin.Begin);
@@ -203,7 +206,7 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
                 writer.Seek(posUnknownList2, SeekOrigin.Begin);
                 writer.WriteNulls(16);
             }
-            
+
             {
                 long posResourceCuts = writer.Position;
                 writer.Seek(posResourceCutsOffset, SeekOrigin.Begin);
@@ -214,7 +217,7 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
                 writer.WriteNulls(12);
                 writer.WriteCollection(ResourceCuts);
             }
-            
+
             {
                 long unknownList4Pos = writer.Position;
                 writer.Seek(unknownList4OffsetPos, SeekOrigin.Begin);
@@ -225,7 +228,7 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
             }
 
             {
-                var posRootNode = writer.Position;
+                long posRootNode = writer.Position;
                 writer.Seek(rootNodeOffsetPos, SeekOrigin.Begin);
                 writer.Write((int)(posRootNode - posStart));
                 writer.Seek(posRootNode, SeekOrigin.Begin);
@@ -249,7 +252,7 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
 }
 
 public enum GameType
-{ 
+{
     Common,
     Frontiers,
     ShadowGenerations,

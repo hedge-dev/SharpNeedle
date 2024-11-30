@@ -53,22 +53,28 @@ public class EffectParameter : IBinarySerializable<Effect>
 
         Loop = Convert.ToBoolean(reader.Read<int>());
 
-        for (int i = 0; i < Animations.Capacity; i++)
+        for(int i = 0; i < Animations.Capacity; i++)
         {
             Animations.Add(new());
 
             long animationOffset = reader.ReadOffsetValue();
-            if (animationOffset != 0)
+            if(animationOffset != 0)
+            {
                 Animations[i] = reader.ReadObjectAtOffset<AnimationParameter>(animationOffset);
+            }
         }
 
         long emitterOffset = reader.ReadOffsetValue();
-        if (emitterOffset != 0)
+        if(emitterOffset != 0)
+        {
             Emitters.AddFirst(reader.ReadObjectAtOffset<EmitterParameter, EffectParameter>(emitterOffset, this));
+        }
 
         long nextOffset = reader.ReadOffsetValue();
-        if (nextOffset != 0)
+        if(nextOffset != 0)
+        {
             parent.Parameters.AddLast(reader.ReadObjectAtOffset<EffectParameter>(nextOffset));
+        }
     }
 
     public void Write(BinaryObjectWriter writer, Effect parent)
@@ -101,19 +107,27 @@ public class EffectParameter : IBinarySerializable<Effect>
 
         writer.Write(Convert.ToInt32(Loop));
 
-        foreach (var animation in Animations)
+        foreach(AnimationParameter animation in Animations)
         {
-            if (animation.Keyframes.Count != 0)
+            if(animation.Keyframes.Count != 0)
+            {
                 writer.WriteObjectOffset(animation);
+            }
             else
+            {
                 writer.WriteOffsetValue(0);
+            }
         }
 
         writer.WriteObjectOffset(Emitters.First.Value, this, 16);
 
-        if (parent.Parameters.Find(this).Next != null)
+        if(parent.Parameters.Find(this).Next != null)
+        {
             writer.WriteObjectOffset(parent.Parameters.Find(this).Next.Value, parent, 16);
+        }
         else
+        {
             writer.WriteOffsetValue(0);
+        }
     }
 }

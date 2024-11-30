@@ -7,17 +7,17 @@ public class ShaderParameter : SampleChunkResource
 
     public ShaderParameter()
     {
-        for (var i = 0; i < UsageSet.Length; i++)
+        for(int i = 0; i < UsageSet.Length; i++)
         {
-            UsageSet[i] = new();
+            UsageSet[i] = [];
         }
     }
 
     public IEnumerable<ShaderConstantUsage> AllUsages()
     {
-        foreach (var set in UsageSet)
+        foreach(List<ShaderConstantUsage> set in UsageSet)
         {
-            foreach (var usage in set)
+            foreach(ShaderConstantUsage usage in set)
             {
                 yield return usage;
             }
@@ -25,7 +25,9 @@ public class ShaderParameter : SampleChunkResource
     }
 
     public List<ShaderConstantUsage> Usage(ShaderConstantType type)
-        => UsageSet[(int)type];
+    {
+        return UsageSet[(int)type];
+    }
 
     public void AddUsage(ShaderConstantType type, ShaderConstantUsage usage)
     {
@@ -38,17 +40,32 @@ public class ShaderParameter : SampleChunkResource
         AddUsage(type, new ShaderConstantUsage { Name = name, Index = index, Size = size });
     }
 
-    public void AddFloat4Usage(string name, byte index, byte size = 1) => AddUsage(ShaderConstantType.Float4, name, index, size);
-    public void AddInt4Usage(string name, byte index, byte size = 1) => AddUsage(ShaderConstantType.Int4, name, index, size);
-    public void AddBoolUsage(string name, byte index, byte size = 1) => AddUsage(ShaderConstantType.Bool, name, index, size);
-    public void AddSamplerUsage(string name, byte index, byte size = 1) => AddUsage(ShaderConstantType.Sampler, name, index, size);
+    public void AddFloat4Usage(string name, byte index, byte size = 1)
+    {
+        AddUsage(ShaderConstantType.Float4, name, index, size);
+    }
+
+    public void AddInt4Usage(string name, byte index, byte size = 1)
+    {
+        AddUsage(ShaderConstantType.Int4, name, index, size);
+    }
+
+    public void AddBoolUsage(string name, byte index, byte size = 1)
+    {
+        AddUsage(ShaderConstantType.Bool, name, index, size);
+    }
+
+    public void AddSamplerUsage(string name, byte index, byte size = 1)
+    {
+        AddUsage(ShaderConstantType.Sampler, name, index, size);
+    }
 
     public override void Read(BinaryObjectReader reader)
     {
-        for (var i = 0; i < UsageSet.Length; i++)
+        for(int i = 0; i < UsageSet.Length; i++)
         {
             UsageSet[i] = reader.ReadObject<BinaryList<BinaryPointer<ShaderConstantUsage>>>().Unwind();
-            foreach (var usage in UsageSet[i])
+            foreach(ShaderConstantUsage usage in UsageSet[i])
             {
                 usage.Type = (ShaderConstantType)i;
             }
@@ -59,12 +76,13 @@ public class ShaderParameter : SampleChunkResource
     {
         Debug.Assert(UsageSet.Length == (int)ShaderConstantType.Count);
 
-        foreach (var usages in UsageSet)
+        foreach(List<ShaderConstantUsage> usages in UsageSet)
         {
-            writer.Write(usages.Count);;
+            writer.Write(usages.Count);
+            ;
             writer.WriteOffset(() =>
             {
-                foreach (var c in usages)
+                foreach(ShaderConstantUsage c in usages)
                 {
                     writer.WriteObjectOffset(c);
                 }
@@ -85,7 +103,7 @@ public class ShaderConstantUsage : IBinarySerializable
         Name = reader.ReadStringOffset();
         Index = reader.Read<byte>();
         Size = reader.Read<byte>();
-        
+
         reader.Align(reader.GetOffsetSize());
     }
 

@@ -32,32 +32,34 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
     public uint Field70 { get; set; }
     public CastInfo Info { get; set; }
     public int[] SpriteIndices { get; set; }
-    public List<Cast> Children { get; set; } = new();
+    public List<Cast> Children { get; set; } = [];
 
     public int Priority
     {
         get => mPriority;
         set
         {
-            var oldPriority = mPriority;
+            int oldPriority = mPriority;
             mPriority = value;
 
-            if (oldPriority != mPriority)
+            if(oldPriority != mPriority)
+            {
                 Family?.NotifyPriorityChanged(this);
+            }
         }
     }
-    
+
     public void Read(BinaryObjectReader reader, Family family)
     {
         Field00 = reader.Read<uint>();
         Field04 = reader.Read<uint>();
         Enabled = reader.Read<uint>() != 0;
-        
+
         TopLeft = reader.Read<Vector2>();
         BottomLeft = reader.Read<Vector2>();
         TopRight = reader.Read<Vector2>();
         BottomRight = reader.Read<Vector2>();
-        
+
         Field2C = reader.Read<uint>();
         Info = reader.ReadValueOffset<CastInfo>();
         InheritanceFlags = reader.Read<BitSet<uint>>();
@@ -66,10 +68,10 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
 
         Text = reader.ReadStringOffset();
         FontName = reader.ReadStringOffset();
-        
+
         Field4C = reader.Read<uint>();
 
-        if (family.Scene.Version >= 3)
+        if(family.Scene.Version >= 3)
         {
             Width = reader.Read<uint>();
             Height = reader.Read<uint>();
@@ -107,7 +109,7 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
         writer.Write(Field4C);
 
         family ??= Family;
-        if (family.Scene.Version >= 3)
+        if(family.Scene.Version >= 3)
         {
             writer.Write(Width);
             writer.Write(Height);
@@ -127,9 +129,11 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
 
     public void Add(Cast item)
     {
-        if (item == null)
+        if(item == null)
+        {
             throw new ArgumentNullException(nameof(item));
-        
+        }
+
         Family?.NotifyCastAdded(item);
         item.Family = Family;
         item.Parent = this;
@@ -138,12 +142,12 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
 
     public void Clear()
     {
-        foreach (var child in this)
+        foreach(Cast child in this)
         {
             child.Parent = null;
             Family?.NotifyCastRemoved(child);
         }
-        
+
         Children.Clear();
     }
 
@@ -159,8 +163,10 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
 
     public bool Remove(Cast item)
     {
-        if (item?.Parent != this)
+        if(item?.Parent != this)
+        {
             return false;
+        }
 
         Children.Remove(item);
         item.Parent = null;
@@ -175,8 +181,10 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
 
     public void Insert(int index, Cast item)
     {
-        if (item == null)
+        if(item == null)
+        {
             throw new ArgumentNullException(nameof(item));
+        }
 
         item.Parent = this;
         Family?.NotifyCastAdded(item);

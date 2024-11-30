@@ -43,30 +43,38 @@ public class CharAnimScript : BinaryResource
 
     public int CountTriggers()
     {
-        var triggerCount = 0;
-        
-        if (SimpleAnimations != null)
-            Traverse(SimpleAnimations);
+        int triggerCount = 0;
 
-        if (ComplexAnimations != null)
+        if(SimpleAnimations != null)
         {
-            foreach (var animation in ComplexAnimations)
+            Traverse(SimpleAnimations);
+        }
+
+        if(ComplexAnimations != null)
+        {
+            foreach(ComplexAnimation animation in ComplexAnimations)
+            {
                 Traverse(animation.Animations);
+            }
         }
 
         return triggerCount;
 
         void Traverse(List<SimpleAnimation> animations)
         {
-            foreach (var animation in animations)
+            foreach(SimpleAnimation animation in animations)
             {
-                if (animation.Triggers == null)
-                    continue;
-
-                foreach (var trigger in animation.Triggers)
+                if(animation.Triggers == null)
                 {
-                    if (trigger.ID < triggerCount)
+                    continue;
+                }
+
+                foreach(TriggerInfo trigger in animation.Triggers)
+                {
+                    if(trigger.ID < triggerCount)
+                    {
                         continue;
+                    }
 
                     triggerCount = (int)trigger.ID;
                 }
@@ -76,28 +84,36 @@ public class CharAnimScript : BinaryResource
 
     public int CountLayers()
     {
-        var maxLayer = 0;
-       
-        if (SimpleAnimations != null)
-            Traverse(SimpleAnimations);
+        int maxLayer = 0;
 
-        if (ComplexAnimations != null)
+        if(SimpleAnimations != null)
         {
-            foreach (var animation in ComplexAnimations)
+            Traverse(SimpleAnimations);
+        }
+
+        if(ComplexAnimations != null)
+        {
+            foreach(ComplexAnimation animation in ComplexAnimations)
+            {
                 Traverse(animation.Animations);
+            }
         }
 
         return maxLayer + 1;
 
         void Traverse(List<SimpleAnimation> animations)
         {
-            if (animations == null)
-                return;
-
-            foreach (var animation in animations)
+            if(animations == null)
             {
-                if (animation.Layer <= maxLayer)
+                return;
+            }
+
+            foreach(SimpleAnimation animation in animations)
+            {
+                if(animation.Layer <= maxLayer)
+                {
                     continue;
+                }
 
                 maxLayer = animation.Layer;
             }

@@ -1,11 +1,9 @@
 ﻿namespace SharpNeedle.Ninja;
-using System.IO;
-
 public class OffsetChunk : IChunk, IList<int>
 {
     public uint Signature { get; private set; } = BinaryHelper.MakeSignature<uint>("NOF0");
 
-    public List<int> Offsets { get; set; } = new();
+    public List<int> Offsets { get; set; } = [];
     public int Count => Offsets.Count;
     public bool IsReadOnly => false;
 
@@ -15,8 +13,8 @@ public class OffsetChunk : IChunk, IList<int>
     {
         options.Header ??= reader.ReadLittle<ChunkHeader>();
         Signature = options.Header.Value.Signature;
-        
-        var count = reader.Read<int>();
+
+        int count = reader.Read<int>();
         reader.Skip(4); // Runtime flags
         Offsets.AddRange(reader.ReadArray<int>(count));
     }
@@ -25,7 +23,7 @@ public class OffsetChunk : IChunk, IList<int>
     {
         writer.WriteLittle(Signature);
         writer.Write(BinarySize - 8); // Size excluding header
-        
+
         writer.Write(Offsets.Count);
         writer.Write(0); // Runtime flags, make this 0 to kill the game
         writer.WriteCollection(Offsets);

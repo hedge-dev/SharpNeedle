@@ -21,7 +21,7 @@ public class Cell2D : ICell
         Field0A = reader.Read<byte>();
         Field0B = reader.Read<byte>();
         Translation = reader.Read<Vector2>();
-        if (options.Version >= 4)
+        if(options.Version >= 4)
         {
             reader.Align(16);
             Translation = reader.Read<Vector2>();
@@ -46,7 +46,7 @@ public class Cell2D : ICell
         writer.Write(Field09);
         writer.Write(Field0A);
         writer.Write(Field0B);
-        if (options.Version >= 4)
+        if(options.Version >= 4)
         {
             writer.Align(16);
             writer.Write(Translation);

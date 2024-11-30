@@ -1,11 +1,11 @@
 ﻿namespace SharpNeedle.Ninja;
-using System.IO;
 using Csd;
+using System.IO;
 
 public class InfoChunk : IChunk
 {
     public uint Signature { get; set; } = BinaryHelper.MakeSignature<uint>("NXIF");
-    public List<IChunk> Chunks { get; set; } = new();
+    public List<IChunk> Chunks { get; set; } = [];
     public OffsetChunk Offsets { get; set; }
     public uint Field1C { get; set; } = 1;
 
@@ -13,32 +13,36 @@ public class InfoChunk : IChunk
     {
         options.Header ??= reader.ReadLittle<ChunkHeader>();
         Signature = options.Header.Value.Signature;
-        var chunkCount = reader.Read<int>();
+        int chunkCount = reader.Read<int>();
 
         // Check if Signature ends with IF
-        if (((Signature >> 16) & 0xFFFF) != 0x4649)
+        if(((Signature >> 16) & 0xFFFF) != 0x4649)
+        {
             throw new InvalidDataException($"Invalid Signature: 0x{Signature:X}");
+        }
 
         Chunks.Clear();
         Chunks.Capacity = chunkCount;
         reader.ReadOffset(() =>
         {
             reader.PushOffsetOrigin();
-            for (int i = 0; i < chunkCount; i++)
+            for(int i = 0; i < chunkCount; i++)
             {
-                var header = reader.ReadLittle<ChunkHeader>();
-                var begin = reader.Position;
+                ChunkHeader header = reader.ReadLittle<ChunkHeader>();
+                long begin = reader.Position;
                 options.Header = header;
-                if (header.Signature == ProjectChunk.BinSignature)
-                    Chunks.Add(reader.ReadObject<ProjectChunk, ChunkBinaryOptions>(options));
-                else if (((Signature >> 16) & 0xFFFF) != 0x4C54) // TL
+                if(header.Signature == ProjectChunk.BinSignature)
                 {
-                    switch (options.TextureFormat)
+                    Chunks.Add(reader.ReadObject<ProjectChunk, ChunkBinaryOptions>(options));
+                }
+                else if(((Signature >> 16) & 0xFFFF) != 0x4C54) // TL
+                {
+                    switch(options.TextureFormat)
                     {
                         case TextureFormat.NextNinja:
                             Chunks.Add(reader.ReadObject<TextureListNN, ChunkBinaryOptions>(options));
                             break;
-                        
+
                         default:
                             Chunks.Add(reader.ReadObject<TextureListMirage, ChunkBinaryOptions>(options));
                             break;
@@ -49,7 +53,7 @@ public class InfoChunk : IChunk
             }
             reader.PopOffsetOrigin();
         });
-        
+
         reader.Skip(4); // size of all chunks
         Offsets = reader.ReadObjectOffset<OffsetChunk>();
         reader.Skip(4); // Offsets.BinarySize
@@ -65,28 +69,32 @@ public class InfoChunk : IChunk
 
         writer.Write(0x20); // Always at the end of the chunk
 
-        var sizePos = writer.At();
+        SeekToken sizePos = writer.At();
         writer.Write(0); // Chunk list size
-        
+
         writer.Write(0); // OffsetChunk Ptr
         writer.Write(0); // OffsetChunk.BinarySize
         writer.Write(Field1C);
 
         writer.PushOffsetOrigin();
-        var offsetBase = writer.OffsetHandler.OffsetOrigin;
+        long offsetBase = writer.OffsetHandler.OffsetOrigin;
 
-        var chunkBegin = writer.At();
-        foreach (var chunk in Chunks)
+        SeekToken chunkBegin = writer.At();
+        foreach(IChunk chunk in Chunks)
+        {
             writer.WriteObject(chunk, options);
-        
-        var chunkEnd = writer.At();
+        }
+
+        SeekToken chunkEnd = writer.At();
         writer.PopOffsetOrigin();
 
-        Offsets = new OffsetChunk();
-        foreach (var offset in writer.OffsetHandler.OffsetPositions)
+        Offsets = [];
+        foreach(long offset in writer.OffsetHandler.OffsetPositions)
+        {
             Offsets.Add((int)(offset - offsetBase));
+        }
 
-        var offsetChunkPos = writer.At();
+        SeekToken offsetChunkPos = writer.At();
         writer.WriteObject(Offsets);
         {
             writer.WriteNative(BinaryHelper.MakeSignature<uint>("NEND"));

@@ -6,12 +6,14 @@ public class LightIndexMesh : List<LightIndexData>, IBinarySerializable
 
     public void Read(BinaryObjectReader reader)
     {
-        var dataCount = reader.Read<int>();
+        int dataCount = reader.Read<int>();
         Capacity = dataCount;
         reader.ReadOffset(() =>
         {
-            for (int i = 0; i < dataCount; i++)
+            for(int i = 0; i < dataCount; i++)
+            {
                 Add(reader.ReadObjectOffset<LightIndexData>());
+            }
         });
     }
 
@@ -20,8 +22,10 @@ public class LightIndexMesh : List<LightIndexData>, IBinarySerializable
         writer.Write(Count);
         writer.WriteOffset(() =>
         {
-            foreach (var mesh in this)
+            foreach(LightIndexData mesh in this)
+            {
                 writer.WriteObjectOffset(mesh);
+            }
         });
     }
 }
@@ -33,10 +37,10 @@ public class LightIndexData : IBinarySerializable
 
     public void Read(BinaryObjectReader reader)
     {
-        var lightsCount = reader.Read<int>();
+        int lightsCount = reader.Read<int>();
         reader.ReadOffset(() => LightIndices = reader.ReadArray<uint>(lightsCount));
 
-        var verticesCount = reader.Read<int>();
+        int verticesCount = reader.Read<int>();
         reader.ReadOffset(() => VertexIndices = reader.ReadArray<ushort>(verticesCount));
     }
 

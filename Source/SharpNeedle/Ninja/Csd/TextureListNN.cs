@@ -6,7 +6,7 @@ public class TextureListNN : ITextureList
     public static readonly uint BinSignature = BinaryHelper.MakeSignature<uint>("NGTL");
     public uint Signature { get; private set; } = BinSignature;
     public uint FieldC { get; set; }
-    public List<TextureNN> Textures { get; set; } = new();
+    public List<TextureNN> Textures { get; set; } = [];
     public int Count => Textures.Count;
     public bool IsReadOnly => false;
 
@@ -16,10 +16,7 @@ public class TextureListNN : ITextureList
         Signature = options.Header.Value.Signature;
 
         Textures.Clear();
-        reader.ReadOffset(() =>
-        {
-            Textures.AddRange(reader.ReadObject<BinaryList<TextureNN>>());
-        });
+        reader.ReadOffset(() => Textures.AddRange(reader.ReadObject<BinaryList<TextureNN>>()));
         FieldC = reader.Read<uint>();
     }
 
@@ -28,7 +25,7 @@ public class TextureListNN : ITextureList
         writer.WriteLittle(Signature);
         writer.Write<int>(0);
 
-        var start = writer.At();
+        SeekToken start = writer.At();
         writer.Write(0x10); // List offset, untracked
         writer.Write(FieldC);
 
@@ -36,9 +33,9 @@ public class TextureListNN : ITextureList
 
         writer.Flush();
         writer.Align(16);
-        var end = writer.At();
+        SeekToken end = writer.At();
 
-        var size = (long)end - (long)start;
+        long size = (long)end - (long)start;
         writer.At((long)start - sizeof(int), SeekOrigin.Begin);
         writer.Write((int)size);
 
@@ -62,8 +59,10 @@ public class TextureListNN : ITextureList
 
     public void CopyTo(ITexture[] array, int arrayIndex)
     {
-        for (int i = 0; i < Count; i++)
+        for(int i = 0; i < Count; i++)
+        {
             array[arrayIndex + i] = Textures[i];
+        }
     }
 
     public bool Remove(ITexture item)
@@ -100,5 +99,5 @@ public class TextureListNN : ITextureList
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
-    }    
+    }
 }

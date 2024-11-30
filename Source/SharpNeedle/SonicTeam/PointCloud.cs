@@ -6,7 +6,7 @@ public class PointCloud : BinaryResource
 {
     public new static readonly uint Signature = BinaryHelper.MakeSignature<uint>("CPIC");
     public uint FormatVersion { get; set; } = 2; // Either 1 or 2, the data is the same regardless
-    public List<InstanceData> Instances { get; set; } = new();
+    public List<InstanceData> Instances { get; set; } = [];
 
     public PointCloud()
     {
@@ -18,12 +18,12 @@ public class PointCloud : BinaryResource
         reader.EnsureSignature(Signature);
         FormatVersion = reader.Read<uint>();
 
-        var instancesOffset = reader.ReadOffsetValue();
-        var instanceCount = reader.ReadOffsetValue();
+        long instancesOffset = reader.ReadOffsetValue();
+        long instanceCount = reader.ReadOffsetValue();
 
         reader.ReadAtOffset(instancesOffset, () =>
         {
-            for (int i = 0; i < instanceCount; i++)
+            for(int i = 0; i < instanceCount; i++)
             {
                 Instances.Add(reader.ReadObject<InstanceData, bool>(i == instanceCount - 1));
             }
@@ -37,7 +37,7 @@ public class PointCloud : BinaryResource
 
         writer.WriteOffset(() =>
         {
-            for (int i = 0; i < Instances.Count; i++)
+            for(int i = 0; i < Instances.Count; i++)
             {
                 writer.WriteObject(Instances[i], i == Instances.Count - 1);
             }
@@ -67,8 +67,10 @@ public class PointCloud : BinaryResource
             reader.Skip(4);
 
             // The last instance is never aligned
-            if (!isLast)
+            if(!isLast)
+            {
                 reader.Align(8);
+            }
         }
 
         public void Write(BinaryObjectWriter writer, bool isLast = false)
@@ -83,8 +85,10 @@ public class PointCloud : BinaryResource
             writer.Skip(4);
 
             // The last instance is never aligned
-            if (!isLast)
-                writer.Align(8); 
+            if(!isLast)
+            {
+                writer.Align(8);
+            }
         }
     }
 }

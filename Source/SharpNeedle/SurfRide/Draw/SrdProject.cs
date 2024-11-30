@@ -13,26 +13,26 @@ public class SrdProject : ResourceBase, IBinarySerializable<uint>
     {
         Name = file.Name;
         BaseFile = file;
-        
-        using var reader = new BinaryObjectReader(file.Open(), StreamOwnership.Transfer, Endianness.Little);
+
+        using BinaryObjectReader reader = new(file.Open(), StreamOwnership.Transfer, Endianness.Little);
         Read(reader, 2);
     }
-    
+
     public override void Write(IFile file)
     {
         Name = file.Name;
         BaseFile = file;
-        
-        using var writer = new BinaryObjectWriter(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness);
+
+        using BinaryObjectWriter writer = new(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness);
         Write(writer, 2);
     }
 
     public void Read(BinaryObjectReader reader, uint version)
     {
-        var info = reader.ReadObject<InfoChunk, ChunkBinaryOptions>(new() { Version = version });
-        foreach (var chunk in info.Chunks)
+        InfoChunk info = reader.ReadObject<InfoChunk, ChunkBinaryOptions>(new() { Version = version });
+        foreach(IChunk chunk in info.Chunks)
         {
-            switch (chunk)
+            switch(chunk)
             {
                 case ProjectChunk project:
                     Project = project;
@@ -42,14 +42,14 @@ public class SrdProject : ResourceBase, IBinarySerializable<uint>
                     break;
             }
         }
-        
+
         Version = info.Version;
         Endianness = reader.Endianness;
     }
-    
+
     public void Write(BinaryObjectWriter writer, uint version)
     {
-        var info = new InfoChunk();
+        InfoChunk info = new();
         info.Version = Version;
         info.Chunks.Add(TextureLists);
         info.Chunks.Add(Project);

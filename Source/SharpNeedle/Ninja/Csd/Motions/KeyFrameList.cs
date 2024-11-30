@@ -25,36 +25,26 @@ public class KeyFrameList : IBinarySerializable, IList<KeyFrame>
 
     public void ReadExtended(BinaryObjectReader reader)
     {
-        reader.ReadOffset(() =>
-        {
-            reader.ReadOffset(() =>
-            {
-                reader.ReadOffset(() =>
+        reader.ReadOffset(() => reader.ReadOffset(() => reader.ReadOffset(() =>
                 {
-                    foreach (var frame in Frames)
+                    foreach(KeyFrame frame in Frames)
+                    {
                         frame.Correction = reader.ReadValueOffset<AspectRatioCorrection>();
-                });
-            });
-        });
+                    }
+                })));
     }
 
     public void WriteExtended(BinaryObjectWriter writer)
     {
-        writer.WriteOffset(() =>
-        {
-            writer.WriteOffset(() =>
-            {
-                writer.WriteOffset(() =>
+        writer.WriteOffset(() => writer.WriteOffset(() => writer.WriteOffset(() =>
                 {
-                    foreach (var frame in Frames)
+                    foreach(KeyFrame frame in Frames)
                     {
                         writer.WriteValueOffset(frame.Correction ?? default);
                     }
-                });
-            });
-        });
+                })));
     }
-    
+
 
     public IEnumerator<KeyFrame> GetEnumerator()
     {

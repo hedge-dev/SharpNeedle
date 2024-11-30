@@ -4,8 +4,8 @@ public class CastInfoTable : List<(string Name, int FamilyIdx, int CastIdx)>, IB
 {
     public void Read(BinaryObjectReader reader)
     {
-        var count = reader.Read<int>();
-        if (count == 0)
+        int count = reader.Read<int>();
+        if(count == 0)
         {
             reader.Skip(reader.GetOffsetSize());
             return;
@@ -13,7 +13,7 @@ public class CastInfoTable : List<(string Name, int FamilyIdx, int CastIdx)>, IB
 
         reader.ReadOffset(() =>
         {
-            for (int i = 0; i < count; i++)
+            for(int i = 0; i < count; i++)
             {
                 Add(new(reader.ReadStringOffset(), reader.Read<int>(), reader.Read<int>()));
             }
@@ -23,8 +23,8 @@ public class CastInfoTable : List<(string Name, int FamilyIdx, int CastIdx)>, IB
     public void Write(BinaryObjectWriter writer)
     {
         writer.Write(Count);
-        
-        if (Count == 0)
+
+        if(Count == 0)
         {
             writer.WriteOffsetValue(0);
             return;
@@ -33,7 +33,7 @@ public class CastInfoTable : List<(string Name, int FamilyIdx, int CastIdx)>, IB
         Sort((x, y) => string.Compare(x.Name, y.Name, StringComparison.Ordinal));
         writer.WriteOffset(() =>
         {
-            foreach (var item in this)
+            foreach((string Name, int FamilyIdx, int CastIdx) item in this)
             {
                 writer.WriteStringOffset(StringBinaryFormat.NullTerminated, item.Name);
                 writer.Write(item.FamilyIdx);

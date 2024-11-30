@@ -2,7 +2,7 @@
 
 public class AnimationParameter : IBinarySerializable
 {
-    public List<Keyframe> Keyframes { get; set; } = new();
+    public List<Keyframe> Keyframes { get; set; } = [];
     public int Field08 { get; set; }
     public int Field0C { get; set; }
 
@@ -13,8 +13,10 @@ public class AnimationParameter : IBinarySerializable
 
         reader.ReadAtOffset(keyframeOffset, () =>
         {
-            for (int i = 0; i < keyframeCount; i++)
+            for(int i = 0; i < keyframeCount; i++)
+            {
                 Keyframes.Add(reader.ReadObject<Keyframe>());
+            }
         });
 
         Field08 = reader.Read<int>();
@@ -25,8 +27,10 @@ public class AnimationParameter : IBinarySerializable
     {
         writer.WriteOffset(() =>
         {
-            foreach (var keyframe in Keyframes)
+            foreach(Keyframe keyframe in Keyframes)
+            {
                 writer.WriteObject(keyframe);
+            }
         });
 
         writer.Write(Keyframes.Count);

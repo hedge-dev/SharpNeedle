@@ -15,9 +15,11 @@ public class Track : List<KeyFrame>, IBinarySerializable<ChunkBinaryOptions>
         Flags = reader.Read<uint>();
         StartFrame = reader.Read<uint>();
         EndFrame = reader.Read<uint>();
-        if (options.Version >= 3)
+        if(options.Version >= 3)
+        {
             reader.Align(8);
-        
+        }
+
         AddRange(reader.ReadObjectArrayOffset<KeyFrame, uint>(Flags, Capacity));
     }
 
@@ -28,9 +30,11 @@ public class Track : List<KeyFrame>, IBinarySerializable<ChunkBinaryOptions>
         writer.Write(Flags);
         writer.Write(StartFrame);
         writer.Write(EndFrame);
-        if (options.Version >= 3)
+        if(options.Version >= 3)
+        {
             writer.Align(8);
-        
+        }
+
         writer.WriteObjectCollectionOffset(Flags, this);
     }
 }

@@ -20,8 +20,10 @@ public class MaterialParameter : IBinarySerializable
     {
         Name = reader.ReadStringOffset();
 
-        for (int i = 0; i < 2; i++)
+        for(int i = 0; i < 2; i++)
+        {
             TextureDatas.Insert(i, reader.ReadObject<TextureData>());
+        }
 
         int textureCount = reader.Read<int>();
         TextureAddresMode = reader.Read<int>();
@@ -47,8 +49,10 @@ public class MaterialParameter : IBinarySerializable
     {
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
 
-        for (int i = 0; i < TextureDatas.Capacity; i++)
+        for(int i = 0; i < TextureDatas.Capacity; i++)
+        {
             writer.WriteObject(TextureDatas[i]);
+        }
 
         writer.Write(TextureDatas.Capacity);
         writer.Write(TextureAddresMode);
@@ -87,7 +91,7 @@ public class MaterialParameter : IBinarySerializable
             Field0C = reader.Read<int>();
         }
 
-        public void Write(BinaryObjectWriter writer)
+        public readonly void Write(BinaryObjectWriter writer)
         {
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
 

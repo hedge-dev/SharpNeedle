@@ -1,14 +1,13 @@
-﻿using System.IO;
-
-namespace SharpNeedle.IO;
+﻿namespace SharpNeedle.IO;
+using System.IO;
 
 public class VirtualDirectory : IDirectory
 {
     public IDirectory Parent { get; protected set; }
     public string Path { get; protected set; }
     public string Name { get; set; }
-    public Dictionary<string, VirtualFile> Files { get; set; } = new();
-    public Dictionary<string, VirtualDirectory> Directories { get; set; } = new();
+    public Dictionary<string, VirtualFile> Files { get; set; } = [];
+    public Dictionary<string, VirtualDirectory> Directories { get; set; } = [];
 
     public VirtualDirectory(string name) : this(name, null)
     {
@@ -20,26 +19,30 @@ public class VirtualDirectory : IDirectory
         Name = name;
         Parent = parent;
 
-        if (parent != null)
+        if(parent != null)
+        {
             Path = System.IO.Path.Combine(parent.Path, Name);
+        }
     }
 
     public IFile this[string path]
     {
         get
         {
-            var names = path.Split('/', '\\', StringSplitOptions.RemoveEmptyEntries);
+            string[] names = path.Split('/', '\\', StringSplitOptions.RemoveEmptyEntries);
             VirtualDirectory current = this;
-            
-            for (int i = 0; i < names.Length; i++)
+
+            for(int i = 0; i < names.Length; i++)
             {
-                if (current == null)
+                if(current == null)
+                {
                     return null;
+                }
 
-                var name = names[i];
-                var isLast = i == names.Length - 1;
+                string name = names[i];
+                bool isLast = i == names.Length - 1;
 
-                switch (name)
+                switch(name)
                 {
                     case ".":
                         continue;
@@ -50,8 +53,10 @@ public class VirtualDirectory : IDirectory
 
                     default:
                     {
-                        if (isLast && current.Files.TryGetValue(name, out var vFile))
+                        if(isLast && current.Files.TryGetValue(name, out VirtualFile vFile))
+                        {
                             return vFile;
+                        }
 
                         current.Directories.TryGetValue(name, out current);
                         continue;
@@ -65,21 +70,21 @@ public class VirtualDirectory : IDirectory
 
     public IFile CreateFile(string name)
     {
-        var file = new VirtualFile(name, this);
+        VirtualFile file = new(name, this);
         Files.Add(name, file);
         return file;
     }
 
     public IDirectory CreateDirectory(string name)
     {
-        var dir = new VirtualDirectory(name, this);
+        VirtualDirectory dir = new(name, this);
         Directories.Add(name, dir);
         return dir;
     }
 
     public IFile Add(IFile file)
     {
-        if (file is VirtualFile vFile)
+        if(file is VirtualFile vFile)
         {
             vFile.Parent = this;
             vFile.Path = System.IO.Path.Combine(Path, vFile.Name);
@@ -95,7 +100,7 @@ public class VirtualDirectory : IDirectory
 
     public IDirectory OpenDirectory(string name)
     {
-        return Directories.TryGetValue(name, out var dir) ? dir : null;
+        return Directories.TryGetValue(name, out VirtualDirectory dir) ? dir : null;
     }
 
     public bool DeleteFile(string name)
@@ -108,7 +113,10 @@ public class VirtualDirectory : IDirectory
         return Directories.Remove(name);
     }
 
-    public override string ToString() => Name;
+    public override string ToString()
+    {
+        return Name;
+    }
 
     internal void FileNameChanged(VirtualFile file, string oldName, string newName)
     {
@@ -117,10 +125,14 @@ public class VirtualDirectory : IDirectory
     }
 
     public IEnumerable<IDirectory> GetDirectories()
-        => Directories.Values;
+    {
+        return Directories.Values;
+    }
 
     public IEnumerator<IFile> GetEnumerator()
-        => Files.Values.GetEnumerator();
+    {
+        return Files.Values.GetEnumerator();
+    }
 
     IEnumerator IEnumerable.GetEnumerator()
     {

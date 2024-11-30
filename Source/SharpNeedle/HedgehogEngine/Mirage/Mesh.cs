@@ -15,7 +15,7 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
 
     public void Read(BinaryObjectReader reader, uint version)
     {
-        Elements ??= new List<VertexElement>();
+        Elements ??= [];
         Material = reader.ReadStringOffset();
 
         Faces = reader.ReadArrayOffset<ushort>(reader.Read<int>());
@@ -25,11 +25,13 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
 
         reader.ReadOffset(() =>
         {
-            while (true)
+            while(true)
             {
-                var element = reader.Read<VertexElement>();
-                if (element.Format == VertexFormat.Invalid)
+                VertexElement element = reader.Read<VertexElement>();
+                if(element.Format == VertexFormat.Invalid)
+                {
                     break;
+                }
 
                 Elements.Add(element);
                 reader.Align(4);
@@ -37,9 +39,13 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
         });
 
         if(version >= 6)
+        {
             BoneIndices = reader.ReadArrayOffset<short>(reader.Read<int>());
+        }
         else
+        {
             BoneIndices = reader.ReadArrayOffset<byte>(reader.Read<int>()).Select(Convert.ToInt16).ToArray();
+        }
 
         Textures = reader.ReadObject<BinaryList<BinaryPointer<TextureUnit>>>().Unwind();
         SwapVertexEndianness();
@@ -51,10 +57,10 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
         writer.Write(Faces.Length);
         writer.WriteArrayOffset(Faces);
 
-        var verticesClone = new byte[Vertices.Length];
+        byte[] verticesClone = new byte[Vertices.Length];
         Array.Copy(Vertices, verticesClone, verticesClone.LongLength);
-        VertexElement.SwapEndianness(Elements.ToArray(), verticesClone.AsSpan(), (nint)VertexCount, (nint)VertexSize);
-        
+        VertexElement.SwapEndianness([.. Elements], verticesClone.AsSpan(), (nint)VertexCount, (nint)VertexSize);
+
         writer.Write(VertexCount);
         writer.Write(VertexSize);
         writer.WriteArrayOffset(verticesClone);
@@ -63,7 +69,7 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
 
         writer.WriteOffset(() =>
         {
-            foreach (var element in Elements)
+            foreach(VertexElement element in Elements)
             {
                 writer.Write(element);
                 writer.Align(4);
@@ -75,34 +81,46 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
         writer.Write(BoneIndices.Length);
 
         if(version >= 6)
+        {
             writer.WriteArrayOffset(BoneIndices);
+        }
         else
+        {
             writer.WriteArrayOffset(BoneIndices.Select(Convert.ToByte).ToArray());
+        }
 
         writer.Write(Textures.Count);
         writer.WriteOffset(() =>
         {
-            foreach (var texture in Textures)
+            foreach(TextureUnit texture in Textures)
+            {
                 writer.WriteObjectOffset(texture);
+            }
         });
     }
 
     public void SwapVertexEndianness()
     {
-        if (Vertices == null || Vertices.Length == 0)
+        if(Vertices == null || Vertices.Length == 0)
+        {
             return;
+        }
 
-        VertexElement.SwapEndianness(Elements.ToArray(), Vertices.AsSpan(), (nint)VertexCount, (nint)VertexSize);
+        VertexElement.SwapEndianness([.. Elements], Vertices.AsSpan(), (nint)VertexCount, (nint)VertexSize);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ref byte GetVertexReference(int idx)
-        => ref Vertices[idx * VertexSize];
+    {
+        return ref Vertices[idx * VertexSize];
+    }
 
     public void ResolveDependencies(IResourceResolver resolver)
     {
-        if (Material.IsValid())
+        if(Material.IsValid())
+        {
             return;
+        }
 
         Material = resolver.Open<Material>($"{Material.Name}.material");
     }
@@ -148,7 +166,7 @@ public struct MeshSlot
     public MeshSlot(string name)
     {
         Name = default;
-        switch (name.ToLower())
+        switch(name.ToLower())
         {
             case "opaq":
             case "opaque":
@@ -179,17 +197,19 @@ public struct MeshSlot
     }
 
     public readonly override string ToString()
-        => Name ?? Type.ToString();
+    {
+        return Name ?? Type.ToString();
+    }
 
     public readonly override bool Equals(object obj)
     {
-        if (obj is Mesh.Type type)
+        if(obj is Mesh.Type type)
         {
             return this == type;
         }
-        else if (obj is MeshSlot slot)
+        else if(obj is MeshSlot slot)
         {
-            if (slot.Type == Mesh.Type.Special && Type == Mesh.Type.Special)
+            if(slot.Type == Mesh.Type.Special && Type == Mesh.Type.Special)
             {
                 return slot.Name == Name;
             }
@@ -206,11 +226,22 @@ public struct MeshSlot
     }
 
     public static bool operator ==(MeshSlot lhs, Mesh.Type rhs)
-        => lhs.Type == rhs;
+    {
+        return lhs.Type == rhs;
+    }
 
-    public static bool operator !=(MeshSlot lhs, Mesh.Type rhs) 
-        => lhs.Type != rhs;
+    public static bool operator !=(MeshSlot lhs, Mesh.Type rhs)
+    {
+        return lhs.Type != rhs;
+    }
 
-    public static implicit operator MeshSlot(Mesh.Type type) => new(type);
-    public static implicit operator MeshSlot(string name) => new(name);
+    public static implicit operator MeshSlot(Mesh.Type type)
+    {
+        return new(type);
+    }
+
+    public static implicit operator MeshSlot(string name)
+    {
+        return new(name);
+    }
 }

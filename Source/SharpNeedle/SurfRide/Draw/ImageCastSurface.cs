@@ -3,7 +3,7 @@
 public class ImageCastSurface
 {
     public short CropIndex { get; set; }
-    public List<CropRef> CropRefs { get; set; } = new();
+    public List<CropRef> CropRefs { get; set; } = [];
 }
 
 public struct CropRef

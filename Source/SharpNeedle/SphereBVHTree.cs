@@ -4,8 +4,8 @@ public static class SphereBVHTree
 {
     public static BVHNode<Sphere, TValue> Build<TValue>(List<KeyValuePair<Sphere, TValue>> nodes)
     {
-        var bNode = new BVHNode<Sphere, TValue>();
-        if (nodes.Count == 1)
+        BVHNode<Sphere, TValue> bNode = new();
+        if(nodes.Count == 1)
         {
             bNode.Key = nodes[0].Key;
             bNode.Value = nodes[0].Value;
@@ -13,45 +13,60 @@ public static class SphereBVHTree
         }
 
         // Avoid stack copies
-        var span = CollectionsMarshal.AsSpan(nodes);
-        var bounds = new AABB { Center = span[0].Key.Center };
-        foreach (var node in span)
-            bounds.Add(node.Key);
-
-        bNode.Key = new Sphere(bounds);
-        var maxAxis = bounds.Max.MaxAxis();
-        var center = bounds.Max.GetAxis(maxAxis);
-
-        var leftNodes = new List<KeyValuePair<Sphere, TValue>>();
-        var rightNodes = new List<KeyValuePair<Sphere, TValue>>();
-        foreach (var node in span)
+        Span<KeyValuePair<Sphere, TValue>> span = CollectionsMarshal.AsSpan(nodes);
+        AABB bounds = new()
+        { Center = span[0].Key.Center };
+        foreach(KeyValuePair<Sphere, TValue> node in span)
         {
-            if (node.Key.Center.GetAxis(maxAxis) < center)
-                leftNodes.Add(node);
-            else
-                rightNodes.Add(node);
+            bounds.Add(node.Key);
         }
 
-        if (leftNodes.Count == 0)
-            (leftNodes, rightNodes) = (rightNodes, leftNodes);
+        bNode.Key = new Sphere(bounds);
+        int maxAxis = bounds.Max.MaxAxis();
+        float center = bounds.Max.GetAxis(maxAxis);
 
-        if (rightNodes.Count == 0)
+        List<KeyValuePair<Sphere, TValue>> leftNodes = [];
+        List<KeyValuePair<Sphere, TValue>> rightNodes = [];
+        foreach(KeyValuePair<Sphere, TValue> node in span)
         {
-            for (int i = 0; i < leftNodes.Count; i++)
+            if(node.Key.Center.GetAxis(maxAxis) < center)
             {
-                if ((i & 1) == 0)
+                leftNodes.Add(node);
+            }
+            else
+            {
+                rightNodes.Add(node);
+            }
+        }
+
+        if(leftNodes.Count == 0)
+        {
+            (leftNodes, rightNodes) = (rightNodes, leftNodes);
+        }
+
+        if(rightNodes.Count == 0)
+        {
+            for(int i = 0; i < leftNodes.Count; i++)
+            {
+                if((i & 1) == 0)
+                {
                     continue;
+                }
 
                 rightNodes.Add(leftNodes.Last());
                 leftNodes.RemoveAt(leftNodes.Count - 1);
             }
         }
 
-        if (leftNodes.Count != 0)
+        if(leftNodes.Count != 0)
+        {
             bNode.Left = Build(leftNodes);
+        }
 
-        if (rightNodes.Count != 0)
+        if(rightNodes.Count != 0)
+        {
             bNode.Right = Build(rightNodes);
+        }
 
         return bNode;
     }

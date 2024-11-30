@@ -4,27 +4,35 @@ public class BlenderData : List<Blender>, IComplexData
 {
     public void Read(BinaryObjectReader reader, bool readType)
     {
-        if (readType)
+        if(readType)
+        {
             reader.EnsureSignatureNative(1);
+        }
 
-        var nodeCount = reader.Read<int>();
+        int nodeCount = reader.Read<int>();
         reader.ReadOffset(() =>
         {
-            for (int i = 0; i < nodeCount; i++)
+            for(int i = 0; i < nodeCount; i++)
+            {
                 Add(reader.ReadObjectOffset<Blender>());
+            }
         });
     }
 
     public void Write(BinaryObjectWriter writer, bool writeType)
     {
-        if (writeType)
+        if(writeType)
+        {
             writer.Write(1);
+        }
 
         writer.Write(Count);
         writer.WriteOffset(() =>
         {
-            foreach (var blender in this)
+            foreach(Blender blender in this)
+            {
                 writer.WriteObjectOffset(blender);
+            }
         });
     }
 }
@@ -64,7 +72,7 @@ public class Blender : IBinarySerializable
             Priority = reader.Read<int>();
         }
 
-        public void Write(BinaryObjectWriter writer)
+        public readonly void Write(BinaryObjectWriter writer)
         {
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
             writer.Write(Weight);

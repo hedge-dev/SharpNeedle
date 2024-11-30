@@ -1,6 +1,5 @@
-﻿using System.IO;
-
-namespace SharpNeedle;
+﻿namespace SharpNeedle;
+using System.IO;
 
 public struct DirectoryResourceResolver : IResourceResolver
 {
@@ -13,20 +12,22 @@ public struct DirectoryResourceResolver : IResourceResolver
         Directory = dir;
     }
 
-    public TRes Open<TRes>(string fileName) where TRes : IResource, new()
+    public readonly TRes Open<TRes>(string fileName) where TRes : IResource, new()
     {
-        var file = Directory[fileName];
-        if (file == null)
-            throw new FileNotFoundException();
+        IFile file = Directory[fileName];
+        if(file == null)
+        {
+            throw new FileNotFoundException($"File \"{fileName}\" not found", Path.Join(Directory.Path, fileName));
+        }
 
         TRes res;
-        if (Manager != null)
+        if(Manager != null)
         {
             res = Manager.Open<TRes>(file, false);
             res.ResolveDependencies(this);
             return res;
         }
-        
+
         res = new TRes();
         res.Read(file);
         res.ResolveDependencies(this);

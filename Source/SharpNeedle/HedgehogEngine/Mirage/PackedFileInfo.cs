@@ -7,12 +7,14 @@ public class PackedFileInfo : SampleChunkResource
     public override void Read(BinaryObjectReader reader)
     {
         reader.Read(out int fileCount);
-        Files = new List<File>();
+        Files = [];
 
         reader.ReadOffset(() =>
         {
-            for (int i = 0; i < fileCount; i++)
+            for(int i = 0; i < fileCount; i++)
+            {
                 Files.Add(reader.ReadObjectOffset<File>());
+            }
         });
     }
 
@@ -21,8 +23,10 @@ public class PackedFileInfo : SampleChunkResource
         writer.Write(Files.Count);
         writer.WriteOffset(() =>
         {
-            foreach (var file in Files)
+            foreach(File file in Files)
+            {
                 writer.WriteObjectOffset(file);
+            }
         });
     }
 
@@ -39,14 +43,14 @@ public class PackedFileInfo : SampleChunkResource
             Size = reader.Read<uint>();
         }
 
-        public void Write(BinaryObjectWriter writer)
+        public readonly void Write(BinaryObjectWriter writer)
         {
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
             writer.Write(Offset);
             writer.Write(Size);
         }
 
-        public override string ToString()
+        public override readonly string ToString()
         {
             return Name;
         }

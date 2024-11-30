@@ -19,6 +19,13 @@ public struct BinaryPrimitive<T> : IBinarySerializable where T : unmanaged
         writer.Write(ref Value);
     }
 
-    public static implicit operator T(BinaryPrimitive<T> self) => self.Value;
-    public static implicit operator BinaryPrimitive<T>(T value) => new (value);
+    public static implicit operator T(BinaryPrimitive<T> self)
+    {
+        return self.Value;
+    }
+
+    public static implicit operator BinaryPrimitive<T>(T value)
+    {
+        return new(value);
+    }
 }

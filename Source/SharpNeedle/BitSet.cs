@@ -3,7 +3,7 @@
 public struct BitSet<T> : IEnumerable<bool> where T : INumberBase<T>, IBinaryInteger<T>
 {
     public T Value;
-    public int BitCount => Unsafe.SizeOf<T>() * 8;
+    public readonly int BitCount => Unsafe.SizeOf<T>() * 8;
 
     public BitSet(T value)
     {
@@ -12,8 +12,10 @@ public struct BitSet<T> : IEnumerable<bool> where T : INumberBase<T>, IBinaryInt
 
     public BitSet(params T[] activeBits) : this()
     {
-        foreach (var bit in activeBits)
+        foreach(T bit in activeBits)
+        {
             Set(NumberHelper.Create<int, T>(bit));
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
@@ -21,9 +23,9 @@ public struct BitSet<T> : IEnumerable<bool> where T : INumberBase<T>, IBinaryInt
     {
         unchecked
         {
-            var start = range.Start.IsFromEnd ? BitCount - range.Start.Value : range.Start.Value;
-            var end = range.End.IsFromEnd ? BitCount - range.End.Value : range.End.Value;
-            return Value >> start & ((T.One << end - start) - T.One);
+            int start = range.Start.IsFromEnd ? BitCount - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? BitCount - range.End.Value : range.End.Value;
+            return (Value >> start) & ((T.One << (end - start)) - T.One);
         }
     }
 
@@ -32,36 +34,61 @@ public struct BitSet<T> : IEnumerable<bool> where T : INumberBase<T>, IBinaryInt
     {
         unchecked
         {
-            var start = range.Start.IsFromEnd ? BitCount - range.Start.Value : range.Start.Value;
-            var end = range.End.IsFromEnd ? BitCount - range.End.Value : range.End.Value;
-            var mask = ((T.One << end - start) - T.One) << start;
-            Value = (Value & mask) | T.CreateChecked(value & ((1 << end - start) - 1));
+            int start = range.Start.IsFromEnd ? BitCount - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? BitCount - range.End.Value : range.End.Value;
+            T mask = ((T.One << (end - start)) - T.One) << start;
+            Value = (Value & mask) | T.CreateChecked(value & ((1 << (end - start)) - 1));
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Test(int bit) => (Value & T.One << bit) != T.Zero;
+    public readonly bool Test(int bit)
+    {
+        return (Value & (T.One << bit)) != T.Zero;
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Set(int bit) => Value |= T.One << bit;
+    public void Set(int bit)
+    {
+        Value |= T.One << bit;
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Reset() => Value = T.Zero;
+    public void Reset()
+    {
+        Value = T.Zero;
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Reset(int bit) => Value &= ~(T.One << bit);
+    public void Reset(int bit)
+    {
+        Value &= ~(T.One << bit);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Set(int bit, bool value)
     {
-        if (value)
+        if(value)
+        {
             Set(bit);
+        }
         else
+        {
             Reset(bit);
+        }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)] public int PopCount() => NumberHelper.Create<int, T>(T.PopCount(Value));
-    [MethodImpl(MethodImplOptions.AggressiveInlining)] public bool Any() => Value != T.Zero;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public readonly int PopCount()
+    {
+        return NumberHelper.Create<int, T>(T.PopCount(Value));
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public readonly bool Any()
+    {
+        return Value != T.Zero;
+    }
 
     public bool this[int bit]
     {
@@ -71,24 +98,38 @@ public struct BitSet<T> : IEnumerable<bool> where T : INumberBase<T>, IBinaryInt
 
     public IEnumerator<bool> GetEnumerator()
     {
-        for (int i = 0; i < BitCount; i++)
+        for(int i = 0; i < BitCount; i++)
+        {
             yield return Test(i);
+        }
     }
 
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    
-    public override string ToString()
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
+    public override readonly string ToString()
     {
         return Value.ToString();
     }
 
-    public static implicit operator BitSet<T>(T value) => new (value);
-    public static implicit operator T(BitSet<T> bits) => bits.Value;
+    public static implicit operator BitSet<T>(T value)
+    {
+        return new(value);
+    }
+
+    public static implicit operator T(BitSet<T> bits)
+    {
+        return bits.Value;
+    }
 
     private static class NumberHelper
     {
         public static TTo Create<TTo, TFrom>(TFrom number) where TTo : IBinaryInteger<TTo>
             where TFrom : IBinaryInteger<TFrom>
-            => TTo.CreateChecked(number);
+        {
+            return TTo.CreateChecked(number);
+        }
     }
 }

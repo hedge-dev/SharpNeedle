@@ -13,17 +13,27 @@ public struct Vector4Int
     }
 
     public static Vector4Int operator +(Vector4Int a, Vector4Int b)
-        => new (a.X + b.X, a.Y + b.Y, a.Z + b.Z, a.W + b.W);
+    {
+        return new(a.X + b.X, a.Y + b.Y, a.Z + b.Z, a.W + b.W);
+    }
 
     public static Vector4Int operator -(Vector4Int a, Vector4Int b)
-        => new (a.X - b.X, a.Y - b.Y, a.Z - b.Z, a.W - b.W);
+    {
+        return new(a.X - b.X, a.Y - b.Y, a.Z - b.Z, a.W - b.W);
+    }
 
     public static Vector4Int operator *(Vector4Int a, Vector4Int b)
-        => new (a.X * b.X, a.Y * b.Y, a.Z * b.Z, a.W * b.W);
+    {
+        return new(a.X * b.X, a.Y * b.Y, a.Z * b.Z, a.W * b.W);
+    }
 
     public static Vector4Int operator /(Vector4Int a, Vector4Int b)
-        => new (a.X / b.X, a.Y / b.Y, a.Z / b.Z, a.W / b.W);
+    {
+        return new(a.X / b.X, a.Y / b.Y, a.Z / b.Z, a.W / b.W);
+    }
 
     public static implicit operator Vector4(Vector4Int self)
-        => new (self.X, self.Y, self.Z, self.W);
+    {
+        return new(self.X, self.Y, self.Z, self.W);
+    }
 }

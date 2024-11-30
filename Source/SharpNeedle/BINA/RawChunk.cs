@@ -21,8 +21,8 @@ public class RawChunk : IChunk
 
     public T Parse<T>() where T : IBinarySerializable, new()
     {
-        using var stream = new MemoryStream(Data, false);
-        using var reader = new BinaryObjectReader(stream, StreamOwnership.Retain, Endianness.Little);
+        using MemoryStream stream = new(Data, false);
+        using BinaryObjectReader reader = new(stream, StreamOwnership.Retain, Endianness.Little);
         return reader.ReadObject<T>();
     }
 }

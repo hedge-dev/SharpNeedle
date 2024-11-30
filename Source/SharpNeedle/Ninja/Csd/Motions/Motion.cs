@@ -22,11 +22,15 @@ public class Motion : IBinarySerializable
         Scene = scene;
 
         // Attach to families that we don't have
-        for (int i = FamilyMotions.Count; i < scene.Families.Count; i++)
+        for(int i = FamilyMotions.Count; i < scene.Families.Count; i++)
+        {
             FamilyMotions.Add(new FamilyMotion(scene.Families[i]));
+        }
 
-        for (int i = 0; i < FamilyMotions.Count; i++)
+        for(int i = 0; i < FamilyMotions.Count; i++)
+        {
             scene.Families[i].AttachMotion(FamilyMotions[i]);
+        }
     }
 
     public void Read(BinaryObjectReader reader)
@@ -38,19 +42,23 @@ public class Motion : IBinarySerializable
     {
         // Remove families we don't have
         FamilyMotions.RemoveAll(x => !Scene.Families.Contains(x.Family));
- 
+
         // Sanity checks
-        for (int i = FamilyMotions.Count; i < Scene.Families.Count; i++)
-            FamilyMotions.Add(new FamilyMotion(Scene.Families[i]));
-        
-        for (int i = 0; i < FamilyMotions.Count; i++)
+        for(int i = FamilyMotions.Count; i < Scene.Families.Count; i++)
         {
-            if (Scene.Families[i] == FamilyMotions[i].Family)
+            FamilyMotions.Add(new FamilyMotion(Scene.Families[i]));
+        }
+
+        for(int i = 0; i < FamilyMotions.Count; i++)
+        {
+            if(Scene.Families[i] == FamilyMotions[i].Family)
+            {
                 continue;
+            }
 
             // Re-arrange motions to fit the palette
-            var idx = Scene.Families.IndexOf(FamilyMotions[i].Family);
-            var temp = FamilyMotions[i];
+            int idx = Scene.Families.IndexOf(FamilyMotions[i].Family);
+            FamilyMotion temp = FamilyMotions[i];
             FamilyMotions[idx] = FamilyMotions[i];
             FamilyMotions[i] = temp;
         }
@@ -62,8 +70,10 @@ public class Motion : IBinarySerializable
     {
         reader.ReadOffset(() =>
         {
-            foreach (var motion in FamilyMotions)
+            foreach(FamilyMotion motion in FamilyMotions)
+            {
                 motion.ReadExtended(reader);
+            }
         });
     }
 
@@ -71,8 +81,10 @@ public class Motion : IBinarySerializable
     {
         writer.WriteOffset(() =>
         {
-            foreach (var motion in FamilyMotions)
+            foreach(FamilyMotion motion in FamilyMotions)
+            {
                 motion.WriteExtended(writer);
+            }
         });
     }
 }

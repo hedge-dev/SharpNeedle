@@ -19,9 +19,9 @@ public class CastMotion : List<KeyFrameList>, IBinarySerializable
     {
         Clear();
         Flags = reader.Read<BitSet<uint>>();
-        var count = Flags.PopCount();
+        int count = Flags.PopCount();
 
-        if (count == 0)
+        if(count == 0)
         {
             reader.Skip(reader.GetOffsetSize());
             return;
@@ -30,12 +30,14 @@ public class CastMotion : List<KeyFrameList>, IBinarySerializable
         Capacity = count;
         reader.ReadOffset(() =>
         {
-            for (int i = 0; i < Flags.BitCount; i++)
+            for(int i = 0; i < Flags.BitCount; i++)
             {
-                if (!Flags.Test(i))
+                if(!Flags.Test(i))
+                {
                     continue;
+                }
 
-                var list = reader.ReadObject<KeyFrameList>();
+                KeyFrameList list = reader.ReadObject<KeyFrameList>();
                 list.Property = (KeyProperty)i;
                 Add(list);
             }
@@ -44,7 +46,7 @@ public class CastMotion : List<KeyFrameList>, IBinarySerializable
 
     public void Write(BinaryObjectWriter writer)
     {
-        if (Count == 0)
+        if(Count == 0)
         {
             writer.Write(0);
             writer.WriteOffsetValue(0);
@@ -52,8 +54,10 @@ public class CastMotion : List<KeyFrameList>, IBinarySerializable
         }
 
         Flags.Reset();
-        foreach (var list in this)
+        foreach(KeyFrameList list in this)
+        {
             Flags.Set((int)list.Property);
+        }
 
         writer.Write(Flags);
         writer.WriteObjectCollectionOffset(this);
@@ -63,8 +67,10 @@ public class CastMotion : List<KeyFrameList>, IBinarySerializable
     {
         reader.ReadOffset(() =>
         {
-            foreach (var list in this)
+            foreach(KeyFrameList list in this)
+            {
                 list.ReadExtended(reader);
+            }
         });
     }
 
@@ -72,11 +78,15 @@ public class CastMotion : List<KeyFrameList>, IBinarySerializable
     {
         writer.WriteOffset(() =>
         {
-            if (Count == 0)
+            if(Count == 0)
+            {
                 writer.WriteOffsetValue(0);
+            }
 
-            foreach (var list in this)
+            foreach(KeyFrameList list in this)
+            {
                 list.WriteExtended(writer);
+            }
         });
     }
 }

@@ -8,7 +8,7 @@ public static class StreamExtension
         int structureSize = Marshal.SizeOf(typeof(T));
         byte[] buffer = new byte[structureSize];
 
-        if (stream.Read(buffer, 0, structureSize) != structureSize)
+        if(stream.Read(buffer, 0, structureSize) != structureSize)
         {
             throw new EndOfStreamException("could not read all of data for structure");
         }
@@ -27,7 +27,7 @@ public static class StreamExtension
         int structureSize = Marshal.SizeOf(typeof(T));
         byte[] buffer = new byte[Math.Max(structureSize, size)];
 
-        if (stream.Read(buffer, 0, size) != size)
+        if(stream.Read(buffer, 0, size) != size)
         {
             throw new EndOfStreamException("could not read all of data for structure");
         }
@@ -46,7 +46,7 @@ public static class StreamExtension
         int structureSize = Marshal.SizeOf(typeof(T));
         byte[] buffer = new byte[structureSize * count];
 
-        if (stream.Read(buffer, 0, structureSize * count) != structureSize * count)
+        if(stream.Read(buffer, 0, structureSize * count) != structureSize * count)
         {
             throw new EndOfStreamException("could not read all of data for structures");
         }
@@ -57,7 +57,7 @@ public static class StreamExtension
 
         IntPtr bufferPtr = handle.AddrOfPinnedObject();
 
-        for (int i = 0; i < count; i++)
+        for(int i = 0; i < count; i++)
         {
             structArray[i] = (T)Marshal.PtrToStructure(bufferPtr, typeof(T));
             bufferPtr += structureSize;
@@ -101,7 +101,7 @@ public static class StreamExtension
         GCHandle handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
         IntPtr bufferPtr = handle.AddrOfPinnedObject();
 
-        for (int i = 0; i < count; i++)
+        for(int i = 0; i < count; i++)
         {
             Marshal.StructureToPtr(structArray[i], bufferPtr, false);
             bufferPtr += structureSize;

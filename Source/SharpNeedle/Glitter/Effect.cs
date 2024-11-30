@@ -6,30 +6,27 @@ using SharpNeedle.BINA;
 public class Effect : BinaryResource
 {
     public new static readonly uint Signature = BinaryHelper.MakeSignature<uint>("FIRG");
-    public uint Version { get; set; } = 0x01060000;
+    public new uint Version { get; set; } = 0x01060000;
     public LinkedList<EffectParameter> Parameters { get; set; } = new();
-    
+
     public override void Read(BinaryObjectReader reader)
     {
         reader.EnsureSignature(Signature);
 
         Version = reader.Read<uint>();
-        if (Version != 0x01060000)
+        if(Version != 0x01060000)
         {
             throw new NotSupportedException();
         }
 
         reader.Skip(4); // Always 0?
 
-        reader.ReadOffset(() =>
-        {
-            Parameters.AddFirst(reader.ReadObject<EffectParameter, Effect>(this));
-        });
+        reader.ReadOffset(() => Parameters.AddFirst(reader.ReadObject<EffectParameter, Effect>(this)));
     }
 
     public override void Write(BinaryObjectWriter writer)
     {
-        if (Version != 0x01060000)
+        if(Version != 0x01060000)
         {
             throw new NotSupportedException();
         }

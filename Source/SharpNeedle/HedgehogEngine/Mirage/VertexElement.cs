@@ -15,20 +15,28 @@ public struct VertexElement
     public static unsafe void SwapEndianness(VertexElement[] elements, Span<byte> vertices, nint count, nint size)
     {
         // I'm going to have a breakdown
-        fixed (byte* pBegin = vertices)
+        fixed(byte* pBegin = vertices)
         {
             byte* pVertex = pBegin;
-            for (nint i = 0; i < count; i++)
+            for(nint i = 0; i < count; i++)
             {
-                foreach (var element in elements)
+                foreach(VertexElement element in elements)
                 {
                     byte* pData = pVertex + element.Offset;
-                    switch (element.Format)
+                    switch(element.Format)
                     {
-                        case VertexFormat.Float1: Swap<float>(); break;
-                        case VertexFormat.Float2: Swap<Vector2>(); break;
-                        case VertexFormat.Float3: Swap<Vector3>(); break;
-                        case VertexFormat.Float4: Swap<Vector4>(); break;
+                        case VertexFormat.Float1:
+                            Swap<float>();
+                            break;
+                        case VertexFormat.Float2:
+                            Swap<Vector2>();
+                            break;
+                        case VertexFormat.Float3:
+                            Swap<Vector3>();
+                            break;
+                        case VertexFormat.Float4:
+                            Swap<Vector4>();
+                            break;
 
                         case VertexFormat.Byte4:
                         case VertexFormat.UByte4:
@@ -105,7 +113,9 @@ public struct VertexElement
 
                     [MethodImpl(MethodImplOptions.AggressiveInlining)]
                     void Swap<T>() where T : unmanaged
-                        => BinaryOperations<T>.Reverse(ref Unsafe.AsRef<T>(pData));
+                    {
+                        BinaryOperations<T>.Reverse(ref Unsafe.AsRef<T>(pData));
+                    }
                 }
 
                 pVertex += size;

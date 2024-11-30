@@ -15,35 +15,43 @@ public class GITextureGroupInfo : SampleChunkResource
     public override void Read(BinaryObjectReader reader)
     {
         reader.Read(out int instanceCount);
-        Instances = new (instanceCount);
+        Instances = new(instanceCount);
         reader.ReadOffset(() =>
         {
-            for (int i = 0; i < instanceCount; i++)
-                Instances.Add(new (reader.ReadStringOffset(), default));
+            for(int i = 0; i < instanceCount; i++)
+            {
+                Instances.Add(new(reader.ReadStringOffset(), default));
+            }
         });
 
         reader.ReadOffset(() =>
         {
-            var span = CollectionsMarshal.AsSpan(Instances);
-            for (int i = 0; i < span.Length; i++)
+            Span<(string Name, Sphere Bounds)> span = CollectionsMarshal.AsSpan(Instances);
+            for(int i = 0; i < span.Length; i++)
+            {
                 span[i].Bounds = reader.ReadValueOffset<Sphere>();
+            }
         });
 
         reader.Read(out int groupCount);
-        Groups = new (groupCount);
+        Groups = new(groupCount);
 
         reader.ReadOffset(() =>
         {
-            for (int i = 0; i < groupCount; i++)
+            for(int i = 0; i < groupCount; i++)
+            {
                 Groups.Add(reader.ReadObjectOffset<GITextureGroup>());
+            }
         });
 
         reader.Read(out int lowCount);
-        LowQualityGroups = new (lowCount);
+        LowQualityGroups = new(lowCount);
         reader.ReadOffset(() =>
         {
-            for (int i = 0; i < lowCount; i++)
+            for(int i = 0; i < lowCount; i++)
+            {
                 LowQualityGroups.Add(reader.Read<int>());
+            }
         });
     }
 
@@ -52,28 +60,36 @@ public class GITextureGroupInfo : SampleChunkResource
         writer.Write(Instances.Count);
         writer.WriteOffset(() =>
         {
-            foreach (var (name, bounds) in Instances)
+            foreach((string name, Sphere bounds) in Instances)
+            {
                 writer.WriteStringOffset(StringBinaryFormat.NullTerminated, name);
+            }
         });
 
         writer.WriteOffset(() =>
         {
-            foreach (var (name, bounds) in Instances)
+            foreach((string name, Sphere bounds) in Instances)
+            {
                 writer.WriteValueOffset(bounds);
+            }
         });
 
         writer.Write(Groups.Count);
         writer.WriteOffset(() =>
         {
-            foreach (var group in Groups)
+            foreach(GITextureGroup group in Groups)
+            {
                 writer.WriteObjectOffset(group);
+            }
         });
 
         writer.Write(LowQualityGroups.Count);
         writer.WriteOffset(() =>
         {
-            foreach (var group in LowQualityGroups)
+            foreach(int group in LowQualityGroups)
+            {
                 writer.Write(group);
+            }
         });
     }
 }
@@ -92,8 +108,10 @@ public class GITextureGroup : IBinarySerializable
         Indices = new List<int>(indexCount);
         reader.ReadOffset(() =>
         {
-            for (int i = 0; i < indexCount; i++)
+            for(int i = 0; i < indexCount; i++)
+            {
                 Indices.Add(reader.Read<int>());
+            }
         });
 
         Bounds = reader.ReadValueOffset<Sphere>();
@@ -106,8 +124,10 @@ public class GITextureGroup : IBinarySerializable
         writer.Write(Indices.Count);
         writer.WriteOffset(() =>
         {
-            foreach (var index in Indices)
+            foreach(int index in Indices)
+            {
                 writer.Write(index);
+            }
         });
         writer.WriteValueOffset(Bounds);
         writer.Write(MemorySize);

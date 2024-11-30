@@ -71,22 +71,28 @@ public class EmitterParameter : IBinarySerializable<EffectParameter>
         Field100 = reader.Read<int>();
         Field104 = reader.Read<int>();
 
-        for (int i = 0; i < Animations.Capacity; i++)
+        for(int i = 0; i < Animations.Capacity; i++)
         {
             Animations.Add(new());
 
             long animationOffset = reader.ReadOffsetValue();
-            if (animationOffset != 0)
+            if(animationOffset != 0)
+            {
                 Animations[i] = reader.ReadObjectAtOffset<AnimationParameter>(animationOffset);
+            }
         }
 
         long particleOffset = reader.ReadOffsetValue();
-        if (particleOffset != 0)
+        if(particleOffset != 0)
+        {
             Particles.AddFirst(reader.ReadObjectAtOffset<ParticleParameter, EmitterParameter>(particleOffset, this));
+        }
 
         long nextOffset = reader.ReadOffsetValue();
-        if (nextOffset != 0)
+        if(nextOffset != 0)
+        {
             parent.Emitters.AddLast(reader.ReadObjectAtOffset<EmitterParameter>(nextOffset));
+        }
     }
 
     public void Write(BinaryObjectWriter writer, EffectParameter parent)
@@ -112,7 +118,7 @@ public class EmitterParameter : IBinarySerializable<EffectParameter>
 
         writer.Write(LoopStartPosition);
         writer.Write(LoopEndPosition);
-        
+
         writer.Write(EmitCondition);
         writer.Write(DirectionType);
 
@@ -130,20 +136,28 @@ public class EmitterParameter : IBinarySerializable<EffectParameter>
         writer.Write(Field100);
         writer.Write(Field104);
 
-        foreach (var animation in Animations)
+        foreach(AnimationParameter animation in Animations)
         {
-            if (animation.Keyframes.Count != 0)
+            if(animation.Keyframes.Count != 0)
+            {
                 writer.WriteObjectOffset(animation);
+            }
             else
+            {
                 writer.WriteOffsetValue(0);
+            }
         }
 
         writer.WriteObjectOffset(Particles.First.Value, this, 16);
 
-        if (parent.Emitters.Find(this).Next != null)
+        if(parent.Emitters.Find(this).Next != null)
+        {
             writer.WriteObjectOffset(parent.Emitters.Find(this).Next.Value, parent, 16);
+        }
         else
+        {
             writer.WriteOffsetValue(0);
+        }
     }
 
     public enum EEmitterType : int
@@ -196,7 +210,7 @@ public class EmitterParameter : IBinarySerializable<EffectParameter>
     {
 
     }
-    
+
     public struct PolygonParameter : IShapeParameter
     {
         public float Radius { get; set; }
@@ -213,28 +227,104 @@ public class EmitterParameter : IBinarySerializable<EffectParameter>
         [FieldOffset(0)] public MeshParameter Mesh;
         [FieldOffset(0)] public PolygonParameter Polygon;
 
-        public ShapeParameterUnion(BoxParameter value) : this() => Box = value;
-        public ShapeParameterUnion(SphereParameter value) : this() => Sphere = value;
-        public ShapeParameterUnion(CylinderParameter value) : this() => Cylinder = value;
-        public ShapeParameterUnion(MeshParameter value) : this() => Mesh = value;
-        public ShapeParameterUnion(PolygonParameter value) : this() => Polygon = value;
+        public ShapeParameterUnion(BoxParameter value) : this()
+        {
+            Box = value;
+        }
 
-        public void Set(BoxParameter value) => Box = value;
-        public void Set(SphereParameter value) => Sphere = value;
-        public void Set(CylinderParameter value) => Cylinder = value;
-        public void Set(MeshParameter value) => Mesh = value;
-        public void Set(PolygonParameter value) => Polygon = value;
+        public ShapeParameterUnion(SphereParameter value) : this()
+        {
+            Sphere = value;
+        }
 
-        public static implicit operator ShapeParameterUnion(BoxParameter value) => new(value);
-        public static implicit operator ShapeParameterUnion(SphereParameter value) => new(value);
-        public static implicit operator ShapeParameterUnion(CylinderParameter value) => new(value);
-        public static implicit operator ShapeParameterUnion(MeshParameter value) => new(value);
-        public static implicit operator ShapeParameterUnion(PolygonParameter value) => new(value);
+        public ShapeParameterUnion(CylinderParameter value) : this()
+        {
+            Cylinder = value;
+        }
 
-        public static implicit operator BoxParameter(ShapeParameterUnion value) => value.Box;
-        public static implicit operator SphereParameter(ShapeParameterUnion value) => value.Sphere;
-        public static implicit operator CylinderParameter(ShapeParameterUnion value) => value.Cylinder;
-        public static implicit operator MeshParameter(ShapeParameterUnion value) => value.Mesh;
-        public static implicit operator PolygonParameter(ShapeParameterUnion value) => value.Polygon;
+        public ShapeParameterUnion(MeshParameter value) : this()
+        {
+            Mesh = value;
+        }
+
+        public ShapeParameterUnion(PolygonParameter value) : this()
+        {
+            Polygon = value;
+        }
+
+        public void Set(BoxParameter value)
+        {
+            Box = value;
+        }
+
+        public void Set(SphereParameter value)
+        {
+            Sphere = value;
+        }
+
+        public void Set(CylinderParameter value)
+        {
+            Cylinder = value;
+        }
+
+        public void Set(MeshParameter value)
+        {
+            Mesh = value;
+        }
+
+        public void Set(PolygonParameter value)
+        {
+            Polygon = value;
+        }
+
+        public static implicit operator ShapeParameterUnion(BoxParameter value)
+        {
+            return new(value);
+        }
+
+        public static implicit operator ShapeParameterUnion(SphereParameter value)
+        {
+            return new(value);
+        }
+
+        public static implicit operator ShapeParameterUnion(CylinderParameter value)
+        {
+            return new(value);
+        }
+
+        public static implicit operator ShapeParameterUnion(MeshParameter value)
+        {
+            return new(value);
+        }
+
+        public static implicit operator ShapeParameterUnion(PolygonParameter value)
+        {
+            return new(value);
+        }
+
+        public static implicit operator BoxParameter(ShapeParameterUnion value)
+        {
+            return value.Box;
+        }
+
+        public static implicit operator SphereParameter(ShapeParameterUnion value)
+        {
+            return value.Sphere;
+        }
+
+        public static implicit operator CylinderParameter(ShapeParameterUnion value)
+        {
+            return value.Cylinder;
+        }
+
+        public static implicit operator MeshParameter(ShapeParameterUnion value)
+        {
+            return value.Mesh;
+        }
+
+        public static implicit operator PolygonParameter(ShapeParameterUnion value)
+        {
+            return value.Polygon;
+        }
     }
 }

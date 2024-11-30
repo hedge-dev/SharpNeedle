@@ -13,8 +13,8 @@ public class CsdProject : ResourceBase, IBinarySerializable
     {
         Name = file.Name;
         BaseFile = file;
-        
-        using var reader = new BinaryObjectReader(file.Open(), StreamOwnership.Transfer, Endianness.Little);
+
+        using BinaryObjectReader reader = new(file.Open(), StreamOwnership.Transfer, Endianness.Little);
         Read(reader);
     }
 
@@ -23,7 +23,7 @@ public class CsdProject : ResourceBase, IBinarySerializable
         Name = file.Name;
         BaseFile = file;
 
-        using var writer = new BinaryObjectWriter(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness);
+        using BinaryObjectWriter writer = new(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness);
         Write(writer);
     }
 
@@ -31,17 +31,17 @@ public class CsdProject : ResourceBase, IBinarySerializable
     {
         Package = reader.ReadObject<CsdPackage>();
         Endianness = Package.Endianness;
-        var options = new ChunkBinaryOptions();
-        for (int i = 0; i < Package.Files.Count; i++)
+        ChunkBinaryOptions options = new();
+        for(int i = 0; i < Package.Files.Count; i++)
         {
-            var stream = Package.GetStream(i);
-            using var infoReader = new BinaryObjectReader(stream, StreamOwnership.Transfer, Package.Endianness);
+            Stream stream = Package.GetStream(i);
+            using BinaryObjectReader infoReader = new(stream, StreamOwnership.Transfer, Package.Endianness);
             try
             {
-                var info = infoReader.ReadObject<InfoChunk, ChunkBinaryOptions>(options);
-                foreach (var chunk in info.Chunks)
+                InfoChunk info = infoReader.ReadObject<InfoChunk, ChunkBinaryOptions>(options);
+                foreach(IChunk chunk in info.Chunks)
                 {
-                    switch (chunk)
+                    switch(chunk)
                     {
                         case ProjectChunk project:
                             Project = project;
@@ -56,8 +56,10 @@ public class CsdProject : ResourceBase, IBinarySerializable
             }
             catch(Exception e)
             {
-                if (e is not InvalidDataException)
+                if(e is not InvalidDataException)
+                {
                     throw;
+                }
             }
         }
     }
@@ -68,24 +70,30 @@ public class CsdProject : ResourceBase, IBinarySerializable
         {
             Endianness = Endianness
         };
-        
-        if (Textures is TextureListMirage)
+
+        if(Textures is TextureListMirage)
+        {
             Project.TextureFormat = TextureFormat.Mirage;
-        else if (Textures is TextureListNN)
+        }
+        else if(Textures is TextureListNN)
+        {
             Project.TextureFormat = TextureFormat.NextNinja;
+        }
 
         CreatePackageFile(Project);
 
-        if (Textures != null)
+        if(Textures != null)
+        {
             CreatePackageFile(Textures);
+        }
 
         writer.WriteObject(Package);
 
         void CreatePackageFile(IChunk chunk)
         {
-            using var stream = Package.GetStream(Package.Add(), true, true);
-            using var infoWriter = new BinaryObjectWriter(stream, StreamOwnership.Retain, Endianness);
-            var info = new InfoChunk
+            using Stream stream = Package.GetStream(Package.Add(), true, true);
+            using BinaryObjectWriter infoWriter = new(stream, StreamOwnership.Retain, Endianness);
+            InfoChunk info = new()
             {
                 Signature = BinaryHelper.MakeSignature<uint>(Endianness == Endianness.Little ? "NXIF" : "NYIF"),
             };

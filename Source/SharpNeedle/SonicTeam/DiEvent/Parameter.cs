@@ -16,7 +16,7 @@ public class UnknownParam : BaseParam
     public int Type { get; set; }
 
     public UnknownParam() { }
-    public UnknownParam(BinaryObjectReader reader, int size, int type) 
+    public UnknownParam(BinaryObjectReader reader, int size, int type)
     {
         Size = size;
         Type = type;
@@ -25,12 +25,12 @@ public class UnknownParam : BaseParam
         Read(reader, GameType.Common);
     }
 
-    public override void Read(BinaryObjectReader reader, GameType game) 
+    public override void Read(BinaryObjectReader reader, GameType game)
     {
         reader.ReadArray<byte>(Size * 4, Data);
     }
 
-    public override void Write(BinaryObjectWriter writer, GameType game) 
+    public override void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.WriteArrayFixedLength(Data, Size * 4);
     }
@@ -49,7 +49,9 @@ class DrawOffParam : BaseParam
 
     public DrawOffParam() { }
     public DrawOffParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -80,7 +82,9 @@ public class PathAdjustParam : BaseParam
 
     public PathAdjustParam() { }
     public PathAdjustParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -116,7 +120,9 @@ public class CameraShakeParam : BaseParam
 
     public CameraShakeParam() { }
     public CameraShakeParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -159,7 +165,9 @@ public class CameraShakeLoopParam : BaseParam
 
     public CameraShakeLoopParam() { }
     public CameraShakeLoopParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -207,7 +215,9 @@ public class EffectParam : BaseParam
 
     public EffectParam() { }
     public EffectParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -248,7 +258,9 @@ public class CullDisabledParam : BaseParam
 {
     public CullDisabledParam() { }
     public CullDisabledParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game) { }
 
@@ -268,7 +280,9 @@ public class UVAnimParam : BaseParam
 
     public UVAnimParam() { }
     public UVAnimParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -304,7 +318,9 @@ public class VisibilityAnimParam : BaseParam
 
     public VisibilityAnimParam() { }
     public VisibilityAnimParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -340,7 +356,9 @@ public class MaterialAnimParam : BaseParam
 
     public MaterialAnimParam() { }
     public MaterialAnimParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -374,7 +392,9 @@ public class CompositeAnimParam : BaseParam
 
     public CompositeAnimParam() { }
     public CompositeAnimParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -443,7 +463,9 @@ public class SonicCameraParam : BaseParam
 
     public SonicCameraParam() { }
     public SonicCameraParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -507,7 +529,9 @@ public class GameCameraParam : BaseParam
 
     public GameCameraParam() { }
     public GameCameraParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -583,7 +607,9 @@ public class ControllerVibrationParam : BaseParam
 
     public ControllerVibrationParam() { }
     public ControllerVibrationParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -617,7 +643,9 @@ public class MaterialParameterParam : BaseParam
 
     public MaterialParameterParam() { }
     public MaterialParameterParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -665,7 +693,9 @@ public class DOFParam : BaseParam
 
     public DOFParam() { }
     public DOFParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -715,7 +745,9 @@ public class DOFParam : BaseParam
         public Endpoint() { }
 
         public Endpoint(BinaryObjectReader reader)
-            => Read(reader);
+        {
+            Read(reader);
+        }
 
         public void Read(BinaryObjectReader reader)
         {
@@ -754,7 +786,9 @@ public class MovieDisplayParam : BaseParam
 {
     public MovieDisplayParam() { }
     public MovieDisplayParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public void Read(BinaryObjectReader reader, GameType game) { }
 
@@ -762,7 +796,7 @@ public class MovieDisplayParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.MovieDisplay;
@@ -778,12 +812,14 @@ public class MovieDisplayParam : BaseParam
 
 public class FadeParam : BaseParam
 {
-    Color<uint> Color {  get; set; }
+    Color<uint> Color { get; set; }
     public float[] CurveData { get; set; } = new float[32];
 
     public FadeParam() { }
     public FadeParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -799,7 +835,7 @@ public class FadeParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.Fade;
@@ -819,7 +855,9 @@ public class LetterboxParam : BaseParam
 
     public LetterboxParam() { }
     public LetterboxParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -833,7 +871,7 @@ public class LetterboxParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.Letterbox;
@@ -853,7 +891,9 @@ public class ChromaAberrationParam : BaseParam
 
     public ChromaAberrationParam() { }
     public ChromaAberrationParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -875,7 +915,7 @@ public class ChromaAberrationParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.ChromaticAberration;
@@ -898,7 +938,9 @@ public class ChromaAberrationParam : BaseParam
         public Endpoint() { }
 
         public Endpoint(BinaryObjectReader reader)
-            => Read(reader);
+        {
+            Read(reader);
+        }
 
         public void Read(BinaryObjectReader reader)
         {
@@ -926,7 +968,9 @@ public class SoundParam : BaseParam
 
     public SoundParam() { }
     public SoundParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -944,7 +988,7 @@ public class SoundParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.Sound;
@@ -969,7 +1013,9 @@ public class SubtitleParam : BaseParam
 
     public SubtitleParam() { }
     public SubtitleParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public void Read(BinaryObjectReader reader, GameType game)
     {
@@ -992,7 +1038,7 @@ public class SubtitleParam : BaseParam
 
     public void Write(BinaryObjectWriter writer, GameType game)
     {
-        if (game == GameType.ShadowGenerations)
+        if(game == GameType.ShadowGenerations)
         {
             writer.WriteDiString(CellName, 32);
             writer.Write((int)Language);
@@ -1011,7 +1057,7 @@ public class SubtitleParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.Subtitle;
@@ -1083,7 +1129,9 @@ public class QTEParam : BaseParam
 
     public QTEParam() { }
     public QTEParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -1124,7 +1172,7 @@ public class QTEParam : BaseParam
         Field100 = reader.ReadString(StringBinaryFormat.FixedLength, 64);
         Field140 = reader.ReadString(StringBinaryFormat.FixedLength, 64);
 
-        if (game == GameType.ShadowGenerations)
+        if(game == GameType.ShadowGenerations)
         {
             Field180 = reader.ReadString(StringBinaryFormat.FixedLength, 64);
             Field1C0 = reader.Read<uint>();
@@ -1170,7 +1218,7 @@ public class QTEParam : BaseParam
         writer.WriteString(StringBinaryFormat.FixedLength, Field100, 64);
         writer.WriteString(StringBinaryFormat.FixedLength, Field140, 64);
 
-        if (game == GameType.ShadowGenerations)
+        if(game == GameType.ShadowGenerations)
         {
             writer.WriteString(StringBinaryFormat.FixedLength, Field180, 64);
             writer.Write(Field1C0);
@@ -1179,7 +1227,7 @@ public class QTEParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.QTE;
@@ -1202,7 +1250,9 @@ public class TimescaleParam : BaseParam
 
     public TimescaleParam() { }
     public TimescaleParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -1222,7 +1272,7 @@ public class TimescaleParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.TimescaleChange;
@@ -1292,7 +1342,9 @@ public class VignetteParam : BaseParam
 
     public VignetteParam() { }
     public VignetteParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -1408,7 +1460,7 @@ public class VignetteParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.Vignette;
@@ -1429,7 +1481,9 @@ public class BossNameParam : BaseParam
 
     public BossNameParam() { }
     public BossNameParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -1445,7 +1499,7 @@ public class BossNameParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.BossName;
@@ -1459,7 +1513,7 @@ public class BossNameParam : BaseParam
     }
 
     public enum FrontiersNames
-    { 
+    {
         Giant = 0,
         Dragon,
         Knight,
@@ -1503,7 +1557,9 @@ public class AuraParam : BaseParam
 
     public AuraParam() { }
     public AuraParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -1555,7 +1611,7 @@ public class AuraParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.Aura;
@@ -1577,7 +1633,9 @@ public class TheEndCableParam : BaseParam
 
     public TheEndCableParam() { }
     public TheEndCableParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -1595,7 +1653,7 @@ public class TheEndCableParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.TheEndCable;
@@ -1612,7 +1670,9 @@ public class ASMOverrideParam : BaseParam
 
     public ASMOverrideParam() { }
     public ASMOverrideParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -1628,7 +1688,7 @@ public class ASMOverrideParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.ASMForcedOverwrite;
@@ -1646,7 +1706,9 @@ public class GeneralTriggerParam : BaseParam
 
     public GeneralTriggerParam() { }
     public GeneralTriggerParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -1662,7 +1724,7 @@ public class GeneralTriggerParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.GeneralPurposeTrigger;
@@ -1686,7 +1748,9 @@ public class CameraBlurParam : BaseParam
 
     public CameraBlurParam() { }
     public CameraBlurParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -1708,7 +1772,7 @@ public class CameraBlurParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.CameraBlur;
@@ -1720,7 +1784,7 @@ public class CameraBlurParam : BaseParam
                 return 0;
         }
     }
-}   
+}
 
 public class ShadowResolutionParam : BaseParam
 {
@@ -1728,7 +1792,9 @@ public class ShadowResolutionParam : BaseParam
 
     public ShadowResolutionParam() { }
     public ShadowResolutionParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public void Read(BinaryObjectReader reader, GameType game)
     {
@@ -1742,7 +1808,7 @@ public class ShadowResolutionParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.ShadowResolution;
@@ -1768,7 +1834,9 @@ public class TimeParam : BaseParam
 
     public TimeParam() { }
     public TimeParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -1800,7 +1868,7 @@ public class TimeParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.Time;
@@ -1818,7 +1886,9 @@ public class WeatherParam : BaseParam
 
     public WeatherParam() { }
     public WeatherParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -1834,7 +1904,7 @@ public class WeatherParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.Weather;
@@ -1849,7 +1919,9 @@ public class FinalBossLightingParam : BaseParam
 {
     public FinalBossLightingParam() { }
     public FinalBossLightingParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public void Read(BinaryObjectReader reader, GameType game) { }
 
@@ -1857,7 +1929,7 @@ public class FinalBossLightingParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.FinalBossLighting;
@@ -1875,15 +1947,17 @@ public class CyberNoiseParam : BaseParam
 
     public CyberNoiseParam() { }
     public CyberNoiseParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
-    public override void Read(BinaryObjectReader reader, GameType game) 
+    public override void Read(BinaryObjectReader reader, GameType game)
     {
         Field00 = reader.Read<uint>();
         reader.ReadArray<float>(32, CurveData);
     }
 
-    public override void Write(BinaryObjectWriter writer, GameType game) 
+    public override void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.Write(Field00);
         writer.WriteArrayFixedLength(CurveData, 32);
@@ -1891,7 +1965,7 @@ public class CyberNoiseParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.CyberNoise;
@@ -1909,7 +1983,9 @@ public class DitherDepthParam : BaseParam
 
     public DitherDepthParam() { }
     public DitherDepthParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -1925,7 +2001,7 @@ public class DitherDepthParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.DitherDepth;
@@ -1950,7 +2026,9 @@ public class CameraExposureParam : BaseParam
 
     public CameraExposureParam() { }
     public CameraExposureParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -1980,7 +2058,7 @@ public class CameraExposureParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.CameraExposure;
@@ -2005,7 +2083,9 @@ public class ColorCorrectionParam : BaseParam
 
     public ColorCorrectionParam() { }
     public ColorCorrectionParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -2035,7 +2115,7 @@ public class ColorCorrectionParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.ColorCorrection;
@@ -2054,7 +2134,9 @@ public class TimeStopParam : BaseParam
 
     public TimeStopParam() { }
     public TimeStopParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -2072,7 +2154,7 @@ public class TimeStopParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.ShadowGenerations:
                 return (int)ShadowGensParams.TimeStop;
@@ -2096,7 +2178,9 @@ public class TimeStopControlParam : BaseParam
 
     public TimeStopControlParam() { }
     public TimeStopControlParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -2114,7 +2198,7 @@ public class TimeStopControlParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.ShadowGenerations:
                 return (int)ShadowGensParams.TimeStopControl;
@@ -2137,7 +2221,9 @@ public class TimeStopObjectBehaviorParam : BaseParam
 
     public TimeStopObjectBehaviorParam() { }
     public TimeStopObjectBehaviorParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public void Read(BinaryObjectReader reader, GameType game)
     {
@@ -2151,7 +2237,7 @@ public class TimeStopObjectBehaviorParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.ShadowGenerations:
                 return (int)ShadowGensParams.TimeStopObjectBehavior;
@@ -2168,7 +2254,9 @@ public class FalloffToggleParam : BaseParam
 
     public FalloffToggleParam() { }
     public FalloffToggleParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public void Read(BinaryObjectReader reader, GameType game)
     {
@@ -2182,7 +2270,7 @@ public class FalloffToggleParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.ShadowGenerations:
                 return (int)ShadowGensParams.FalloffToggle;
@@ -2207,7 +2295,9 @@ public class ShadowAfterimageParam : BaseParam
 
     public ShadowAfterimageParam() { }
     public ShadowAfterimageParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -2237,7 +2327,7 @@ public class ShadowAfterimageParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch (game)
+        switch(game)
         {
             case GameType.ShadowGenerations:
                 return (int)ShadowGensParams.ShadowAfterimage;

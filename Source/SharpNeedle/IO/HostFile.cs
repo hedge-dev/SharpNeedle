@@ -3,7 +3,7 @@ using System.IO;
 
 public class HostFile : IFile
 {
-    private DateTime mLastModified;
+    private DateTime _mLastModified;
     public IDirectory Parent
         => HostDirectory.FromPath(Path.GetDirectoryName(Path.IsPathRooted(FullPath.AsSpan())
             ? FullPath
@@ -16,23 +16,25 @@ public class HostFile : IFile
 
     public DateTime LastModified
     {
-        get => mLastModified;
+        get => _mLastModified;
         set
         {
-            mLastModified = value;
+            _mLastModified = value;
             File.SetLastWriteTime(FullPath, value);
         }
     }
 
     protected FileAccess Access { get; set; }
     protected FileStream BaseStream { get; set; }
-    
+
     public HostFile(string fullPath)
     {
-        if (!File.Exists(fullPath))
+        if(!File.Exists(fullPath))
+        {
             throw new FileNotFoundException(fullPath);
+        }
 
-        var info = new FileInfo(fullPath);
+        FileInfo info = new(fullPath);
         Name = info.Name;
         FullPath = fullPath;
         Length = info.Length;
@@ -41,7 +43,7 @@ public class HostFile : IFile
 
     public static HostFile Create(string fullPath)
     {
-        File.WriteAllBytes(fullPath, Array.Empty<byte>());
+        File.WriteAllBytes(fullPath, []);
         return new HostFile(fullPath);
     }
 
@@ -52,15 +54,19 @@ public class HostFile : IFile
 
     public Stream Open(FileAccess access = FileAccess.Read)
     {
-        if (CheckDisposed())
+        if(CheckDisposed())
+        {
             BaseStream = null;
+        }
 
         Access = access;
 
-        if (BaseStream != null && Access == access)
+        if(BaseStream != null && Access == access)
+        {
             return BaseStream;
-            
-        if (BaseStream != null && Access == access)
+        }
+
+        if(BaseStream != null && Access == access)
         {
             Dispose();
             return Open(access);
@@ -72,8 +78,10 @@ public class HostFile : IFile
 
     public bool CheckDisposed()
     {
-        if (BaseStream == null)
+        if(BaseStream == null)
+        {
             return false;
+        }
 
         try
         {
@@ -87,13 +95,19 @@ public class HostFile : IFile
     }
 
     public override string ToString()
-        => Name;
+    {
+        return Name;
+    }
 
     public override bool Equals(object obj)
-        => obj is HostFile file && Equals(file);
+    {
+        return obj is HostFile file && Equals(file);
+    }
 
     protected bool Equals(HostFile other)
-        => FullPath == other.FullPath;
+    {
+        return FullPath == other.FullPath;
+    }
 
     public override int GetHashCode()
     {

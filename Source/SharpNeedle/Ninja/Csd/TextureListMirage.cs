@@ -6,7 +6,7 @@ public class TextureListMirage : ITextureList
     public static readonly uint BinSignature = BinaryHelper.MakeSignature<uint>("NXTL");
     public uint Signature { get; private set; } = BinSignature;
     public uint FieldC { get; set; }
-    public List<TextureMirage> Textures { get; set; } = new();
+    public List<TextureMirage> Textures { get; set; } = [];
     public int Count => Textures.Count;
     public bool IsReadOnly => false;
 
@@ -19,26 +19,32 @@ public class TextureListMirage : ITextureList
         reader.ReadOffset(() =>
         {
             Textures.AddRange(reader.ReadObject<BinaryList<TextureMirage>>());
-            var memoryTextureCount = 0;
-            foreach (var texture in Textures)
+            int memoryTextureCount = 0;
+            foreach(TextureMirage texture in Textures)
             {
-                if (texture.Name == null)
+                if(texture.Name == null)
+                {
                     memoryTextureCount = Math.Max(texture.MemoryDataIndex + 1, memoryTextureCount);
+                }
             }
 
-            if (memoryTextureCount > 0)
+            if(memoryTextureCount > 0)
             {
-                var textures = new byte[memoryTextureCount][];
+                byte[][] textures = new byte[memoryTextureCount][];
                 reader.ReadOffset(() =>
                 {
-                    for (int i = 0; i < memoryTextureCount; i++)
+                    for(int i = 0; i < memoryTextureCount; i++)
+                    {
                         textures[i] = reader.ReadArrayOffset<byte>((int)reader.ReadOffsetValue());
+                    }
                 });
 
-                foreach (var texture in Textures)
+                foreach(TextureMirage texture in Textures)
                 {
-                    if (texture.Name == null)
+                    if(texture.Name == null)
+                    {
                         texture.Data = textures[texture.MemoryDataIndex];
+                    }
                 }
             }
         });
@@ -50,25 +56,29 @@ public class TextureListMirage : ITextureList
         writer.WriteLittle(Signature);
         writer.Write<int>(0);
 
-        var start = writer.At();
+        SeekToken start = writer.At();
         writer.Write(0x10); // List offset, untracked
         writer.Write(FieldC);
-        var memoryTextureCount = 0;
-        foreach (var texture in Textures)
+        int memoryTextureCount = 0;
+        foreach(TextureMirage texture in Textures)
         {
-            if (texture.Name == null)
+            if(texture.Name == null)
+            {
                 texture.MemoryDataIndex = memoryTextureCount++;
+            }
         }
 
         writer.WriteObject<BinaryList<TextureMirage>>(Textures);
-        if (memoryTextureCount > 0)
+        if(memoryTextureCount > 0)
         {
             writer.WriteOffset(() =>
             {
-                foreach (var texture in Textures)
+                foreach(TextureMirage texture in Textures)
                 {
-                    if (texture.Name != null)
+                    if(texture.Name != null)
+                    {
                         continue;
+                    }
 
                     writer.Write(texture.Data.Length);
                     writer.WriteArrayOffset(texture.Data);
@@ -78,9 +88,9 @@ public class TextureListMirage : ITextureList
 
         writer.Flush();
         writer.Align(16);
-        var end = writer.At();
+        SeekToken end = writer.At();
 
-        var size =         (long)end - (long)start;
+        long size = (long)end - (long)start;
         writer.At((long)start - sizeof(int), SeekOrigin.Begin);
         writer.Write((int)size);
 
@@ -104,15 +114,17 @@ public class TextureListMirage : ITextureList
 
     public void CopyTo(ITexture[] array, int arrayIndex)
     {
-        for (int i = 0; i < Count; i++)
+        for(int i = 0; i < Count; i++)
+        {
             array[arrayIndex + i] = Textures[i];
+        }
     }
 
     public bool Remove(ITexture item)
     {
         return Textures.Remove((TextureMirage)item);
     }
-    
+
     public int IndexOf(ITexture item)
     {
         return Textures.IndexOf((TextureMirage)item);

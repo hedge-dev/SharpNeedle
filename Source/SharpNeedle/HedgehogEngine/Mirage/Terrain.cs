@@ -13,16 +13,18 @@ public class Terrain : SampleChunkResource
     public override void Write(BinaryObjectWriter writer)
     {
         writer.Write(Groups.Count);
-        writer.WriteOffset(() => 
+        writer.WriteOffset(() =>
         {
-            foreach (var group in Groups)
+            foreach(GroupInfo group in Groups)
+            {
                 writer.WriteObjectOffset(group);
+            }
         });
     }
 
     public class GroupInfo : IBinarySerializable
     {
-        public string Name { get; set;}
+        public string Name { get; set; }
         public Sphere Bounds { get; set; }
         public uint MemorySize { get; set; }
         public int SubsetID { get; set; }
@@ -33,13 +35,15 @@ public class Terrain : SampleChunkResource
             Bounds = reader.ReadValueOffset<Sphere>();
             Name = reader.ReadStringOffset();
             MemorySize = reader.Read<uint>();
-            
+
             reader.Read(out int instancesCount);
             Instances = new List<Sphere>(instancesCount);
-            reader.ReadOffset(() => 
+            reader.ReadOffset(() =>
             {
-                for (int i = 0; i < instancesCount; i++)
+                for(int i = 0; i < instancesCount; i++)
+                {
                     Instances.Add(reader.ReadValueOffset<Sphere>());
+                }
             });
 
             SubsetID = reader.Read<int>();
@@ -53,8 +57,10 @@ public class Terrain : SampleChunkResource
             writer.Write(Instances.Count);
             writer.WriteOffset(() =>
             {
-                foreach (var instance in Instances)
+                foreach(Sphere instance in Instances)
+                {
                     writer.WriteValueOffset(instance);
+                }
             });
         }
 

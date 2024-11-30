@@ -8,8 +8,13 @@ public class TerrainGroup : SampleChunkResource
 
     public Subset GetSubset(Vector3 point)
     {
-        foreach (var set in Subsets)
-            if (set.Bounds.Intersects(point)) return set;
+        foreach(Subset set in Subsets)
+        {
+            if(set.Bounds.Intersects(point))
+            {
+                return set;
+            }
+        }
 
         return null;
     }
@@ -22,8 +27,10 @@ public class TerrainGroup : SampleChunkResource
 
         reader.ReadOffset(() =>
         {
-            for (int i = 0; i < modelCount; i++)
+            for(int i = 0; i < modelCount; i++)
+            {
                 ModelNames.Add(reader.ReadStringOffset());
+            }
         });
     }
 
@@ -32,15 +39,19 @@ public class TerrainGroup : SampleChunkResource
         writer.Write(Subsets.Count);
         writer.WriteOffset(() =>
         {
-            foreach (var set in Subsets)
+            foreach(Subset set in Subsets)
+            {
                 writer.WriteObjectOffset(set);
+            }
         });
 
         writer.Write(ModelNames.Count);
         writer.WriteOffset(() =>
         {
-            foreach (var name in ModelNames)
+            foreach(string name in ModelNames)
+            {
                 writer.WriteStringOffset(StringBinaryFormat.NullTerminated, name);
+            }
         });
     }
 
@@ -56,8 +67,10 @@ public class TerrainGroup : SampleChunkResource
 
             reader.ReadOffset(() =>
             {
-                for (int i = 0; i < instanceCount; i++)
+                for(int i = 0; i < instanceCount; i++)
+                {
                     Add(reader.ReadStringOffset());
+                }
             });
 
             Bounds = reader.ReadValueOffset<Sphere>();
@@ -69,8 +82,10 @@ public class TerrainGroup : SampleChunkResource
 
             writer.WriteOffset(() =>
             {
-                foreach (var instance in this)
+                foreach(string instance in this)
+                {
                     writer.WriteStringOffset(StringBinaryFormat.NullTerminated, instance);
+                }
             });
             writer.WriteValueOffset(Bounds);
         }

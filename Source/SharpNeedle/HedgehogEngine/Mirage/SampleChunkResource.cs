@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.HedgehogEngine.Mirage;
-using System.Reflection;
 using System.IO;
+using System.Reflection;
 
 public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
 {
@@ -200,7 +200,9 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
     {
         SampleChunkNode contexts = Root.FindNode("Contexts");
         if(contexts != null)
+        {
             contexts.Value = DataVersion;
+        }
 
         writer.WriteObject(Root);
     }

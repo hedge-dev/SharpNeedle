@@ -13,7 +13,7 @@ public struct ChunkHeader : IBinarySerializable
         reader.Read(out Size);
     }
 
-    public void Write(BinaryObjectWriter writer)
+    public readonly void Write(BinaryObjectWriter writer)
     {
         writer.WriteLittle(Signature);
         writer.Write(Size);

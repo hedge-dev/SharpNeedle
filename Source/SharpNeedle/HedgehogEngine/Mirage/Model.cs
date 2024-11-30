@@ -10,62 +10,78 @@ public class Model : ModelBase
     public override void Read(BinaryObjectReader reader)
     {
         CommonRead(reader);
-        if (DataVersion >= 4)
+        if(DataVersion >= 4)
+        {
             Morphs = reader.ReadObject<BinaryList<BinaryPointer<MorphModel>>>().Unwind();
-        
+        }
+
         reader.Read(out int nodeCount);
         Nodes = new List<Node>(nodeCount);
         reader.ReadOffset(() =>
         {
-            for (int i = 0; i < nodeCount; i++)
+            for(int i = 0; i < nodeCount; i++)
+            {
                 Nodes.Add(reader.ReadObjectOffset<Node>());
+            }
         });
 
         reader.ReadOffset(() =>
         {
-            for (int i = 0; i < Nodes.Count; i++)
+            for(int i = 0; i < Nodes.Count; i++)
             {
-                var node = Nodes[i];
+                Node node = Nodes[i];
                 node.Transform = Matrix4x4.Transpose(reader.Read<Matrix4x4>());
                 Nodes[i] = node;
             }
         });
 
-        if (DataVersion >= 2)
+        if(DataVersion >= 2)
+        {
             Bounds = reader.ReadObjectOffset<AABB>();
+        }
     }
 
     public override void Write(BinaryObjectWriter writer)
     {
         CommonWrite(writer);
-        if (DataVersion >= 4)
+        if(DataVersion >= 4)
         {
             writer.Write(Morphs?.Count ?? 0);
             writer.WriteOffset(() =>
             {
-                if (Morphs == null)
+                if(Morphs == null)
+                {
                     return;
+                }
 
-                foreach (var morph in Morphs)
+                foreach(MorphModel morph in Morphs)
+                {
                     writer.WriteObjectOffset(morph);
+                }
             });
         }
 
         writer.Write(Nodes.Count);
         writer.WriteOffset(() =>
         {
-            foreach (var node in Nodes)
+            foreach(Node node in Nodes)
+            {
                 writer.WriteObjectOffset(node);
+            }
         });
 
         writer.WriteOffset(() =>
         {
-            foreach (var node in Nodes)
+            foreach(Node node in Nodes)
+            {
                 writer.Write(Matrix4x4.Transpose(node.Transform));
+            }
         });
 
-        if (DataVersion >= 2)
+        if(DataVersion >= 2)
+        {
             writer.WriteObjectOffset(Bounds);
+        }
     }
 
     public struct Node : IBinarySerializable
@@ -80,13 +96,13 @@ public class Model : ModelBase
             Name = reader.ReadStringOffset();
         }
 
-        public void Write(BinaryObjectWriter writer)
+        public readonly void Write(BinaryObjectWriter writer)
         {
             writer.Write(ParentIndex);
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         }
 
-        public override string ToString()
+        public override readonly string ToString()
         {
             return Name ?? base.ToString();
         }

@@ -17,7 +17,7 @@ public class SliceCastData : IImageDataBase
     public short VerticalFixedCount { get; set; }
     public IEffectData Effect { get; set; }
     public ImageCastSurface Surface { get; set; } = new();
-    public List<Slice> Slices { get; set; } = new();
+    public List<Slice> Slices { get; set; } = [];
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
@@ -37,17 +37,25 @@ public class SliceCastData : IImageDataBase
         Surface.CropRefs.Capacity = reader.Read<short>();
         reader.Skip(2); // Alignment
 
-        if (options.Version >= 3)
+        if(options.Version >= 3)
+        {
             reader.Align(8);
-        
-        if (Surface.CropRefs.Capacity != 0)
-            Surface.CropRefs.AddRange(reader.ReadArrayOffset<CropRef>(Surface.CropRefs.Capacity));
-        else
-            reader.ReadOffsetValue();
+        }
 
-        var type = reader.Read<EffectType>();
-        if (options.Version >= 3)
+        if(Surface.CropRefs.Capacity != 0)
+        {
+            Surface.CropRefs.AddRange(reader.ReadArrayOffset<CropRef>(Surface.CropRefs.Capacity));
+        }
+        else
+        {
+            reader.ReadOffsetValue();
+        }
+
+        EffectType type = reader.Read<EffectType>();
+        if(options.Version >= 3)
+        {
             reader.Align(8);
+        }
 
         Effect = Utilities.ReadEffectOffset(reader, type, options);
         Slices.AddRange(reader.ReadObjectArray<Slice>(SliceHorizontalCount * SliceVerticalCount));
@@ -71,17 +79,25 @@ public class SliceCastData : IImageDataBase
         writer.Write((short)Surface.CropRefs.Count);
         writer.Write((short)0); // Alignment
 
-        if (options.Version >= 3)
+        if(options.Version >= 3)
+        {
             writer.Align(8);
-        
-        if (Surface.CropRefs.Count != 0)
+        }
+
+        if(Surface.CropRefs.Count != 0)
+        {
             writer.WriteCollectionOffset(Surface.CropRefs);
+        }
         else
+        {
             writer.WriteOffsetValue(0);
+        }
 
         writer.Write(Effect?.Type ?? EffectType.None);
-        if (options.Version >= 3)
+        if(options.Version >= 3)
+        {
             writer.Align(8);
+        }
 
         writer.WriteObjectOffset(Effect, options, 16);
         writer.WriteObjectCollection(Slices);

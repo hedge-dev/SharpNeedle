@@ -6,7 +6,7 @@ public class TerrainMaterial : BinaryResource
 {
     public new static readonly uint Signature = BinaryHelper.MakeSignature<uint>("MTDN");
     public uint FormatVersion { get; set; } = 1;
-    public List<TerrainLayer> Layers { get; set; } = new();
+    public List<TerrainLayer> Layers { get; set; } = [];
 
     public TerrainMaterial()
     {
@@ -18,13 +18,10 @@ public class TerrainMaterial : BinaryResource
         reader.EnsureSignature(Signature);
         FormatVersion = reader.Read<uint>();
 
-        var instancesOffset = reader.ReadOffsetValue();
-        var instanceCount = (int)reader.Read<long>();
+        long instancesOffset = reader.ReadOffsetValue();
+        int instanceCount = (int)reader.Read<long>();
 
-        reader.ReadAtOffset(instancesOffset, () =>
-        {
-            Layers.AddRange(reader.ReadObjectArray<TerrainLayer>(instanceCount));
-        });
+        reader.ReadAtOffset(instancesOffset, () => Layers.AddRange(reader.ReadObjectArray<TerrainLayer>(instanceCount)));
     }
 
     public override void Write(BinaryObjectWriter writer)

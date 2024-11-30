@@ -7,7 +7,7 @@ public struct ResourceReference<TResource> where TResource : IResource
 
     public string Name
     {
-        get => Resource?.Name ?? mName;
+        readonly get => Resource?.Name ?? mName;
 
         set
         {
@@ -33,13 +33,23 @@ public struct ResourceReference<TResource> where TResource : IResource
         Resource = resource;
     }
 
-    public bool IsValid() => Resource != null;
+    public readonly bool IsValid()
+    {
+        return Resource != null;
+    }
 
     public override string ToString()
     {
         return Resource?.ToString() ?? Name;
     }
 
-    public static implicit operator ResourceReference<TResource>(string name) => new(name);
-    public static implicit operator ResourceReference<TResource>(in TResource resource) => new(resource);
+    public static implicit operator ResourceReference<TResource>(string name)
+    {
+        return new(name);
+    }
+
+    public static implicit operator ResourceReference<TResource>(in TResource resource)
+    {
+        return new(resource);
+    }
 }

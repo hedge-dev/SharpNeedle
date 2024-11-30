@@ -10,8 +10,10 @@ public class ReferenceCastData : ICastData
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
-        if (options.Version >= 3)
+        if(options.Version >= 3)
+        {
             reader.Align(8);
+        }
 
         Layer = reader.ReadObjectOffset<Layer, ChunkBinaryOptions>(options);
         Field04 = reader.Read<int>();
@@ -22,9 +24,11 @@ public class ReferenceCastData : ICastData
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
-        if (options.Version >= 3)
+        if(options.Version >= 3)
+        {
             writer.Align(8);
-        
+        }
+
         writer.WriteObjectOffset(Layer, options);
         writer.Write(Field04);
         writer.Write(AnimationID);

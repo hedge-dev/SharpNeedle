@@ -1,5 +1,4 @@
 ﻿namespace SharpNeedle;
-using Color8 = Color<byte>;
 
 [StructLayout(LayoutKind.Sequential)]
 public struct Color<T> where T : struct, INumber<T>
@@ -19,8 +18,10 @@ public struct Color<T> where T : struct, INumber<T>
 
     public Color(ReadOnlySpan<T> values)
     {
-        if (values.Length < 4)
+        if(values.Length < 4)
+        {
             throw new IndexOutOfRangeException();
+        }
 
         this = Unsafe.ReadUnaligned<Color<T>>(ref Unsafe.As<T, byte>(ref MemoryMarshal.GetReference(values)));
     }
@@ -35,7 +36,7 @@ public struct Color<T> where T : struct, INumber<T>
         return new Vector<T>(value.AsSpan());
     }
 
-    public override string ToString()
+    public override readonly string ToString()
     {
         return $"{{ R:{R}, G:{G}, B:{B}, A:{A} }}";
     }
@@ -44,8 +45,12 @@ public struct Color<T> where T : struct, INumber<T>
 public static class ColorExtensions
 {
     public static Vector4 AsVector(this Color<float> color)
-        => new (color.AsSpan());
+    {
+        return new(color.AsSpan());
+    }
 
     public static unsafe Color<float> AsColor(this Vector4 color)
-        => new (new ReadOnlySpan<float>(Unsafe.AsPointer(ref color), 4));
+    {
+        return new(new ReadOnlySpan<float>(Unsafe.AsPointer(ref color), 4));
+    }
 }

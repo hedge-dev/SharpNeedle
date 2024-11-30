@@ -3,7 +3,9 @@
 public static class Extensions
 {
     public static string GetIdentifier(this IResource res)
-        => ResourceManager.GetIdentifier(res.GetType());
+    {
+        return ResourceManager.GetIdentifier(res.GetType());
+    }
 
     public static bool IndexOf(this string str, char value, out int index)
     {
@@ -13,22 +15,22 @@ public static class Extensions
 
     public static int IndexOf<T>(this IReadOnlyList<T> list, T value)
     {
-        for (int i = 0; i < list.Count; i++)
+        for(int i = 0; i < list.Count; i++)
         {
-            if (list[i].Equals(value))
+            if(list[i].Equals(value))
             {
                 return i;
             }
         }
-        
+
         return -1;
     }
 
     public static int IndexOf<T>(this IReadOnlyList<T> list, Predicate<T> predict)
     {
-        for (var i = 0; i < list.Count; i++)
+        for(int i = 0; i < list.Count; i++)
         {
-            if (predict(list[i]))
+            if(predict(list[i]))
             {
                 return i;
             }
@@ -39,11 +41,13 @@ public static class Extensions
 
     public static LinkedListNode<T> Find<T>(this LinkedList<T> list, Predicate<T> predicate)
     {
-        var node = list.First;
-        while (node != null)
+        LinkedListNode<T> node = list.First;
+        while(node != null)
         {
-            if (predicate(node.Value))
+            if(predicate(node.Value))
+            {
                 return node;
+            }
 
             node = node.Next;
         }
@@ -53,11 +57,13 @@ public static class Extensions
 
     public static LinkedListNode<T> FindLast<T>(this LinkedList<T> list, Predicate<T> predicate)
     {
-        var node = list.Last;
-        while (node != null)
+        LinkedListNode<T> node = list.Last;
+        while(node != null)
         {
-            if (predicate(node.Value))
+            if(predicate(node.Value))
+            {
                 return node;
+            }
 
             node = node.Previous;
         }

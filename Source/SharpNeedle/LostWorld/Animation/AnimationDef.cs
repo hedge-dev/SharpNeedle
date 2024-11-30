@@ -26,7 +26,9 @@ public class AnimationDef : IBinarySerializable
     }
 
     public override string ToString()
-        => Name;
+    {
+        return Name;
+    }
 }
 
 public enum AnimationType : short

@@ -35,11 +35,15 @@ public class NeedleResourceAttribute : Attribute
     public bool CheckResource(IFile file)
     {
         bool patternMatches = false;
-        if (!string.IsNullOrEmpty(MatchPattern))
+        if(!string.IsNullOrEmpty(MatchPattern))
+        {
             patternMatches = Regex.Match(file.Name, MatchPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase).Success;
+        }
 
-        if (!patternMatches && CheckResourceFunc != null)
+        if(!patternMatches && CheckResourceFunc != null)
+        {
             return CheckResourceFunc(file);
+        }
 
         return patternMatches;
     }

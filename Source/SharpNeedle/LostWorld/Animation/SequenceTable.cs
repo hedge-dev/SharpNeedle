@@ -6,32 +6,40 @@ public class SequenceTable : List<string>, IComplexData
 
     public void Read(BinaryObjectReader reader, bool readType)
     {
-        if (readType)
+        if(readType)
+        {
             reader.EnsureSignatureNative(0);
+        }
 
         Clear();
         PlayMode = reader.Read<PlayModeInfo>();
-        var seqCount = reader.Read<int>();
-        if (seqCount == 0)
+        int seqCount = reader.Read<int>();
+        if(seqCount == 0)
+        {
             return;
+        }
 
         reader.ReadOffset(() =>
         {
-            for (int i = 0; i < seqCount; i++)
+            for(int i = 0; i < seqCount; i++)
+            {
                 Add(reader.ReadStringOffset());
+            }
         });
     }
 
     public void Write(BinaryObjectWriter writer, bool writeType)
     {
-        if (writeType)
+        if(writeType)
+        {
             writer.Write(0);
+        }
 
         writer.Write(PlayMode);
         writer.Write(Count);
         writer.WriteOffset(() =>
         {
-            foreach (var seq in this)
+            foreach(string seq in this)
             {
                 writer.WriteStringOffset(StringBinaryFormat.NullTerminated, seq);
             }

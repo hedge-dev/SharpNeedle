@@ -36,16 +36,44 @@ public class KeyFrame : IBinarySerializable
         [FieldOffset(0)] public Color<byte> Color;
         [FieldOffset(0)] public float Float;
 
-        public Union(Color<byte> value) : this() => Color = value;
-        public Union(float value) : this() => Float = value;
+        public Union(Color<byte> value) : this()
+        {
+            Color = value;
+        }
 
-        public void Set(Color<byte> value) => Color = value;
-        public void Set(float value) => Float = value;
+        public Union(float value) : this()
+        {
+            Float = value;
+        }
 
-        public static implicit operator Union(float value) => new Union(value);
-        public static implicit operator Union(Color<byte> value) => new Union(value);
+        public void Set(Color<byte> value)
+        {
+            Color = value;
+        }
 
-        public static implicit operator float(Union value) => value.Float;
-        public static implicit operator Color<byte>(Union value) => value.Color;
+        public void Set(float value)
+        {
+            Float = value;
+        }
+
+        public static implicit operator Union(float value)
+        {
+            return new(value);
+        }
+
+        public static implicit operator Union(Color<byte> value)
+        {
+            return new(value);
+        }
+
+        public static implicit operator float(Union value)
+        {
+            return value.Float;
+        }
+
+        public static implicit operator Color<byte>(Union value)
+        {
+            return value.Color;
+        }
     }
 }

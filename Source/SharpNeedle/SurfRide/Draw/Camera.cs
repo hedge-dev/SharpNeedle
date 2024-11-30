@@ -15,16 +15,18 @@ public class Camera : IBinarySerializable<ChunkBinaryOptions>
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
-        if (options.Version >= 1)
+        if(options.Version >= 1)
         {
-            if (options.Version >= 3)
+            if(options.Version >= 3)
+            {
                 reader.Align(8);
-            
+            }
+
             Name = reader.ReadStringOffset();
             ID = reader.Read<int>();
         }
-        
-        if (options.Version >= 4)
+
+        if(options.Version >= 4)
         {
             reader.Align(16);
             Position = reader.Read<Vector3>();
@@ -42,7 +44,7 @@ public class Camera : IBinarySerializable<ChunkBinaryOptions>
         FieldOfView = reader.Read<uint>();
         NearPlane = reader.Read<float>();
         FarPlane = reader.Read<float>();
-        if (options.Version >= 1)
+        if(options.Version >= 1)
         {
             Field48 = reader.ReadOffsetValue();
             Field50 = reader.ReadOffsetValue();
@@ -51,16 +53,18 @@ public class Camera : IBinarySerializable<ChunkBinaryOptions>
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
-        if (options.Version >= 1)
+        if(options.Version >= 1)
         {
-            if (options.Version >= 3)
+            if(options.Version >= 3)
+            {
                 writer.Align(8);
-            
+            }
+
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
             writer.Write(ID);
         }
-        
-        if (options.Version >= 4)
+
+        if(options.Version >= 4)
         {
             writer.Align(16);
             writer.Write(Position);
@@ -74,11 +78,11 @@ public class Camera : IBinarySerializable<ChunkBinaryOptions>
             writer.Write(Position);
             writer.Write(Target);
         }
-        
+
         writer.Write(FieldOfView);
         writer.Write(NearPlane);
         writer.Write(FarPlane);
-        if (options.Version >= 1)
+        if(options.Version >= 1)
         {
             writer.WriteOffsetValue(Field48);
             writer.WriteOffsetValue(Field50);

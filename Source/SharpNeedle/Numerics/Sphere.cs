@@ -26,9 +26,13 @@ public struct Sphere : IIntersectable<Vector3>, IIntersectable<Sphere>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly bool Intersects(Vector3 point)
-        => Vector3.DistanceSquared(point, Center) <= (Radius * Radius);
+    {
+        return Vector3.DistanceSquared(point, Center) <= (Radius * Radius);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly bool Intersects(Sphere sphere)
-        => Vector3.DistanceSquared(Center, sphere.Center) <= (Radius * Radius) + (sphere.Radius * sphere.Radius);
+    {
+        return Vector3.DistanceSquared(Center, sphere.Center) <= (Radius * Radius) + (sphere.Radius * sphere.Radius);
+    }
 }

@@ -8,9 +8,9 @@ public class Material : SampleChunkResource
     public bool NoBackFaceCulling { get; set; }
     public bool UseAdditiveBlending { get; set; }
 
-    public Dictionary<string, Parameter<Vector4>> FloatParameters { get; set; } = new();
-    public Dictionary<string, Parameter<Vector4Int>> IntParameters { get; set; } = new();
-    public Dictionary<string, Parameter<bool>> BoolParameters { get; set; } = new();
+    public Dictionary<string, Parameter<Vector4>> FloatParameters { get; set; } = [];
+    public Dictionary<string, Parameter<Vector4Int>> IntParameters { get; set; } = [];
+    public Dictionary<string, Parameter<bool>> BoolParameters { get; set; } = [];
     public Texset Texset { get; set; } = new();
 
     public Material()
@@ -20,8 +20,10 @@ public class Material : SampleChunkResource
 
     public override void Read(BinaryObjectReader reader)
     {
-        if (Root != null)
+        if(Root != null)
+        {
             DataVersion = 3;
+        }
 
         ShaderName = reader.ReadStringOffset();
         reader.Skip(4); // Unused vertex shader name (always the same as ShaderName)
@@ -30,17 +32,17 @@ public class Material : SampleChunkResource
         long textureNamesOffset = 0;
         long texturesOffset = 0;
 
-        if (DataVersion <= 1)
+        if(DataVersion <= 1)
         {
             texsetNameOffset = reader.ReadOffsetValue();
             reader.Skip(4); // Reserved
         }
-        else if (DataVersion == 2)
+        else if(DataVersion == 2)
         {
             texsetNameOffset = reader.ReadOffsetValue();
             textureNamesOffset = reader.ReadOffsetValue();
         }
-        else if (DataVersion >= 3)
+        else if(DataVersion >= 3)
         {
             textureNamesOffset = reader.ReadOffsetValue();
             texturesOffset = reader.ReadOffsetValue();
@@ -51,60 +53,59 @@ public class Material : SampleChunkResource
         UseAdditiveBlending = reader.Read<bool>();
         reader.Skip(1); // Alignment padding
 
-        var floatParamsCount = reader.Read<byte>();
-        var intParamsCount = reader.Read<byte>();
-        var boolParamsCount = reader.Read<byte>();
-        var textureCount = reader.Read<byte>(); // Reserved in version 1
+        byte floatParamsCount = reader.Read<byte>();
+        byte intParamsCount = reader.Read<byte>();
+        byte boolParamsCount = reader.Read<byte>();
+        byte textureCount = reader.Read<byte>(); // Reserved in version 1
 
-        var floatParamOffset = reader.ReadOffsetValue();
-        var intParamOffset = reader.ReadOffsetValue();
-        var boolParamOffset = reader.ReadOffsetValue();
+        long floatParamOffset = reader.ReadOffsetValue();
+        long intParamOffset = reader.ReadOffsetValue();
+        long boolParamOffset = reader.ReadOffsetValue();
 
         ReadParameters(FloatParameters, floatParamOffset, floatParamsCount);
         ReadParameters(IntParameters, intParamOffset, intParamsCount);
         ReadParameters(BoolParameters, boolParamOffset, boolParamsCount);
-        
-        if (DataVersion >= 2)
+
+        if(DataVersion >= 2)
         {
-            using var token = reader.AtOffset(textureNamesOffset);
-            for (byte i = 0; i < textureCount; i++)
+            using SeekToken token = reader.AtOffset(textureNamesOffset);
+            for(byte i = 0; i < textureCount; i++)
             {
-                Texset.Textures.Add(new Texture 
+                Texset.Textures.Add(new Texture
                 {
                     Name = reader.ReadStringOffset()
                 });
             }
         }
 
-        if (DataVersion <= 2)
+        if(DataVersion <= 2)
         {
-            using var token = reader.AtOffset(texsetNameOffset);
+            using SeekToken token = reader.AtOffset(texsetNameOffset);
             Texset.Name = reader.ReadString(StringBinaryFormat.NullTerminated);
         }
 
-        if (DataVersion >= 3)
+        if(DataVersion >= 3)
         {
-            using var token = reader.AtOffset(texturesOffset);
+            using SeekToken token = reader.AtOffset(texturesOffset);
 
-            foreach (var texture in Texset.Textures)
+            foreach(Texture texture in Texset.Textures)
             {
-                reader.ReadOffset(() => 
-                { 
-                    texture.Read(reader);
-                });
+                reader.ReadOffset(() => texture.Read(reader));
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         void ReadParameters<T>(Dictionary<string, Parameter<T>> paramsOut, long offset, int count) where T : unmanaged
         {
-            if (offset == 0 || count == 0)
-                return;
-
-            using var token = reader.AtOffset(offset);
-            for (byte i = 0; i < count; i++)
+            if(offset == 0 || count == 0)
             {
-                var param = reader.ReadObjectOffset<Parameter<T>>();
+                return;
+            }
+
+            using SeekToken token = reader.AtOffset(offset);
+            for(byte i = 0; i < count; i++)
+            {
+                global::SharpNeedle.HedgehogEngine.Mirage.Material.Parameter<T> param = reader.ReadObjectOffset<Parameter<T>>();
                 paramsOut.TryAdd(param.Name, param);
             }
         }
@@ -113,29 +114,33 @@ public class Material : SampleChunkResource
     public override void Write(BinaryObjectWriter writer)
     {
         // Fix texset name
-        if (string.IsNullOrEmpty(Texset.Name))
+        if(string.IsNullOrEmpty(Texset.Name))
+        {
             Texset.Name = Name;
+        }
 
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, ShaderName);
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, ShaderName); // Unused vertex shader name
 
-        if (DataVersion <= 1)
+        if(DataVersion <= 1)
         {
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Texset.Name);
             writer.Write(0); // Reserved
         }
-        else if (DataVersion == 2)
+        else if(DataVersion == 2)
         {
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Texset.Name);
             WriteTextureNames();
         }
-        else if (DataVersion >= 3)
+        else if(DataVersion >= 3)
         {
             WriteTextureNames();
             writer.WriteOffset(() =>
             {
-                foreach (var texture in Texset.Textures)
+                foreach(Texture texture in Texset.Textures)
+                {
                     writer.WriteObjectOffset(texture);
+                }
             });
         }
 
@@ -157,7 +162,7 @@ public class Material : SampleChunkResource
         {
             writer.WriteOffset(() =>
             {
-                foreach (var texture in Texset.Textures)
+                foreach(Texture texture in Texset.Textures)
                 {
                     writer.WriteStringOffset(StringBinaryFormat.NullTerminated, texture.Name);
                 }
@@ -172,12 +177,14 @@ public class Material : SampleChunkResource
                 return;
             }
 
-            foreach (var parameter in parameters)
+            foreach(global::System.Collections.Generic.KeyValuePair<string, global::SharpNeedle.HedgehogEngine.Mirage.Material.Parameter<T>> parameter in parameters)
+            {
                 parameter.Value.Name = parameter.Key;
+            }
 
             writer.WriteOffset(() =>
             {
-                foreach (var parameter in parameters)
+                foreach(global::System.Collections.Generic.KeyValuePair<string, global::SharpNeedle.HedgehogEngine.Mirage.Material.Parameter<T>> parameter in parameters)
                 {
                     writer.WriteOffset(() => writer.WriteObject(parameter.Value));
                 }
@@ -187,23 +194,27 @@ public class Material : SampleChunkResource
 
     public override void ResolveDependencies(IResourceResolver resolver)
     {
-        if (DataVersion <= 1)
+        if(DataVersion <= 1)
         {
             Texset = resolver.Open<Texset>($"{Texset.Name}.texset");
         }
 
-        if (DataVersion <= 2)
+        if(DataVersion <= 2)
+        {
             Texset.ResolveDependencies(resolver);
+        }
     }
 
     public override void WriteDependencies(IDirectory dir)
     {
-        if (DataVersion >= 3)
-            return;
-
-        if (DataVersion <= 1)
+        if(DataVersion >= 3)
         {
-            var texSetFile = dir.CreateFile($"{Texset.Name}.texset");
+            return;
+        }
+
+        if(DataVersion <= 1)
+        {
+            IFile texSetFile = dir.CreateFile($"{Texset.Name}.texset");
             Texset.Write(texSetFile);
         }
 
@@ -219,8 +230,10 @@ public class Material : SampleChunkResource
         {
             get
             {
-                if (Values.Count == 0 || Values == null)
+                if(Values.Count == 0 || Values == null)
+                {
                     return default;
+                }
 
                 return Values[0];
             }
@@ -228,30 +241,38 @@ public class Material : SampleChunkResource
             {
                 Values ??= new List<T>(1);
 
-                if (Values.Count == 0)
+                if(Values.Count == 0)
+                {
                     Values.Add(value);
+                }
                 else
+                {
                     Values[0] = value;
+                }
             }
         }
 
         public void Read(BinaryObjectReader reader)
         {
             reader.Skip(2);
-            var valueCount = reader.Read<byte>();
+            byte valueCount = reader.Read<byte>();
             reader.Skip(1);
 
             Name = reader.ReadStringOffset();
-            if (valueCount != 0)
+            if(valueCount != 0)
             {
-                using var token = reader.ReadOffset();
-                for (byte i = 0; i < valueCount; i++)
+                using SeekToken token = reader.ReadOffset();
+                for(byte i = 0; i < valueCount; i++)
                 {
                     // Handle booleans
-                    if (typeof(T) == typeof(bool))
+                    if(typeof(T) == typeof(bool))
+                    {
                         Unsafe.As<List<bool>>(Values)!.Add(reader.Read<int>() != 0);
-                    else 
+                    }
+                    else
+                    {
                         Values!.Add(reader.Read<T>());
+                    }
                 }
             }
         }
@@ -264,15 +285,19 @@ public class Material : SampleChunkResource
             writer.Write((byte)0);
 
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-            if (typeof(T) != typeof(bool))
+            if(typeof(T) != typeof(bool))
+            {
                 writer.WriteCollectionOffset(Values, 4);
+            }
             else
             {
-                var values = Unsafe.As<List<bool>>(Values);
+                List<bool> values = Unsafe.As<List<bool>>(Values);
                 writer.WriteOffset(() =>
                 {
-                    foreach (var value in values!)
+                    foreach(bool value in values!)
+                    {
                         writer.Write(value ? 1 : 0);
+                    }
                 });
             }
         }

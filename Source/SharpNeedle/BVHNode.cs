@@ -13,33 +13,37 @@ public static class BVHNode
 {
     public static bool Traverse<TKey, TValue, TPoint>(this BVHNode<TKey, TValue> node, TPoint point, Action<BVHNode<TKey, TValue>> callback) where TKey : IIntersectable<TPoint>
     {
-        if (node == null || !node.Key.Intersects(point))
+        if(node == null || !node.Key.Intersects(point))
+        {
             return false;
+        }
 
-        if (node.Type == BVHNodeType.Leaf)
+        if(node.Type == BVHNodeType.Leaf)
         {
             callback(node);
             return true;
         }
 
-        var hasLeft = Traverse(node.Left, point, callback);
-        var hasRight = Traverse(node.Right, point, callback);
+        bool hasLeft = Traverse(node.Left, point, callback);
+        bool hasRight = Traverse(node.Right, point, callback);
         return hasLeft || hasRight;
     }
 
     public static bool Traverse<TPoint, TKey, TValue>(this BVHNode<TKey, TValue> node, TPoint point, Action<BVHNode<TKey, TValue>> callback) where TPoint : IIntersectable<TKey>
     {
-        if (node == null || !point.Intersects(node.Key))
+        if(node == null || !point.Intersects(node.Key))
+        {
             return false;
+        }
 
-        if (node.Type == BVHNodeType.Leaf)
+        if(node.Type == BVHNodeType.Leaf)
         {
             callback(node);
             return true;
         }
 
-        var hasLeft = Traverse(node.Left, point, callback);
-        var hasRight = Traverse(node.Right, point, callback);
+        bool hasLeft = Traverse(node.Left, point, callback);
+        bool hasRight = Traverse(node.Right, point, callback);
         return hasLeft || hasRight;
     }
 }
