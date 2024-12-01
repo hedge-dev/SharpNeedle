@@ -2,22 +2,18 @@
 
 public class HostDirectory : IDirectory
 {
-    string IDirectory.Path => FullPath;
-    public string FullPath { get; set; }
+    public IDirectory? Parent => ParentFromPath(Path);
 
-    public IDirectory Parent
-        => FromPath(Path.GetDirectoryName(Path.IsPathRooted(FullPath.AsSpan())
-            ? FullPath
-            : Path.TrimEndingDirectorySeparator(FullPath)));
+    public string Path { get; set; }
 
     public string Name
     {
         get
         {
-            string name = Path.GetFileName(FullPath);
+            string name = System.IO.Path.GetFileName(Path);
             if(string.IsNullOrEmpty(name))
             {
-                return FullPath;
+                return Path;
             }
 
             return name;
@@ -26,35 +22,84 @@ public class HostDirectory : IDirectory
         set => throw new NotSupportedException();
     }
 
-    public IFile this[string name] => GetFile(name);
+    public IFile? this[string name] => GetFile(name);
 
-    public IDirectory OpenDirectory(string name)
+
+    internal static HostDirectory? ParentFromPath(string path)
     {
-        return FromPath(Path.Combine(FullPath, name));
+        if(!System.IO.Path.IsPathRooted(path.AsSpan()))
+        {
+            path = System.IO.Path.TrimEndingDirectorySeparator(path);
+        }
+
+        string? directoryName = System.IO.Path.GetDirectoryName(path);
+        return FromPath(directoryName);
     }
 
-    public bool DeleteFile(string name)
+    public static HostDirectory? FromPath(string? path)
     {
-        string path = Path.Combine(FullPath, name);
-        if(!File.Exists(path))
+        if(string.IsNullOrEmpty(path)
+            || !Directory.Exists(path))
         {
-            return false;
+            return null;
         }
 
-        try
+        return new HostDirectory
         {
-            File.Delete(path);
-            return true;
-        }
-        catch
+            Path = path
+        };
+    }
+
+    public static HostDirectory Create(string path)
+    {
+        Directory.CreateDirectory(path);
+        return new HostDirectory(path);
+    }
+
+
+    private HostDirectory()
+    {
+        Path = string.Empty;
+    }
+
+    public HostDirectory(string path)
+    {
+        Path = System.IO.Path.GetFullPath(path);
+        if(!Directory.Exists(Path))
         {
-            return false;
+            throw new DirectoryNotFoundException(path);
         }
+    }
+
+
+    public IEnumerable<IDirectory> GetDirectories()
+    {
+        foreach(string file in Directory.EnumerateDirectories(Path))
+        {
+            yield return new HostDirectory(file);
+        }
+    }
+
+    public IDirectory? GetDirectory(string name)
+    {
+        return FromPath(System.IO.Path.Combine(Path, name));
+    }
+
+    public IDirectory CreateDirectory(string name)
+    {
+        string directoryPath = System.IO.Path.Combine(Path, Name);
+
+        if(Directory.Exists(directoryPath))
+        {
+            throw new InvalidOperationException($"Failed to create directory \"{name}\"! Directory \"{Path}\" already has a directory with the same name!");
+        }
+
+        return Create(System.IO.Path.Combine(Path, Name));
     }
 
     public bool DeleteDirectory(string name)
     {
-        string path = Path.Combine(FullPath, name);
+        string path = System.IO.Path.Combine(Path, name);
         if(!Directory.Exists(path))
         {
             return false;
@@ -71,58 +116,22 @@ public class HostDirectory : IDirectory
         }
     }
 
-    public static HostDirectory FromPath(string path)
+
+    public IFile? GetFile(string name)
     {
-        if(string.IsNullOrEmpty(path))
-        {
-            return null;
-        }
-
-        if(!Directory.Exists(path))
-        {
-            return null;
-        }
-
-        return new HostDirectory
-        {
-            FullPath = path
-        };
-    }
-
-    private HostDirectory()
-    {
-
-    }
-
-    public HostDirectory(string path)
-    {
-        FullPath = Path.GetFullPath(path);
-        if(!Directory.Exists(FullPath))
-        {
-            throw new DirectoryNotFoundException(path);
-        }
-    }
-
-    public IFile GetFile(string name)
-    {
-        string path = Path.Combine(FullPath, name);
+        string path = System.IO.Path.Combine(Path, name);
 
         return File.Exists(path) ? new HostFile(path) : null;
     }
 
-    public IFile CreateFile(string name)
+    public IFile CreateFile(string name, bool overwrite = true)
     {
-        return HostFile.Create(Path.Combine(FullPath, name));
+        return HostFile.Create(System.IO.Path.Combine(Path, name), overwrite);
     }
-
-    public IDirectory CreateDirectory(string name)
+     
+    public IFile AddFile(IFile file, bool overwrite = true)
     {
-        return Create(Path.Combine(FullPath, Name));
-    }
-
-    public IFile Add(IFile file)
-    {
-        HostFile destFile = (HostFile)CreateFile(file.Name);
+        HostFile destFile = (HostFile)CreateFile(file.Name, overwrite);
         Stream destStream = destFile.Open(FileAccess.Write);
         Stream srcStream = file.Open();
         srcStream.CopyTo(destStream);
@@ -132,23 +141,15 @@ public class HostDirectory : IDirectory
         return destFile;
     }
 
-    public static HostDirectory Create(string path)
+    public bool DeleteFile(string name)
     {
-        Directory.CreateDirectory(path);
-        return new HostDirectory(path);
+        return HostFile.Delete(System.IO.Path.Combine(Path, name));
     }
 
-    public IEnumerable<IDirectory> GetDirectories()
-    {
-        foreach(string file in Directory.EnumerateDirectories(FullPath))
-        {
-            yield return new HostDirectory(file);
-        }
-    }
 
     public IEnumerator<IFile> GetEnumerator()
     {
-        foreach(string file in Directory.EnumerateFiles(FullPath))
+        foreach(string file in Directory.EnumerateFiles(Path))
         {
             yield return new HostFile(file);
         }

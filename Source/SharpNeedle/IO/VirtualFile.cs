@@ -2,39 +2,42 @@
 
 public class VirtualFile : IFile
 {
-    private string _mName;
+    private string _name = string.Empty;
+    private bool _leaveOpen = true;
+
 
     IDirectory IFile.Parent => Parent;
-    public string Path { get; internal set; }
-    public VirtualDirectory Parent { get; internal set; }
-    public long Length => BaseStream?.Length ?? 0;
-    public DateTime LastModified { get; set; }
-    public Stream BaseStream { get; set; }
 
-    private bool _mLeaveOpen = true;
+
+    /// <summary>
+    /// Directory containing this file.
+    /// </summary>
+    public VirtualDirectory Parent { get; internal set; }
+
+    public string Path { get; internal set; }
 
     public string Name
     {
-        get => _mName;
+        get => _name;
         set
         {
-            if(_mName == value)
+            if(_name == value)
             {
                 return;
             }
 
-            Parent?.FileNameChanged(this, _mName, value);
+            Parent?.FileNameChanged(this, _name, value);
             Path = System.IO.Path.Combine(Parent?.Path ?? string.Empty, value);
-            _mName = value;
+            _name = value;
         }
     }
 
-    public VirtualFile(string name, Stream baseStream, bool leaveOpen = false)
-    {
-        Name = name;
-        _mLeaveOpen = leaveOpen;
-        BaseStream = baseStream;
-    }
+    public long Length => BaseStream?.Length ?? 0;
+
+    public DateTime LastModified { get; set; }
+
+    public Stream? BaseStream { get; set; }
+
 
     public VirtualFile(string name, VirtualDirectory parent)
     {
@@ -43,12 +46,13 @@ public class VirtualFile : IFile
         Path = System.IO.Path.Combine(parent.Path, name);
     }
 
+
     public Stream Open(FileAccess access = FileAccess.Read)
     {
         if(BaseStream == null)
         {
             BaseStream = new MemoryStream();
-            _mLeaveOpen = false;
+            _leaveOpen = false;
         }
 
         BaseStream.Position = 0;
@@ -57,9 +61,9 @@ public class VirtualFile : IFile
 
     public void Dispose()
     {
-        if(!_mLeaveOpen)
+        if(!_leaveOpen)
         {
-            BaseStream.Dispose();
+            BaseStream?.Dispose();
         }
     }
 

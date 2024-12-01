@@ -6,11 +6,12 @@ using System.Text.RegularExpressions;
 public class NeedleResourceAttribute : Attribute
 {
     public string Id { get; }
-    public ResourceType Type { get; }
-    public string MatchPattern { get; }
-    public Type Owner { get; internal set; }
 
-    internal Func<IFile, bool> CheckResourceFunc { get; set; }
+    public ResourceType Type { get; }
+    public string? MatchPattern { get; }
+    public Type? Owner { get; internal set; }
+
+    internal Func<IFile, bool>? CheckResourceFunc { get; set; }
 
     public NeedleResourceAttribute(string id)
     {

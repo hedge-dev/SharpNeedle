@@ -2,8 +2,9 @@
 
 public struct Singleton<T>
 {
-    private static T StaticInstance { get; set; }
-    public readonly T Instance => StaticInstance;
+    private static T? StaticInstance { get; set; }
+
+    public readonly T? Instance => StaticInstance;
 
     public Singleton(T instance)
     {
@@ -15,7 +16,7 @@ public struct Singleton<T>
         StaticInstance = instance;
     }
 
-    public static T GetInstance()
+    public static T? GetInstance()
     {
         return StaticInstance;
     }
@@ -25,7 +26,7 @@ public struct Singleton<T>
         return StaticInstance is not null;
     }
 
-    public static implicit operator T(Singleton<T> singleton)
+    public static implicit operator T?(Singleton<T> singleton)
     {
         return GetInstance();
     }
@@ -33,7 +34,7 @@ public struct Singleton<T>
 
 public struct Singleton
 {
-    public static T GetInstance<T>()
+    public static T? GetInstance<T>()
     {
         return Singleton<T>.GetInstance();
     }

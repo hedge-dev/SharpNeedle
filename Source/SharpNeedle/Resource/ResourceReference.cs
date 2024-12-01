@@ -2,16 +2,15 @@
 
 public struct ResourceReference<TResource> where TResource : IResource
 {
-    private string mName = string.Empty;
+    private string _name = string.Empty;
 
     public string Name
     {
-        readonly get => Resource?.Name ?? mName;
-
+        readonly get => Resource?.Name ?? _name;
         set
         {
             Resource = default;
-            mName = value;
+            _name = value;
         }
     }
 
@@ -31,6 +30,7 @@ public struct ResourceReference<TResource> where TResource : IResource
     {
         Resource = resource;
     }
+
 
     public readonly bool IsValid()
     {

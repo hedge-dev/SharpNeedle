@@ -6,79 +6,45 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
     public const string ResourceId = "hh/archive-list";
     public static uint Signature { get; } = BinaryHelper.MakeSignature<uint>("ARL2");
 
-    public long MaxSplitSize { get; set; } = 1024 * 1024 * 1024;
-    public IDirectory Parent { get; private set; }
-    public bool DependsResolved { get; private set; }
-    public List<Archive> Archives { get; private set; }
-    public List<uint> ArchiveSizes { get; set; } = [];
-    public HashSet<string> Files { get; set; } = [];
-    public string Path { get; set; }
-    public IFile this[string name] => GetFile(name);
+    public IDirectory? Parent { get; private set; }
 
-    public bool DeleteFile(string name)
+    public string Path { get; set; } = string.Empty;
+
+    public IFile? this[string name] => GetFile(name);
+
+
+    public long MaxSplitSize { get; set; } = 1024 * 1024 * 1024;
+
+    public bool DependsResolved { get; private set; }
+
+    public List<Archive> Archives { get; private set; } = [];
+
+    public List<uint> ArchiveSizes { get; set; } = [];
+
+    public HashSet<string> Files { get; set; } = [];
+
+
+    [ResourceCheckFunction]
+    public static bool IsResourceValid(IFile file)
     {
-        foreach(Archive archive in Archives)
+        using Stream stream = file.Open();
+        return BitConverter.ToUInt32(stream.ReadBytes(sizeof(uint)), 0) == Signature;
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if(!disposing)
         {
-            if(archive.DeleteFile(name))
+            return;
+        }
+
+        if(Archives != null)
+        {
+            foreach(Archive archive in Archives)
             {
-                return true;
+                archive.Dispose();
             }
         }
-
-        return false;
-    }
-
-    // Format doesn't support directories
-    public bool DeleteDirectory(string name)
-    {
-        return false;
-    }
-
-    public IDirectory OpenDirectory(string name)
-    {
-        return null;
-    }
-
-    public IDirectory CreateDirectory(string name)
-    {
-        return null;
-    }
-
-    public IFile CreateFile(string name)
-    {
-        if(Archives == null)
-        {
-            Archives =
-            [
-                []
-            ];
-
-            EnsureSplit();
-            return Archives.First().CreateFile(name);
-        }
-
-        return Archives.Last().CreateFile(name);
-    }
-
-    public IFile Add(IFile file)
-    {
-        if(Archives == null)
-        {
-            Archives =
-            [
-                []
-            ];
-
-            return Archives.First().Add(file);
-        }
-
-        EnsureSplit();
-        return Archives.Last().Add(file);
-    }
-
-    public IEnumerable<IDirectory> GetDirectories()
-    {
-        return [];
     }
 
     private void EnsureSplit()
@@ -90,6 +56,16 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
 
         Archives.Add([]);
     }
+    
+    public void LoadToMemory()
+    {
+        foreach(Archive archive in Archives)
+        {
+            archive.LoadToMemory();
+        }
+    }
+
+    #region ResourceBase method implementations
 
     public override void Read(IFile file)
     {
@@ -121,21 +97,7 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
                 Files.Add(name);
             }
         }
-    }
-
-    public override IEnumerable<ResourceDependency> GetDependencies()
-    {
-        string baseName = System.IO.Path.GetFileNameWithoutExtension(Name);
-
-        for(int i = 0; i < ArchiveSizes.Count; i++)
-        {
-            yield return new ResourceDependency()
-            {
-                Name = $"{baseName}.ar.{i:00}",
-                Id = Archive.ResourceId
-            };
-        }
-    }
+     }
 
     public override void Write(IFile file)
     {
@@ -170,9 +132,14 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
             }
         }
     }
-
+    
     public override void ResolveDependencies(IResourceResolver resolver)
     {
+        if(DependsResolved)
+        {
+            return;
+        }
+
         if(ArchiveSizes.Count > 0)
         {
             Archives = new List<Archive>(ArchiveSizes.Count);
@@ -182,7 +149,8 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
         for(int i = 0; i < ArchiveSizes.Count; i++)
         {
             string name = $"{baseName}.ar.{i:00}";
-            Archives.Add(resolver.Open<Archive>(name));
+            Archive archive = resolver.Open<Archive>(name) ?? throw new FileNotFoundException($"Archive file \"{name}\" not found!");
+            Archives.Add(archive);
         }
 
         DependsResolved = true;
@@ -199,14 +167,46 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
         }
     }
 
-    [ResourceCheckFunction]
-    public static bool IsResourceValid(IFile file)
+    public override IEnumerable<ResourceDependency> GetDependencies()
     {
-        using Stream stream = file.Open();
-        return BitConverter.ToUInt32(stream.ReadBytes(sizeof(uint)), 0) == Signature;
+        string baseName = System.IO.Path.GetFileNameWithoutExtension(Name);
+
+        for(int i = 0; i < ArchiveSizes.Count; i++)
+        {
+            yield return new ResourceDependency()
+            {
+                Name = $"{baseName}.ar.{i:00}",
+                Id = Archive.ResourceId
+            };
+        }
     }
 
-    public IFile GetFile(string name)
+    #endregion
+
+    #region IDirectory method implementations
+
+    public IEnumerable<IDirectory> GetDirectories()
+    {
+        return [];
+    }
+
+    public IDirectory? GetDirectory(string name)
+    {
+        throw new NotSupportedException();
+    }
+
+    public IDirectory CreateDirectory(string name)
+    {
+        throw new NotSupportedException();
+    }
+
+    public bool DeleteDirectory(string name)
+    {
+        throw new NotSupportedException();
+    }
+
+
+    public IFile? GetFile(string name)
     {
         foreach(Archive archive in Archives)
         {
@@ -220,29 +220,48 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
         return null;
     }
 
-    public void LoadToMemory()
+    public IFile CreateFile(string name, bool overwrite = true)
+    {
+        if(Archives == null)
+        {
+            Archives = [[]];
+        }
+        else
+        {
+            EnsureSplit();
+        }
+
+        return Archives.Last().CreateFile(name, overwrite);
+    }
+
+    public IFile AddFile(IFile file, bool overwrite = true)
+    {
+        if(Archives == null)
+        {
+            Archives = [[]];
+        }
+        else
+        {
+            EnsureSplit();
+        }
+
+        return Archives.Last().AddFile(file, overwrite);
+    }
+
+    public bool DeleteFile(string name)
     {
         foreach(Archive archive in Archives)
         {
-            archive.LoadToMemory();
-        }
-    }
-
-    protected override void Dispose(bool disposing)
-    {
-        if(!disposing)
-        {
-            return;
-        }
-
-        if(Archives != null)
-        {
-            foreach(Archive archive in Archives)
+            if(archive.DeleteFile(name))
             {
-                archive.Dispose();
+                return true;
             }
         }
+
+        return false;
     }
+
+    #endregion
 
     public IEnumerator<IFile> GetEnumerator()
     {

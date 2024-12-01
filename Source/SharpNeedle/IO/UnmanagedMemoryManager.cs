@@ -4,13 +4,11 @@ using System.Buffers;
 
 public sealed unsafe class UnmanagedMemoryManager<T> : MemoryManager<T> where T : unmanaged
 {
-    private T* mPtr;
-    private int mLength;
+    private T* _ptr;
+    private int _length;
 
-    public UnmanagedMemoryManager()
-    {
 
-    }
+    public UnmanagedMemoryManager() { }
 
     public UnmanagedMemoryManager(ReadOnlySpan<T> span)
     {
@@ -20,39 +18,31 @@ public sealed unsafe class UnmanagedMemoryManager<T> : MemoryManager<T> where T 
         }
     }
 
+
     public void Swap(T* ptr, int length)
     {
-        if(length < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(length));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(length);
 
-        mPtr = ptr;
-        mLength = length;
+        _ptr = ptr;
+        _length = length;
     }
 
     public override Span<T> GetSpan()
     {
-        return new(mPtr, mLength);
+        return new(_ptr, _length);
     }
 
     public override MemoryHandle Pin(int elementIndex = 0)
     {
-        if(elementIndex < 0 || elementIndex >= mLength)
+        if(elementIndex < 0 || elementIndex >= _length)
         {
             throw new ArgumentOutOfRangeException(nameof(elementIndex));
         }
 
-        return new MemoryHandle(mPtr + elementIndex);
+        return new MemoryHandle(_ptr + elementIndex);
     }
 
-    public override void Unpin()
-    {
+    public override void Unpin() { }
 
-    }
-
-    protected override void Dispose(bool disposing)
-    {
-
-    }
+    protected override void Dispose(bool disposing) { }
 }

@@ -2,22 +2,21 @@
 
 public struct DirectoryResourceResolver : IResourceResolver
 {
-    public IResourceManager Manager;
-    public IDirectory Directory;
+    public IDirectory Directory { get; set; }
 
-    public DirectoryResourceResolver(IDirectory dir, IResourceManager manager = null)
+    public IResourceManager? Manager { get; set; }
+
+
+    public DirectoryResourceResolver(IDirectory dir, IResourceManager? manager = null)
     {
         Manager = manager;
         Directory = dir;
     }
 
+
     public readonly TRes Open<TRes>(string fileName) where TRes : IResource, new()
     {
-        IFile file = Directory[fileName];
-        if(file == null)
-        {
-            throw new FileNotFoundException($"File \"{fileName}\" not found", Path.Join(Directory.Path, fileName));
-        }
+        IFile file = Directory[fileName] ?? throw new FileNotFoundException($"File \"{fileName}\" not found", Path.Join(Directory.Path, fileName));
 
         TRes res;
         if(Manager != null)

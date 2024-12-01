@@ -1,8 +1,21 @@
 ﻿namespace SharpNeedle.IO;
 
+/// <summary>
+/// File system that allows for mounting of e.g. virtual directories.
+/// </summary>
 public class FileSystem
 {
-    private static readonly Dictionary<string, IDirectory> mMountPoints = new(StringComparer.InvariantCultureIgnoreCase);
+    private readonly Dictionary<string, IDirectory> _mountPoints = new(StringComparer.InvariantCultureIgnoreCase);
+
+    public static FileSystem Instance => Singleton.GetInstance<FileSystem>()!;
+
+
+    static FileSystem()
+    {
+        FileSystem instance = new();
+        Singleton.SetInstance(instance);
+    }
+
 
     public static string GetPathRoot(ReadOnlySpan<char> path)
     {
@@ -15,7 +28,7 @@ public class FileSystem
         return string.Empty;
     }
 
-    public static string GetPathWithoutRoot(ReadOnlySpan<char> path)
+    public static string? GetPathWithoutRoot(ReadOnlySpan<char> path)
     {
         string root = GetPathRoot(path);
         if(string.IsNullOrEmpty(root))
@@ -37,9 +50,20 @@ public class FileSystem
         return null;
     }
 
-    public static IEnumerable<(string Name, IDirectory Directory)> GetMounts()
+
+    public void Mount(string root, IDirectory dir)
     {
-        foreach(KeyValuePair<string, IDirectory> mountPoint in mMountPoints)
+        if(root.IndexOf(':', out int colonIndex))
+        {
+            root = root[..colonIndex];
+        }
+
+        _mountPoints.Add(root, dir);
+    }
+
+    public IEnumerable<(string Name, IDirectory Directory)> GetMounts()
+    {
+        foreach(KeyValuePair<string, IDirectory> mountPoint in _mountPoints)
         {
             yield return (mountPoint.Key, mountPoint.Value);
         }
@@ -50,42 +74,33 @@ public class FileSystem
         }
     }
 
-    public static void Mount(string root, IDirectory dir)
-    {
-        if(root.IndexOf(':', out int colonIndex))
-        {
-            root = root[..colonIndex];
-        }
 
-        mMountPoints.Add(root, dir);
-    }
-
-    public static IFile Open(string path)
+    public IFile? Open(string path)
     {
         string root = GetPathRoot(path);
-        if(mMountPoints.TryGetValue(root, out IDirectory dir))
+        if(_mountPoints.TryGetValue(root, out IDirectory? dir))
         {
-            return dir[GetPathWithoutRoot(path)];
+            return dir[GetPathWithoutRoot(path) ?? string.Empty];
         }
 
         return HostFile.Open(path);
     }
 
-    public static IFile Create(string path)
+    public IFile Create(string path, bool overwrite = true)
     {
         string root = GetPathRoot(path);
-        if(mMountPoints.TryGetValue(root, out IDirectory dir))
+        if(_mountPoints.TryGetValue(root, out IDirectory? dir))
         {
-            return dir.CreateFile(path);
+            return dir.CreateFile(path, overwrite);
         }
-
-        return HostFile.Create(path);
+        
+        return HostFile.Create(path, overwrite);
     }
 
-    public static IDirectory CreateDirectory(string path)
+    public IDirectory CreateDirectory(string path)
     {
         string root = GetPathRoot(path);
-        if(mMountPoints.TryGetValue(root, out IDirectory dir))
+        if(_mountPoints.TryGetValue(root, out IDirectory? dir))
         {
             return dir.CreateDirectory(path);
         }
