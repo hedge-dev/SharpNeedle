@@ -8,7 +8,7 @@ public struct Version : IBinarySerializable
     public Endianness Endianness;
 
     public readonly bool IsV1 => Major == 0 && Minor == 0 && Revision == 1;
-    public readonly bool Is64Bit => Major > 2 || Major >= 2 && Minor > 0;
+    public readonly bool Is64Bit => Major > 2 || (Major >= 2 && Minor > 0);
 
     public Version(byte major, byte minor, byte revision, Endianness endianness)
     {

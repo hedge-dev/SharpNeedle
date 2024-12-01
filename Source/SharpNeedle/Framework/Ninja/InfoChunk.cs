@@ -16,7 +16,7 @@ public class InfoChunk : IChunk
         int chunkCount = reader.Read<int>();
 
         // Check if Signature ends with IF
-        if((Signature >> 16 & 0xFFFF) != 0x4649)
+        if(((Signature >> 16) & 0xFFFF) != 0x4649)
         {
             throw new InvalidDataException($"Invalid Signature: 0x{Signature:X}");
         }
@@ -35,7 +35,7 @@ public class InfoChunk : IChunk
                 {
                     Chunks.Add(reader.ReadObject<ProjectChunk, ChunkBinaryOptions>(options));
                 }
-                else if((Signature >> 16 & 0xFFFF) != 0x4C54) // TL
+                else if(((Signature >> 16) & 0xFFFF) != 0x4C54) // TL
                 {
                     switch(options.TextureFormat)
                     {

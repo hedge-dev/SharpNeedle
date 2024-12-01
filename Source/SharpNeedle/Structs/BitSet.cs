@@ -12,6 +12,7 @@ public struct BitSet<T> : IEnumerable<bool> where T : INumberBase<T>, IBinaryInt
 
     public BitSet(params T[] activeBits) : this()
     {
+        Value = default!;
         foreach(T bit in activeBits)
         {
             Set(NumberHelper.Create<int, T>(bit));
@@ -25,7 +26,7 @@ public struct BitSet<T> : IEnumerable<bool> where T : INumberBase<T>, IBinaryInt
         {
             int start = range.Start.IsFromEnd ? BitCount - range.Start.Value : range.Start.Value;
             int end = range.End.IsFromEnd ? BitCount - range.End.Value : range.End.Value;
-            return Value >> start & (T.One << end - start) - T.One;
+            return (Value >> start) & ((T.One << (end - start)) - T.One);
         }
     }
 
@@ -36,15 +37,15 @@ public struct BitSet<T> : IEnumerable<bool> where T : INumberBase<T>, IBinaryInt
         {
             int start = range.Start.IsFromEnd ? BitCount - range.Start.Value : range.Start.Value;
             int end = range.End.IsFromEnd ? BitCount - range.End.Value : range.End.Value;
-            T mask = (T.One << end - start) - T.One << start;
-            Value = Value & mask | T.CreateChecked(value & (1 << end - start) - 1);
+            T mask = ((T.One << (end - start)) - T.One) << start;
+            Value = (Value & mask) | T.CreateChecked(value & ((1 << (end - start)) - 1));
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly bool Test(int bit)
     {
-        return (Value & T.One << bit) != T.Zero;
+        return (Value & (T.One << bit)) != T.Zero;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -111,7 +112,7 @@ public struct BitSet<T> : IEnumerable<bool> where T : INumberBase<T>, IBinaryInt
 
     public override readonly string ToString()
     {
-        return Value.ToString();
+        return Value.ToString() ?? string.Empty;
     }
 
     public static implicit operator BitSet<T>(T value)

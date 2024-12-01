@@ -48,7 +48,7 @@ public class Package : ResourceBase, IBinarySerializable, IStreamable
 
             foreach(char c in str)
             {
-                hash = hash * 31 + c;
+                hash = (hash * 31) + c;
             }
 
             return hash & 0x7FFFFFFF;

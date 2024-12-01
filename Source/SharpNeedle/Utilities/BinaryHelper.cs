@@ -141,7 +141,7 @@ public static class BinaryHelper
         return Unsafe.As<byte, TSize>(ref result[0]);
     }
 
-    public static string ReadStringOffset(this BinaryObjectReader reader, StringBinaryFormat format = StringBinaryFormat.NullTerminated, int fixedLength = -1)
+    public static string? ReadStringOffset(this BinaryObjectReader reader, StringBinaryFormat format = StringBinaryFormat.NullTerminated, int fixedLength = -1)
     {
         long offset = reader.ReadOffsetValue();
         if(offset == 0)
@@ -189,7 +189,7 @@ public static class BinaryHelper
 
     public static bool EnsureSignature<TSignature>(TSignature sig, bool throwOnFail, params TSignature[] expected)
     {
-        if(expected.Any(x => x.Equals(sig)))
+        if(expected.Any(x => x?.Equals(sig) == true))
         {
             return true;
         }

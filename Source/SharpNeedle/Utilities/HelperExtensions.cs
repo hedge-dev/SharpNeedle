@@ -12,7 +12,7 @@ public static class HelperExtensions
     {
         for(int i = 0; i < list.Count; i++)
         {
-            if(list[i].Equals(value))
+            if(list[i]?.Equals(value) == true)
             {
                 return i;
             }
@@ -34,9 +34,9 @@ public static class HelperExtensions
         return -1;
     }
 
-    public static LinkedListNode<T> Find<T>(this LinkedList<T> list, Predicate<T> predicate)
+    public static LinkedListNode<T>? Find<T>(this LinkedList<T> list, Predicate<T> predicate)
     {
-        LinkedListNode<T> node = list.First;
+        LinkedListNode<T>? node = list.First;
         while(node != null)
         {
             if(predicate(node.Value))
@@ -50,9 +50,9 @@ public static class HelperExtensions
         return null;
     }
 
-    public static LinkedListNode<T> FindLast<T>(this LinkedList<T> list, Predicate<T> predicate)
+    public static LinkedListNode<T>? FindLast<T>(this LinkedList<T> list, Predicate<T> predicate)
     {
-        LinkedListNode<T> node = list.Last;
+        LinkedListNode<T>? node = list.Last;
         while(node != null)
         {
             if(predicate(node.Value))

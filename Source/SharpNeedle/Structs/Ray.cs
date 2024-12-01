@@ -20,7 +20,7 @@ public struct Ray : IIntersectable<Sphere>, IIntersectable<AABB>
         float t2 = Math.Max(tmin, tmax);
         if(t1 > 0 && t2 > 0)
         {
-            return Origin + Direction * t1;
+            return Origin + (Direction * t1);
         }
 
         return null;
@@ -30,9 +30,9 @@ public struct Ray : IIntersectable<Sphere>, IIntersectable<AABB>
     {
         float a = Vector3.Dot(Direction, Direction);
         float b = 2 * Vector3.Dot(Direction, Origin - sphere.Center);
-        float c = Vector3.Dot(Origin - sphere.Center, Origin - sphere.Center) - sphere.Radius * sphere.Radius;
+        float c = Vector3.Dot(Origin - sphere.Center, Origin - sphere.Center) - (sphere.Radius * sphere.Radius);
 
-        float discriminant = b * b - 4 * a * c;
+        float discriminant = (b * b) - (4 * a * c);
 
         if(discriminant < 0)
         {
@@ -41,16 +41,16 @@ public struct Ray : IIntersectable<Sphere>, IIntersectable<AABB>
 
         float t = (-b - MathF.Sqrt(discriminant)) / (2 * a);
 
-        return Origin + Direction * t;
+        return Origin + (Direction * t);
     }
 
     public readonly bool Intersects(Sphere sphere)
     {
         float a = Vector3.Dot(Direction, Direction);
         float b = 2 * Vector3.Dot(Direction, Origin - sphere.Center);
-        float c = Vector3.Dot(Origin - sphere.Center, Origin - sphere.Center) - sphere.Radius * sphere.Radius;
+        float c = Vector3.Dot(Origin - sphere.Center, Origin - sphere.Center) - (sphere.Radius * sphere.Radius);
 
-        float discriminant = b * b - 4 * a * c;
+        float discriminant = (b * b) - (4 * a * c);
 
         return discriminant >= 0;
     }
@@ -70,6 +70,6 @@ public struct Ray : IIntersectable<Sphere>, IIntersectable<AABB>
 
     public readonly Vector3 PointAt(float t)
     {
-        return Origin + t * Direction;
+        return Origin + (t * Direction);
     }
 }

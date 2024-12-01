@@ -50,7 +50,7 @@ public class OffsetTable : List<long>
                 case OffsetEncoding.FourteenBit:
                 {
                     byte v2 = table[++i];
-                    outOffsets.Add((ushort)((v << 8 | v2) << 2) + lastOffset);
+                    outOffsets.Add((ushort)(((v << 8) | v2) << 2) + lastOffset);
                     break;
                 }
 
@@ -59,8 +59,8 @@ public class OffsetTable : List<long>
                     byte v2 = table[++i];
                     byte v3 = table[++i];
                     byte v4 = table[++i];
-                    outOffsets.Add((uint)((v << 24 | v2 << 16 |
-                                            v3 << 8 | v4) << 2) + lastOffset);
+                    outOffsets.Add((uint)(((v << 24) | (v2 << 16) |
+                                            (v3 << 8) | v4) << 2) + lastOffset);
                     break;
                 }
             }
@@ -87,17 +87,17 @@ public class OffsetTable : List<long>
         long lastOffset = 0L;
         foreach(long offset in offsets)
         {
-            long d = offset - lastOffset >> 2;
+            long d = (offset - lastOffset) >> 2;
             if(d > 0x3FFF)
             {
-                writer.WriteBig((byte)(0xC0 | d >> 24));
+                writer.WriteBig((byte)(0xC0 | (d >> 24)));
                 writer.WriteBig((byte)(d >> 16));
                 writer.WriteBig((byte)(d >> 8));
                 writer.WriteBig((byte)(d & 0xFF));
             }
             else if(d > 0x3F)
             {
-                writer.WriteBig((byte)(0x80 | d >> 8));
+                writer.WriteBig((byte)(0x80 | (d >> 8)));
                 writer.WriteBig((byte)d);
             }
             else

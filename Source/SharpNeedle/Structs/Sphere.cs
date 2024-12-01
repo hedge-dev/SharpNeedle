@@ -33,6 +33,6 @@ public struct Sphere : IIntersectable<Vector3>, IIntersectable<Sphere>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly bool Intersects(Sphere sphere)
     {
-        return Vector3.DistanceSquared(Center, sphere.Center) <= Radius * Radius + sphere.Radius * sphere.Radius;
+        return Vector3.DistanceSquared(Center, sphere.Center) <= (Radius * Radius) + (sphere.Radius * sphere.Radius);
     }
 }

@@ -6,9 +6,21 @@ public class BVHNode<TKey, TValue>
 {
     public BVHNodeType Type => Left == null && Right == null ? BVHNodeType.Leaf : BVHNodeType.Branch;
     public TKey Key { get; set; }
-    public BVHNode<TKey, TValue> Left { get; set; }
-    public BVHNode<TKey, TValue> Right { get; set; }
-    public TValue Value { get; set; }
+    public BVHNode<TKey, TValue>? Left { get; set; }
+    public BVHNode<TKey, TValue>? Right { get; set; }
+    public TValue? Value { get; set; }
+
+    public BVHNode(TKey key)
+    {
+        Key = key;
+        Value = default;
+    }
+
+    public BVHNode(TKey key, TValue value)
+    {
+        Key = key;
+        Value = value;
+    }
 }
 
 public static class BVHNode
@@ -26,8 +38,8 @@ public static class BVHNode
             return true;
         }
 
-        bool hasLeft = node.Left.Traverse(point, callback);
-        bool hasRight = node.Right.Traverse(point, callback);
+        bool hasLeft = node.Left?.Traverse(point, callback) == true;
+        bool hasRight = node.Right?.Traverse(point, callback) == true;
         return hasLeft || hasRight;
     }
 
@@ -44,8 +56,8 @@ public static class BVHNode
             return true;
         }
 
-        bool hasLeft = node.Left.Traverse(point, callback);
-        bool hasRight = node.Right.Traverse(point, callback);
+        bool hasLeft = node.Left?.Traverse(point, callback) == true;
+        bool hasRight = node.Right?.Traverse(point, callback) == true;
         return hasLeft || hasRight;
     }
 }

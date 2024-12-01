@@ -17,7 +17,7 @@ public class WrappedStream<TStream> : Stream where TStream : Stream
         set => BaseStream.Position = value;
     }
 
-    public event Action<TStream> OnClosing;
+    public event Action<TStream>? OnClosing;
 
     public WrappedStream(TStream baseStream, bool keepOpen)
     {

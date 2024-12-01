@@ -57,10 +57,7 @@ public class TerrainBlockSphereTree : SampleChunkResource
 
         BVHNode<Sphere, (int, int)> BuildNode(ref BinaryNode node)
         {
-            BVHNode<Sphere, (int GroupID, int SubsetID)> result = new()
-            {
-                Key = node.Bounds
-            };
+            BVHNode<Sphere, (int GroupID, int SubsetID)> result = new(node.Bounds);
 
             if(node.Type == NodeType.Branch)
             {

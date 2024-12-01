@@ -8,7 +8,7 @@ public class OffsetChunk : IChunk, IList<int>
     public int Count => Offsets.Count;
     public bool IsReadOnly => false;
 
-    public int BinarySize => AlignmentHelper.Align(16 + Offsets.Count * sizeof(int), 16);
+    public int BinarySize => AlignmentHelper.Align(16 + (Offsets.Count * sizeof(int)), 16);
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {

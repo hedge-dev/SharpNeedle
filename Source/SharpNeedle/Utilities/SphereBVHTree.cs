@@ -6,12 +6,9 @@ public static class SphereBVHTree
 {
     public static BVHNode<Sphere, TValue> Build<TValue>(List<KeyValuePair<Sphere, TValue>> nodes)
     {
-        BVHNode<Sphere, TValue> bNode = new();
         if(nodes.Count == 1)
         {
-            bNode.Key = nodes[0].Key;
-            bNode.Value = nodes[0].Value;
-            return bNode;
+            return new(nodes[0].Key, nodes[0].Value);
         }
 
         // Avoid stack copies
@@ -23,7 +20,8 @@ public static class SphereBVHTree
             bounds.Add(node.Key);
         }
 
-        bNode.Key = new Sphere(bounds);
+        BVHNode<Sphere, TValue> bNode = new(new(bounds));
+
         int maxAxis = bounds.Max.MaxAxis();
         float center = bounds.Max.GetAxis(maxAxis);
 

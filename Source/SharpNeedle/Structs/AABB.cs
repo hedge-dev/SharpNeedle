@@ -17,7 +17,7 @@ public struct AABB : IBinarySerializable, IIntersectable<Vector3>, IIntersectabl
 
     public float Size => SizeX * SizeY * SizeZ;
 
-    public readonly bool IsEmpty => Min == Vector3.Zero && Max == Vector3.Zero || Min == Max;
+    public readonly bool IsEmpty => (Min == Vector3.Zero && Max == Vector3.Zero) || Min == Max;
 
     public Vector3 Center
     {

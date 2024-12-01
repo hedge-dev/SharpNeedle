@@ -150,8 +150,8 @@ public struct ShadowVertex
                 continue;
             }
 
-            BlendWeight = BlendWeight & ~mask | weight << offset;
-            BlendIndices = BlendIndices & ~mask | index << offset;
+            BlendWeight = (BlendWeight & ~mask) | (weight << offset);
+            BlendIndices = (BlendIndices & ~mask) | (index << offset);
 
             break;
         }
@@ -160,9 +160,9 @@ public struct ShadowVertex
     public void NormalizeBlendWeight()
     {
         int b1 = BlendWeight & 0xFF;
-        int b2 = BlendWeight >> 8 & 0xFF;
-        int b3 = BlendWeight >> 16 & 0xFF;
-        int b4 = BlendWeight >> 24 & 0xFF;
+        int b2 = (BlendWeight >> 8) & 0xFF;
+        int b3 = (BlendWeight >> 16) & 0xFF;
+        int b4 = (BlendWeight >> 24) & 0xFF;
 
         BlendWeight += 0xFF - (b1 + b2 + b3 + b4);
     }
