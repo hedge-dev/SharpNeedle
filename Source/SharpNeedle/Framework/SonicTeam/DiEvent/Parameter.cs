@@ -792,9 +792,9 @@ public class MovieDisplayParam : BaseParam
         Read(reader, game);
     }
 
-    public void Read(BinaryObjectReader reader, GameType game) { }
+    public override void Read(BinaryObjectReader reader, GameType game) { }
 
-    public void Write(BinaryObjectWriter writer, GameType game) { }
+    public override void Write(BinaryObjectWriter writer, GameType game) { }
 
     public override int GetTypeID(GameType game)
     {
@@ -1019,7 +1019,7 @@ public class SubtitleParam : BaseParam
         Read(reader, game);
     }
 
-    public void Read(BinaryObjectReader reader, GameType game)
+    public override void Read(BinaryObjectReader reader, GameType game)
     {
         if(game == GameType.ShadowGenerations)
         {
@@ -1038,7 +1038,7 @@ public class SubtitleParam : BaseParam
         }
     }
 
-    public void Write(BinaryObjectWriter writer, GameType game)
+    public override void Write(BinaryObjectWriter writer, GameType game)
     {
         if(game == GameType.ShadowGenerations)
         {
@@ -1798,12 +1798,12 @@ public class ShadowResolutionParam : BaseParam
         Read(reader, game);
     }
 
-    public void Read(BinaryObjectReader reader, GameType game)
+    public override void Read(BinaryObjectReader reader, GameType game)
     {
         Resolution = reader.Read<Vector2Int>();
     }
 
-    public void Write(BinaryObjectWriter writer, GameType game)
+    public override void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.Write(Resolution);
     }
@@ -1925,9 +1925,9 @@ public class FinalBossLightingParam : BaseParam
         Read(reader, game);
     }
 
-    public void Read(BinaryObjectReader reader, GameType game) { }
+    public override void Read(BinaryObjectReader reader, GameType game) { }
 
-    public void Write(BinaryObjectWriter writer, GameType game) { }
+    public override void Write(BinaryObjectWriter writer, GameType game) { }
 
     public override int GetTypeID(GameType game)
     {
@@ -2227,12 +2227,12 @@ public class TimeStopObjectBehaviorParam : BaseParam
         Read(reader, game);
     }
 
-    public void Read(BinaryObjectReader reader, GameType game)
+    public override void Read(BinaryObjectReader reader, GameType game)
     {
         Mode = reader.Read<int>();
     }
 
-    public void Write(BinaryObjectWriter writer, GameType game)
+    public override void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.Write(Mode);
     }
@@ -2260,12 +2260,12 @@ public class FalloffToggleParam : BaseParam
         Read(reader, game);
     }
 
-    public void Read(BinaryObjectReader reader, GameType game)
+    public override void Read(BinaryObjectReader reader, GameType game)
     {
         Intensity = reader.Read<float>();
     }
 
-    public void Write(BinaryObjectWriter writer, GameType game)
+    public override void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.Write(Intensity);
     }
