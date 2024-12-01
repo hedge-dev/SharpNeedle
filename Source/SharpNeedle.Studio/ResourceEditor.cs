@@ -1,6 +1,7 @@
 ﻿namespace SharpNeedle.Studio;
 using System.Reflection;
 using Models;
+using SharpNeedle.Resource;
 
 public class ResourceEditor
 {

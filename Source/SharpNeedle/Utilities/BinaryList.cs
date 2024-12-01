@@ -1,4 +1,5 @@
 ﻿namespace SharpNeedle.Utilities;
+
 public struct BinaryList<T> : IBinarySerializable, IList<T> where T : IBinarySerializable, new()
 {
     public List<T> Items { get; set; }

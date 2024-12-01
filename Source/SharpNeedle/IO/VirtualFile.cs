@@ -1,7 +1,5 @@
 ﻿namespace SharpNeedle.IO;
 
-using System.IO;
-
 public class VirtualFile : IFile
 {
     private string _mName;

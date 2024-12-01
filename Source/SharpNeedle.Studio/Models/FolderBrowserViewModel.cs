@@ -1,4 +1,7 @@
 ﻿namespace SharpNeedle.Studio.Models;
+
+using SharpNeedle.IO;
+using SharpNeedle.Resource;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 

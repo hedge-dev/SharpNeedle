@@ -1,5 +1,4 @@
 ﻿namespace SharpNeedle.Utilities;
-using System.IO;
 
 public static class StreamExtension
 {

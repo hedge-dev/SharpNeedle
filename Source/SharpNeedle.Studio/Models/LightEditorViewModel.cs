@@ -1,6 +1,8 @@
 ﻿namespace SharpNeedle.Studio.Models;
 using System.ComponentModel;
 using HedgehogEngine.Mirage;
+using SharpNeedle.Framework.HedgehogEngine.Mirage;
+using SharpNeedle.Resource;
 
 [ResourceEditor(typeof(Light))]
 public class LightEditorViewModel : IViewModel
