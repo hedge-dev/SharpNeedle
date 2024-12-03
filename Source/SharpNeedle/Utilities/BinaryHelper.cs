@@ -85,6 +85,36 @@ public static class BinaryHelper
         return result;
     }
 
+    public static T[] ReadObjectArrayAtOffset<T>(this BinaryObjectReader reader, long offset, int count) where T : IBinarySerializable, new()
+    {
+        T[] result = new T[count];
+
+        reader.ReadAtOffset(offset, () =>
+        {
+            for(int i = 0; i < count; i++)
+            {
+                result[i] = reader.ReadObject<T>();
+            }
+        });
+
+        return result;
+    }
+
+    public static T[] ReadObjectArrayAtOffset<T, TContext>(this BinaryObjectReader reader, TContext context, long offset, int count) where T : IBinarySerializable<TContext>, new()
+    {
+        T[] result = new T[count];
+
+        reader.ReadAtOffset(offset, () =>
+        {
+            for(int i = 0; i < count; i++)
+            {
+                result[i] = reader.ReadObject<T, TContext>(context);
+            }
+        });
+
+        return result;
+    }
+
     public static void WriteObjectCollection<T>(this BinaryObjectWriter writer, IEnumerable<T> items) where T : IBinarySerializable
     {
         foreach(T item in items)
