@@ -28,10 +28,10 @@ public class UserData : List<Data>, IBinarySerializable<ChunkBinaryOptions>
 
 public class Data : IBinarySerializable<ChunkBinaryOptions>
 {
-    public string Name { get; set; }
+    public string? Name { get; set; }
     public int Type { get; set; }
     public Union Value { get; set; }
-    public string ValueName { get; set; }
+    public string? ValueName { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {

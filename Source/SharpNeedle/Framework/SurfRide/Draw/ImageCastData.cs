@@ -11,10 +11,10 @@ public class ImageCastData : IImageDataBase
     public Color<byte> VertexColorBottomLeft { get; set; }
     public Color<byte> VertexColorTopRight { get; set; }
     public Color<byte> VertexColorBottomRight { get; set; }
-    public IEffectData Effect { get; set; }
+    public IEffectData? Effect { get; set; }
     public ImageCastSurface Surface { get; set; } = new();
     public ImageCastSurface Surface1 { get; set; } = new();
-    public FontData FontData { get; set; }
+    public FontData? FontData { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
@@ -134,8 +134,8 @@ public class FontData : IBinarySerializable<ChunkBinaryOptions>
     public uint Field18 { get; set; }
     public short SpaceCorrection { get; set; }
     public ushort Field1E { get; set; }
-    public string Characters { get; set; }
-    public Font Font { get; set; }
+    public string? Characters { get; set; }
+    public Font? Font { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
@@ -178,6 +178,11 @@ public class FontData : IBinarySerializable<ChunkBinaryOptions>
         if(options.Version >= 3)
         {
             writer.Align(8);
+        }
+
+        if(Font == null)
+        {
+            throw new InvalidOperationException("Font is null!");
         }
 
         writer.WriteObjectOffset(Font, options);

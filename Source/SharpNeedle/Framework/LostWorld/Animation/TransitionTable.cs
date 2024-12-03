@@ -10,7 +10,7 @@ public class TransitionTable : Dictionary<string, string>, IBinarySerializable
         {
             for(int i = 0; i < count; i++)
             {
-                Add(reader.ReadStringOffset(), reader.ReadStringOffset());
+                Add(reader.ReadStringOffsetOrEmpty(), reader.ReadStringOffsetOrEmpty());
             }
         });
     }

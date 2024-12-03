@@ -2,8 +2,8 @@
 
 public class TextureMirage : IBinarySerializable, ITexture
 {
-    public string Name { get; set; }
-    public byte[] Data { get; set; }
+    public string? Name { get; set; }
+    public byte[] Data { get; set; } = [];
     public int MemoryDataIndex { get; internal set; }
 
     public TextureMirage()
@@ -38,6 +38,6 @@ public class TextureMirage : IBinarySerializable, ITexture
 
     public override string ToString()
     {
-        return Name;
+        return Name ?? string.Empty;
     }
 }

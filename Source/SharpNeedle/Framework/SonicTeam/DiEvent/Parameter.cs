@@ -13,11 +13,12 @@ public abstract class BaseParam : IBinarySerializable<GameType>
 
 public class UnknownParam : BaseParam
 {
-    public byte[] Data { get; set; }
+    public byte[] Data { get; set; } = [];
     public int Size { get; set; }
     public int Type { get; set; }
 
     public UnknownParam() { }
+
     public UnknownParam(BinaryObjectReader reader, int size, int type)
     {
         Size = size;
@@ -204,7 +205,7 @@ public class EffectParam : BaseParam
 {
     public Matrix4x4 LocalTransform { get; set; }
     public int Field40 { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     public int Field84 { get; set; }
     public int Field88 { get; set; }
     public int Field8C { get; set; }
@@ -274,13 +275,14 @@ public class CullDisabledParam : BaseParam
 public class UVAnimParam : BaseParam
 {
     public int Field00 { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     public int Field44 { get; set; }
     public float Field48 { get; set; }
     public int Field4C { get; set; }
     public int Field50 { get; set; }
 
     public UVAnimParam() { }
+
     public UVAnimParam(BinaryObjectReader reader, GameType game)
     {
         Read(reader, game);
@@ -312,13 +314,14 @@ public class UVAnimParam : BaseParam
 public class VisibilityAnimParam : BaseParam
 {
     public int Field00 { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     public int Field44 { get; set; }
     public float Field48 { get; set; }
     public int Field4C { get; set; }
     public int Field50 { get; set; }
 
     public VisibilityAnimParam() { }
+
     public VisibilityAnimParam(BinaryObjectReader reader, GameType game)
     {
         Read(reader, game);
@@ -350,13 +353,14 @@ public class VisibilityAnimParam : BaseParam
 public class MaterialAnimParam : BaseParam
 {
     public int Field00 { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     public int Field44 { get; set; }
     public float Field48 { get; set; }
     public int Field4C { get; set; }
     public int Field50 { get; set; }
 
     public MaterialAnimParam() { }
+
     public MaterialAnimParam(BinaryObjectReader reader, GameType game)
     {
         Read(reader, game);
@@ -388,11 +392,12 @@ public class MaterialAnimParam : BaseParam
 public class CompositeAnimParam : BaseParam
 {
     public int Field00 { get; set; }
-    public string StateName { get; set; }
+    public string StateName { get; set; } = string.Empty;
     public Animation[] Animations { get; set; } = new Animation[16];
     public int ActiveAnimCount { get; set; }
 
     public CompositeAnimParam() { }
+
     public CompositeAnimParam(BinaryObjectReader reader, GameType game)
     {
         Read(reader, game);
@@ -601,13 +606,14 @@ public class GameCameraParam : BaseParam
 public class ControllerVibrationParam : BaseParam
 {
     public int Field00 { get; set; }
-    public string Group { get; set; }
-    public string Mode { get; set; }
+    public string Group { get; set; } = string.Empty;
+    public string Mode { get; set; } = string.Empty;
     public uint Field84 { get; set; }
     public uint Field88 { get; set; }
     public uint Field8C { get; set; }
 
     public ControllerVibrationParam() { }
+
     public ControllerVibrationParam(BinaryObjectReader reader, GameType game)
     {
         Read(reader, game);
@@ -638,12 +644,13 @@ public class ControllerVibrationParam : BaseParam
 
 public class MaterialParameterParam : BaseParam
 {
-    public string MaterialName { get; set; }
-    public string ParamName { get; set; }
+    public string MaterialName { get; set; } = string.Empty;
+    public string ParamName { get; set; } = string.Empty;
     public uint Type { get; set; }
     public uint[] UnknownData { get; set; } = new uint[40];
 
     public MaterialParameterParam() { }
+
     public MaterialParameterParam(BinaryObjectReader reader, GameType game)
     {
         Read(reader, game);
@@ -964,11 +971,12 @@ public class ChromaAberrationParam : BaseParam
 
 public class SoundParam : BaseParam
 {
-    public string CueName { get; set; }
+    public string CueName { get; set; } = string.Empty;
     public int Field40 { get; set; }
     public int Field44 { get; set; }
 
     public SoundParam() { }
+
     public SoundParam(BinaryObjectReader reader, GameType game)
     {
         Read(reader, game);
@@ -1006,12 +1014,12 @@ public class SoundParam : BaseParam
 
 public class SubtitleParam : BaseParam
 {
-    public string CellName { get; set; }
+    public string CellName { get; set; } = string.Empty;
     public SubtitleLanguage Language { get; set; }
     public int Field14 { get; set; }
     public int Field24 { get; set; }
     public int Field28 { get; set; }
-    public string CellName2 { get; set; }
+    public string CellName2 { get; set; } = string.Empty;
 
     public SubtitleParam() { }
     public SubtitleParam(BinaryObjectReader reader, GameType game)
@@ -1124,9 +1132,9 @@ public class QTEParam : BaseParam
     public float Field78 { get; set; }
     public float Field7C { get; set; }
     public int[] Field80 { get; set; } = new int[32];
-    public string Field100 { get; set; }
-    public string Field140 { get; set; }
-    public string Field180 { get; set; }
+    public string Field100 { get; set; } = string.Empty;
+    public string Field140 { get; set; } = string.Empty;
+    public string Field180 { get; set; } = string.Empty;
     public uint Field1C0 { get; set; }
 
     public QTEParam() { }
@@ -1667,10 +1675,11 @@ public class TheEndCableParam : BaseParam
 }
 public class ASMOverrideParam : BaseParam
 {
-    public string OverriddenASMName { get; set; }
-    public string OverridingASMName { get; set; }
+    public string OverriddenASMName { get; set; } = string.Empty;
+    public string OverridingASMName { get; set; } = string.Empty;
 
     public ASMOverrideParam() { }
+
     public ASMOverrideParam(BinaryObjectReader reader, GameType game)
     {
         Read(reader, game);
@@ -1704,9 +1713,10 @@ public class ASMOverrideParam : BaseParam
 public class GeneralTriggerParam : BaseParam
 {
     public uint Field00 { get; set; }
-    public string TriggerName { get; set; }
+    public string TriggerName { get; set; } = string.Empty;
 
     public GeneralTriggerParam() { }
+
     public GeneralTriggerParam(BinaryObjectReader reader, GameType game)
     {
         Read(reader, game);

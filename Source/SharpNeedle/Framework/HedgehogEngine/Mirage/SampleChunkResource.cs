@@ -5,11 +5,11 @@ using System.Reflection;
 public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
 {
     public uint DataVersion { get; set; }
-    public SampleChunkNode Root { get; set; }
+    public SampleChunkNode? Root { get; set; }
 
     public void SetupNodes()
     {
-        NeedleResourceAttribute attribute = GetType().GetCustomAttribute<NeedleResourceAttribute>();
+        NeedleResourceAttribute? attribute = GetType().GetCustomAttribute<NeedleResourceAttribute>();
         if(attribute == null || attribute.Type == ResourceType.Raw)
         {
             SetupNodes(GetType().Name);
@@ -75,7 +75,7 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
 
         reader.ReadOffsetValue(); // offset table 
 
-        string name = reader.ReadStringOffset();
+        string? name = reader.ReadStringOffset();
         if(!string.IsNullOrEmpty(name))
         {
             Name = Path.GetFileNameWithoutExtension(name);
@@ -87,7 +87,7 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
         long rootStart = reader.Position;
         Root = reader.ReadObject<SampleChunkNode>();
 
-        SampleChunkNode contexts = Root.FindNode("Contexts");
+        SampleChunkNode? contexts = Root.FindNode("Contexts");
         if(contexts == null)
         {
             return;
@@ -198,7 +198,7 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
 
     private void WriteResourceV2(BinaryObjectWriter writer)
     {
-        SampleChunkNode contexts = Root.FindNode("Contexts");
+        SampleChunkNode? contexts = Root?.FindNode("Contexts");
         if(contexts != null)
         {
             contexts.Value = DataVersion;

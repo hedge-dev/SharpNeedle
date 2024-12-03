@@ -49,8 +49,8 @@ public class PointCloud : BinaryResource
 
     public class InstanceData : IBinarySerializable<bool>
     {
-        public string Name { get; set; }
-        public string ResourceName { get; set; }
+        public string? Name { get; set; }
+        public string? ResourceName { get; set; }
         public Vector3 Position { get; set; }
         public Vector3 Rotation { get; set; }
         public int Field28 { get; set; }

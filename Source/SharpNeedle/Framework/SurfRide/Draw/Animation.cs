@@ -2,11 +2,11 @@
 
 public class Animation : List<Motion>, IBinarySerializable<ChunkBinaryOptions>
 {
-    public string Name { get; set; }
+    public string? Name { get; set; }
     public int ID { get; set; }
     public uint EndFrame { get; set; }
     public bool IsLooping { get; set; }
-    public UserData UserData { get; set; }
+    public UserData? UserData { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {

@@ -14,7 +14,7 @@ public class Texset : SampleChunkResource
             {
                 Textures.Add(new Texture
                 {
-                    Name = reader.ReadStringOffset()
+                    Name = reader.ReadStringOffsetOrEmpty()
                 });
             }
         });
@@ -36,7 +36,9 @@ public class Texset : SampleChunkResource
     {
         for(int i = 0; i < Textures.Count; i++)
         {
-            Textures[i] = resolver.Open<Texture>($"{Textures[i].Name}.texture");
+            string file = $"{Textures[i].Name}.texture";
+            Textures[i] = resolver.Open<Texture>(file) 
+                ?? throw new InvalidDataException($"Could not resolve dependency \"{file}\"");
         }
     }
 

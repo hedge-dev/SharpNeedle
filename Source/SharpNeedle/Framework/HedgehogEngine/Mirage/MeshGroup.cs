@@ -4,7 +4,7 @@ using SharpNeedle.Structs;
 
 public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICloneable<MeshGroup>
 {
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     public void Read(BinaryObjectReader reader, uint version)
     {
@@ -38,7 +38,7 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
         {
             for(int i = 0; i < specialMeshCount; i++)
             {
-                slots[i] = new(reader.ReadStringOffset(), 0);
+                slots[i] = new(reader.ReadStringOffsetOrEmpty(), 0);
             }
         });
 
@@ -101,13 +101,13 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
                 continue;
             }
 
-            if(specialGroups.TryGetValue(mesh.Slot.Name, out List<Mesh> meshes))
+            if(specialGroups.TryGetValue(mesh.Slot.Name!, out List<Mesh>? meshes))
             {
                 meshes.Add(mesh);
             }
             else
             {
-                specialGroups.Add(mesh.Slot.Name, [mesh]);
+                specialGroups.Add(mesh.Slot.Name!, [mesh]);
             }
         }
 

@@ -55,7 +55,7 @@ public class Archive : ResourceBase, IDirectory, IStreamable
         foreach(IFile file in this)
         {
             PackedFileInfo.File pfiFile = new();
-            size = AlignmentHelper.Align(size + 21 + pfiFile.Name.Length, DataAlignment);
+            size = AlignmentHelper.Align(size + 21 + file.Name.Length, DataAlignment);
             pfiFile.Name = file.Name;
             pfiFile.Offset = (uint)size;
             pfiFile.Size = (uint)file.Length;

@@ -3,13 +3,13 @@
 [NeedleResource("hh/light-list", @"\.light-list$")]
 public class LightList : SampleChunkResource
 {
-    public List<string> LightNames { get; set; }
-    public List<Light> Lights { get; set; }
+    public List<string?> LightNames { get; set; } = [];
+    public List<Light> Lights { get; set; } = [];
 
     public override void Read(BinaryObjectReader reader)
     {
         int count = reader.Read<int>();
-        LightNames = new List<string>(count);
+        LightNames = new(count);
         reader.ReadOffset(() =>
         {
             for(int i = 0; i < count; i++)
@@ -34,7 +34,7 @@ public class LightList : SampleChunkResource
             }
             else
             {
-                foreach(string light in LightNames)
+                foreach(string? light in LightNames)
                 {
                     writer.WriteStringOffset(StringBinaryFormat.NullTerminated, light);
                 }
@@ -59,12 +59,12 @@ public class LightList : SampleChunkResource
 
     public override IEnumerable<ResourceDependency> GetDependencies()
     {
-        if(LightNames?.Count is 0 or null)
+        if(LightNames.Count == 0)
         {
             yield break;
         }
 
-        foreach(string name in LightNames)
+        foreach(string? name in LightNames)
         {
             yield return new ResourceDependency()
             {
@@ -76,17 +76,17 @@ public class LightList : SampleChunkResource
 
     public override void ResolveDependencies(IResourceResolver resolver)
     {
-        if(LightNames?.Count is 0 or null)
+        if(LightNames.Count == 0)
         {
             return;
         }
 
-        Lights = new List<Light>(LightNames.Count);
-        foreach(string name in LightNames)
+        Lights = new(LightNames.Count);
+        foreach(string? name in LightNames)
         {
-            Lights.Add(resolver.Open<Light>($"{name}{Light.Extension}"));
+            Lights.Add(resolver.Open<Light>($"{name}{Light.Extension}") ?? throw new InvalidDataException("Light is null!"));
         }
 
-        LightNames = null;
+        LightNames = [];
     }
 }

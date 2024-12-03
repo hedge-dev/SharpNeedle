@@ -3,9 +3,9 @@
 [NeedleResource("nn/csd-project", @"\.[gsxy]ncp$")]
 public class CsdProject : ResourceBase, IBinarySerializable
 {
-    public CsdPackage Package { get; set; }
-    public ProjectChunk Project { get; set; }
-    public ITextureList Textures { get; set; }
+    public CsdPackage? Package { get; set; }
+    public ProjectChunk? Project { get; set; }
+    public ITextureList? Textures { get; set; }
     public Endianness Endianness { get; set; }
 
     public override void Read(IFile file)
@@ -65,6 +65,11 @@ public class CsdProject : ResourceBase, IBinarySerializable
 
     public void Write(BinaryObjectWriter writer)
     {
+        if(Project == null)
+        {
+            throw new InvalidOperationException("Project is null!");
+        }
+
         Package = new CsdPackage
         {
             Endianness = Endianness

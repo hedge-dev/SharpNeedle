@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.Framework.LostWorld.Animation;
 
-public class SequenceTable : List<string>, IComplexData
+public class SequenceTable : List<string?>, IComplexData
 {
     public PlayModeInfo PlayMode { get; set; }
 
@@ -39,7 +39,7 @@ public class SequenceTable : List<string>, IComplexData
         writer.Write(Count);
         writer.WriteOffset(() =>
         {
-            foreach(string seq in this)
+            foreach(string? seq in this)
             {
                 writer.WriteStringOffset(StringBinaryFormat.NullTerminated, seq);
             }

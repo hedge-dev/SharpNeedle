@@ -2,14 +2,14 @@
 
 public class ComplexAnimation : AnimationDef
 {
-    public List<SimpleAnimation> Animations { get; set; }
-    public IComplexData Data { get; set; }
+    public List<SimpleAnimation> Animations { get; set; } = [];
+    public IComplexData? Data { get; set; }
 
     public bool HasBlender => Data is BlenderData;
-    public BlenderData Blender => Data as BlenderData;
+    public BlenderData? Blender => Data as BlenderData;
 
     public bool HasSequenceTable => Data is SequenceTable;
-    public SequenceTable SequenceTable => Data as SequenceTable;
+    public SequenceTable? SequenceTable => Data as SequenceTable;
 
     public ComplexAnimation() : base(AnimationType.Complex)
     {
@@ -38,6 +38,11 @@ public class ComplexAnimation : AnimationDef
 
     public override void Write(BinaryObjectWriter writer)
     {
+        if(Data == null)
+        {
+            throw new InvalidOperationException("Data is null!");
+        }
+
         base.Write(writer);
         writer.WriteObject<BinaryList<SimpleAnimation>>(Animations);
         writer.WriteOffset(() => writer.WriteObject(Data, true));

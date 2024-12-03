@@ -10,7 +10,7 @@ public class Node : IBinarySerializable<GameType>
     public int Field24 { get; set; }
     public int Field28 { get; set; }
     public int Field2C { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     public BaseNodeData Data { get; set; } = new PathData();
 
     public Node() { }

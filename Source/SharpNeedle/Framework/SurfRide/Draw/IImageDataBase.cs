@@ -12,6 +12,6 @@ public interface IImageDataBase : ICastData
     public Color<byte> VertexColorTopRight { get; set; }
     public Color<byte> VertexColorBottomRight { get; set; }
     public ImageCastSurface Surface { get; set; }
-    public IEffectData Effect { get; set; }
+    public IEffectData? Effect { get; set; }
 }
 public interface ICastData : IBinarySerializable<ChunkBinaryOptions> { }

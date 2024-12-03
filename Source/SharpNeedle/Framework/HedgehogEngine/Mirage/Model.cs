@@ -5,8 +5,8 @@ using SharpNeedle.Structs;
 [NeedleResource("hh/model", ResourceType.Model, @"\.model$")]
 public class Model : ModelBase
 {
-    public List<MorphModel> Morphs { get; set; }
-    public List<Node> Nodes { get; set; }
+    public List<MorphModel>? Morphs { get; set; }
+    public List<Node> Nodes { get; set; } = [];
     public AABB Bounds { get; set; }
 
     public override void Read(BinaryObjectReader reader)
@@ -88,7 +88,7 @@ public class Model : ModelBase
 
     public struct Node : IBinarySerializable
     {
-        public string Name;
+        public string? Name;
         public int ParentIndex;
         public Matrix4x4 Transform;
 
@@ -106,7 +106,7 @@ public class Model : ModelBase
 
         public override readonly string ToString()
         {
-            return Name ?? base.ToString();
+            return Name ?? base.ToString()!;
         }
     }
 }

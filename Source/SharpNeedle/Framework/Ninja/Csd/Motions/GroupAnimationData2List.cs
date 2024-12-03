@@ -2,7 +2,8 @@
 
 public class GroupAnimationData2List : IBinarySerializable<Family>
 {
-    public Family Target { get; set; }
+    public Family? Target { get; set; }
+
     public void Read(BinaryObjectReader reader, Family context)
     {
         Target = context;

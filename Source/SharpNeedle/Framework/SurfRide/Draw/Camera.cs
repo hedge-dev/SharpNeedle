@@ -2,7 +2,7 @@
 
 public class Camera : IBinarySerializable<ChunkBinaryOptions>
 {
-    public string Name { get; set; }
+    public string? Name { get; set; }
     public int ID { get; set; }
     public uint FieldOfView { get; set; }
     public float NearPlane { get; set; }

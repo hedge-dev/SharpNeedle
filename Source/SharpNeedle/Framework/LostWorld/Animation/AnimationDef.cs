@@ -1,8 +1,10 @@
 ﻿namespace SharpNeedle.Framework.LostWorld.Animation;
 
+using SharpNeedle.Utilities;
+
 public class AnimationDef : IBinarySerializable
 {
-    public string Name { get; set; }
+    public string? Name { get; set; }
     public short Layer { get; set; }
     public AnimationType Type { get; }
 
@@ -27,7 +29,7 @@ public class AnimationDef : IBinarySerializable
 
     public override string ToString()
     {
-        return Name;
+        return Name ?? string.Empty;
     }
 }
 

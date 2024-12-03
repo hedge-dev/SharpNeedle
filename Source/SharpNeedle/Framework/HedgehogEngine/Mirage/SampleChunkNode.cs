@@ -22,7 +22,7 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
     /// <summary>
     /// Name of the node
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
     /// Unsigned 32 bit integer value
@@ -50,12 +50,12 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
     /// <summary>
     /// Arbitrary binary data
     /// </summary>
-    public IBinarySerializable Data { get; set; }
+    public IBinarySerializable? Data { get; set; }
 
     /// <summary>
     /// Parent node
     /// </summary>
-    public SampleChunkNode Parent { get; private set; }
+    public SampleChunkNode? Parent { get; private set; }
 
     /// <summary>
     /// Node children
@@ -181,7 +181,7 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
     /// </summary>
     /// <param name="name">Name of the node to look for.</param>
     /// <param name="recursive">Whether to recursively look in child nodes too</param>
-    public SampleChunkNode FindNode(string name, bool recursive = true)
+    public SampleChunkNode? FindNode(string name, bool recursive = true)
     {
         if(string.IsNullOrEmpty(name))
         {
@@ -197,7 +197,7 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
 
             if(recursive && child.Count > 0)
             {
-                SampleChunkNode item = child.FindNode(name, recursive);
+                SampleChunkNode? item = child.FindNode(name, recursive);
                 if(item != null)
                 {
                     return item;

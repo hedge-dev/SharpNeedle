@@ -2,10 +2,10 @@
 
 public class Info : ResourceBase, IBinarySerializable
 {
-    public string PackageName { get; set; }
+    public string PackageName { get; set; } = string.Empty;
     public int Mip4x4Index { get; set; }
-    public byte[] Mip4x4 { get; set; }
-    public byte[] DdsHeader { get; set; }
+    public byte[]? Mip4x4 { get; set; }
+    public byte[]? DdsHeader { get; set; }
 
     public override void Read(IFile file)
     {
@@ -51,6 +51,16 @@ public class Info : ResourceBase, IBinarySerializable
 
     public void Write(BinaryObjectWriter writer)
     {
+        if(Mip4x4 == null)
+        {
+            throw new InvalidOperationException("Mip4x4 is null!");
+        }
+
+        if(DdsHeader == null)
+        {
+            throw new InvalidOperationException("DdsHeader is null!");
+        }
+
         writer.WriteInt32(0x4953544E);
         writer.WriteInt32(1);
         writer.WriteInt32(0);
@@ -80,6 +90,12 @@ public class Info : ResourceBase, IBinarySerializable
         for(int i = 0; i < entry.MipLevels; i++)
         {
             DataBlock block = package.Blocks[entry.BlockIndex + i];
+
+            if(block.DataStream == null)
+            {
+                throw new InvalidOperationException("Block has no datastream!");
+            }
+
             result.Write(block.DataStream.ReadAllBytes());
         }
 

@@ -6,7 +6,7 @@ public class Resource : IBinarySerializable
     public ResourceType ResType { get; set; }
     public uint Flags { get; set; }
     public int Field18 { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     public Resource() { }
 

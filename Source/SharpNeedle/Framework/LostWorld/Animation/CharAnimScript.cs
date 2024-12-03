@@ -5,10 +5,10 @@ using SharpNeedle.Framework.BINA;
 [NeedleResource("lw/anm", @"\.anm$")]
 public class CharAnimScript : BinaryResource
 {
-    public string ScriptVersion { get; set; } = "1.02";
-    public List<SimpleAnimation> SimpleAnimations { get; set; }
-    public List<ComplexAnimation> ComplexAnimations { get; set; }
-    public TransitionTable Transitions { get; set; }
+    public string? ScriptVersion { get; set; } = "1.02";
+    public List<SimpleAnimation> SimpleAnimations { get; set; } = [];
+    public List<ComplexAnimation> ComplexAnimations { get; set; } = [];
+    public TransitionTable Transitions { get; set; } = [];
 
     public override void Read(BinaryObjectReader reader)
     {
@@ -46,17 +46,11 @@ public class CharAnimScript : BinaryResource
     {
         int triggerCount = 0;
 
-        if(SimpleAnimations != null)
-        {
-            Traverse(SimpleAnimations);
-        }
+        Traverse(SimpleAnimations);
 
-        if(ComplexAnimations != null)
+        foreach(ComplexAnimation animation in ComplexAnimations)
         {
-            foreach(ComplexAnimation animation in ComplexAnimations)
-            {
-                Traverse(animation.Animations);
-            }
+            Traverse(animation.Animations);
         }
 
         return triggerCount;

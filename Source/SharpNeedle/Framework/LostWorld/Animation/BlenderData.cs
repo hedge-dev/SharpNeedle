@@ -39,9 +39,9 @@ public class BlenderData : List<Blender>, IComplexData
 
 public class Blender : IBinarySerializable
 {
-    public string Name { get; set; }
+    public string? Name { get; set; }
     public float Weight { get; set; }
-    public List<Node> Nodes { get; set; }
+    public List<Node> Nodes { get; set; } = [];
 
     public void Read(BinaryObjectReader reader)
     {
@@ -61,7 +61,7 @@ public class Blender : IBinarySerializable
 
     public struct Node : IBinarySerializable
     {
-        public string Name;
+        public string? Name;
         public float Weight;
         public int Priority;
 

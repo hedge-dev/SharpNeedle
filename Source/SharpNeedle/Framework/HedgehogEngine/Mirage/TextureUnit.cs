@@ -2,7 +2,7 @@
 
 public class TextureUnit : IBinarySerializable
 {
-    public string Name { get; set; }
+    public string? Name { get; set; }
     public byte Index { get; set; }
 
     public void Read(BinaryObjectReader reader)

@@ -4,21 +4,21 @@
 public class TerrainInstanceInfo : SampleChunkResource
 {
     public const string Extension = ".terrain-instanceinfo";
-    private string _mModelName;
+    private string? _modelName;
 
-    public TerrainModel Model { get; set; }
+    public TerrainModel? Model { get; set; }
     public Matrix4x4 Transform { get; set; }
-    public List<LightIndexMeshGroup> LightGroups { get; set; }
+    public List<LightIndexMeshGroup> LightGroups { get; set; } = [];
 
-    public string ModelName
+    public string? ModelName
     {
-        get => Model == null ? _mModelName : Model.Name;
+        get => Model == null ? _modelName : Model.Name;
         set
         {
-            _mModelName = value;
+            _modelName = value;
             if(Model != null)
             {
-                Model.Name = value;
+                Model.Name = value ?? string.Empty;
             }
         }
     }
@@ -27,7 +27,7 @@ public class TerrainInstanceInfo : SampleChunkResource
     {
         ModelName = reader.ReadStringOffset();
         Transform = Matrix4x4.Transpose(reader.ReadValueOffset<Matrix4x4>());
-        Name = reader.ReadStringOffset();
+        Name = reader.ReadStringOffsetOrEmpty();
         LightGroups = DataVersion >= 5
             ? reader.ReadObject<BinaryList<BinaryPointer<LightIndexMeshGroup>>>().Unwind()
             : new List<LightIndexMeshGroup>(2) { reader.ReadObject<LightIndexMeshGroup>() };
@@ -67,13 +67,13 @@ public class TerrainInstanceInfo : SampleChunkResource
 
     public override void ResolveDependencies(IResourceResolver resolver)
     {
-        if(string.IsNullOrEmpty(_mModelName))
+        if(string.IsNullOrEmpty(_modelName))
         {
             return;
         }
 
-        Model = resolver.Open<TerrainModel>($"{_mModelName}.terrain-model");
-        _mModelName = null;
+        Model = resolver.Open<TerrainModel>($"{_modelName}.terrain-model");
+        _modelName = null;
     }
 
     protected override void Dispose(bool disposing)

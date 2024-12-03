@@ -3,8 +3,8 @@
 [NeedleResource("sr/project", @"\.swif$")]
 public class SrdProject : ResourceBase, IBinarySerializable<uint>
 {
-    public ProjectChunk Project { get; set; }
-    public TextureListChunk TextureLists { get; set; }
+    public ProjectChunk? Project { get; set; }
+    public TextureListChunk? TextureLists { get; set; }
     public int Version { get; set; }
     public Endianness Endianness { get; set; } = BinaryHelper.PlatformEndianness;
 
@@ -48,15 +48,26 @@ public class SrdProject : ResourceBase, IBinarySerializable<uint>
 
     public void Write(BinaryObjectWriter writer, uint version)
     {
-        InfoChunk info = new();
-        info.Version = Version;
-        info.Chunks.Add(TextureLists);
-        info.Chunks.Add(Project);
+        InfoChunk info = new()
+        {
+            Version = Version
+        };
+
+        if(TextureLists != null)
+        {
+            info.Chunks.Add(TextureLists);
+        }
+
+        if(Project != null)
+        {
+            info.Chunks.Add(Project);
+        }
+
         writer.WriteObject(info, new ChunkBinaryOptions() { Version = version });
     }
 
-    public TextureList GetTextureList(string name)
+    public TextureList? GetTextureList(string name)
     {
-        return TextureLists.Find(item => item.Name == name);
+        return TextureLists?.Find(item => item.Name == name);
     }
 }

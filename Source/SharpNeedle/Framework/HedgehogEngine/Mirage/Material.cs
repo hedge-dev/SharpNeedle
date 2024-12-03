@@ -1,11 +1,12 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Mirage;
 
 using SharpNeedle.Structs;
+using SharpNeedle.Utilities;
 
 [NeedleResource("hh/material", ResourceType.Material, @"\.material$")]
 public class Material : SampleChunkResource
 {
-    public string ShaderName { get; set; }
+    public string? ShaderName { get; set; }
     public byte AlphaThreshold { get; set; }
     public bool NoBackFaceCulling { get; set; }
     public bool UseAdditiveBlending { get; set; }
@@ -75,7 +76,7 @@ public class Material : SampleChunkResource
             {
                 Texset.Textures.Add(new Texture
                 {
-                    Name = reader.ReadStringOffset()
+                    Name = reader.ReadStringOffset() ?? string.Empty
                 });
             }
         }
@@ -198,7 +199,7 @@ public class Material : SampleChunkResource
     {
         if(DataVersion <= 1)
         {
-            Texset = resolver.Open<Texset>($"{Texset.Name}.texset");
+            Texset = resolver.Open<Texset>($"{Texset.Name}.texset") ?? throw new InvalidDataException("Texset is null!");
         }
 
         if(DataVersion <= 2)
@@ -225,7 +226,7 @@ public class Material : SampleChunkResource
 
     public class Parameter<T> : IBinarySerializable where T : unmanaged
     {
-        internal string Name { get; set; }
+        internal string Name { get; set; } = string.Empty;
         public List<T> Values { get; set; } = new(1);
 
         public T Value
@@ -260,7 +261,7 @@ public class Material : SampleChunkResource
             byte valueCount = reader.Read<byte>();
             reader.Skip(1);
 
-            Name = reader.ReadStringOffset();
+            Name = reader.ReadStringOffsetOrEmpty();
             if(valueCount != 0)
             {
                 using SeekToken token = reader.ReadOffset();

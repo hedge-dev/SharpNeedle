@@ -12,11 +12,11 @@ public enum WrapMode : byte
 [NeedleResource("hh/texture", @"\.texture$")]
 public class Texture : SampleChunkResource
 {
-    public string PictureName { get; set; }
+    public string? PictureName { get; set; }
     public byte TexCoordIndex { get; set; }
     public WrapMode WrapModeU { get; set; }
     public WrapMode WrapModeV { get; set; }
-    public string Type { get; set; }
+    public string? Type { get; set; }
 
     public Texture()
     {

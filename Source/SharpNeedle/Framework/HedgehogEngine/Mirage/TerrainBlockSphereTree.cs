@@ -5,7 +5,7 @@ using SharpNeedle.Structs;
 [NeedleResource("hh/tbst", @"\.tbst$")]
 public class TerrainBlockSphereTree : SampleChunkResource
 {
-    public new BVHNode<Sphere, (int GroupID, int SubsetID)> Root { get; set; }
+    public new BVHNode<Sphere, (int GroupID, int SubsetID)> Root { get; set; } = new(default);
 
     public static TerrainBlockSphereTree Build(List<TerrainGroup> groups)
     {
@@ -103,11 +103,17 @@ public class TerrainBlockSphereTree : SampleChunkResource
             }
             else
             {
-                bNode.LeftIndex = result.Count;
-                BuildNodes(node.Left, result);
+                if(node.Left != null)
+                {
+                    bNode.LeftIndex = result.Count;
+                    BuildNodes(node.Left, result);
+                }
 
-                bNode.RightIndex = result.Count;
-                BuildNodes(node.Right, result);
+                if(node.Right != null)
+                {
+                    bNode.RightIndex = result.Count;
+                    BuildNodes(node.Right, result);
+                }
             }
 
             result.Add(bNode);

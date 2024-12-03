@@ -32,8 +32,8 @@ public class LightIndexMesh : List<LightIndexData>, IBinarySerializable
 
 public class LightIndexData : IBinarySerializable
 {
-    public uint[] LightIndices { get; set; }
-    public ushort[] VertexIndices { get; set; }
+    public uint[] LightIndices { get; set; } = [];
+    public ushort[] VertexIndices { get; set; } = [];
 
     public void Read(BinaryObjectReader reader)
     {

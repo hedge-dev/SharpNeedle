@@ -117,9 +117,9 @@ public class CameraMotionData : BaseNodeData
 public class ModelData : BaseNodeData
 {
     public int Field00 { get; set; }
-    public string ModelName { get; set; }
-    public string SkeletonName { get; set; }
-    public string Field84 { get; set; }
+    public string ModelName { get; set; } = string.Empty;
+    public string SkeletonName { get; set; } = string.Empty;
+    public string Field84 { get; set; } = string.Empty;
 
     public ModelData() { }
     public ModelData(BinaryObjectReader reader, GameType game)
@@ -154,7 +154,7 @@ public class MotionModelData : BaseNodeData
     public int Field04 { get; set; }
     public int Field08 { get; set; }
     public int Field0C { get; set; }
-    public string Field10 { get; set; }
+    public string Field10 { get; set; } = string.Empty;
     public float Field18 { get; set; }
 
     public MotionModelData() { }
@@ -191,7 +191,7 @@ public class MotionModelData : BaseNodeData
 public class AttachmentData : BaseNodeData
 {
     public int Field00 { get; set; }
-    public string NodeName { get; set; }
+    public string NodeName { get; set; } = string.Empty;
     public int Field44 { get; set; }
     public int Field48 { get; set; }
     public int Field4C { get; set; }
@@ -223,7 +223,6 @@ public class AttachmentData : BaseNodeData
 
 public class ParameterData : BaseNodeData
 {
-    private int UnknownDataSize;
 
     public float StartTime { get; set; }
     public float EndTime { get; set; }
@@ -232,7 +231,8 @@ public class ParameterData : BaseNodeData
     public int Field14 { get; set; }
     public int Field18 { get; set; }
     public int Field1C { get; set; }
-    public BaseParam Parameter { get; set; }
+    public BaseParam? Parameter { get; set; }
+    public int UnknownDataSize { get; set; }
 
     public ParameterData() { }
     public ParameterData(BinaryObjectReader reader, GameType game, int size)

@@ -2,13 +2,13 @@
 
 public class CastNode : IBinarySerializable<ChunkBinaryOptions>
 {
-    public string Name { get; set; }
+    public string? Name { get; set; }
     public int ID { get; set; }
     public uint Flags { get; set; }
     public short ChildIndex { get; set; }
     public short SiblingIndex { get; set; }
-    public ICastData Data { get; set; }
-    public UserData UserData { get; set; }
+    public ICastData? Data { get; set; }
+    public UserData? UserData { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {

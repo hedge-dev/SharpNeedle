@@ -2,7 +2,7 @@
 
 public class EffectParameter : IBinarySerializable<Effect>
 {
-    public string Name { get; set; }
+    public string? Name { get; set; }
     public float StartTime { get; set; }
     public float LifeTime { get; set; }
     public int PreprocessFrame { get; set; } // Guessed
@@ -119,11 +119,18 @@ public class EffectParameter : IBinarySerializable<Effect>
             }
         }
 
-        writer.WriteObjectOffset(Emitters.First.Value, this, 16);
-
-        if(parent.Parameters.Find(this).Next != null)
+        if(Emitters.First != null)
         {
-            writer.WriteObjectOffset(parent.Parameters.Find(this).Next.Value, parent, 16);
+            writer.WriteObjectOffset(Emitters.First.Value, this, 16);
+        }
+        else
+        {
+            writer.WriteOffsetValue(0);
+        }
+
+        if(parent.Parameters.Find(this)?.Next is LinkedListNode<EffectParameter> parameter)
+        {
+            writer.WriteObjectOffset(parameter.Value, parent, 16);
         }
         else
         {

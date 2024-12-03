@@ -63,7 +63,7 @@ public class MasterLevel : BinaryResource
 
     public class LevelInfo : IBinarySerializable<LevelInfoBinaryOptions>
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public bool HasFiles { get; set; }
         public bool Field20 { get; set; }
         public List<FileInfo> Files { get; set; } = [];
@@ -167,10 +167,10 @@ public class MasterLevel : BinaryResource
 
     public class FileInfo : IBinarySerializable<FileInfoBinaryOptions>
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public bool Field08 { get; set; }
-        public string NextDependencyName { get; set; }
-        public FileInfo NextFileInfo { get; set; }
+        public string? NextDependencyName { get; set; }
+        public FileInfo? NextFileInfo { get; set; }
 
         public void Read(BinaryObjectReader reader, FileInfoBinaryOptions options)
         {

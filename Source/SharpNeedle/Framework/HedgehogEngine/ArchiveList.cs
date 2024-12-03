@@ -210,7 +210,7 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
     {
         foreach(Archive archive in Archives)
         {
-            IFile file = archive.GetFile(name);
+            IFile? file = archive.GetFile(name);
             if(file != null)
             {
                 return file;

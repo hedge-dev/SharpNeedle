@@ -2,13 +2,13 @@
 
 public class Font : List<CharData>, IBinarySerializable<ChunkBinaryOptions>
 {
-    public string Name { get; set; }
+    public string? Name { get; set; }
     public int ID { get; set; }
     public uint Field0C { get; set; }
     public short Field10 { get; set; }
     public ushort Field14 { get; set; }
     public long Field20 { get; set; }
-    public UserData UserData { get; set; }
+    public UserData? UserData { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {

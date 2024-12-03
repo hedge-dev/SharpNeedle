@@ -12,13 +12,13 @@ public class Page : IBinarySerializable
     public int Field24 { get; set; }
     public int Field28 { get; set; }
     public int Field2C { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     public int Field50 { get; set; }
     public int Field54 { get; set; }
     public int Field58 { get; set; }
     public int Field5C { get; set; }
-    public int[] UnknownArray { get; set; }
-    public byte[] Data { get; set; }
+    public int[] UnknownArray { get; set; } = [];
+    public byte[] Data { get; set; } = [];
 
     public void Read(BinaryObjectReader reader)
     {

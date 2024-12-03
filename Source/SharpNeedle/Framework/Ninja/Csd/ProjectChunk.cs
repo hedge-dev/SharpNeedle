@@ -6,12 +6,12 @@ public class ProjectChunk : IChunk
 {
     public static readonly uint BinSignature = BinaryHelper.MakeSignature<uint>("nCPJ");
     public uint Signature { get; private set; } = BinSignature;
-    public string Name { get; set; }
+    public string? Name { get; set; }
     public TextureFormat TextureFormat { get; set; }
     public uint Field08 { get; set; }
     public uint Field0C { get; set; }
-    public SceneNode Root { get; set; }
-    public FontCollection Fonts { get; set; }
+    public SceneNode? Root { get; set; }
+    public FontCollection? Fonts { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {

@@ -14,7 +14,7 @@ public struct DirectoryResourceResolver : IResourceResolver
     }
 
 
-    public readonly TRes Open<TRes>(string fileName) where TRes : IResource, new()
+    public readonly TRes? Open<TRes>(string fileName) where TRes : IResource, new()
     {
         IFile file = Directory[fileName] ?? throw new FileNotFoundException($"File \"{fileName}\" not found", Path.Join(Directory.Path, fileName));
 

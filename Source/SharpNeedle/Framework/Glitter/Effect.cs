@@ -36,6 +36,13 @@ public class Effect : BinaryResource
 
         writer.Write(0); // Always 0?
 
-        writer.WriteObjectOffset(Parameters.First.Value, this, 16);
+        if(Parameters.First != null)
+        {
+            writer.WriteObjectOffset(Parameters.First.Value, this, 16);
+        }
+        else
+        {
+            writer.WriteOffsetValue(0);
+        }
     }
 }

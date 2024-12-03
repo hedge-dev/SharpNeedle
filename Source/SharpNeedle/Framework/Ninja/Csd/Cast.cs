@@ -5,13 +5,13 @@ using SharpNeedle.Structs;
 
 public class Cast : IBinarySerializable<Family>, IList<Cast>
 {
-    private int mPriority;
+    private int _priority;
     public int Count => Children.Count;
     public bool IsReadOnly => false;
 
-    public Family Family { get; internal set; }
-    public Cast Parent { get; set; }
-    public string Name { get; set; }
+    public Family? Family { get; internal set; }
+    public Cast? Parent { get; set; }
+    public string? Name { get; set; }
     public uint Field00 { get; set; }
     public uint Field04 { get; set; }
     public bool Enabled { get; set; }
@@ -22,8 +22,8 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
     public uint Field2C { get; set; }
     public BitSet<uint> InheritanceFlags { get; set; }
     public uint Field38 { get; set; }
-    public string Text { get; set; }
-    public string FontName { get; set; }
+    public string? Text { get; set; }
+    public string? FontName { get; set; }
     public uint Field4C { get; set; }
     public uint Width { get; set; }
     public uint Height { get; set; }
@@ -33,18 +33,18 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
     public Vector2 Position { get; set; }
     public uint Field70 { get; set; }
     public CastInfo Info { get; set; }
-    public int[] SpriteIndices { get; set; }
+    public int[] SpriteIndices { get; set; } = [];
     public List<Cast> Children { get; set; } = [];
 
     public int Priority
     {
-        get => mPriority;
+        get => _priority;
         set
         {
-            int oldPriority = mPriority;
-            mPriority = value;
+            int oldPriority = _priority;
+            _priority = value;
 
-            if(oldPriority != mPriority)
+            if(oldPriority != _priority)
             {
                 Family?.NotifyPriorityChanged(this);
             }
@@ -73,6 +73,11 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
 
         Field4C = reader.Read<uint>();
 
+        if(family.Scene == null)
+        {
+            throw new InvalidOperationException("Family scene is null!");
+        }
+
         if(family.Scene.Version >= 3)
         {
             Width = reader.Read<uint>();
@@ -86,7 +91,7 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
         }
     }
 
-    public void Write(BinaryObjectWriter writer, Family family)
+    public void Write(BinaryObjectWriter writer, Family? family)
     {
         writer.Write(Field00);
         writer.Write(Field04);
@@ -111,6 +116,17 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
         writer.Write(Field4C);
 
         family ??= Family;
+
+        if(family == null)
+        {
+            throw new InvalidOperationException("family is null!");
+        }
+
+        if(family.Scene == null)
+        {
+            throw new InvalidOperationException("Family scene is null!");
+        }
+
         if(family.Scene.Version >= 3)
         {
             writer.Write(Width);
@@ -218,6 +234,6 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
 
     public override string ToString()
     {
-        return Name;
+        return Name ?? string.Empty;
     }
 }

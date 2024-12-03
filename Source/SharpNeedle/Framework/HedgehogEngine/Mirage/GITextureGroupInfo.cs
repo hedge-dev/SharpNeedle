@@ -5,9 +5,9 @@ using SharpNeedle.Structs;
 [NeedleResource("hh/gi-texture-group-info", @"\.gi-texture-group-info$")]
 public class GITextureGroupInfo : SampleChunkResource
 {
-    public List<(string Name, Sphere Bounds)> Instances { get; set; }
-    public List<GITextureGroup> Groups { get; set; }
-    public List<int> LowQualityGroups { get; set; }
+    public List<(string? Name, Sphere Bounds)> Instances { get; set; } = [];
+    public List<GITextureGroup> Groups { get; set; } = [];
+    public List<int> LowQualityGroups { get; set; } = [];
 
     public GITextureGroupInfo()
     {
@@ -22,13 +22,13 @@ public class GITextureGroupInfo : SampleChunkResource
         {
             for(int i = 0; i < instanceCount; i++)
             {
-                Instances.Add(new(reader.ReadStringOffset(), default));
+                Instances.Add((reader.ReadStringOffset(), default));
             }
         });
 
         reader.ReadOffset(() =>
         {
-            Span<(string Name, Sphere Bounds)> span = CollectionsMarshal.AsSpan(Instances);
+            Span<(string? Name, Sphere Bounds)> span = CollectionsMarshal.AsSpan(Instances);
             for(int i = 0; i < span.Length; i++)
             {
                 span[i].Bounds = reader.ReadValueOffset<Sphere>();
@@ -62,7 +62,7 @@ public class GITextureGroupInfo : SampleChunkResource
         writer.Write(Instances.Count);
         writer.WriteOffset(() =>
         {
-            foreach((string name, Sphere bounds) in Instances)
+            foreach((string? name, Sphere bounds) in Instances)
             {
                 writer.WriteStringOffset(StringBinaryFormat.NullTerminated, name);
             }
@@ -70,7 +70,7 @@ public class GITextureGroupInfo : SampleChunkResource
 
         writer.WriteOffset(() =>
         {
-            foreach((string name, Sphere bounds) in Instances)
+            foreach((string? name, Sphere bounds) in Instances)
             {
                 writer.WriteValueOffset(bounds);
             }
@@ -100,7 +100,7 @@ public class GITextureGroup : IBinarySerializable
 {
     public QualityLevel Quality { get; set; }
     public Sphere Bounds { get; set; }
-    public List<int> Indices { get; set; }
+    public List<int> Indices { get; set; } = [];
     public uint MemorySize { get; set; }
 
     public void Read(BinaryObjectReader reader)

@@ -16,7 +16,7 @@ public class SHLightField : BinaryResource
 
     public override void Read(BinaryObjectReader reader)
     {
-        bool inMeters = Path.GetExtension(BaseFile.Name) == ".lf";
+        bool inMeters = Path.GetExtension(BaseFile?.Name) == ".lf";
 
         FormatVersion = reader.Read<uint>();
         reader.ReadArray<float>(36, DefaultProbeLightingData);
@@ -27,7 +27,7 @@ public class SHLightField : BinaryResource
 
     public override void Write(BinaryObjectWriter writer)
     {
-        bool inMeters = Path.GetExtension(BaseFile.Name) == ".lf";
+        bool inMeters = Path.GetExtension(BaseFile?.Name) == ".lf";
 
         writer.Write(FormatVersion);
         writer.WriteArrayFixedLength(DefaultProbeLightingData, 36);
@@ -38,7 +38,7 @@ public class SHLightField : BinaryResource
 
     public class Node : IBinarySerializable<bool>
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         public int ProbeCountX { get; set; }
         public int ProbeCountY { get; set; }

@@ -5,7 +5,7 @@ using SharpNeedle.Structs;
 [NeedleResource("hh/terrain", @"\.terrain$")]
 public class Terrain : SampleChunkResource
 {
-    public List<GroupInfo> Groups { get; set; }
+    public List<GroupInfo> Groups { get; set; } = [];
 
     public override void Read(BinaryObjectReader reader)
     {
@@ -26,11 +26,11 @@ public class Terrain : SampleChunkResource
 
     public class GroupInfo : IBinarySerializable
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public Sphere Bounds { get; set; }
         public uint MemorySize { get; set; }
         public int SubsetID { get; set; }
-        public List<Sphere> Instances { get; set; }
+        public List<Sphere> Instances { get; set; } = [];
 
         public void Read(BinaryObjectReader reader)
         {

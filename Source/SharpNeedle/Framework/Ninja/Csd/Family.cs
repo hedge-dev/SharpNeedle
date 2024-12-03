@@ -10,7 +10,7 @@ public class Family : IBinarySerializable<Scene>, IList<Cast>
     private List<Cast> CastBuffer { get; set; } = [];
     private List<Cast> Children { get; set; } = [];
     public IReadOnlyList<Cast> Casts => CastBuffer;
-    public Scene Scene { get; set; }
+    public Scene? Scene { get; set; }
 
     public void AttachMotion(FamilyMotion motion)
     {
@@ -129,10 +129,12 @@ public class Family : IBinarySerializable<Scene>, IList<Cast>
         Disown(cast);
     }
 
+#pragma warning disable IDE0060 // Remove unused parameter
     internal void NotifyPriorityChanged(Cast cast)
     {
         CastBuffer.Sort((x, y) => x.Priority - y.Priority);
     }
+#pragma warning restore IDE0060 // Remove unused parameter
 
     private void TakeOwnership(Cast cast)
     {

@@ -6,7 +6,7 @@ public class InfoChunk : IChunk
 {
     public uint Signature { get; set; } = BinaryHelper.MakeSignature<uint>("NXIF");
     public List<IChunk> Chunks { get; set; } = [];
-    public OffsetChunk Offsets { get; set; }
+    public OffsetChunk Offsets { get; set; } = [];
     public uint Field1C { get; set; } = 1;
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
@@ -51,6 +51,7 @@ public class InfoChunk : IChunk
 
                 reader.At(begin + header.Size, SeekOrigin.Begin);
             }
+
             reader.PopOffsetOrigin();
         });
 

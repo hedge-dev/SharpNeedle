@@ -6,7 +6,7 @@ public class InfoChunk : IChunk
 {
     public uint Signature { get; private set; } = BinaryHelper.MakeSignature<uint>("SWIF");
     public List<IChunk> Chunks { get; set; } = [];
-    public OffsetChunk Offsets { get; set; }
+    public OffsetChunk Offsets { get; set; } = [];
     public int Version { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
@@ -36,6 +36,7 @@ public class InfoChunk : IChunk
                     break;
             }
         }
+
         beforeChunk.Dispose();
 
         Chunks = new List<IChunk>(chunkCount);

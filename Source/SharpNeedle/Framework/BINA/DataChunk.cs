@@ -44,9 +44,12 @@ public class DataChunk<T> : DataChunk, IChunk where T : IBinarySerializable
             return;
         }
 
-        MemoryStream dataStream = new();
-        BinaryObjectWriter dataWriter = new(dataStream, StreamOwnership.Transfer, writer.Endianness, writer.Encoding, writer.FilePath);
-        dataWriter.OffsetBinaryFormat = writer.OffsetBinaryFormat;
+        using MemoryStream dataStream = new();
+        using BinaryObjectWriter dataWriter = new(dataStream, StreamOwnership.Transfer, writer.Endianness, writer.Encoding, writer.FilePath)
+        {
+            OffsetBinaryFormat = writer.OffsetBinaryFormat
+        };
+
         Data.Write(dataWriter);
         dataWriter.Flush();
 
@@ -84,5 +87,5 @@ public class DataChunk
     public static readonly uint AltBinSignature = BinaryHelper.MakeSignature<uint>("IMAG");
 
     public uint Signature { get; set; } = BinSignature;
-    public OffsetTable Offsets { get; set; }
+    public OffsetTable? Offsets { get; set; }
 }

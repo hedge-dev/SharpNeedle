@@ -4,7 +4,7 @@ using SharpNeedle.Structs;
 
 public class ParticleParameter : IBinarySerializable<EmitterParameter>
 {
-    public string Name { get; set; }
+    public string? Name { get; set; }
     public EParticleType ParticleType { get; set; }
     public EDirectionType DirectionType { get; set; }
     public float LifeTime { get; set; }
@@ -85,8 +85,8 @@ public class ParticleParameter : IBinarySerializable<EmitterParameter>
     public Vector3 GravitionalAcceleration { get; set; }
     public Vector3 ExternalAcceleration { get; set; }
     public Vector3 ExternalAccelerationRandomMargin { get; set; }
-    public MaterialParameter Material { get; set; }
-    public MeshParameter Mesh { get; set; }
+    public MaterialParameter? Material { get; set; }
+    public MeshParameter? Mesh { get; set; }
     public List<Color<float>> ColorTables { get; set; } = [];
     public List<Color<float>> ColorTable2s { get; set; } = [];
     public List<AnimationParameter> Animations { get; set; } = new(30);
@@ -403,9 +403,9 @@ public class ParticleParameter : IBinarySerializable<EmitterParameter>
             }
         }
 
-        if(parent.Particles.Find(this).Next != null)
+        if(parent.Particles.Find(this)?.Next is LinkedListNode<ParticleParameter> particle)
         {
-            writer.WriteObjectOffset(parent.Particles.Find(this).Next.Value, parent, 16);
+            writer.WriteObjectOffset(particle.Value, parent, 16);
         }
         else
         {
@@ -453,7 +453,7 @@ public class ParticleParameter : IBinarySerializable<EmitterParameter>
 
     public class MeshParameter : IBinarySerializable
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         public void Read(BinaryObjectReader reader)
         {

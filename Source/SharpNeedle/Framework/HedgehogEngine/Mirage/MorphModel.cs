@@ -2,8 +2,8 @@
 
 public class MorphModel : SampleChunkResource
 {
-    public List<MorphTarget> Targets { get; set; }
-    public Mesh Mesh { get; set; }
+    public List<MorphTarget> Targets { get; set; } = [];
+    public Mesh? Mesh { get; set; }
 
     public override void Read(BinaryObjectReader reader)
     {
@@ -27,7 +27,7 @@ public class MorphModel : SampleChunkResource
         {
             for(int i = 0; i < shapeCount; i++)
             {
-                Targets[i].Name = reader.ReadStringOffset();
+                Targets[i].Name = reader.ReadStringOffsetOrEmpty();
             }
         });
 
@@ -53,6 +53,11 @@ public class MorphModel : SampleChunkResource
 
     public override void Write(BinaryObjectWriter writer)
     {
+        if(Mesh == null)
+        {
+            throw new InvalidOperationException("Mesh is null");
+        }
+
         byte[] verticesClone = new byte[Mesh.Vertices.Length];
         Array.Copy(Mesh.Vertices, verticesClone, verticesClone.LongLength);
         VertexElement.SwapEndianness([.. Mesh.Elements], verticesClone.AsSpan(), (nint)Mesh.VertexCount, (nint)Mesh.VertexSize);
@@ -60,7 +65,6 @@ public class MorphModel : SampleChunkResource
         writer.Write(Mesh.VertexCount);
         writer.WriteArrayOffset(verticesClone);
 
-        verticesClone = null;
         writer.Write(1); // Some kind of flags
         writer.Write(Targets.Count);
 
@@ -91,11 +95,11 @@ public class MorphModel : SampleChunkResource
 
 public class MorphTarget
 {
-    public string Name { get; set; }
-    public Vector3[] Positions { get; set; }
+    public string? Name { get; set; }
+    public Vector3[] Positions { get; set; } = [];
 
     public override string ToString()
     {
-        return Name ?? base.ToString();
+        return Name ?? base.ToString()!;
     }
 }

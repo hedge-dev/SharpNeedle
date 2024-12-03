@@ -2,7 +2,7 @@
 
 public class ReferenceCastData : ICastData
 {
-    public Layer Layer { get; set; }
+    public Layer? Layer { get; set; }
     public int Field04 { get; set; }
     public int AnimationID { get; set; }
     public int AnimationFrame { get; set; }
@@ -24,6 +24,11 @@ public class ReferenceCastData : ICastData
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
+        if(Layer == null)
+        {
+            throw new InvalidOperationException("Layer is null");
+        }
+
         if(options.Version >= 3)
         {
             writer.Align(8);

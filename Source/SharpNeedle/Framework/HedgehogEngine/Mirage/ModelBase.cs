@@ -2,7 +2,7 @@
 
 public abstract class ModelBase : SampleChunkResource
 {
-    public List<MeshGroup> Groups { get; set; }
+    public List<MeshGroup> Groups { get; set; } = [];
 
     public override void ResolveDependencies(IResourceResolver resolver)
     {

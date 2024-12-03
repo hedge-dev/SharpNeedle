@@ -3,7 +3,7 @@
 public class KeyFrameList : IBinarySerializable, IList<KeyFrame>
 {
     public uint Field00 { get; set; }
-    public List<KeyFrame> Frames { get; set; }
+    public List<KeyFrame> Frames { get; set; } = [];
     public KeyProperty Property { get; set; }
 
     public int Count => Frames.Count;

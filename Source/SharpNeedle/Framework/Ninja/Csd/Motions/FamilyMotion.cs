@@ -5,7 +5,7 @@ using SharpNeedle.Framework.Ninja.Csd;
 public class FamilyMotion : IBinarySerializable
 {
     public List<CastMotion> CastMotions { get; set; } = [];
-    public Family Family { get; internal set; }
+    public Family? Family { get; internal set; }
 
     public FamilyMotion()
     {
@@ -37,6 +37,11 @@ public class FamilyMotion : IBinarySerializable
 
     public void Write(BinaryObjectWriter writer)
     {
+        if(Family == null)
+        {
+            throw new InvalidOperationException("Family is null!");
+        }
+
         // Remove casts we don't have
         CastMotions.RemoveAll(x => !Family.Casts.Contains(x.Cast));
 

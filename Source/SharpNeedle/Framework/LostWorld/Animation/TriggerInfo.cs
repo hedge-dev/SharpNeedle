@@ -28,7 +28,7 @@ public struct TriggerInfo : IBinarySerializable
         public TriggerValueType Type;
         public int Integer;
         public float Float;
-        public string String;
+        public string? String;
 
         public CallbackParam(int value)
         {
@@ -106,10 +106,10 @@ public struct TriggerInfo : IBinarySerializable
                     return Float.ToString(CultureInfo.InvariantCulture);
 
                 case TriggerValueType.String:
-                    return String;
+                    return String ?? string.Empty;
             }
 
-            return base.ToString();
+            return base.ToString()!;
         }
 
         public static implicit operator CallbackParam(int value)

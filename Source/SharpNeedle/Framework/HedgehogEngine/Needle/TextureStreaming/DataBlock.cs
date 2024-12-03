@@ -2,7 +2,7 @@
 
 public class DataBlock : IBinarySerializable
 {
-    public Stream DataStream { get; set; }
+    public Stream? DataStream { get; set; }
 
 
     public void Read(BinaryObjectReader reader)
@@ -25,6 +25,11 @@ public class DataBlock : IBinarySerializable
 
     private void WriteData(BinaryObjectWriter writer)
     {
+        if(DataStream == null)
+        {
+            throw new InvalidOperationException("Datastream is null!");
+        }
+
         long previousPosition = DataStream.Position;
         DataStream.Seek(0, SeekOrigin.Begin);
         writer.WriteBytes(DataStream.ReadAllBytes());

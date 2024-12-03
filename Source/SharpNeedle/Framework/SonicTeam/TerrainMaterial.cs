@@ -37,17 +37,17 @@ public class TerrainMaterial : BinaryResource
     public class TerrainLayer : IBinarySerializable
     {
         public static readonly string[] Types = { "grass", "gravel", "hole", "bare", "earth", "rock", "flowerground" };
-        public string Type { get; set; }
+        public string? Type { get; set; }
         public int SplatIndex { get; set; }
         public int Field0C { get; set; }
         public int Field10 { get; set; }
         public int Field14 { get; set; }
-        public string DetailAlbedoMap { get; set; }
-        public string DetailNormalMap { get; set; }
-        public string DetailHeightMap { get; set; }
-        public string BaseAlbedoMap { get; set; }
-        public string BaseNormalMap { get; set; }
-        public string BaseParameterMap { get; set; }
+        public string? DetailAlbedoMap { get; set; }
+        public string? DetailNormalMap { get; set; }
+        public string? DetailHeightMap { get; set; }
+        public string? BaseAlbedoMap { get; set; }
+        public string? BaseNormalMap { get; set; }
+        public string? BaseParameterMap { get; set; }
 
         public void Read(BinaryObjectReader reader)
         {

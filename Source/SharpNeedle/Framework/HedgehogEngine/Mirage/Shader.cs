@@ -3,12 +3,12 @@
 [NeedleResource("hh/shader", ResourceType.Material, @"\.vertexshader$")]
 public class Shader : SampleChunkResource
 {
-    public ResourceReference<ResourceRaw> ByteCode { get; set; }
-    public List<ResourceReference<ShaderParameter>> Parameters { get; set; }
+    public ResourceReference<ResourceRaw>? ByteCode { get; set; }
+    public List<ResourceReference<ShaderParameter>> Parameters { get; set; } = [];
 
     public override void Read(BinaryObjectReader reader)
     {
-        ByteCode = reader.ReadStringOffset();
+        ByteCode = reader.ReadStringOffsetOrEmpty();
         long paramCount = reader.ReadOffsetValue();
         Parameters = new((int)paramCount);
 
@@ -16,16 +16,21 @@ public class Shader : SampleChunkResource
         {
             for(int i = 0; i < paramCount; i++)
             {
-                Parameters.Add(reader.ReadStringOffset());
+                Parameters.Add(reader.ReadStringOffsetOrEmpty());
             }
         });
     }
 
     public override void Write(BinaryObjectWriter writer)
     {
-        writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Path.GetFileNameWithoutExtension(ByteCode.Name));
+        if(ByteCode == null)
+        {
+            throw new InvalidOperationException("ByteCode is null");
+        }
 
-        if(Parameters == null || Parameters.Count == 0)
+        writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Path.GetFileNameWithoutExtension(ByteCode.Value.Name));
+
+        if(Parameters.Count == 0)
         {
             writer.WriteOffsetValue(0);
             writer.WriteOffsetValue(0);

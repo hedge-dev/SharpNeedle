@@ -4,8 +4,8 @@ public class Motion : IBinarySerializable
 {
     public float StartFrame { get; set; }
     public float EndFrame { get; set; }
-    public List<FamilyMotion> FamilyMotions { get; set; }
-    public Scene Scene { get; internal set; }
+    public List<FamilyMotion> FamilyMotions { get; set; } = [];
+    public Scene? Scene { get; internal set; }
 
     public Motion()
     {
@@ -40,8 +40,18 @@ public class Motion : IBinarySerializable
 
     public void Write(BinaryObjectWriter writer)
     {
+        if(Scene == null)
+        {
+            throw new InvalidOperationException("Scene is null!");
+        }
+
+        if(FamilyMotions.Any(x => x.Family == null))
+        {
+            throw new InvalidOperationException("Not all family motions have a family!");
+        }
+
         // Remove families we don't have
-        FamilyMotions.RemoveAll(x => !Scene.Families.Contains(x.Family));
+        FamilyMotions.RemoveAll(x => !Scene.Families.Contains(x.Family!));
 
         // Sanity checks
         for(int i = FamilyMotions.Count; i < Scene.Families.Count; i++)
@@ -57,7 +67,7 @@ public class Motion : IBinarySerializable
             }
 
             // Re-arrange motions to fit the palette
-            int idx = Scene.Families.IndexOf(FamilyMotions[i].Family);
+            int idx = Scene.Families.IndexOf(FamilyMotions[i].Family!);
             FamilyMotion temp = FamilyMotions[i];
             FamilyMotions[idx] = FamilyMotions[i];
             FamilyMotions[i] = temp;

@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.Framework.Ninja.Csd;
 
-public class CastInfoTable : List<(string Name, int FamilyIdx, int CastIdx)>, IBinarySerializable
+public class CastInfoTable : List<(string? Name, int FamilyIdx, int CastIdx)>, IBinarySerializable
 {
     public void Read(BinaryObjectReader reader)
     {
@@ -33,11 +33,11 @@ public class CastInfoTable : List<(string Name, int FamilyIdx, int CastIdx)>, IB
         Sort((x, y) => string.Compare(x.Name, y.Name, StringComparison.Ordinal));
         writer.WriteOffset(() =>
         {
-            foreach((string Name, int FamilyIdx, int CastIdx) item in this)
+            foreach((string? Name, int FamilyIdx, int CastIdx) in this)
             {
-                writer.WriteStringOffset(StringBinaryFormat.NullTerminated, item.Name);
-                writer.Write(item.FamilyIdx);
-                writer.Write(item.CastIdx);
+                writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
+                writer.Write(FamilyIdx);
+                writer.Write(CastIdx);
             }
         });
     }

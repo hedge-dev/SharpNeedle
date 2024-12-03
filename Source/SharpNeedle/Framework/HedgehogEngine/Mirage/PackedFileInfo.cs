@@ -2,7 +2,7 @@
 
 public class PackedFileInfo : SampleChunkResource
 {
-    public List<File> Files { get; set; }
+    public List<File> Files { get; set; } = [];
 
     public override void Read(BinaryObjectReader reader)
     {
@@ -32,7 +32,7 @@ public class PackedFileInfo : SampleChunkResource
 
     public struct File : IBinarySerializable
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public uint Offset { get; set; }
         public uint Size { get; set; }
 
@@ -52,7 +52,7 @@ public class PackedFileInfo : SampleChunkResource
 
         public override readonly string ToString()
         {
-            return Name;
+            return Name ?? string.Empty;
         }
     }
 }

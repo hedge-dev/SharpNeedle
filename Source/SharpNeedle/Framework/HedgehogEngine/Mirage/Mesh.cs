@@ -5,19 +5,19 @@ using SharpNeedle.Structs;
 public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
 {
     public ResourceReference<Material> Material { get; set; }
-    public ushort[] Faces { get; set; }
+    public ushort[] Faces { get; set; } = [];
     public uint VertexSize { get; set; }
     public uint VertexCount { get; set; }
-    public byte[] Vertices { get; set; }
-    public short[] BoneIndices { get; set; }
-    public List<VertexElement> Elements { get; set; }
-    public List<TextureUnit> Textures { get; set; }
+    public byte[] Vertices { get; set; } = [];
+    public short[] BoneIndices { get; set; } = [];
+    public List<VertexElement> Elements { get; set; } = [];
+    public List<TextureUnit> Textures { get; set; } = [];
     public MeshSlot Slot { get; set; }
 
     public void Read(BinaryObjectReader reader, uint version)
     {
-        Elements ??= [];
-        Material = reader.ReadStringOffset();
+        Elements = [];
+        Material = reader.ReadStringOffsetOrEmpty();
 
         Faces = reader.ReadArrayOffset<ushort>(reader.Read<int>());
         VertexCount = reader.Read<uint>();
@@ -66,8 +66,6 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
         writer.Write(VertexSize);
         writer.WriteArrayOffset(verticesClone);
 
-        verticesClone = null;
-
         writer.WriteOffset(() =>
         {
             foreach(VertexElement element in Elements)
@@ -102,7 +100,7 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
 
     public void SwapVertexEndianness()
     {
-        if(Vertices == null || Vertices.Length == 0)
+        if(Vertices.Length == 0)
         {
             return;
         }
@@ -123,7 +121,7 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
             return;
         }
 
-        Material = resolver.Open<Material>($"{Material.Name}.material");
+        Material = resolver.Open<Material>($"{Material.Name}.material") ?? throw new InvalidOperationException("Material resolved to null!");
     }
 
     public Mesh Clone()
@@ -154,15 +152,15 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
     {
         Material.Resource?.Dispose();
         Material = default;
-        Vertices = null;
-        Elements = null;
+        Vertices = [];
+        Elements = [];
     }
 }
 
 public struct MeshSlot
 {
     public Mesh.Type Type;
-    public readonly string Name;
+    public readonly string? Name;
 
     public MeshSlot(string name)
     {
@@ -202,7 +200,7 @@ public struct MeshSlot
         return Name ?? Type.ToString();
     }
 
-    public readonly override bool Equals(object obj)
+    public readonly override bool Equals(object? obj)
     {
         if(obj is Mesh.Type type)
         {
@@ -221,9 +219,10 @@ public struct MeshSlot
         return false;
     }
 
+
     public readonly override int GetHashCode()
     {
-        return Type == Mesh.Type.Special ? Name.GetHashCode() : Type.GetHashCode();
+        return Type == Mesh.Type.Special ? (Name?.GetHashCode() ?? 0) : Type.GetHashCode();
     }
 
     public static bool operator ==(MeshSlot lhs, Mesh.Type rhs)

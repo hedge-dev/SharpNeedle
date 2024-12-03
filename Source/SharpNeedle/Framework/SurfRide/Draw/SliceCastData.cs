@@ -17,7 +17,7 @@ public class SliceCastData : IImageDataBase
     public short SliceVerticalCount { get; set; }
     public short HorizontalFixedCount { get; set; }
     public short VerticalFixedCount { get; set; }
-    public IEffectData Effect { get; set; }
+    public IEffectData? Effect { get; set; }
     public ImageCastSurface Surface { get; set; } = new();
     public List<Slice> Slices { get; set; } = [];
 

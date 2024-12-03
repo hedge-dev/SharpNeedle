@@ -4,7 +4,7 @@ using static SharpNeedle.Framework.Glitter.EmitterParameter.IShapeParameter;
 
 public class EmitterParameter : IBinarySerializable<EffectParameter>
 {
-    public string Name { get; set; }
+    public string? Name { get; set; }
     public EEmitterType EmitterType { get; set; }
     public EEmitCondition EmitCondition { get; set; }
     public EDirectionType DirectionType { get; set; }
@@ -148,11 +148,18 @@ public class EmitterParameter : IBinarySerializable<EffectParameter>
             }
         }
 
-        writer.WriteObjectOffset(Particles.First.Value, this, 16);
-
-        if(parent.Emitters.Find(this).Next != null)
+        if(Particles.First != null)
         {
-            writer.WriteObjectOffset(parent.Emitters.Find(this).Next.Value, parent, 16);
+            writer.WriteObjectOffset(Particles.First.Value, this, 16);
+        }
+        else
+        {
+            writer.WriteOffsetValue(0);
+        }
+
+        if(parent.Emitters.Find(this)?.Next is LinkedListNode<EmitterParameter> emitter)
+        {
+            writer.WriteObjectOffset(emitter.Value, parent, 16);
         }
         else
         {

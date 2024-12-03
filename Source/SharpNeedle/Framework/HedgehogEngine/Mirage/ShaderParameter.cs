@@ -94,7 +94,7 @@ public class ShaderParameter : SampleChunkResource
 
 public class ShaderConstantUsage : IBinarySerializable
 {
-    public string Name { get; set; }
+    public string? Name { get; set; }
     public byte Index { get; set; }
     public byte Size { get; set; } = 1;
     public ShaderConstantType Type { get; internal set; } = ShaderConstantType.Unknown;
@@ -119,7 +119,7 @@ public class ShaderConstantUsage : IBinarySerializable
 
     public override string ToString()
     {
-        return Name;
+        return Name ?? string.Empty;
     }
 }
 

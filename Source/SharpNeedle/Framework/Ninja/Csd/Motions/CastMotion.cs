@@ -6,12 +6,9 @@ using SharpNeedle.Structs;
 public class CastMotion : List<KeyFrameList>, IBinarySerializable
 {
     public BitSet<uint> Flags { get; set; }
-    public Cast Cast { get; internal set; }
+    public Cast? Cast { get; internal set; }
 
-    public CastMotion()
-    {
-
-    }
+    public CastMotion() { }
 
     public CastMotion(Cast cast)
     {

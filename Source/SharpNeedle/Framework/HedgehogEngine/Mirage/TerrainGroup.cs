@@ -5,10 +5,10 @@ using SharpNeedle.Structs;
 [NeedleResource("hh/terrain-group", @"\.terrain-group$")]
 public class TerrainGroup : SampleChunkResource
 {
-    public List<string> ModelNames { get; set; }
-    public List<Subset> Subsets { get; set; }
+    public List<string?> ModelNames { get; set; } = [];
+    public List<Subset> Subsets { get; set; } = [];
 
-    public Subset GetSubset(Vector3 point)
+    public Subset? GetSubset(Vector3 point)
     {
         foreach(Subset set in Subsets)
         {
@@ -25,7 +25,7 @@ public class TerrainGroup : SampleChunkResource
     {
         Subsets = reader.ReadObject<BinaryList<BinaryPointer<Subset>>>().Unwind();
         reader.Read(out int modelCount);
-        ModelNames = new List<string>(modelCount);
+        ModelNames = new(modelCount);
 
         reader.ReadOffset(() =>
         {
@@ -50,14 +50,14 @@ public class TerrainGroup : SampleChunkResource
         writer.Write(ModelNames.Count);
         writer.WriteOffset(() =>
         {
-            foreach(string name in ModelNames)
+            foreach(string? name in ModelNames)
             {
                 writer.WriteStringOffset(StringBinaryFormat.NullTerminated, name);
             }
         });
     }
 
-    public class Subset : List<string>, IBinarySerializable
+    public class Subset : List<string?>, IBinarySerializable
     {
         public Sphere Bounds { get; set; }
 
@@ -84,7 +84,7 @@ public class TerrainGroup : SampleChunkResource
 
             writer.WriteOffset(() =>
             {
-                foreach(string instance in this)
+                foreach(string? instance in this)
                 {
                     writer.WriteStringOffset(StringBinaryFormat.NullTerminated, instance);
                 }

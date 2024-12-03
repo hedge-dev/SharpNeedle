@@ -31,7 +31,10 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
 
     public void Read(string path, GameType game)
     {
-        Read(FileSystem.Instance.Open(path), game);
+        IFile? file = FileSystem.Instance.Open(path) 
+            ?? throw new FileNotFoundException($"Could not open file \"{path}\"", path);
+
+        Read(file, game);
     }
 
     public void Read(IFile file, GameType game)

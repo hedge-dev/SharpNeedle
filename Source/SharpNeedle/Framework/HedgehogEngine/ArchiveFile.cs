@@ -40,6 +40,11 @@ public class ArchiveFile : IFile
             return;
         }
 
+        if(Parent.BaseStream == null)
+        {
+            throw new InvalidDataException("Parent archvie has no stream");
+        }
+
         using SubStream readStream = new(Parent.BaseStream, FileOffset, FileLength);
         DataStream = new MemoryStream((int)FileLength);
         DataStream.Write(readStream.ReadAllBytes().AsSpan());
@@ -58,6 +63,11 @@ public class ArchiveFile : IFile
         {
             DataStream.Position = 0;
             return new WrappedStream<MemoryStream>(DataStream);
+        }
+
+        if(Parent.BaseStream == null)
+        {
+            throw new InvalidDataException("Parent archvie has no stream");
         }
 
         return new SubStream(Parent.BaseStream, FileOffset, FileLength);

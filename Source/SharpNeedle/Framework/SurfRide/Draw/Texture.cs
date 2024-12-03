@@ -2,13 +2,13 @@
 
 public class Texture : List<Crop>, IBinarySerializable<ChunkBinaryOptions>
 {
-    public string Name { get; set; }
-    public string TextureFileName { get; set; }
+    public string? Name { get; set; }
+    public string? TextureFileName { get; set; }
     public int ID { get; set; }
     public ushort Width { get; set; }
     public ushort Height { get; set; }
     public uint Flags { get; set; }
-    public UserData UserData { get; set; }
+    public UserData? UserData { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {

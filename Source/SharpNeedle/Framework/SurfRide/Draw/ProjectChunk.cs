@@ -44,13 +44,13 @@ public class ProjectChunk : ProjectNode, IChunk
 
 public class ProjectNode : IBinarySerializable<ChunkBinaryOptions>
 {
-    public string Name { get; set; }
+    public string? Name { get; set; }
     public short Field06 { get; set; }
     public uint StartFrame { get; set; }
     public uint EndFrame { get; set; }
     public float FrameRate { get; set; }
-    public Camera Camera { get; set; }
-    public UserData UserData { get; set; }
+    public Camera? Camera { get; set; }
+    public UserData? UserData { get; set; }
     public List<Scene> Scenes { get; set; } = [];
     public List<TextureList> TextureLists { get; set; } = [];
     public List<Font> Fonts { get; set; } = [];
@@ -87,6 +87,11 @@ public class ProjectNode : IBinarySerializable<ChunkBinaryOptions>
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
+        if(Camera == null)
+        {
+            throw new InvalidOperationException("Camera is null");
+        }
+
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         writer.Write((ushort)Scenes.Count);
         writer.Write(Field06);
@@ -142,16 +147,16 @@ public class ProjectNode : IBinarySerializable<ChunkBinaryOptions>
         }
     }
 
-    public Scene GetScene(string name)
+    public Scene? GetScene(string name)
     {
         return Scenes.Find(item => item.Name == name);
     }
 
-    public TextureList GetTextureList(string name)
+    public TextureList? GetTextureList(string name)
     {
         return TextureLists.Find(item => item.Name == name);
     }
-    public Font GetFont(string name)
+    public Font? GetFont(string name)
     {
         return Fonts.Find(item => item.Name == name);
     }

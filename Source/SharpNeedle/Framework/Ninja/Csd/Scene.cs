@@ -9,10 +9,10 @@ public class Scene : IBinarySerializable
     public float Priority { get; set; }
     public float FrameRate { get; set; }
     public float AspectRatio { get; set; } = 1.333333F; // Default Aspect Ratio is 4:3
-    public List<Vector2> Textures { get; set; } // Size of textures used in the scene
-    public List<Sprite> Sprites { get; set; }
-    public List<Family> Families { get; set; }
-    public CsdDictionary<Motion> Motions { get; set; }
+    public List<Vector2> Textures { get; set; } = []; // Size of textures used in the scene
+    public List<Sprite> Sprites { get; set; } = [];
+    public List<Family> Families { get; set; } = [];
+    public CsdDictionary<Motion> Motions { get; set; } = [];
 
     public void Read(BinaryObjectReader reader)
     {
@@ -37,7 +37,7 @@ public class Scene : IBinarySerializable
         CastInfoTable castInfo = reader.ReadObject<CastInfoTable>();
         Motions = reader.ReadObject<CsdDictionary<Motion>>();
 
-        foreach(KeyValuePair<string, Motion> motion in Motions)
+        foreach(KeyValuePair<string?, Motion> motion in Motions)
         {
             motion.Value.Attach(this);
         }
@@ -74,9 +74,9 @@ public class Scene : IBinarySerializable
             });
         }
 
-        foreach((string Name, int FamilyIdx, int CastIdx) item in castInfo)
+        foreach((string? Name, int FamilyIdx, int CastIdx) in castInfo)
         {
-            Families[item.FamilyIdx].Casts[item.CastIdx].Name = item.Name;
+            Families[FamilyIdx].Casts[CastIdx].Name = Name;
         }
     }
 

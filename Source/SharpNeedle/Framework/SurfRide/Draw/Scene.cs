@@ -5,7 +5,7 @@ using SharpNeedle.Structs;
 public class Scene : IBinarySerializable<ChunkBinaryOptions>
 {
     public int Version { get; set; }
-    public string Name { get; set; }
+    public string? Name { get; set; }
     public int ID { get; set; }
     public uint Flags { get; set; }
     public uint Field10 { get; set; }
@@ -14,7 +14,7 @@ public class Scene : IBinarySerializable<ChunkBinaryOptions>
     public Vector2 Resolution { get; set; }
     public List<Layer> Layers { get; set; } = [];
     public List<Camera> Cameras { get; set; } = [];
-    public UserData UserData { get; set; }
+    public UserData? UserData { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
@@ -131,12 +131,12 @@ public class Scene : IBinarySerializable<ChunkBinaryOptions>
         }
     }
 
-    public Layer GetLayer(string name)
+    public Layer? GetLayer(string name)
     {
         return Layers.Find(item => item.Name == name);
     }
 
-    public Camera GetCamera(string name)
+    public Camera? GetCamera(string name)
     {
         return Cameras.Find(item => item.Name == name);
     }

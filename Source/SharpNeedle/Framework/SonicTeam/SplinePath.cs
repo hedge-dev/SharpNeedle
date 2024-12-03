@@ -26,7 +26,7 @@ public class SplinePath : BinaryResource
             {
                 for(uint i = 0; i < pathCount; i++)
                 {
-                    paths.Add(reader.ReadStringOffset(), reader.Read<uint>());
+                    paths.Add(reader.ReadStringOffsetOrEmpty(), reader.Read<uint>());
                 }
             });
 
@@ -82,7 +82,7 @@ public class SplinePath : BinaryResource
 
         if(Version == 1)
         {
-            PathObject guidePath = Paths.FirstOrDefault(obj => obj.Name == "StageGuidePath");
+            PathObject? guidePath = Paths.FirstOrDefault(obj => obj.Name == "StageGuidePath");
 
             if(guidePath != null)
             {
@@ -97,12 +97,12 @@ public class SplinePath : BinaryResource
 
             foreach(PathObject path in Paths)
             {
-                if(path.Name.Equals("StageGuidePath", StringComparison.InvariantCulture))
+                if(path.Name != null && path.Name.Equals("StageGuidePath", StringComparison.InvariantCulture))
                 {
                     continue;
                 }
 
-                if(path.Name.LastIndexOf('@') == -1)
+                if(path.Name == null || path.Name.LastIndexOf('@') == -1)
                 {
                     paths[0].Add(path);
                 }
@@ -156,12 +156,12 @@ public class SplinePath : BinaryResource
 
 public class PathObject : IBinarySerializable<uint>
 {
-    public string Name { get; set; }
+    public string? Name { get; set; }
     public byte Field04 { get; set; }
     public float Distance { get; set; }
     public int Field48 { get; set; }
     public AABB Bounds { get; set; }
-    public UnknownStruct Unknown { get; set; }
+    public UnknownStruct? Unknown { get; set; }
     public List<int> KnotFlags { get; set; } = []; // Knot Type?
     public List<float> KnotDistances { get; set; } = [];
     public List<float> KnotField2Cs { get; set; } = []; // Only used by Version 1
@@ -403,13 +403,19 @@ public class PathObject : IBinarySerializable<uint>
             }
 
             writer.WriteOffsetValue(Field48);
+
+            if(Unknown == null)
+            {
+                throw new InvalidOperationException($"{nameof(Unknown)} is null!");
+            }
+
             writer.WriteObjectOffset(Unknown);
         }
     }
 
     public override string ToString()
     {
-        return Name;
+        return Name ?? string.Empty;
     }
 
     public struct DoubleKnot
@@ -420,10 +426,10 @@ public class PathObject : IBinarySerializable<uint>
 
     public class UserData : IBinarySerializable
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public DataType Type { get; set; }
         public uint Value { get; set; }
-        public string StringValue { get; set; }
+        public string? StringValue { get; set; }
 
         public unsafe float FloatValue
         {
@@ -501,7 +507,7 @@ public class PathObject : IBinarySerializable<uint>
 
         public override string ToString()
         {
-            return Name;
+            return Name ?? string.Empty;
         }
 
         public enum DataType : byte

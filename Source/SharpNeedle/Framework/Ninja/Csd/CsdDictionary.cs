@@ -1,19 +1,21 @@
 ﻿namespace SharpNeedle.Framework.Ninja.Csd;
 
-public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> where T : IBinarySerializable, new()
+using System.Diagnostics.CodeAnalysis;
+
+public class CsdDictionary<T> : IBinarySerializable, IDictionary<string?, T> where T : IBinarySerializable, new()
 {
-    internal static readonly NameIndexPair.Comparer NameIndexPairComparer = new();
+    internal static readonly NameIndexPair.Comparer _nameIndexPairComparer = new();
 
     private List<T> Items { get; } = [];
     private List<NameIndexPair> NameTable { get; } = [];
     public int Count => Items.Count;
-    public ICollection<string> Keys => NameTable.Select(x => x.Name).ToList();
+    public ICollection<string?> Keys => NameTable.Select(x => x.Name).ToList();
     public ICollection<T> Values => Items;
     public bool IsReadOnly => false;
 
-    public void Insert(string key, T value, int index)
+    public void Insert(string? key, T value, int index)
     {
-        int nameIdx = NameTable.BinarySearch(new NameIndexPair(key, 0), NameIndexPairComparer);
+        int nameIdx = NameTable.BinarySearch(new NameIndexPair(key, 0), _nameIndexPairComparer);
         if(nameIdx >= 0)
         {
             throw new Exception($"Key {key} already exists");
@@ -33,7 +35,7 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
         NameTable.Insert(~nameIdx, new NameIndexPair(key, index));
     }
 
-    public void Add(KeyValuePair<string, T> item)
+    public void Add(KeyValuePair<string?, T> item)
     {
         Add(item.Key, item.Value);
     }
@@ -44,12 +46,12 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
         NameTable.Clear();
     }
 
-    public bool Contains(KeyValuePair<string, T> item)
+    public bool Contains(KeyValuePair<string?, T> item)
     {
         return ContainsKey(item.Key);
     }
 
-    public void CopyTo(KeyValuePair<string, T>[] array, int arrayIndex)
+    public void CopyTo(KeyValuePair<string?, T>[] array, int arrayIndex)
     {
         if(Count > array.Length - arrayIndex)
         {
@@ -57,13 +59,13 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
         }
 
         int i = 0;
-        foreach(KeyValuePair<string, T> pair in this)
+        foreach(KeyValuePair<string?, T> pair in this)
         {
             array[i++ + arrayIndex] = pair;
         }
     }
 
-    public bool Remove(KeyValuePair<string, T> item)
+    public bool Remove(KeyValuePair<string?, T> item)
     {
         return Remove(item.Key);
     }
@@ -96,9 +98,9 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
         writer.WriteObjectCollectionOffset(NameTable);
     }
 
-    public int Find(string key)
+    public int Find(string? key)
     {
-        int result = NameTable.BinarySearch(new NameIndexPair(key, 0), NameIndexPairComparer);
+        int result = NameTable.BinarySearch(new NameIndexPair(key, 0), _nameIndexPairComparer);
         if(result < 0)
         {
             return -1;
@@ -107,7 +109,7 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
         return NameTable[result].Index;
     }
 
-    public void Add(string key, T value)
+    public void Add(string? key, T value)
     {
         if(Items.Count == 0)
         {
@@ -116,7 +118,7 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
             return;
         }
 
-        int index = NameTable.BinarySearch(new NameIndexPair(key, 0), NameIndexPairComparer);
+        int index = NameTable.BinarySearch(new NameIndexPair(key, 0), _nameIndexPairComparer);
         if(index >= 0)
         {
             throw new ArgumentException($"Key {key} already exists");
@@ -126,14 +128,14 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
         NameTable.Insert(~index, new NameIndexPair(key, Items.Count - 1));
     }
 
-    public bool ContainsKey(string key)
+    public bool ContainsKey(string? key)
     {
         return Find(key) >= 0;
     }
 
-    public bool Remove(string key)
+    public bool Remove(string? key)
     {
-        int index = NameTable.BinarySearch(new NameIndexPair(key, 0), NameIndexPairComparer);
+        int index = NameTable.BinarySearch(new NameIndexPair(key, 0), _nameIndexPairComparer);
         if(index < 0)
         {
             return false;
@@ -171,9 +173,9 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
         }
     }
 
-    public bool TryGetValue(string key, out T value)
+    public bool TryGetValue(string? key, [MaybeNullWhen(false)] out T value)
     {
-        int index = NameTable.BinarySearch(new NameIndexPair(key, 0), NameIndexPairComparer);
+        int index = NameTable.BinarySearch(new NameIndexPair(key, 0), _nameIndexPairComparer);
         if(index < 0)
         {
             value = default;
@@ -184,7 +186,7 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
         return true;
     }
 
-    public T this[string key]
+    public T this[string? key]
     {
         get => Items[Find(key)];
         set => Items[Find(key)] = value;
@@ -196,7 +198,7 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
         set => Items[idx] = value;
     }
 
-    public IEnumerator<KeyValuePair<string, T>> GetEnumerator()
+    public IEnumerator<KeyValuePair<string?, T>> GetEnumerator()
     {
         for(int i = 0; i < Items.Count; i++)
         {
@@ -204,7 +206,7 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
             {
                 if(NameTable[j].Index == i)
                 {
-                    yield return new KeyValuePair<string, T>(NameTable[j].Name, Items[i]);
+                    yield return new KeyValuePair<string?, T>(NameTable[j].Name, Items[i]);
                     break;
                 }
             }
@@ -218,10 +220,10 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string, T> wher
 
     public struct NameIndexPair : IBinarySerializable
     {
-        public string Name;
+        public string? Name;
         public int Index;
 
-        public NameIndexPair(string name, int idx)
+        public NameIndexPair(string? name, int idx)
         {
             Name = name;
             Index = idx;

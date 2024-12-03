@@ -4,7 +4,7 @@ public class Package : ResourceBase, IBinarySerializable, IStreamable
 {
     public struct EntryInfo : IBinarySerializable
     {
-        private string _name;
+        private string? _name;
 
         public int Hash { get; set; }
         public int BlockIndex { get; set; }
@@ -14,7 +14,7 @@ public class Package : ResourceBase, IBinarySerializable, IStreamable
 
         public string Name
         {
-            readonly get => _name;
+            readonly get => _name ?? string.Empty;
             set
             {
                 _name = value;
@@ -29,7 +29,7 @@ public class Package : ResourceBase, IBinarySerializable, IStreamable
             MipLevels = reader.ReadInt32();
             Width = reader.ReadUInt16();
             Height = reader.ReadUInt16();
-            _name = reader.ReadStringOffset();
+            _name = reader.ReadStringOffsetOrEmpty();
         }
 
         public readonly void Write(BinaryObjectWriter writer)
@@ -65,7 +65,7 @@ public class Package : ResourceBase, IBinarySerializable, IStreamable
 
     public List<DataBlock> Blocks { get; set; } = [];
 
-    public Stream BaseStream { get; private set; }
+    public Stream? BaseStream { get; private set; }
 
 
     public EntryInfo FindEntry(string name)

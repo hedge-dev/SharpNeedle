@@ -26,7 +26,7 @@ public class TerrainModel : ModelBase
         CommonRead(reader);
         if(DataVersion >= 5)
         {
-            Name = reader.ReadStringOffset();
+            Name = reader.ReadStringOffsetOrEmpty();
             Flags = reader.Read<TerrainFlags>();
         }
     }

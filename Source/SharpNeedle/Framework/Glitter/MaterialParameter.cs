@@ -2,8 +2,8 @@
 
 public class MaterialParameter : IBinarySerializable
 {
-    public string Name { get; set; }
-    public string ShaderName { get; set; }
+    public string? Name { get; set; }
+    public string? ShaderName { get; set; }
     public int TextureAddresMode { get; set; }
     public int Field2C { get; set; }
     public float Field30 { get; set; }
@@ -76,7 +76,7 @@ public class MaterialParameter : IBinarySerializable
 
     public struct TextureData : IBinarySerializable
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public float Field04 { get; set; }
         public int Field08 { get; set; }
         public int Field0C { get; set; }

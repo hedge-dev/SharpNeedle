@@ -5,7 +5,7 @@ public struct InterpolateInfo : IBinarySerializable
     public InterpolateMode EnterInterpolation;
     public InterpolateMode ExitInterpolation;
     public float Time;
-    public string From;
+    public string? From;
 
     public void Read(BinaryObjectReader reader)
     {

@@ -2,14 +2,14 @@
 
 public class SimpleAnimation : AnimationDef
 {
-    public string ResourceName { get; set; }
+    public string? ResourceName { get; set; }
     public float StartFrame { get; set; }
     public float EndFrame { get; set; }
     public float Speed { get; set; }
     public PlayModeInfo PlayMode { get; set; }
     public AnimOptions Options { get; set; }
-    public List<InterpolateInfo> Interpolations { get; set; }
-    public List<TriggerInfo> Triggers { get; set; }
+    public List<InterpolateInfo> Interpolations { get; set; } = [];
+    public List<TriggerInfo> Triggers { get; set; } = [];
 
     public SimpleAnimation() : base(AnimationType.Simple)
     {

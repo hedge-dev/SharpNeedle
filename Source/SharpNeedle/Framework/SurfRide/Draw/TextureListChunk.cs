@@ -38,7 +38,7 @@ public class TextureListChunk : List<TextureList>, IChunk
         end.Dispose();
     }
 
-    public TextureList GetTextureList(string name)
+    public TextureList? GetTextureList(string name)
     {
         return Find(item => item.Name == name);
     }
@@ -46,10 +46,10 @@ public class TextureListChunk : List<TextureList>, IChunk
 
 public class TextureList : List<Texture>, IBinarySerializable<ChunkBinaryOptions>
 {
-    public string Name { get; set; }
+    public string? Name { get; set; }
     public uint Field08 { get; set; }
     public uint Field14 { get; set; }
-    public UserData UserData { get; set; }
+    public UserData? UserData { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
@@ -115,7 +115,7 @@ public class TextureList : List<Texture>, IBinarySerializable<ChunkBinaryOptions
         }
     }
 
-    public Texture GetTexture(string name)
+    public Texture? GetTexture(string name)
     {
         return Find(item => item.Name == name);
     }

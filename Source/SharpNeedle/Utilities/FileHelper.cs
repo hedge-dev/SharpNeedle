@@ -13,6 +13,7 @@ public class FileHelper
             case FileAccess.ReadWrite:
                 return FileMode.OpenOrCreate;
         }
+
         return FileMode.OpenOrCreate;
     }
 }

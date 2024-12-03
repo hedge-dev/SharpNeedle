@@ -2,14 +2,14 @@
 
 public class Layer : IBinarySerializable<ChunkBinaryOptions>
 {
-    public string Name { get; set; }
+    public string? Name { get; set; }
     public int ID { get; set; }
     public uint Flags { get; set; }
     public uint CurrentAnimationIndex { get; set; }
     public List<CastNode> Nodes { get; set; } = [];
     public List<ICell> Cells { get; set; } = [];
     public List<Animation> Animations { get; set; } = [];
-    public UserData UserData { get; set; }
+    public UserData? UserData { get; set; }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
@@ -133,17 +133,23 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>
         }
     }
 
-    public CastNode GetCastNode(string name)
+    public CastNode? GetCastNode(string? name)
     {
         return Nodes.Find(item => item.Name == name);
     }
 
-    public ICell GetCastCell(string name)
+    public ICell? GetCastCell(string? name)
     {
-        return Cells[Nodes.FindIndex(item => item.Name == name)];
+        int index = Nodes.FindIndex(item => item.Name == name);
+        if(index == -1)
+        {
+            return null;
+        }
+
+        return Cells[index];
     }
 
-    public Animation GetAnimation(string name)
+    public Animation? GetAnimation(string? name)
     {
         return Animations.Find(item => item.Name == name);
     }
