@@ -1,7 +1,6 @@
 ﻿namespace SharpNeedle.IO;
 
 using System.IO;
-using System.Xml.Linq;
 
 public class VirtualDirectory : IDirectory
 {

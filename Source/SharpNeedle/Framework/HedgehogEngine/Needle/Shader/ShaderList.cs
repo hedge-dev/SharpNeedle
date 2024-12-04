@@ -2,8 +2,6 @@
 
 using Amicitia.IO.Binary;
 using SharpNeedle.Framework.BINA;
-using SharpNeedle.Framework.HedgehogEngine.Mirage;
-using System.Drawing;
 
 [NeedleResource("hhn/shader-list", @"\.shader-list$")]
 public class ShaderList : BinaryResource
