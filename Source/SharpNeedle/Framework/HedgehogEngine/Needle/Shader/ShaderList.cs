@@ -71,13 +71,19 @@ public class ShaderList : BinaryResource
 
         long inputsOffset = reader.ReadOffsetValue();
         int inputsSize = reader.ReadInt32();
-        reader.Skip(4);
-
-        long shadersOffset = reader.ReadOffsetValue();
-        int shadersSize = reader.ReadInt32();
-
         Inputs = reader.ReadObjectArrayAtOffset<Input>(inputsOffset, inputsSize).ToList();
-        Shaders = reader.ReadObjectArrayAtOffset<Shader>(shadersOffset, shadersSize).ToList();
+
+        if(ShaderListVersion >= 2)
+        {
+            reader.Skip(4);
+            long shadersOffset = reader.ReadOffsetValue();
+            int shadersSize = reader.ReadInt32();
+            Shaders = reader.ReadObjectArrayAtOffset<Shader>(shadersOffset, shadersSize).ToList();
+        }
+        else
+        {
+            Shaders = [];
+        }
     }
 
     public override void Write(BinaryObjectWriter writer)
@@ -93,22 +99,26 @@ public class ShaderList : BinaryResource
             }
         });
         writer.WriteInt32(Inputs.Count);
-        writer.Align(8);
 
-        writer.WriteOffset(() =>
+        if(ShaderListVersion >= 2)
         {
-            foreach(Shader input in Shaders)
+            writer.Align(8);
+
+            writer.WriteOffset(() =>
             {
-                writer.WriteObject(input);
-            }
-        });
-        writer.WriteInt32(Shaders.Count);
+                foreach(Shader input in Shaders)
+                {
+                    writer.WriteObject(input);
+                }
+            });
+            writer.WriteInt32(Shaders.Count);
+        }
 
         // the weirdest aligment padding in existence.
         // Only done when any of the arrays have values,
         // and it affects the pointers too.
         // Way to save 4 bytes i guess.
-        if(Shaders.Count > 0 || Inputs.Count > 0)
+        if(Inputs.Count > 0 || (Shaders.Count > 0 && ShaderListVersion >= 2))
         {
             writer.Align(8);
         }
