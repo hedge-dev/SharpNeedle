@@ -51,35 +51,14 @@ public abstract class SampleChunkResourceBlock<T> : NeedleArchiveBlock where T :
 
     private static BinaryObjectReader FixSelfRelativeOffsets(BinaryObjectReader reader)
     {
-        long startPosition = reader.Position;
         SeekToken startToken = reader.At();
 
-        SampleChunkNode rootNode = reader.ReadObject<SampleChunkNode>();
-
-        SampleChunkNode contexts = rootNode.FindNode("Contexts")
-            ?? throw new InvalidDataException("No Contexts node!");
-
-        SampleChunkNode? dataNode = contexts;
-        while(dataNode != null && dataNode.DataSize == 0)
-        {
-            dataNode = dataNode.Parent;
-        }
-
-        if(dataNode == null || dataNode == rootNode)
-        {
-            throw new InvalidDataException("No data found!");
-        }
-
-        long dataOffsetOrigin = dataNode.DataOffset - startPosition - 0x10;
-
-        startToken.Dispose();
         long[] offsets = GetOffsetTable(reader);
         byte[] adjustedData = reader.GetBaseStream().ReadAllBytes();
 
         MemoryStream stream = new(adjustedData);
-        using(BinaryObjectWriter writer = new(stream, StreamOwnership.Retain, Endianness.Big))
+        using(BinaryObjectWriter writer = new(stream, StreamOwnership.Retain, reader.Endianness))
         {
-            Endianness prevEndianness = reader.Endianness;
             reader.Endianness = Endianness.Little;
 
             foreach(uint offset in offsets)
@@ -88,11 +67,11 @@ public abstract class SampleChunkResourceBlock<T> : NeedleArchiveBlock where T :
                 writer.Seek(offset, SeekOrigin.Begin);
 
                 int relativeOffset = reader.ReadInt32();
-                uint realOffset = (uint)(relativeOffset + dataOffsetOrigin);
+                uint realOffset = (uint)(offset + relativeOffset - 0x10);
                 writer.WriteUInt32(realOffset);
             }
 
-            reader.Endianness = prevEndianness;
+            reader.Endianness = writer.Endianness;
         }
 
         stream.Position = 0;
@@ -111,7 +90,7 @@ public abstract class SampleChunkResourceBlock<T> : NeedleArchiveBlock where T :
         };
 
         Resource = CreateResourceInstance(filename);
-        Resource.ReadResource(reader);
+        Resource.ReadResource(adjustedReader);
 
         if(adjustedReader != reader)
         {
