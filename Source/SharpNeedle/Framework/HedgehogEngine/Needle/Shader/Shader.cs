@@ -3,7 +3,7 @@
 using SharpNeedle.IO;
 using SharpNeedle.Utilities;
 
-[NeedleResource("hhn/shader-list", @"\.[pvc]so$")]
+[NeedleResource("hh/needle/shader-list", @"\.[pvc]so$")]
 public class Shader : ResourceBase
 {
     public static readonly ulong FileSignature = BinaryHelper.MakeSignature<ulong>("HHNEEDLE");

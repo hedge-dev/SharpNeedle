@@ -3,7 +3,7 @@
 using Amicitia.IO.Binary;
 using SharpNeedle.Framework.BINA;
 
-[NeedleResource("hhn/shader-list", @"\.shader-list$")]
+[NeedleResource("hh/needle/shader-list", @"\.shader-list$")]
 public class ShaderList : BinaryResource
 {
     public new static readonly uint Signature = BinaryHelper.MakeSignature<uint>("NDSL");
