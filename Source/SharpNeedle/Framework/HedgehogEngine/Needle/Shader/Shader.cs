@@ -51,11 +51,6 @@ public class Shader : ResourceBase
     public List<Permutation> Permutations { get; set; } = [];
 
     /// <summary>
-    /// Might just be padding, yet to be determined
-    /// </summary>
-    public uint Unknown2 { get; set; }
-
-    /// <summary>
     /// One-based index to <see cref="ShaderVariants"/>. 
     /// <br/> 0 Probably means "null" here, so 1 is used to access index 0.
     /// </summary>
@@ -83,11 +78,10 @@ public class Shader : ResourceBase
         int permutationCount = reader.ReadInt32();
         Permutations = [.. reader.ReadObjectArray<Permutation>(permutationCount)];
 
-        Unknown2 = reader.ReadUInt32();
         int variantCount = 1 << Permutations.Count;
         Variants = [.. reader.ReadArray<int>(variantCount)];
 
-        int shaderVariantCount = Variants.Max();
+        int shaderVariantCount = reader.ReadInt32();
         ShaderVariants = [.. reader.ReadObjectArray<ShaderVariant>(shaderVariantCount)];
     }
 
@@ -115,8 +109,6 @@ public class Shader : ResourceBase
         writer.WriteInt32(Permutations.Count);
         writer.WriteObjectCollection(Permutations);
 
-        writer.WriteUInt32(Unknown2);
-
         int variantCount = 1 << Variants.Count;
         if(Variants.Count != variantCount)
         {
@@ -125,12 +117,7 @@ public class Shader : ResourceBase
 
         writer.WriteArray(Variants.ToArray());
 
-        int shaderVariantCount = Variants.Max();
-        if(ShaderVariants.Count != shaderVariantCount)
-        {
-            throw new InvalidOperationException($"Shader uses up to {shaderVariantCount} variants, but only has {ShaderVariants.Count} shader variants!");
-        }
-
+        writer.WriteInt32(ShaderVariants.Count);
         writer.WriteObjectCollection(ShaderVariants);
 
         long dataEnd = writer.Position;
