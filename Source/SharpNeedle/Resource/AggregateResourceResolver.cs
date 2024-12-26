@@ -1,5 +1,7 @@
 ﻿namespace SharpNeedle.Resource;
 
+using SharpNeedle.IO;
+
 public class AggregateResourceResolver : List<IResourceResolver>, IResourceResolver
 {
     public TRes? Open<TRes>(string fileName) where TRes : IResource, new()
@@ -14,5 +16,19 @@ public class AggregateResourceResolver : List<IResourceResolver>, IResourceResol
         }
 
         return default;
+    }
+
+    public IFile? GetFile(string filename)
+    {
+        foreach(IResourceResolver resolver in this)
+        {
+            IFile? file = resolver.GetFile(filename);
+            if(file != null)
+            {
+                return file;
+            }
+        }
+
+        return null;
     }
 }

@@ -142,7 +142,7 @@ public class HostFile : IFile
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Length, Path);
+        return HashCode.Combine(Path);
     }
 
     public override string ToString()

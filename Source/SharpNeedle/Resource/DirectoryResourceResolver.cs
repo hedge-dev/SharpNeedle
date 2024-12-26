@@ -16,7 +16,7 @@ public struct DirectoryResourceResolver : IResourceResolver
 
     public readonly TRes? Open<TRes>(string fileName) where TRes : IResource, new()
     {
-        IFile file = Directory[fileName] ?? throw new FileNotFoundException($"File \"{fileName}\" not found", Path.Join(Directory.Path, fileName));
+        IFile file = GetFile(fileName) ?? throw new FileNotFoundException($"File \"{fileName}\" not found", Path.Join(Directory.Path, fileName));
 
         TRes res;
         if(Manager != null)
@@ -30,5 +30,10 @@ public struct DirectoryResourceResolver : IResourceResolver
         res.Read(file);
         res.ResolveDependencies(this);
         return res;
+    }
+
+    public readonly IFile? GetFile(string filename)
+    {
+        return Directory[filename];
     }
 }

@@ -1,9 +1,11 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Mirage;
 
+using SharpNeedle.Utilities;
+
 public class MorphModel : SampleChunkResource
 {
     public List<MorphTarget> Targets { get; set; } = [];
-    public Mesh? Mesh { get; set; }
+    public MeshGroup? Meshgroup { get; set; }
 
     public override void Read(BinaryObjectReader reader)
     {
@@ -39,30 +41,47 @@ public class MorphModel : SampleChunkResource
             }
         });
 
-        Mesh = reader.ReadObject<MeshGroup>().FirstOrDefault();
-        if(Mesh != null)
+        Meshgroup = reader.ReadObject<MeshGroup>();
+        byte[] vertexData = [];
+
+        for(int i = 0; i < Meshgroup.Count; i++)
         {
-            reader.ReadAtOffset(vertexOffset, () =>
+            Mesh mesh = Meshgroup[i];
+
+            if(i == 0)
             {
-                Mesh.VertexCount = vertexCount;
-                Mesh.Vertices = reader.ReadArray<byte>((int)(vertexCount * Mesh.VertexSize));
-                Mesh.SwapVertexEndianness();
-            });
+                vertexData = reader.ReadArrayAtOffset<byte>(vertexOffset, (int)(vertexCount * mesh.VertexSize));
+            }
+
+            mesh.VertexCount = vertexCount;
+            mesh.Vertices = vertexData;
+
+            if(i == 0)
+            {
+                mesh.SwapVertexEndianness();
+            }
         }
     }
 
     public override void Write(BinaryObjectWriter writer)
     {
-        if(Mesh == null)
+        if(Meshgroup == null)
         {
-            throw new InvalidOperationException("Mesh is null");
+            throw new InvalidOperationException("Meshgroup is null");
         }
 
-        byte[] verticesClone = new byte[Mesh.Vertices.Length];
-        Array.Copy(Mesh.Vertices, verticesClone, verticesClone.LongLength);
-        VertexElement.SwapEndianness([.. Mesh.Elements], verticesClone.AsSpan(), (nint)Mesh.VertexCount, (nint)Mesh.VertexSize);
+        if(Meshgroup.Count == 0)
+        {
+            throw new InvalidOperationException("Meshgroup has no meshes");
+        }
 
-        writer.Write(Mesh.VertexCount);
+        Mesh mesh = Meshgroup.First();
+
+        byte[] verticesClone = new byte[mesh.Vertices.Length];
+        Array.Copy(mesh.Vertices, verticesClone, verticesClone.LongLength);
+        VertexElement.SwapEndianness([.. mesh.Elements], verticesClone.AsSpan(), (nint)mesh.VertexCount, (nint)mesh.VertexSize);
+
+        writer.Write(mesh.VertexCount);
         writer.WriteArrayOffset(verticesClone);
 
         writer.Write(1); // Some kind of flags
@@ -84,12 +103,17 @@ public class MorphModel : SampleChunkResource
             }
         });
 
-        Mesh dummyMesh = Mesh.Clone();
-        dummyMesh.Vertices = [];
-        dummyMesh.VertexCount = 0;
+        MeshGroup dummyGroup = [..Meshgroup.Select(x =>
+        {
+            Mesh dummyMesh = x.Clone();
+            dummyMesh.Vertices = [];
+            dummyMesh.VertexCount = 0;
+            return dummyMesh;
+        })];
 
-        MeshGroup dummyGroup = [dummyMesh];
-        writer.WriteObject(dummyGroup);
+        dummyGroup.Name = Meshgroup.Name;
+
+        writer.WriteObject(Meshgroup);
     }
 }
 
