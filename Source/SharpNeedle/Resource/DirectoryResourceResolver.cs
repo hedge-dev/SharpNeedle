@@ -14,21 +14,30 @@ public struct DirectoryResourceResolver : IResourceResolver
     }
 
 
-    public readonly TRes? Open<TRes>(string fileName) where TRes : IResource, new()
+    public readonly TRes? Open<TRes>(string fileName, bool resolveDependencies = true) where TRes : IResource, new()
     {
-        IFile file = GetFile(fileName) ?? throw new FileNotFoundException($"File \"{fileName}\" not found", Path.Join(Directory.Path, fileName));
+        IFile? file = GetFile(fileName);
+        if(file == null)
+        {
+            return default;
+        }
 
         TRes res;
         if(Manager != null)
         {
             res = Manager.Open<TRes>(file, false);
-            res.ResolveDependencies(this);
-            return res;
+        }
+        else
+        {
+            res = new();
+            res.Read(file);
         }
 
-        res = new TRes();
-        res.Read(file);
-        res.ResolveDependencies(this);
+        if(resolveDependencies)
+        {
+            res.ResolveDependencies(this);
+        }
+
         return res;
     }
 

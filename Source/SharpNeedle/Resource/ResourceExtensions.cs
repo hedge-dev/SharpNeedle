@@ -6,7 +6,7 @@ public static class ResourceExtensions
 {
     public static string? GetIdentifier(this IResource res)
     {
-        return ResourceManager.GetIdentifier(res.GetType());
+        return ResourceTypeManager.GetIdentifier(res.GetType());
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

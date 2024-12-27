@@ -4,11 +4,11 @@ using SharpNeedle.IO;
 
 public class AggregateResourceResolver : List<IResourceResolver>, IResourceResolver
 {
-    public TRes? Open<TRes>(string fileName) where TRes : IResource, new()
+    public TRes? Open<TRes>(string fileName, bool resolveDependencies = true) where TRes : IResource, new()
     {
         foreach(IResourceResolver resolver in this)
         {
-            TRes? res = resolver.Open<TRes>(fileName);
+            TRes? res = resolver.Open<TRes>(fileName, resolveDependencies);
             if(res != null)
             {
                 return res;

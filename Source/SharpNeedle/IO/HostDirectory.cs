@@ -164,4 +164,15 @@ public class HostDirectory : IDirectory
     {
         return Name;
     }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is HostDirectory directory &&
+               Path == directory.Path;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Path);
+    }
 }
