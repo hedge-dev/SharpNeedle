@@ -9,8 +9,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Nerdbank.GitVersioning" Version="3.6.133" PrivateAssets="all" />
+		<PackageReference Include="Nerdbank.GitVersioning" Version="3.7.112" PrivateAssets="all" />
 		<PackageReference Include="Amicitia.IO" Version="1.0.0" />
+		<PackageReference Include="RhuBulletSharp" Version="1.2.5" />
 	</ItemGroup>
 
 </Project>

@@ -60,14 +60,14 @@ public class DataChunk<T> : DataChunk, IChunk where T : IBinarySerializable
 
         long baseSize = dataWriter.Length;
         byte[] table = Offsets.Encode();
-        dataWriter.Write(0); // Dummy string table
+        // string table would go here
         dataWriter.WriteArray(table.AsSpan());
 
         writer.WriteNative(Signature);
 
         writer.Write((int)(baseSize + table.Length + 0x34)); // Size
         writer.Write((int)baseSize); // String Table
-        writer.Write(4); // String Table Size
+        writer.Write(0); // String Table Size
         writer.Write(table.Length); // Offset Table Size
 
         writer.Write((short)0x18);

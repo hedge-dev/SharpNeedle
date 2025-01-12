@@ -11,11 +11,11 @@ public class LODInfoBlock : NeedleArchiveBlock
 
     public struct LODItem
     {
-        public int Unknown1 { get; set; }
+        public int CascadeFlag { get; set; }
 
         public float Unknown2 { get; set; }
 
-        public byte Unknown3 { get; set; }
+        public byte CascadeLevel { get; set; }
     }
 
     public byte Unknown1 { get; set; }
@@ -41,7 +41,7 @@ public class LODInfoBlock : NeedleArchiveBlock
 
         for(int i = 0; i < items.Length; i++)
         {
-            items[i].Unknown1 = reader.ReadInt32();
+            items[i].CascadeFlag = reader.ReadInt32();
         }
 
         for(int i = 0; i < items.Length; i++)
@@ -51,7 +51,7 @@ public class LODInfoBlock : NeedleArchiveBlock
 
         for(int i = 0; i < items.Length; i++)
         {
-            items[i].Unknown3 = reader.ReadByte();
+            items[i].CascadeLevel = reader.ReadByte();
         }
 
         Items = [.. items[..lodCount]];
@@ -70,7 +70,7 @@ public class LODInfoBlock : NeedleArchiveBlock
 
         for(int i = 0; i < Items.Count; i++)
         {
-            writer.WriteInt32(Items[i].Unknown1);
+            writer.WriteInt32(Items[i].CascadeFlag);
         }
 
         writer.WriteNulls(4 * (32 - Items.Count));
@@ -84,7 +84,7 @@ public class LODInfoBlock : NeedleArchiveBlock
 
         for(int i = 0; i < Items.Count; i++)
         {
-            writer.WriteByte(Items[i].Unknown3);
+            writer.WriteByte(Items[i].CascadeLevel);
         }
 
         writer.WriteNulls(32 - Items.Count);
