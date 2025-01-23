@@ -10,7 +10,9 @@ public class PathData : BaseNodeData
 
     public PathData() { }
     public PathData(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

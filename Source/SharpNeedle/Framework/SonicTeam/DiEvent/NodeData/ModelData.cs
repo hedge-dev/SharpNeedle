@@ -3,13 +3,15 @@ namespace SharpNeedle.Framework.SonicTeam.DiEvent.NodeData;
 public class ModelData : BaseNodeData
 {
     public int Field00 { get; set; }
-    public string ModelName { get; set; }
-    public string SkeletonName { get; set; }
-    public string Field84 { get; set; }
+    public string ModelName { get; set; } = string.Empty;
+    public string SkeletonName { get; set; } = string.Empty;
+    public string Field84 { get; set; } = string.Empty;
 
     public ModelData() { }
     public ModelData(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

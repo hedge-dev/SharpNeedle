@@ -9,7 +9,9 @@ public class CameraMotionData : BaseNodeData
 
     public CameraMotionData() { }
     public CameraMotionData(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

@@ -1,10 +1,10 @@
-using SharpNeedle.SonicTeam.DiEvent;
-
 namespace SharpNeedle.Framework.SonicTeam.DiEvent.NodeData;
+
+using SharpNeedle.Framework.SonicTeam.DiEvent.Parameters;
 
 public class ParameterData : BaseNodeData
 {
-    private int UnknownDataSize;
+    private readonly int _unknownDataSize;
 
     public float StartTime { get; set; }
     public float EndTime { get; set; }
@@ -13,12 +13,12 @@ public class ParameterData : BaseNodeData
     public int Field14 { get; set; }
     public int Field18 { get; set; }
     public int Field1C { get; set; }
-    public BaseParam Parameter { get; set; }
+    public BaseParam? Parameter { get; set; }
 
     public ParameterData() { }
     public ParameterData(BinaryObjectReader reader, GameType game, int size)
     {
-        UnknownDataSize = size - 8;
+        _unknownDataSize = size - 8;
         Read(reader, game);
     }
 
@@ -134,7 +134,7 @@ public class ParameterData : BaseNodeData
                 break;
 
             default:
-                Parameter = new UnknownParam(reader, UnknownDataSize, type);
+                Parameter = new UnknownParam(reader, _unknownDataSize, type);
                 break;
         }
     }
@@ -196,7 +196,7 @@ public class ParameterData : BaseNodeData
                 break;
 
             default:
-                Parameter = new UnknownParam(reader, UnknownDataSize, type);
+                Parameter = new UnknownParam(reader, _unknownDataSize, type);
                 break;
         }
     }
@@ -214,7 +214,7 @@ public class ParameterData : BaseNodeData
                 break;
 
             default:
-                Parameter = new UnknownParam(reader, UnknownDataSize, type);
+                Parameter = new UnknownParam(reader, _unknownDataSize, type);
                 break;
         }
     }
@@ -291,7 +291,7 @@ public class ParameterData : BaseNodeData
                     break;
 
                 default:
-                    Parameter = new UnknownParam(reader, UnknownDataSize, type);
+                    Parameter = new UnknownParam(reader, _unknownDataSize, type);
                     break;
             }
         }
@@ -315,6 +315,8 @@ public class ParameterData : BaseNodeData
         writer.Write(Field1C);
 
         if(Parameter != null)
+        {
             writer.WriteObject(Parameter, game);
+        }
     }
 }

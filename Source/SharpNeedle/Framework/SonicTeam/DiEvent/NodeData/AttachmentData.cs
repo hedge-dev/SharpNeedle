@@ -3,14 +3,16 @@ namespace SharpNeedle.Framework.SonicTeam.DiEvent.NodeData;
 public class AttachmentData : BaseNodeData
 {
     public int Field00 { get; set; }
-    public string NodeName { get; set; }
+    public string NodeName { get; set; } = string.Empty;
     public int Field44 { get; set; }
     public int Field48 { get; set; }
     public int Field4C { get; set; }
 
     public AttachmentData() { }
     public AttachmentData(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

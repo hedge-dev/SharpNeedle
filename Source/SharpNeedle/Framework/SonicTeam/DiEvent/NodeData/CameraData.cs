@@ -6,12 +6,14 @@ public class CameraData : BaseNodeData
     public int FrameCount { get; set; }
     public int Field08 { get; set; }
     public int Field0C { get; set; }
-    public List<float> FrameTimes { get; set; } = new List<float>();
-    public List<float> FrameData { get; set; } = new List<float>();
+    public List<float> FrameTimes { get; set; } = [];
+    public List<float> FrameData { get; set; } = [];
 
     public CameraData() { }
     public CameraData(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
