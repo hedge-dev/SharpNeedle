@@ -1,7 +1,9 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Needle.Archive;
 
 using SharpNeedle.Framework.HedgehogEngine.Mirage;
+using SharpNeedle.IO;
 using System;
+using System.IO;
 using System.Linq;
 
 public abstract class SampleChunkResourceBlock<T> : NeedleArchiveBlock where T : SampleChunkResource
@@ -32,62 +34,82 @@ public abstract class SampleChunkResourceBlock<T> : NeedleArchiveBlock where T :
         return result;
     }
 
-    private static BinaryObjectReader FlipEndianOfOffsets(BinaryObjectReader reader)
+    private static void FlipEndianOfOffsets(long[] offsets, byte[] resourceData)
     {
-        using SeekToken startToken = reader.At();
-
-        long[] offsets = GetOffsetTable(reader);
-        byte[] adjustedData = reader.GetBaseStream().ReadAllBytes();
-
         foreach(long offset in offsets)
         {
-            (adjustedData[offset], adjustedData[offset + 3]) = (adjustedData[offset + 3], adjustedData[offset]);
-            (adjustedData[offset + 1], adjustedData[offset + 2]) = (adjustedData[offset + 2], adjustedData[offset + 1]);
+            (resourceData[offset], resourceData[offset + 3]) = (resourceData[offset + 3], resourceData[offset]);
+            (resourceData[offset + 1], resourceData[offset + 2]) = (resourceData[offset + 2], resourceData[offset + 1]);
         }
-
-        MemoryStream stream = new(adjustedData);
-        return new(stream, StreamOwnership.Retain, reader.Endianness);
     }
 
-    private static BinaryObjectReader FixSelfRelativeOffsets(BinaryObjectReader reader)
+    private static void SelfRelativeToAbsoluteOffsets(long[] offsets, byte[] resourceData)
     {
-        SeekToken startToken = reader.At();
-
-        long[] offsets = GetOffsetTable(reader);
-        byte[] adjustedData = reader.GetBaseStream().ReadAllBytes();
-
-        MemoryStream stream = new(adjustedData);
-        using(BinaryObjectWriter writer = new(stream, StreamOwnership.Retain, reader.Endianness))
+        using(MemoryStream stream = new(resourceData))
         {
-            reader.Endianness = Endianness.Little;
+            using BinaryObjectReader reader = new(stream, StreamOwnership.Retain, Endianness.Little);
+            using BinaryObjectWriter writer = new(stream, StreamOwnership.Retain, Endianness.Big);
 
             foreach(uint offset in offsets)
             {
                 reader.Seek(offset, SeekOrigin.Begin);
-                writer.Seek(offset, SeekOrigin.Begin);
-
                 int relativeOffset = reader.ReadInt32();
-                uint realOffset = (uint)(offset + relativeOffset - 0x10);
+                uint realOffset = (uint)(relativeOffset + offset - 0x10);
+
+                writer.Seek(offset, SeekOrigin.Begin);
                 writer.WriteUInt32(realOffset);
             }
 
-            reader.Endianness = writer.Endianness;
+            writer.Flush();
         }
-
-        stream.Position = 0;
-        return new(stream, StreamOwnership.Retain, reader.Endianness);
     }
 
+    private static void AbsoluteToSelfRelativeOffsets(long[] offsets, byte[] resourceData)
+    {
+        using(MemoryStream stream = new(resourceData))
+        {
+            using BinaryObjectReader reader = new(stream, StreamOwnership.Retain, Endianness.Big);
+            using BinaryObjectWriter writer = new(stream, StreamOwnership.Retain, Endianness.Little);
+
+            foreach(uint offset in offsets)
+            {
+                reader.Seek(offset, SeekOrigin.Begin);
+                uint realOffset = reader.ReadUInt32();
+                int relativeOffset = (int)(realOffset - offset + 0x10);
+
+                writer.Seek(offset, SeekOrigin.Begin);
+                writer.WriteInt32(relativeOffset);
+            }
+
+            writer.Flush();
+        }
+    }
 
     protected override void ReadBlockData(BinaryObjectReader reader, string filename, NeedleArchvieDataOffsetMode offsetMode)
     {
-        BinaryObjectReader adjustedReader = offsetMode switch
+        BinaryObjectReader adjustedReader = reader;
+
+        if(offsetMode != NeedleArchvieDataOffsetMode.Default)
         {
-            NeedleArchvieDataOffsetMode.Default => reader,
-            NeedleArchvieDataOffsetMode.Flipped => FlipEndianOfOffsets(reader),
-            NeedleArchvieDataOffsetMode.SelfRelative => FixSelfRelativeOffsets(reader),
-            _ => throw new ArgumentException("Invalid offset mode", nameof(offsetMode)),
-        };
+            using(SeekToken startToken = reader.At())
+            {
+                long[] offsets = GetOffsetTable(reader);
+                byte[] adjustedData = reader.GetBaseStream().ReadAllBytes();
+
+                switch(offsetMode)
+                {
+                    case NeedleArchvieDataOffsetMode.Flipped:
+                        FlipEndianOfOffsets(offsets, adjustedData);
+                        break;
+                    case NeedleArchvieDataOffsetMode.SelfRelative:
+                        SelfRelativeToAbsoluteOffsets(offsets, adjustedData);
+                        break;
+                }
+
+                MemoryStream stream = new(adjustedData);
+                adjustedReader = new(stream, StreamOwnership.Transfer, reader.Endianness);
+            }
+        }
 
         Resource = CreateResourceInstance(filename);
         Resource.ReadResource(adjustedReader);
@@ -100,6 +122,7 @@ public abstract class SampleChunkResourceBlock<T> : NeedleArchiveBlock where T :
 
     protected abstract T CreateResourceInstance(string filename);
 
+    
 
     protected override void WriteBlockData(BinaryObjectWriter writer, string filename, NeedleArchvieDataOffsetMode offsetMode)
     {
@@ -108,13 +131,50 @@ public abstract class SampleChunkResourceBlock<T> : NeedleArchiveBlock where T :
             throw new InvalidOperationException("Model block has no model!");
         }
 
-        Resource.WriteResource(writer, filename);
+        byte[] resourceData;
+
+        using MemoryStream resourceStream = new();
+        {
+            using BinaryObjectWriter resourceWriter = new(resourceStream, StreamOwnership.Retain, Endianness.Big);
+
+            Resource.WriteResource(resourceWriter, filename);
+            resourceWriter.Flush();
+            resourceData = resourceStream.ToArray();
+        }
+
+        if(offsetMode != NeedleArchvieDataOffsetMode.Default)
+        {
+            long[] offsets;
+            using(MemoryStream offsetsStream = new(resourceData))
+            {
+                using BinaryObjectReader offsetsReader = new(offsetsStream, StreamOwnership.Retain, Endianness.Big);
+                offsets = GetOffsetTable(offsetsReader);
+            }
+
+            switch(offsetMode)
+            {
+                case NeedleArchvieDataOffsetMode.Flipped:
+                    FlipEndianOfOffsets(offsets, resourceData);
+                    break;
+                case NeedleArchvieDataOffsetMode.SelfRelative:
+                    AbsoluteToSelfRelativeOffsets(offsets, resourceData);
+                    break;
+            }
+        }
+
+        writer.WriteBytes(resourceData);
     }
 
 
     public override void ResolveDependencies(IResourceResolver dir)
     {
         Resource?.ResolveDependencies(dir);
+    }
+
+
+    public override void WriteDependencies(IDirectory dir)
+    {
+        Resource?.WriteDependencies(dir);
     }
 
 

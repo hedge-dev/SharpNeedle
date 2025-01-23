@@ -1,5 +1,7 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Mirage;
 
+using SharpNeedle.IO;
+using SharpNeedle.Resource;
 using SharpNeedle.Utilities;
 
 public class MorphModel : SampleChunkResource
@@ -114,6 +116,16 @@ public class MorphModel : SampleChunkResource
         dummyGroup.Name = Meshgroup.Name;
 
         writer.WriteObject(Meshgroup);
+    }
+
+    public override void ResolveDependencies(IResourceResolver dir)
+    {
+        Meshgroup?.ResolveDependencies(dir);
+    }
+
+    public override void WriteDependencies(IDirectory dir)
+    {
+        Meshgroup?.WriteDependencies(dir);
     }
 }
 

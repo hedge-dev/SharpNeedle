@@ -93,6 +93,8 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
         FloatValue = value;
     }
 
+    public SampleChunkNode(string name, bool value) : this(name, value ? 1 : 0) { }
+
     public SampleChunkNode(string name, IBinarySerializable data, uint dataVersion) : this(name, dataVersion)
     {
         Data = data;

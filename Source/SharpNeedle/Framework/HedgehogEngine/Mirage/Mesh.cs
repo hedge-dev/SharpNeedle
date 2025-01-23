@@ -1,6 +1,7 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Mirage;
 
 using SharpNeedle.Structs;
+using System.Text.Json.Serialization;
 
 public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
 {
@@ -124,6 +125,18 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
         Material = resolver.Open<Material>($"{Material.Name}.material") ?? throw new InvalidOperationException("Material resolved to null!");
     }
 
+    public void WriteDependencies(IDirectory dir)
+    {
+        if(!Material.IsValid())
+        {
+            return;
+        }
+
+        IFile materialFile = dir.CreateFile($"{Material.Name}.material");
+        Material.Resource!.Write(materialFile);
+        Material.Resource.WriteDependencies(dir);
+    }
+
     public Mesh Clone()
     {
         return new()
@@ -159,8 +172,22 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
 
 public struct MeshSlot
 {
+    [JsonInclude]
     public Mesh.Type Type;
+
+    [JsonInclude]
     public readonly string? Name;
+
+    [JsonConstructor]
+    internal MeshSlot(Mesh.Type type, string name)
+    {
+        Type = type;
+
+        if(type == Mesh.Type.Special)
+        {
+            Name = name;
+        }
+    }
 
     public MeshSlot(string name)
     {

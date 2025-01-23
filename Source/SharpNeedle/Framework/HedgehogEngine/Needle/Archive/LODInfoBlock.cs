@@ -23,7 +23,10 @@ public class LODInfoBlock : NeedleArchiveBlock
     public List<LODItem> Items { get; set; } = [];
 
 
-    public LODInfoBlock() : base("lodinfo") { }
+    public LODInfoBlock() : base("lodinfo") 
+    {
+        Version = 1;
+    }
 
 
     protected override bool IsVersionValid(int version)

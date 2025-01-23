@@ -1,5 +1,6 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Mirage;
 
+using SharpNeedle.IO;
 using SharpNeedle.Structs;
 
 [NeedleResource("hh/model", ResourceType.Model, @"\.model$")]
@@ -86,16 +87,43 @@ public class Model : ModelBase
         }
     }
 
+    public override void ResolveDependencies(IResourceResolver resolver)
+    {
+        base.ResolveDependencies(resolver);
+
+        if(Morphs != null)
+        {
+            foreach(MorphModel morph in Morphs)
+            {
+                morph.ResolveDependencies(resolver);
+            }
+        }
+    }
+
+    public override void WriteDependencies(IDirectory dir)
+    {
+        base.WriteDependencies(dir);
+
+        if(Morphs != null)
+        {
+            foreach(MorphModel morph in Morphs)
+            {
+                morph.WriteDependencies(dir);
+            }
+        }
+    }
+
     public struct Node : IBinarySerializable
     {
-        public string? Name;
-        public int ParentIndex;
-        public Matrix4x4 Transform;
+        public string? Name { get; set; }
+        public int ParentIndex { get; set; }
+        public Matrix4x4 Transform { get; set; }
 
         public void Read(BinaryObjectReader reader)
         {
             ParentIndex = reader.Read<int>();
             Name = reader.ReadStringOffset();
+            Transform = Matrix4x4.Identity;
         }
 
         public readonly void Write(BinaryObjectWriter writer)

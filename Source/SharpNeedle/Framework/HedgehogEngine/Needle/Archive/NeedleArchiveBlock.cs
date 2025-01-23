@@ -2,10 +2,7 @@
 
 using SharpNeedle.IO;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 public abstract class NeedleArchiveBlock : ResourceBase
 {
@@ -113,6 +110,7 @@ public abstract class NeedleArchiveBlock : ResourceBase
         writer.WriteByte((byte)'V');
         writer.WriteByte((byte)(Version + (byte)'0'));
         writer.WriteString(StringBinaryFormat.NullTerminated, Type);
+        writer.Align(4);
 
         SeekToken sizeToken = writer.At();
         writer.WriteInt32(0);

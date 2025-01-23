@@ -2,6 +2,7 @@
 
 using SharpNeedle.Structs;
 using SharpNeedle.Utilities;
+using System.Text.Json.Serialization;
 
 [NeedleResource("hh/material", ResourceType.Material, @"\.material$")]
 public class Material : SampleChunkResource
@@ -227,8 +228,10 @@ public class Material : SampleChunkResource
     public class Parameter<T> : IBinarySerializable where T : unmanaged
     {
         internal string Name { get; set; } = string.Empty;
+
         public List<T> Values { get; set; } = new(1);
 
+        [JsonIgnore]
         public T Value
         {
             get

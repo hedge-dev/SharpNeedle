@@ -1,5 +1,7 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Mirage;
 
+using SharpNeedle.IO;
+
 public abstract class ModelBase : SampleChunkResource
 {
     public List<MeshGroup> Groups { get; set; } = [];
@@ -9,6 +11,14 @@ public abstract class ModelBase : SampleChunkResource
         foreach(MeshGroup group in Groups)
         {
             group.ResolveDependencies(resolver);
+        }
+    }
+
+    public override void WriteDependencies(IDirectory dir)
+    {
+        foreach(MeshGroup group in Groups)
+        {
+            group.WriteDependencies(dir);
         }
     }
 

@@ -67,7 +67,7 @@ public class NeedleArchive : ResourceBase
     public override void Write(IFile file)
     {
         BaseFile = file;
-        using BinaryObjectWriter writer = new(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness.Little);
+        using BinaryObjectWriter writer = new(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness.Big);
 
         writer.WriteString(StringBinaryFormat.FixedLength, Signature, 6);
         writer.WriteByte((byte)'V');
@@ -76,6 +76,9 @@ public class NeedleArchive : ResourceBase
         SeekToken sizeToken = writer.At();
         long dataStartPos = writer.Position;
         writer.WriteInt32(0);
+
+        writer.WriteString(StringBinaryFormat.NullTerminated, Type);
+        writer.Align(4);
 
         foreach(NeedleArchiveBlock block in DataBlocks)
         {

@@ -1,9 +1,6 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Needle.Archive;
 
-using Amicitia.IO.Binary;
 using SharpNeedle.Framework.HedgehogEngine.Mirage;
-using SharpNeedle.Resource;
-using System;
 
 public class ModelBlock : SampleChunkResourceBlock<ModelBase>
 {
@@ -11,10 +8,10 @@ public class ModelBlock : SampleChunkResourceBlock<ModelBase>
 
     public override string Signature => ModelSignature;
 
-    public bool FlipOffsets { get; set; }
-
-    public ModelBlock() : base("model") { }
-
+    public ModelBlock() : base("model") 
+    {
+        Version = 5;
+    }
 
     protected override bool IsVersionValid(int version)
     {

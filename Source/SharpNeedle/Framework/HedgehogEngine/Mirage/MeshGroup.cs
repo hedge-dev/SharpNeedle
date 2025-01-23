@@ -166,6 +166,14 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
         }
     }
 
+    public void WriteDependencies(IDirectory dir)
+    {
+        foreach(Mesh mesh in this)
+        {
+            mesh.WriteDependencies(dir);
+        }
+    }
+
     public void Dispose()
     {
         foreach(Mesh mesh in this)
