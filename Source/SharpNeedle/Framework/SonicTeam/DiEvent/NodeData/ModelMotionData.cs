@@ -1,6 +1,6 @@
 namespace SharpNeedle.Framework.SonicTeam.DiEvent.NodeData;
 
-public class MotionModelData : BaseNodeData
+public class ModelMotionData : BaseNodeData
 {
     public int Field00 { get; set; }
     public int Field04 { get; set; }
@@ -9,8 +9,8 @@ public class MotionModelData : BaseNodeData
     public string Field10 { get; set; } = string.Empty;
     public float Field18 { get; set; }
 
-    public MotionModelData() { }
-    public MotionModelData(BinaryObjectReader reader, GameType game)
+    public ModelMotionData() { }
+    public ModelMotionData(BinaryObjectReader reader, GameType game)
     {
         Read(reader, game);
     }

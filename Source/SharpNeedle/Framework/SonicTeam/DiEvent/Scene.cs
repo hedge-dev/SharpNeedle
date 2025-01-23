@@ -55,7 +55,7 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
         => Write(file, LastGame);
 
     public void Write(string path, GameType game)
-       => Write(FileSystem.Create(path), game);
+       => Write(FileSystem.Instance.Create(path), game);
 
     public void Write(IFile file, GameType game)
     {

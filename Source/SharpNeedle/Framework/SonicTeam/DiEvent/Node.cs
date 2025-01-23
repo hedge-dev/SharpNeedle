@@ -1,5 +1,7 @@
 ﻿namespace SharpNeedle.Framework.SonicTeam.DiEvent;
 
+using SharpNeedle.Framework.SonicTeam.DiEvent.NodeData;
+
 public class Node : IBinarySerializable<GameType>
 {
     public Guid GUID { get; set; }

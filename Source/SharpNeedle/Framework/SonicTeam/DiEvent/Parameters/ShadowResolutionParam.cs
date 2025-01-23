@@ -1,5 +1,7 @@
 namespace SharpNeedle.Framework.SonicTeam.DiEvent.Parameters;
 
+using SharpNeedle.Structs;
+
 public class ShadowResolutionParam : BaseParam
 {
     public Vector2Int Resolution { get; set; }

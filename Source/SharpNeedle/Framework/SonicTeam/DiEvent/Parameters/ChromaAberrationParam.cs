@@ -1,5 +1,7 @@
 namespace SharpNeedle.Framework.SonicTeam.DiEvent.Parameters;
 
+using SharpNeedle.Structs;
+
 public class ChromaAberrationParam : BaseParam
 {
     public Endpoint EndpointA { get; set; } = new Endpoint();

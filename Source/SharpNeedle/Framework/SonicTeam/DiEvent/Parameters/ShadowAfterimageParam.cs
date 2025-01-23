@@ -1,5 +1,7 @@
 namespace SharpNeedle.Framework.SonicTeam.DiEvent.Parameters;
 
+using SharpNeedle.Structs;
+
 public class ShadowAfterimageParam : BaseParam
 {
     public Color<int> Color { get; set; }
