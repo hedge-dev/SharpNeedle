@@ -73,7 +73,7 @@ public class Node : IBinarySerializable<GameType>
 
             case NodeType.CharacterMotion:
             case NodeType.ModelMotion:
-                Data = new MotionModelData(reader, game);
+                Data = new ModelMotionData(reader, game);
                 break;
 
             case NodeType.Attachment:

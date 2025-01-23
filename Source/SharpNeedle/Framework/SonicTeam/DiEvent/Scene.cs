@@ -18,7 +18,9 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
 
     public List<Resource> Resources { get; set; } = [];
 
-    public Scene()
+    private GameType LastGame { get; set; } = GameType.Common;
+
+    public Scene() 
     {
         // Register encoding provider for Shift-JIS strings
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -45,13 +47,15 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
         using BinaryObjectReader reader = new(file.Open(), StreamOwnership.Transfer, Endianness.Little);
         reader.OffsetBinaryFormat = OffsetBinaryFormat.U32;
 
+        LastGame = game;
         Read(reader, game);
     }
 
     public override void Write(IFile file)
-    {
-        Write(file, GameType.Common);
-    }
+        => Write(file, LastGame);
+
+    public void Write(string path, GameType game)
+       => Write(FileSystem.Create(path), game);
 
     public void Write(IFile file, GameType game)
     {
@@ -60,6 +64,7 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
         using BinaryObjectWriter writer = new(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness.Little);
         writer.OffsetBinaryFormat = OffsetBinaryFormat.U32;
 
+        LastGame = game;
         Write(writer, game);
     }
 
@@ -220,10 +225,10 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
             }
 
             {
-                long unknownList4Pos = writer.Position;
+                long posUnknownList4 = writer.Position;
                 writer.Seek(unknownList4OffsetPos, SeekOrigin.Begin);
-                writer.Write((int)(unknownList4Pos - posStart));
-                writer.Seek(unknownList4Pos, SeekOrigin.Begin);
+                writer.Write((int)(posUnknownList4 - posStart));
+                writer.Seek(posUnknownList4, SeekOrigin.Begin);
 
                 writer.WriteNulls(16);
             }

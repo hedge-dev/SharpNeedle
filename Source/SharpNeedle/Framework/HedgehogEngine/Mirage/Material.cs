@@ -181,14 +181,14 @@ public class Material : SampleChunkResource
                 return;
             }
 
-            foreach(global::System.Collections.Generic.KeyValuePair<string, global::SharpNeedle.Framework.HedgehogEngine.Mirage.Material.Parameter<T>> parameter in parameters)
-            {
+            foreach(KeyValuePair<string, Parameter<T>> parameter in parameters)
+            { 
                 parameter.Value.Name = parameter.Key;
             }
 
             writer.WriteOffset(() =>
             {
-                foreach(global::System.Collections.Generic.KeyValuePair<string, global::SharpNeedle.Framework.HedgehogEngine.Mirage.Material.Parameter<T>> parameter in parameters)
+                foreach(KeyValuePair<string, Parameter<T>> parameter in parameters)
                 {
                     writer.WriteOffset(() => writer.WriteObject(parameter.Value));
                 }
