@@ -2,16 +2,18 @@ namespace SharpNeedle.Framework.SonicTeam.DiEvent.Parameters;
 
 public class SubtitleParam : BaseParam
 {
-    public string CellName { get; set; }
+    public string CellName { get; set; } = string.Empty;
     public SubtitleLanguage Language { get; set; }
     public int Field14 { get; set; }
     public int Field24 { get; set; }
     public int Field28 { get; set; }
-    public string CellName2 { get; set; }
+    public string CellName2 { get; set; } = string.Empty;
 
     public SubtitleParam() { }
     public SubtitleParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

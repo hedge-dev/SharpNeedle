@@ -7,7 +7,9 @@ public class WeatherParam : BaseParam
 
     public WeatherParam() { }
     public WeatherParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

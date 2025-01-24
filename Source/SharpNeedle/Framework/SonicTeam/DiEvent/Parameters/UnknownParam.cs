@@ -2,11 +2,12 @@ namespace SharpNeedle.Framework.SonicTeam.DiEvent.Parameters;
 
 public class UnknownParam : BaseParam
 {
-    public byte[] Data { get; set; }
+    public byte[] Data { get; set; } = [];
     public int Size { get; set; }
     public int Type { get; set; }
 
     public UnknownParam() { }
+
     public UnknownParam(BinaryObjectReader reader, int size, int type)
     {
         Size = size;

@@ -11,7 +11,9 @@ public class ChromaAberrationParam : BaseParam
 
     public ChromaAberrationParam() { }
     public ChromaAberrationParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -56,7 +58,9 @@ public class ChromaAberrationParam : BaseParam
         public Endpoint() { }
 
         public Endpoint(BinaryObjectReader reader)
-            => Read(reader);
+        {
+            Read(reader);
+        }
 
         public void Read(BinaryObjectReader reader)
         {

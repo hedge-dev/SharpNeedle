@@ -8,7 +8,9 @@ public class TimeStopParam : BaseParam
 
     public TimeStopParam() { }
     public TimeStopParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
@@ -34,5 +36,10 @@ public class TimeStopParam : BaseParam
             default:
                 return 0;
         }
+    }
+
+    public enum ParamType
+    {
+        Float = 3
     }
 }

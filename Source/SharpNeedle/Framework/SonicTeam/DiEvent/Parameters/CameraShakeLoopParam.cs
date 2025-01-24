@@ -14,7 +14,9 @@ public class CameraShakeLoopParam : BaseParam
 
     public CameraShakeLoopParam() { }
     public CameraShakeLoopParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

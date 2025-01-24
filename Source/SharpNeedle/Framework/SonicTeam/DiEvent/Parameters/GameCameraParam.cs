@@ -31,7 +31,9 @@ public class GameCameraParam : BaseParam
 
     public GameCameraParam() { }
     public GameCameraParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

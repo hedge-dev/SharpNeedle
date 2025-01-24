@@ -4,7 +4,7 @@ public class EffectParam : BaseParam
 {
     public Matrix4x4 LocalTransform { get; set; }
     public int Field40 { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     public int Field84 { get; set; }
     public int Field88 { get; set; }
     public int Field8C { get; set; }
@@ -17,7 +17,9 @@ public class EffectParam : BaseParam
 
     public EffectParam() { }
     public EffectParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

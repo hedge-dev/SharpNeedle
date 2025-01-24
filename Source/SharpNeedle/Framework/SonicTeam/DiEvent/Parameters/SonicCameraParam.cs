@@ -15,7 +15,9 @@ public class SonicCameraParam : BaseParam
 
     public SonicCameraParam() { }
     public SonicCameraParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

@@ -2,14 +2,17 @@ namespace SharpNeedle.Framework.SonicTeam.DiEvent.Parameters;
 
 public class MaterialParameterParam : BaseParam
 {
-    public string MaterialName { get; set; }
-    public string ParamName { get; set; }
+    public string MaterialName { get; set; } = string.Empty;
+    public string ParamName { get; set; } = string.Empty;
     public uint Type { get; set; }
     public uint[] UnknownData { get; set; } = new uint[40];
 
     public MaterialParameterParam() { }
+
     public MaterialParameterParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

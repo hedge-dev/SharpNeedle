@@ -56,7 +56,9 @@ public class VignetteParam : BaseParam
 
     public VignetteParam() { }
     public VignetteParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

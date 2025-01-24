@@ -3,15 +3,18 @@ namespace SharpNeedle.Framework.SonicTeam.DiEvent.Parameters;
 public class VisibilityAnimParam : BaseParam
 {
     public int Field00 { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     public int Field44 { get; set; }
     public float Field48 { get; set; }
     public int Field4C { get; set; }
     public int Field50 { get; set; }
 
     public VisibilityAnimParam() { }
+
     public VisibilityAnimParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

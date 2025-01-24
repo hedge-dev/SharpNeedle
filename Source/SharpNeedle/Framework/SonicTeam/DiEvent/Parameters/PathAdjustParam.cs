@@ -10,7 +10,9 @@ public class PathAdjustParam : BaseParam
 
     public PathAdjustParam() { }
     public PathAdjustParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

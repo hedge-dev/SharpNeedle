@@ -10,7 +10,9 @@ public class CameraBlurParam : BaseParam
 
     public CameraBlurParam() { }
     public CameraBlurParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

@@ -9,7 +9,9 @@ public class TimescaleParam : BaseParam
 
     public TimescaleParam() { }
     public TimescaleParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

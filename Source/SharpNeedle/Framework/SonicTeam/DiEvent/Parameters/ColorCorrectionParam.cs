@@ -14,7 +14,9 @@ public class ColorCorrectionParam : BaseParam
 
     public ColorCorrectionParam() { }
     public ColorCorrectionParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

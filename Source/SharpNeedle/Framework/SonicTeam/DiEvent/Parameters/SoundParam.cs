@@ -2,13 +2,16 @@ namespace SharpNeedle.Framework.SonicTeam.DiEvent.Parameters;
 
 public class SoundParam : BaseParam
 {
-    public string CueName { get; set; }
+    public string CueName { get; set; } = string.Empty;
     public int Field40 { get; set; }
     public int Field44 { get; set; }
 
     public SoundParam() { }
+
     public SoundParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

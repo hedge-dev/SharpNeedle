@@ -35,14 +35,16 @@ public class QTEParam : BaseParam
     public float Field78 { get; set; }
     public float Field7C { get; set; }
     public int[] Field80 { get; set; } = new int[32];
-    public string Field100 { get; set; }
-    public string Field140 { get; set; }
-    public string Field180 { get; set; }
+    public string Field100 { get; set; } = string.Empty;
+    public string Field140 { get; set; } = string.Empty;
+    public string Field180 { get; set; } = string.Empty;
     public uint Field1C0 { get; set; }
 
     public QTEParam() { }
     public QTEParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

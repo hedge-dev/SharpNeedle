@@ -25,7 +25,9 @@ public class AuraParam : BaseParam
 
     public AuraParam() { }
     public AuraParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

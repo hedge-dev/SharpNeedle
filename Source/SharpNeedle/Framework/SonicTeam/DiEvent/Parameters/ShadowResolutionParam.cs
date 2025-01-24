@@ -8,7 +8,9 @@ public class ShadowResolutionParam : BaseParam
 
     public ShadowResolutionParam() { }
     public ShadowResolutionParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

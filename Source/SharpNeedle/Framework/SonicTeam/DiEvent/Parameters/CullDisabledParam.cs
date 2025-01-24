@@ -4,7 +4,9 @@ public class CullDisabledParam : BaseParam
 {
     public CullDisabledParam() { }
     public CullDisabledParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game) { }
 

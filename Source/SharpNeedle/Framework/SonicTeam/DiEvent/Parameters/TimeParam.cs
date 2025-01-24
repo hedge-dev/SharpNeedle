@@ -15,7 +15,9 @@ public class TimeParam : BaseParam
 
     public TimeParam() { }
     public TimeParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

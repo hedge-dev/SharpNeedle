@@ -8,7 +8,9 @@ public class TheEndCableParam : BaseParam
 
     public TheEndCableParam() { }
     public TheEndCableParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

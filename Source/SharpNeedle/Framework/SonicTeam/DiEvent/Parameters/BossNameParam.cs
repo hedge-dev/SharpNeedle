@@ -7,7 +7,9 @@ public class BossNameParam : BaseParam
 
     public BossNameParam() { }
     public BossNameParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

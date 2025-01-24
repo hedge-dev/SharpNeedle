@@ -14,7 +14,9 @@ public class CameraExposureParam : BaseParam
 
     public CameraExposureParam() { }
     public CameraExposureParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

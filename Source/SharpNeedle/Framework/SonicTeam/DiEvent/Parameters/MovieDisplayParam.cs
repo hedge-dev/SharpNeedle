@@ -4,7 +4,9 @@ public class MovieDisplayParam : BaseParam
 {
     public MovieDisplayParam() { }
     public MovieDisplayParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game) { }
 

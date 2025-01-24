@@ -3,13 +3,16 @@ namespace SharpNeedle.Framework.SonicTeam.DiEvent.Parameters;
 public class CompositeAnimParam : BaseParam
 {
     public int Field00 { get; set; }
-    public string StateName { get; set; }
+    public string StateName { get; set; } = string.Empty;
     public Animation[] Animations { get; set; } = new Animation[16];
     public int ActiveAnimCount { get; set; }
 
     public CompositeAnimParam() { }
+
     public CompositeAnimParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

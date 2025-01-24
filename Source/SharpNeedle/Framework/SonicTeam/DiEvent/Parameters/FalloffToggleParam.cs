@@ -6,7 +6,9 @@ public class FalloffToggleParam : BaseParam
 
     public FalloffToggleParam() { }
     public FalloffToggleParam(BinaryObjectReader reader, GameType game)
-        => Read(reader, game);
+    {
+        Read(reader, game);
+    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
