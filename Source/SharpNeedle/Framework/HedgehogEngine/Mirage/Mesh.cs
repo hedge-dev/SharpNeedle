@@ -50,11 +50,11 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
         }
         else if(version >= 6)
         {
-            BoneIndices = reader.ReadArrayOffset<short>(reader.Read<int>());
+            BoneIndices = reader.ReadArrayOffset<short>(boneCount);
         }
         else
         {
-            BoneIndices = reader.ReadArrayOffset<byte>(reader.Read<int>()).Select(Convert.ToInt16).ToArray();
+            BoneIndices = reader.ReadArrayOffset<byte>(boneCount).Select(Convert.ToInt16).ToArray();
         }
 
         Textures = reader.ReadObject<BinaryList<BinaryPointer<TextureUnit>>>().Unwind();
