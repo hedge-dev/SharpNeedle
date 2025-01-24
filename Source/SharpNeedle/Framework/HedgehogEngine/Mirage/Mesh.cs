@@ -1,6 +1,7 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Mirage;
 
 using SharpNeedle.Structs;
+using System.Diagnostics;
 using System.Text.Json.Serialization;
 
 public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
@@ -40,7 +41,14 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
             }
         });
 
-        if(version >= 6)
+        int boneCount = reader.ReadInt32();
+
+        if(boneCount == 0)
+        {
+            BoneIndices = [];
+            reader.ReadOffsetValue();
+        }
+        else if(version >= 6)
         {
             BoneIndices = reader.ReadArrayOffset<short>(reader.Read<int>());
         }
@@ -79,7 +87,11 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
         });
 
         writer.Write(BoneIndices.Length);
-
+        if(BoneIndices.Length == 0)
+        {
+            writer.WriteOffsetValue(0);
+        }
+        else
         if(version >= 6)
         {
             writer.WriteArrayOffset(BoneIndices);
@@ -88,6 +100,7 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
         {
             writer.WriteArrayOffset(BoneIndices.Select(Convert.ToByte).ToArray());
         }
+
 
         writer.Write(Textures.Count);
         writer.WriteOffset(() =>
