@@ -101,15 +101,21 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
             writer.WriteArrayOffset(BoneIndices.Select(Convert.ToByte).ToArray());
         }
 
-
         writer.Write(Textures.Count);
-        writer.WriteOffset(() =>
+        if(Textures.Count == 0)
         {
-            foreach(TextureUnit texture in Textures)
+            writer.WriteOffsetValue(0);
+        }
+        else
+        {
+            writer.WriteOffset(() =>
             {
-                writer.WriteObjectOffset(texture);
-            }
-        });
+                foreach(TextureUnit texture in Textures)
+                {
+                    writer.WriteObjectOffset(texture);
+                }
+            });
+        }
     }
 
     public void SwapVertexEndianness()
