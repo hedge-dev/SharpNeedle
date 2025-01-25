@@ -200,7 +200,9 @@ public class Material : SampleChunkResource
     {
         if(DataVersion <= 1)
         {
-            Texset = resolver.Open<Texset>($"{Texset.Name}.texset") ?? throw new InvalidDataException("Texset is null!");
+            string resource = $"{Texset.Name}.texset";
+            Texset = resolver.Open<Texset>(resource) 
+                ?? throw new ResourceResolveException("Failed resolve texset", [resource]);
         }
 
         if(DataVersion <= 2)

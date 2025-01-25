@@ -160,9 +160,26 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
 
     public void ResolveDependencies(IResourceResolver resolver)
     {
+        List<ResourceResolveException> exceptions = [];
+
         foreach(Mesh mesh in this)
         {
-            mesh.ResolveDependencies(resolver);
+            try
+            {
+                mesh.ResolveDependencies(resolver);
+            }
+            catch(ResourceResolveException exc)
+            {
+                exceptions.Add(exc);
+            }
+        }
+
+        if(exceptions.Count > 0)
+        {
+            throw new ResourceResolveException(
+                $"Failed tor resolve dependencies of {exceptions.Count} meshes", 
+                exceptions.SelectMany(x => x.Resources).ToArray()
+            );
         }
     }
 

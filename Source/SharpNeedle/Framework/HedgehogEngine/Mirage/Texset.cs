@@ -34,11 +34,26 @@ public class Texset : SampleChunkResource
 
     public override void ResolveDependencies(IResourceResolver resolver)
     {
+        List<string> exception = [];
+
         for(int i = 0; i < Textures.Count; i++)
         {
             string file = $"{Textures[i].Name}.texture";
-            Textures[i] = resolver.Open<Texture>(file) 
-                ?? throw new InvalidDataException($"Could not resolve dependency \"{file}\"");
+            Texture? texture = resolver.Open<Texture>(file);
+
+            if(texture != null)
+            {
+                Textures[i] = texture;
+            }
+            else
+            {
+                exception.Add(file);
+            }
+        }
+
+        if(exception.Count > 0)
+        {
+            throw new ResourceResolveException($"Failed to resolve {exception.Count} textures", [.. exception]);
         }
     }
 

@@ -141,7 +141,9 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
             return;
         }
 
-        Material = resolver.Open<Material>($"{Material.Name}.material") ?? throw new InvalidOperationException("Material resolved to null!");
+        string resource = $"{Material.Name}.material";
+        Material = resolver.Open<Material>(resource) 
+            ?? throw new ResourceResolveException("Failed to resolve Material", [resource]);
     }
 
     public void WriteDependencies(IDirectory dir)

@@ -8,9 +8,26 @@ public abstract class ModelBase : SampleChunkResource
 
     public override void ResolveDependencies(IResourceResolver resolver)
     {
+        List<ResourceResolveException> exceptions = [];
+
         foreach(MeshGroup group in Groups)
         {
-            group.ResolveDependencies(resolver);
+            try
+            {
+                group.ResolveDependencies(resolver);
+            }
+            catch(ResourceResolveException exc)
+            {
+                exceptions.Add(exc);
+            }
+        }
+
+        if(exceptions.Count > 0)
+        {
+            throw new ResourceResolveException(
+                $"Failed tor resolve dependencies of {exceptions.Count} mesh groups",
+                exceptions.SelectMany(x => x.Resources).ToArray()
+            );
         }
     }
 
