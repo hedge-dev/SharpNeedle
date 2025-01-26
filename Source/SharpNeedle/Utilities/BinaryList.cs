@@ -21,6 +21,7 @@ public struct BinaryList<T> : IBinarySerializable, IList<T> where T : IBinarySer
         long offset = reader.ReadOffsetValue();
         if(offset == 0)
         {
+            Items = [];
             return;
         }
 
