@@ -4,13 +4,22 @@ using SharpNeedle.Structs;
 using SharpNeedle.Utilities;
 using System.Text.Json.Serialization;
 
+public enum MaterialBlendMode : byte
+{
+    Normal,
+    Additive,
+    Unk1,
+    Unk2
+}
+
 [NeedleResource("hh/material", ResourceType.Material, @"\.material$")]
 public class Material : SampleChunkResource
 {
+
     public string? ShaderName { get; set; }
     public byte AlphaThreshold { get; set; }
     public bool NoBackFaceCulling { get; set; }
-    public bool UseAdditiveBlending { get; set; }
+    public MaterialBlendMode BlendMode { get; set; }
 
     public Dictionary<string, Parameter<Vector4>> FloatParameters { get; set; } = [];
     public Dictionary<string, Parameter<Vector4Int>> IntParameters { get; set; } = [];
@@ -54,7 +63,7 @@ public class Material : SampleChunkResource
 
         AlphaThreshold = reader.Read<byte>();
         NoBackFaceCulling = reader.Read<bool>();
-        UseAdditiveBlending = reader.Read<bool>();
+        BlendMode = (MaterialBlendMode)reader.ReadByte();
         reader.Skip(1); // Alignment padding
 
         byte floatParamsCount = reader.Read<byte>();
@@ -150,7 +159,7 @@ public class Material : SampleChunkResource
 
         writer.Write(AlphaThreshold);
         writer.Write(NoBackFaceCulling);
-        writer.Write(UseAdditiveBlending);
+        writer.Write(BlendMode);
         writer.Align(4);
 
         writer.Write((byte)FloatParameters.Count);
