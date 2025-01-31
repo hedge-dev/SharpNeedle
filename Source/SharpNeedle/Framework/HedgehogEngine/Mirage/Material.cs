@@ -8,8 +8,8 @@ public enum MaterialBlendMode : byte
 {
     Normal,
     Additive,
-    Unknown1,
-    Unknown2
+    Multiply,
+    Subtract
 }
 
 [NeedleResource("hh/material", ResourceType.Material, @"\.material$")]
