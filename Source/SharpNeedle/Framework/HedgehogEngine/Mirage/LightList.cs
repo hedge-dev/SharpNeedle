@@ -3,41 +3,30 @@
 [NeedleResource("hh/light-list", @"\.light-list$")]
 public class LightList : SampleChunkResource
 {
-    public List<string?> LightNames { get; set; } = [];
-    public List<Light> Lights { get; set; } = [];
+    public List<ResourceReference<Light>> Lights { get; set; } = [];
 
     public override void Read(BinaryObjectReader reader)
     {
         int count = reader.Read<int>();
-        LightNames = new(count);
+        Lights = new(count);
         reader.ReadOffset(() =>
         {
             for(int i = 0; i < count; i++)
             {
-                LightNames.Add(reader.ReadStringOffset());
+                Lights.Add(new(reader.ReadStringOffsetOrEmpty()));
             }
         });
     }
 
     public override void Write(BinaryObjectWriter writer)
     {
-        int count = Lights?.Count ?? LightNames.Count;
+        int count = Lights.Count;
         writer.Write(count);
         writer.WriteOffset(() =>
         {
-            if(Lights != null)
+            foreach(ResourceReference<Light> light in Lights)
             {
-                foreach(Light light in Lights)
-                {
-                    writer.WriteStringOffset(StringBinaryFormat.NullTerminated, light.Name);
-                }
-            }
-            else
-            {
-                foreach(string? light in LightNames)
-                {
-                    writer.WriteStringOffset(StringBinaryFormat.NullTerminated, light);
-                }
+                writer.WriteStringOffset(StringBinaryFormat.NullTerminated, light.Name);
             }
         });
     }
@@ -49,26 +38,31 @@ public class LightList : SampleChunkResource
             return;
         }
 
-        foreach(Light light in Lights)
+        foreach(ResourceReference<Light> light in Lights)
         {
+            if(!light.IsValid())
+            {
+                continue;
+            }
+
             using IFile file = dir.CreateFile($"{light.Name}{Light.Extension}");
-            light.Write(file);
-            light.WriteDependencies(dir);
+            light.Resource!.Write(file);
+            light.Resource!.WriteDependencies(dir);
         }
     }
 
     public override IEnumerable<ResourceDependency> GetDependencies()
     {
-        if(LightNames.Count == 0)
+        if(Lights.Count == 0)
         {
             yield break;
         }
 
-        foreach(string? name in LightNames)
+        foreach(ResourceReference<Light> light in Lights)
         {
             yield return new ResourceDependency()
             {
-                Name = $"{name}{Light.Extension}",
+                Name = $"{light.Name}{Light.Extension}",
                 Id = Light.ResourceId
             };
         }
@@ -76,17 +70,33 @@ public class LightList : SampleChunkResource
 
     public override void ResolveDependencies(IResourceResolver resolver)
     {
-        if(LightNames.Count == 0)
+        List<string> unresolved = [];
+
+        for(int i = 0; i < Lights.Count; i++)
         {
-            return;
+            ResourceReference<Light> light = Lights[i];
+
+            if(light.IsValid())
+            {
+                continue;
+            }
+
+            string filename = $"{light.Name}{Light.Extension}";
+            light.Resource = resolver.Open<Light>(filename);
+
+            if(light.Resource == null)
+            {
+                unresolved.Add(filename);
+            }
+            else
+            {
+                Lights[i] = light;
+            }
         }
 
-        Lights = new(LightNames.Count);
-        foreach(string? name in LightNames)
+        if(unresolved.Count > 0)
         {
-            Lights.Add(resolver.Open<Light>($"{name}{Light.Extension}") ?? throw new InvalidDataException("Light is null!"));
+            throw new ResourceResolveException($"Failed to resolve {unresolved.Count} lights!", [.. unresolved]);
         }
-
-        LightNames = [];
     }
 }

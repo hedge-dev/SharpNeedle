@@ -4,28 +4,14 @@
 public class TerrainInstanceInfo : SampleChunkResource
 {
     public const string Extension = ".terrain-instanceinfo";
-    private string? _modelName;
 
-    public TerrainModel? Model { get; set; }
+    public ResourceReference<TerrainModel> Model { get; set; }
     public Matrix4x4 Transform { get; set; }
     public List<LightIndexMeshGroup> LightGroups { get; set; } = [];
 
-    public string? ModelName
-    {
-        get => Model == null ? _modelName : Model.Name;
-        set
-        {
-            _modelName = value;
-            if(Model != null)
-            {
-                Model.Name = value ?? string.Empty;
-            }
-        }
-    }
-
     public override void Read(BinaryObjectReader reader)
     {
-        ModelName = reader.ReadStringOffset();
+        Model = reader.ReadStringOffsetOrEmpty();
         Transform = Matrix4x4.Transpose(reader.ReadValueOffset<Matrix4x4>());
         Name = reader.ReadStringOffsetOrEmpty();
 
@@ -41,7 +27,7 @@ public class TerrainInstanceInfo : SampleChunkResource
 
     public override void Write(BinaryObjectWriter writer)
     {
-        writer.WriteStringOffset(StringBinaryFormat.NullTerminated, ModelName);
+        writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Model.Name);
         writer.WriteValueOffset(Matrix4x4.Transpose(Transform));
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         if(DataVersion >= 5)
@@ -73,13 +59,14 @@ public class TerrainInstanceInfo : SampleChunkResource
 
     public override void ResolveDependencies(IResourceResolver resolver)
     {
-        if(string.IsNullOrEmpty(_modelName))
+        if(Model.IsValid())
         {
             return;
         }
 
-        Model = resolver.Open<TerrainModel>($"{_modelName}.terrain-model");
-        _modelName = null;
+        string filename = $"{Model.Name}.terrain-model";
+        Model = resolver.Open<TerrainModel>(filename)
+            ?? throw new ResourceResolveException($"Failed tor esolve {filename}", [filename]);
     }
 
     protected override void Dispose(bool disposing)
@@ -90,7 +77,7 @@ public class TerrainInstanceInfo : SampleChunkResource
             return;
         }
 
-        Model?.Dispose();
-        Model = null;
+        Model.Resource?.Dispose();
+        Model = default;
     }
 }
