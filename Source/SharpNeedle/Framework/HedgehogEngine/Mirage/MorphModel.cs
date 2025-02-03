@@ -4,12 +4,12 @@ using SharpNeedle.IO;
 using SharpNeedle.Resource;
 using SharpNeedle.Utilities;
 
-public class MorphModel : SampleChunkResource
+public class MorphModel : IBinarySerializable<uint>
 {
     public List<MorphTarget> Targets { get; set; } = [];
     public MeshGroup? Meshgroup { get; set; }
 
-    public override void Read(BinaryObjectReader reader)
+    public void Read(BinaryObjectReader reader, uint version)
     {
         reader.Read(out uint vertexCount);
         long vertexOffset = reader.ReadOffsetValue();
@@ -43,7 +43,8 @@ public class MorphModel : SampleChunkResource
             }
         });
 
-        Meshgroup = reader.ReadObject<MeshGroup>();
+        Meshgroup = reader.ReadObject<MeshGroup, uint>(version);
+
         byte[] vertexData = [];
 
         for(int i = 0; i < Meshgroup.Count; i++)
@@ -65,7 +66,7 @@ public class MorphModel : SampleChunkResource
         }
     }
 
-    public override void Write(BinaryObjectWriter writer)
+    public void Write(BinaryObjectWriter writer, uint version)
     {
         if(Meshgroup == null)
         {
@@ -105,25 +106,15 @@ public class MorphModel : SampleChunkResource
             }
         });
 
-        MeshGroup dummyGroup = [..Meshgroup.Select(x =>
-        {
-            Mesh dummyMesh = x.Clone();
-            dummyMesh.Vertices = [];
-            dummyMesh.VertexCount = 0;
-            return dummyMesh;
-        })];
-
-        dummyGroup.Name = Meshgroup.Name;
-
-        writer.WriteObject(Meshgroup);
+        writer.WriteObject(Meshgroup, version);
     }
 
-    public override void ResolveDependencies(IResourceResolver dir)
+    public void ResolveDependencies(IResourceResolver dir)
     {
         Meshgroup?.ResolveDependencies(dir);
     }
 
-    public override void WriteDependencies(IDirectory dir)
+    public void WriteDependencies(IDirectory dir)
     {
         Meshgroup?.WriteDependencies(dir);
     }

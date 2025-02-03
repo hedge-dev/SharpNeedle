@@ -16,23 +16,19 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
 
         Clear();
 
+        Capacity = opaqMeshes.Count + transMeshes.Count + punchMeshes.Count;
+        AddMeshes(opaqMeshes, Mesh.Type.Opaque);
+        AddMeshes(transMeshes, Mesh.Type.Transparent);
+        AddMeshes(punchMeshes, Mesh.Type.PunchThrough);
+
         if(!readSpecial)
         {
-            Capacity = opaqMeshes.Count + transMeshes.Count + punchMeshes.Count;
-            AddMeshes(opaqMeshes, Mesh.Type.Opaque);
-            AddMeshes(transMeshes, Mesh.Type.Transparent);
-            AddMeshes(punchMeshes, Mesh.Type.PunchThrough);
             return;
         }
 
         int specialMeshCount = reader.Read<int>();
-        {
-            Capacity = opaqMeshes.Count + transMeshes.Count + punchMeshes.Count + specialMeshCount;
-            AddMeshes(opaqMeshes, Mesh.Type.Opaque);
-            AddMeshes(transMeshes, Mesh.Type.Transparent);
-            AddMeshes(punchMeshes, Mesh.Type.PunchThrough);
-        }
-
+        Capacity += specialMeshCount;
+        
         (string Name, int Count)[] slots = new (string Name, int Count)[specialMeshCount];
         reader.ReadOffset(() =>
         {
@@ -112,35 +108,44 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
         }
 
         writer.Write(specialGroups.Count);
-        writer.WriteOffset(() =>
+        if(specialGroups.Count == 0)
         {
-            foreach(KeyValuePair<string, List<Mesh>> group in specialGroups)
-            {
-                writer.WriteStringOffset(StringBinaryFormat.NullTerminated, group.Key);
-            }
-        });
-
-        writer.WriteOffset(() =>
+            writer.WriteUInt32(uint.MaxValue);
+            writer.WriteUInt32(uint.MaxValue);
+            writer.WriteUInt32(uint.MaxValue);
+        }
+        else
         {
-            foreach(KeyValuePair<string, List<Mesh>> group in specialGroups)
+            writer.WriteOffset(() =>
             {
-                writer.WriteValueOffset(group.Value.Count);
-            }
-        });
-
-        writer.WriteOffset(() =>
-        {
-            foreach(KeyValuePair<string, List<Mesh>> group in specialGroups)
-            {
-                writer.WriteOffset(() =>
+                foreach(KeyValuePair<string, List<Mesh>> group in specialGroups)
                 {
-                    foreach(Mesh mesh in group.Value)
+                    writer.WriteStringOffset(StringBinaryFormat.NullTerminated, group.Key);
+                }
+            });
+
+            writer.WriteOffset(() =>
+            {
+                foreach(KeyValuePair<string, List<Mesh>> group in specialGroups)
+                {
+                    writer.WriteValueOffset(group.Value.Count);
+                }
+            });
+
+            writer.WriteOffset(() =>
+            {
+                foreach(KeyValuePair<string, List<Mesh>> group in specialGroups)
+                {
+                    writer.WriteOffset(() =>
                     {
-                        writer.WriteObjectOffset(mesh);
-                    }
-                });
-            }
-        });
+                        foreach(Mesh mesh in group.Value)
+                        {
+                            writer.WriteObjectOffset(mesh);
+                        }
+                    });
+                }
+            });
+        }
 
         writer.WriteString(StringBinaryFormat.NullTerminated, Name ?? string.Empty);
         writer.Align(4);

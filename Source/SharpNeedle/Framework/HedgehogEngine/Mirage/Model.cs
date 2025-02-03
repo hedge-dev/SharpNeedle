@@ -15,7 +15,7 @@ public class Model : ModelBase
         CommonRead(reader);
         if(DataVersion >= 4)
         {
-            Morphs = reader.ReadObject<BinaryList<BinaryPointer<MorphModel>>>().Unwind();
+            Morphs = reader.ReadObject<BinaryList<BinaryPointer<MorphModel, uint>, uint>, uint>(DataVersion).Unwind();
         }
 
         reader.Read(out int nodeCount);
@@ -59,7 +59,7 @@ public class Model : ModelBase
 
                 foreach(MorphModel morph in Morphs)
                 {
-                    writer.WriteObjectOffset(morph);
+                    writer.WriteObjectOffset<MorphModel, uint>(morph, DataVersion);
                 }
             });
         }
