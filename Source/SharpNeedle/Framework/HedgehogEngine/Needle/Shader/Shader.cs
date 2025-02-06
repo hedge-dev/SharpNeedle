@@ -43,10 +43,8 @@ public class Shader : ResourceBase
 
     public string BuildPath { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Might just be padding, yet to be determined
-    /// </summary>
-    public uint Unknown1 { get; set; }
+    // Unused and never filled
+    public string Unknown { get; set; } = string.Empty;
 
     public List<Feature> Features { get; set; } = [];
 
@@ -69,8 +67,10 @@ public class Shader : ResourceBase
         BinaryHelper.EnsureSignature(reader.ReadNative<ulong>(), true, ShaderSignature);
         reader.Skip(4); // shader data size
 
+        Unknown = reader.ReadString(StringBinaryFormat.NullTerminated);
+        reader.Align(4);
+
         reader.Endianness = Endianness.Big;
-        Unknown1 = reader.ReadUInt32();
         int permutationCount = reader.ReadInt32();
         Features = [.. reader.ReadObjectArray<Feature>(permutationCount)];
 
@@ -100,8 +100,10 @@ public class Shader : ResourceBase
         SeekToken shaderSizeToken = writer.At();
         writer.WriteUInt32(0);
 
+        writer.WriteString(StringBinaryFormat.NullTerminated, Unknown);
+        writer.Align(4);
+
         writer.Endianness = Endianness.Big;
-        writer.WriteUInt32(Unknown1);
         writer.WriteInt32(Features.Count);
         writer.WriteObjectCollection(Features);
 
