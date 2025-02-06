@@ -48,9 +48,9 @@ public class Shader : ResourceBase
 
     public List<Feature> Features { get; set; } = [];
 
-    public List<int> PermutationVariant { get; set; } = [];
+    public List<int> Permutations { get; set; } = [];
 
-    public List<ShaderVariant> ShaderVariants { get; set; } = []; 
+    public List<ShaderVariant> Variants { get; set; } = []; 
 
     public override void Read(IFile file)
     {
@@ -71,14 +71,14 @@ public class Shader : ResourceBase
         reader.Align(4);
 
         reader.Endianness = Endianness.Big;
-        int permutationCount = reader.ReadInt32();
-        Features = [.. reader.ReadObjectArray<Feature>(permutationCount)];
+        int featureCount = reader.ReadInt32();
+        Features = [.. reader.ReadObjectArray<Feature>(featureCount)];
 
-        int variantCount = 1 << Features.Count;
-        PermutationVariant = [.. reader.ReadArray<int>(variantCount)];
+        int permutationCount = 1 << Features.Count;
+        Permutations = [.. reader.ReadArray<int>(permutationCount)];
 
-        int shaderVariantCount = reader.ReadInt32();
-        ShaderVariants = [.. reader.ReadObjectArray<ShaderVariant>(shaderVariantCount)];
+        int variantCount = reader.ReadInt32();
+        Variants = [.. reader.ReadObjectArray<ShaderVariant>(variantCount)];
     }
 
     public override void Write(IFile file)
@@ -107,16 +107,16 @@ public class Shader : ResourceBase
         writer.WriteInt32(Features.Count);
         writer.WriteObjectCollection(Features);
 
-        int variantCount = 1 << PermutationVariant.Count;
-        if(PermutationVariant.Count != variantCount)
+        int variantCount = 1 << Permutations.Count;
+        if(Permutations.Count != variantCount)
         {
-            throw new InvalidOperationException($"Shader is supposed to have {variantCount} variants, but has {PermutationVariant.Count}!");
+            throw new InvalidOperationException($"Shader is supposed to have {variantCount} variants, but has {Permutations.Count}!");
         }
 
-        writer.WriteArray(PermutationVariant.ToArray());
+        writer.WriteArray(Permutations.ToArray());
 
-        writer.WriteInt32(ShaderVariants.Count);
-        writer.WriteObjectCollection(ShaderVariants);
+        writer.WriteInt32(Variants.Count);
+        writer.WriteObjectCollection(Variants);
 
         long dataEnd = writer.Position;
         using(SeekToken temp = writer.At())
