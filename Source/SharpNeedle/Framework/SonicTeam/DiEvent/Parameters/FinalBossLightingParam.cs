@@ -13,7 +13,7 @@ public class FinalBossLightingParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch(game)
+        switch (game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.FinalBossLighting;

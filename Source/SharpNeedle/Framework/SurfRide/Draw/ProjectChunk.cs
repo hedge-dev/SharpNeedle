@@ -11,7 +11,7 @@ public class ProjectChunk : ProjectNode, IChunk
         SeekToken start = reader.At();
         options.Header ??= reader.ReadObject<ChunkHeader>();
         Signature = options.Header.Value.Signature;
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.OffsetBinaryFormat = OffsetBinaryFormat.U64;
         }
@@ -68,18 +68,18 @@ public class ProjectNode : IBinarySerializable<ChunkBinaryOptions>
         Camera = reader.ReadObject<Camera, ChunkBinaryOptions>(options);
         StartFrame = reader.Read<uint>();
         EndFrame = reader.Read<uint>();
-        if(options.Version >= 1)
+        if (options.Version >= 1)
         {
             FrameRate = reader.Read<float>();
         }
 
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.Align(8);
         }
 
         long userDataOffset = reader.ReadOffsetValue();
-        if(userDataOffset != 0)
+        if (userDataOffset != 0)
         {
             UserData = reader.ReadObjectAtOffset<UserData, ChunkBinaryOptions>(userDataOffset, options);
         }
@@ -87,7 +87,7 @@ public class ProjectNode : IBinarySerializable<ChunkBinaryOptions>
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
-        if(Camera == null)
+        if (Camera == null)
         {
             throw new InvalidOperationException("Camera is null");
         }
@@ -97,7 +97,7 @@ public class ProjectNode : IBinarySerializable<ChunkBinaryOptions>
         writer.Write(Field06);
         writer.Write((ushort)TextureLists.Count);
         writer.Write((ushort)Fonts.Count);
-        if(Scenes.Count != 0)
+        if (Scenes.Count != 0)
         {
             writer.WriteObjectCollectionOffset(options, Scenes);
         }
@@ -106,7 +106,7 @@ public class ProjectNode : IBinarySerializable<ChunkBinaryOptions>
             writer.WriteOffsetValue(0);
         }
 
-        if(TextureLists.Count != 0)
+        if (TextureLists.Count != 0)
         {
             writer.WriteOffsetValue(0x30);
         }
@@ -115,7 +115,7 @@ public class ProjectNode : IBinarySerializable<ChunkBinaryOptions>
             writer.WriteOffsetValue(0);
         }
 
-        if(Fonts.Count != 0)
+        if (Fonts.Count != 0)
         {
             writer.WriteObjectCollectionOffset(options, Fonts);
         }
@@ -127,17 +127,17 @@ public class ProjectNode : IBinarySerializable<ChunkBinaryOptions>
         writer.WriteObject(Camera, options);
         writer.Write(StartFrame);
         writer.Write(EndFrame);
-        if(options.Version >= 1)
+        if (options.Version >= 1)
         {
             writer.Write(FrameRate);
         }
 
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             writer.Align(8);
         }
 
-        if(UserData != null)
+        if (UserData != null)
         {
             writer.WriteObjectOffset(UserData, options);
         }

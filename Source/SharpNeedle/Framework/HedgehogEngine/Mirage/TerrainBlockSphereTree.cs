@@ -11,10 +11,10 @@ public class TerrainBlockSphereTree : SampleChunkResource
     {
         List<KeyValuePair<Sphere, (int GroupID, int SubsetID)>> nodes = new(groups.Capacity);
 
-        for(int groupId = 0; groupId < groups.Count; groupId++)
+        for (int groupId = 0; groupId < groups.Count; groupId++)
         {
             TerrainGroup group = groups[groupId];
-            for(int subsetID = 0; subsetID < group.Subsets.Count; subsetID++)
+            for (int subsetID = 0; subsetID < group.Subsets.Count; subsetID++)
             {
                 TerrainGroup.Subset set = group.Subsets[subsetID];
                 nodes.Add(new(set.Bounds, (groupId, subsetID)));
@@ -47,7 +47,7 @@ public class TerrainBlockSphereTree : SampleChunkResource
         BinaryNode[] nodes = new BinaryNode[nodeCount];
         reader.ReadOffset(() =>
         {
-            for(int i = 0; i < nodeCount; i++)
+            for (int i = 0; i < nodeCount; i++)
             {
                 nodes[i] = reader.ReadObjectOffset<BinaryNode>();
             }
@@ -59,7 +59,7 @@ public class TerrainBlockSphereTree : SampleChunkResource
         {
             BVHNode<Sphere, (int GroupID, int SubsetID)> result = new(node.Bounds);
 
-            if(node.Type == NodeType.Branch)
+            if (node.Type == NodeType.Branch)
             {
                 result.Left = BuildNode(ref nodes[node.LeftIndex]);
                 result.Right = BuildNode(ref nodes[node.RightIndex]);
@@ -81,7 +81,7 @@ public class TerrainBlockSphereTree : SampleChunkResource
         writer.Write(nodes.Count);
         writer.WriteOffset(() =>
         {
-            foreach(BinaryNode node in nodes)
+            foreach (BinaryNode node in nodes)
             {
                 writer.WriteOffset(() => writer.WriteObject(node));
             }
@@ -96,20 +96,20 @@ public class TerrainBlockSphereTree : SampleChunkResource
                 Type = (NodeType)node.Type
             };
 
-            if(node.Type == BVHNodeType.Leaf)
+            if (node.Type == BVHNodeType.Leaf)
             {
                 bNode.TerrainGroupIndex = node.Value.Item1;
                 bNode.GroupSubsetIndex = node.Value.Item2;
             }
             else
             {
-                if(node.Left != null)
+                if (node.Left != null)
                 {
                     bNode.LeftIndex = result.Count;
                     BuildNodes(node.Left, result);
                 }
 
-                if(node.Right != null)
+                if (node.Right != null)
                 {
                     bNode.RightIndex = result.Count;
                     BuildNodes(node.Right, result);

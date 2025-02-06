@@ -19,12 +19,12 @@ public class FamilyMotion : IBinarySerializable
 
     public void OnAttach(Family family)
     {
-        for(int i = CastMotions.Count; i < family.Casts.Count; i++)
+        for (int i = CastMotions.Count; i < family.Casts.Count; i++)
         {
             CastMotions.Add(new CastMotion(family.Casts[i]));
         }
 
-        for(int i = 0; i < family.Casts.Count; i++)
+        for (int i = 0; i < family.Casts.Count; i++)
         {
             family.Casts[i].AttachMotion(CastMotions[i]);
         }
@@ -37,7 +37,7 @@ public class FamilyMotion : IBinarySerializable
 
     public void Write(BinaryObjectWriter writer)
     {
-        if(Family == null)
+        if (Family == null)
         {
             throw new InvalidOperationException("Family is null!");
         }
@@ -46,14 +46,14 @@ public class FamilyMotion : IBinarySerializable
         CastMotions.RemoveAll(x => !Family.Casts.Contains(x.Cast));
 
         // Sanity checks
-        for(int i = CastMotions.Count; i < Family.Casts.Count; i++)
+        for (int i = CastMotions.Count; i < Family.Casts.Count; i++)
         {
             CastMotions.Add(new CastMotion(Family.Casts[i]));
         }
 
-        for(int i = 0; i < CastMotions.Count; i++)
+        for (int i = 0; i < CastMotions.Count; i++)
         {
-            if(Family.Casts[i] == CastMotions[i].Cast)
+            if (Family.Casts[i] == CastMotions[i].Cast)
             {
                 continue;
             }
@@ -73,7 +73,7 @@ public class FamilyMotion : IBinarySerializable
         int unused = reader.Read<int>();
         reader.ReadOffset(() => reader.ReadOffset(() => reader.ReadOffset(() =>
                 {
-                    foreach(CastMotion motion in CastMotions)
+                    foreach (CastMotion motion in CastMotions)
                     {
                         motion.ReadExtended(reader);
                     }
@@ -85,7 +85,7 @@ public class FamilyMotion : IBinarySerializable
         writer.Write(0);
         writer.WriteOffset(() => writer.WriteOffset(() => writer.WriteOffset(() =>
                 {
-                    foreach(CastMotion motion in CastMotions)
+                    foreach (CastMotion motion in CastMotions)
                     {
                         motion.WriteExtended(writer);
                     }

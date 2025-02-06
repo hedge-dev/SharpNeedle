@@ -42,7 +42,7 @@ public class ShaderVariant : IBinarySerializable
         writer.WriteObject(GlobalVariables);
 
         long endPosition = writer.Position;
-        using(SeekToken temp = writer.At())
+        using (SeekToken temp = writer.At())
         {
             sizeToken.Dispose();
             writer.Write((int)(endPosition - startPosition));

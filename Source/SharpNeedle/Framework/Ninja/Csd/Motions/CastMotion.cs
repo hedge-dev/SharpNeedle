@@ -21,7 +21,7 @@ public class CastMotion : List<KeyFrameList>, IBinarySerializable
         Flags = reader.Read<BitSet<uint>>();
         int count = Flags.PopCount();
 
-        if(count == 0)
+        if (count == 0)
         {
             reader.Skip(reader.GetOffsetSize());
             return;
@@ -30,9 +30,9 @@ public class CastMotion : List<KeyFrameList>, IBinarySerializable
         Capacity = count;
         reader.ReadOffset(() =>
         {
-            for(int i = 0; i < Flags.BitCount; i++)
+            for (int i = 0; i < Flags.BitCount; i++)
             {
-                if(!Flags.Test(i))
+                if (!Flags.Test(i))
                 {
                     continue;
                 }
@@ -46,7 +46,7 @@ public class CastMotion : List<KeyFrameList>, IBinarySerializable
 
     public void Write(BinaryObjectWriter writer)
     {
-        if(Count == 0)
+        if (Count == 0)
         {
             writer.Write(0);
             writer.WriteOffsetValue(0);
@@ -54,7 +54,7 @@ public class CastMotion : List<KeyFrameList>, IBinarySerializable
         }
 
         Flags.Reset();
-        foreach(KeyFrameList list in this)
+        foreach (KeyFrameList list in this)
         {
             Flags.Set((int)list.Property);
         }
@@ -67,7 +67,7 @@ public class CastMotion : List<KeyFrameList>, IBinarySerializable
     {
         reader.ReadOffset(() =>
         {
-            foreach(KeyFrameList list in this)
+            foreach (KeyFrameList list in this)
             {
                 list.ReadExtended(reader);
             }
@@ -78,12 +78,12 @@ public class CastMotion : List<KeyFrameList>, IBinarySerializable
     {
         writer.WriteOffset(() =>
         {
-            if(Count == 0)
+            if (Count == 0)
             {
                 writer.WriteOffsetValue(0);
             }
 
-            foreach(KeyFrameList list in this)
+            foreach (KeyFrameList list in this)
             {
                 list.WriteExtended(writer);
             }

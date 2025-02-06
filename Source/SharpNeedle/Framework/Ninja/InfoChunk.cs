@@ -16,7 +16,7 @@ public class InfoChunk : IChunk
         int chunkCount = reader.Read<int>();
 
         // Check if Signature ends with IF
-        if(((Signature >> 16) & 0xFFFF) != 0x4649)
+        if (((Signature >> 16) & 0xFFFF) != 0x4649)
         {
             throw new InvalidDataException($"Invalid Signature: 0x{Signature:X}");
         }
@@ -26,18 +26,18 @@ public class InfoChunk : IChunk
         reader.ReadOffset(() =>
         {
             reader.PushOffsetOrigin();
-            for(int i = 0; i < chunkCount; i++)
+            for (int i = 0; i < chunkCount; i++)
             {
                 ChunkHeader header = reader.ReadLittle<ChunkHeader>();
                 long begin = reader.Position;
                 options.Header = header;
-                if(header.Signature == ProjectChunk.BinSignature)
+                if (header.Signature == ProjectChunk.BinSignature)
                 {
                     Chunks.Add(reader.ReadObject<ProjectChunk, ChunkBinaryOptions>(options));
                 }
-                else if(((Signature >> 16) & 0xFFFF) != 0x4C54) // TL
+                else if (((Signature >> 16) & 0xFFFF) != 0x4C54) // TL
                 {
-                    switch(options.TextureFormat)
+                    switch (options.TextureFormat)
                     {
                         case TextureFormat.NextNinja:
                             Chunks.Add(reader.ReadObject<TextureListNN, ChunkBinaryOptions>(options));
@@ -81,7 +81,7 @@ public class InfoChunk : IChunk
         long offsetBase = writer.OffsetHandler.OffsetOrigin;
 
         SeekToken chunkBegin = writer.At();
-        foreach(IChunk chunk in Chunks)
+        foreach (IChunk chunk in Chunks)
         {
             writer.WriteObject(chunk, options);
         }
@@ -90,7 +90,7 @@ public class InfoChunk : IChunk
         writer.PopOffsetOrigin();
 
         Offsets = [];
-        foreach(long offset in writer.OffsetHandler.OffsetPositions)
+        foreach (long offset in writer.OffsetHandler.OffsetPositions)
         {
             Offsets.Add((int)(offset - offsetBase));
         }

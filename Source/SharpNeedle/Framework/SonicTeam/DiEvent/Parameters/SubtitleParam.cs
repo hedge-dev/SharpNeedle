@@ -17,7 +17,7 @@ public class SubtitleParam : BaseParam
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
-        if(game == GameType.ShadowGenerations)
+        if (game == GameType.ShadowGenerations)
         {
             CellName = reader.ReadDiString(32);
             Language = (SubtitleLanguage)reader.Read<int>();
@@ -36,7 +36,7 @@ public class SubtitleParam : BaseParam
 
     public override void Write(BinaryObjectWriter writer, GameType game)
     {
-        if(game == GameType.ShadowGenerations)
+        if (game == GameType.ShadowGenerations)
         {
             writer.WriteDiString(CellName, 32);
             writer.Write((int)Language);
@@ -55,7 +55,7 @@ public class SubtitleParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch(game)
+        switch (game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.Subtitle;

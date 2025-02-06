@@ -10,7 +10,7 @@ public class Texset : SampleChunkResource
         int textureCount = reader.Read<int>();
         reader.ReadOffset(() =>
         {
-            for(int i = 0; i < textureCount; i++)
+            for (int i = 0; i < textureCount; i++)
             {
                 Textures.Add(new Texture
                 {
@@ -25,7 +25,7 @@ public class Texset : SampleChunkResource
         writer.Write(Textures.Count);
         writer.WriteOffset(() =>
         {
-            foreach(Texture texture in Textures)
+            foreach (Texture texture in Textures)
             {
                 writer.WriteStringOffset(StringBinaryFormat.NullTerminated, texture.Name);
             }
@@ -36,12 +36,12 @@ public class Texset : SampleChunkResource
     {
         List<string> exception = [];
 
-        for(int i = 0; i < Textures.Count; i++)
+        for (int i = 0; i < Textures.Count; i++)
         {
             string file = $"{Textures[i].Name}.texture";
             Texture? texture = resolver.Open<Texture>(file);
 
-            if(texture != null)
+            if (texture != null)
             {
                 Textures[i] = texture;
             }
@@ -51,7 +51,7 @@ public class Texset : SampleChunkResource
             }
         }
 
-        if(exception.Count > 0)
+        if (exception.Count > 0)
         {
             throw new ResourceResolveException($"Failed to resolve {exception.Count} textures", [.. exception]);
         }
@@ -59,7 +59,7 @@ public class Texset : SampleChunkResource
 
     public override void WriteDependencies(IDirectory dir)
     {
-        foreach(Texture texture in Textures)
+        foreach (Texture texture in Textures)
         {
             texture.Write(dir.CreateFile($"{texture.Name}.texture"));
         }

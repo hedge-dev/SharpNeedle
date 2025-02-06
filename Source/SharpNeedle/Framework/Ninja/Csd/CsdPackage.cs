@@ -10,12 +10,12 @@ public class CsdPackage : ResourceBase, IBinarySerializable
 
     public Stream GetStream(int idx, bool writable = false, bool expandable = false)
     {
-        if(!writable)
+        if (!writable)
         {
             return new MemoryStream(Files[idx]);
         }
 
-        if(!expandable)
+        if (!expandable)
         {
             return new MemoryStream(Files[idx], true);
         }
@@ -57,13 +57,13 @@ public class CsdPackage : ResourceBase, IBinarySerializable
     public void Read(BinaryObjectReader reader)
     {
         uint sig = reader.ReadNative<uint>();
-        if(sig == BinaryPrimitives.ReverseEndianness(Signature))
+        if (sig == BinaryPrimitives.ReverseEndianness(Signature))
         {
             Endianness = Endianness.Big;
         }
 
         reader.Endianness = Endianness;
-        while(reader.Position < reader.Length)
+        while (reader.Position < reader.Length)
         {
             Files.Add(reader.ReadArray<byte>(reader.Read<int>()));
         }
@@ -73,7 +73,7 @@ public class CsdPackage : ResourceBase, IBinarySerializable
     {
         writer.Endianness = Endianness;
         writer.Write(Signature);
-        foreach(byte[] file in Files)
+        foreach (byte[] file in Files)
         {
             writer.Write(file.Length);
             writer.WriteArray(file);

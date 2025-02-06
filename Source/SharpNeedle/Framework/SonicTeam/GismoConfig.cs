@@ -11,7 +11,7 @@ public class GismoConfig : BinaryResource
 
     public override void Read(BinaryObjectReader reader)
     {
-        if(base.Version.IsV1)
+        if (base.Version.IsV1)
         {
             reader.EnsureSignatureNative(Signature);
         }
@@ -29,7 +29,7 @@ public class GismoConfig : BinaryResource
 
     public override void Write(BinaryObjectWriter writer)
     {
-        if(base.Version.IsV1)
+        if (base.Version.IsV1)
         {
             writer.WriteNative(Signature);
         }
@@ -81,7 +81,7 @@ public class GismoConfig : BinaryResource
 
         public void Read(BinaryObjectReader reader, bool isV1)
         {
-            if(isV1)
+            if (isV1)
             {
                 Field00 = reader.Read<int>();
                 Field04 = reader.Read<int>();
@@ -107,7 +107,7 @@ public class GismoConfig : BinaryResource
 
             Name = reader.ReadStringOffset();
 
-            if(isV1)
+            if (isV1)
             {
                 ParticleName = reader.ReadStringOffset();
                 SoundCueName = reader.ReadStringOffset();
@@ -131,7 +131,7 @@ public class GismoConfig : BinaryResource
         public void Write(BinaryObjectWriter writer, bool isV1)
         {
 
-            if(isV1)
+            if (isV1)
             {
                 writer.Write(Field00);
                 writer.Write(Field04);
@@ -159,7 +159,7 @@ public class GismoConfig : BinaryResource
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, ModelName);
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, SkeletonName);
 
-            if(!isV1)
+            if (!isV1)
             {
                 writer.Write(ShapeType);
                 writer.Write(CollisionRadius);

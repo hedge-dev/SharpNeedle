@@ -20,9 +20,9 @@ public class ResourceManager : IResourceManager
 
     public void Dispose()
     {
-        foreach(WeakReference<IResource> resource in _resources.Values)
+        foreach (WeakReference<IResource> resource in _resources.Values)
         {
-            if(resource.TryGetTarget(out IResource? res))
+            if (resource.TryGetTarget(out IResource? res))
             {
                 res.Dispose();
             }
@@ -36,9 +36,9 @@ public class ResourceManager : IResourceManager
     private T OpenBase<T>(IFile file, ref T res, bool resolveDepends = true) where T : IResource
     {
         string path = file.Path;
-        if(_resources.TryGetValue(path, out WeakReference<IResource>? resRef))
+        if (_resources.TryGetValue(path, out WeakReference<IResource>? resRef))
         {
-            if(resRef.TryGetTarget(out IResource? cacheRes))
+            if (resRef.TryGetTarget(out IResource? cacheRes))
             {
                 return (T)cacheRes;
             }
@@ -50,7 +50,7 @@ public class ResourceManager : IResourceManager
         res.Read(file);
         _resources.Add(path, new WeakReference<IResource>(res));
         _resourceTable.Add(res, path);
-        if(resolveDepends)
+        if (resolveDepends)
         {
             res.ResolveDependencies(new DirectoryResourceResolver(file.Parent, this));
         }
@@ -78,7 +78,7 @@ public class ResourceManager : IResourceManager
 
     public void Close(IResource res)
     {
-        if(!_resourceTable.TryGetValue(res, out string? key))
+        if (!_resourceTable.TryGetValue(res, out string? key))
         {
             return;
         }

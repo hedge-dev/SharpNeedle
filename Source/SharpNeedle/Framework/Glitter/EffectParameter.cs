@@ -53,25 +53,25 @@ public class EffectParameter : IBinarySerializable<Effect>
 
         Loop = Convert.ToBoolean(reader.Read<int>());
 
-        for(int i = 0; i < Animations.Capacity; i++)
+        for (int i = 0; i < Animations.Capacity; i++)
         {
             Animations.Add(new());
 
             long animationOffset = reader.ReadOffsetValue();
-            if(animationOffset != 0)
+            if (animationOffset != 0)
             {
                 Animations[i] = reader.ReadObjectAtOffset<AnimationParameter>(animationOffset);
             }
         }
 
         long emitterOffset = reader.ReadOffsetValue();
-        if(emitterOffset != 0)
+        if (emitterOffset != 0)
         {
             Emitters.AddFirst(reader.ReadObjectAtOffset<EmitterParameter, EffectParameter>(emitterOffset, this));
         }
 
         long nextOffset = reader.ReadOffsetValue();
-        if(nextOffset != 0)
+        if (nextOffset != 0)
         {
             parent.Parameters.AddLast(reader.ReadObjectAtOffset<EffectParameter>(nextOffset));
         }
@@ -107,9 +107,9 @@ public class EffectParameter : IBinarySerializable<Effect>
 
         writer.Write(Convert.ToInt32(Loop));
 
-        foreach(AnimationParameter animation in Animations)
+        foreach (AnimationParameter animation in Animations)
         {
-            if(animation.Keyframes.Count != 0)
+            if (animation.Keyframes.Count != 0)
             {
                 writer.WriteObjectOffset(animation);
             }
@@ -119,7 +119,7 @@ public class EffectParameter : IBinarySerializable<Effect>
             }
         }
 
-        if(Emitters.First != null)
+        if (Emitters.First != null)
         {
             writer.WriteObjectOffset(Emitters.First.Value, this, 16);
         }
@@ -128,7 +128,7 @@ public class EffectParameter : IBinarySerializable<Effect>
             writer.WriteOffsetValue(0);
         }
 
-        if(parent.Parameters.Find(this)?.Next is LinkedListNode<EffectParameter> parameter)
+        if (parent.Parameters.Find(this)?.Next is LinkedListNode<EffectParameter> parameter)
         {
             writer.WriteObjectOffset(parameter.Value, parent, 16);
         }

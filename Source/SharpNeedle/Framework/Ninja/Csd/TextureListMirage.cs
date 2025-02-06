@@ -19,28 +19,28 @@ public class TextureListMirage : ITextureList
         {
             Textures.AddRange(reader.ReadObject<BinaryList<TextureMirage>>());
             int memoryTextureCount = 0;
-            foreach(TextureMirage texture in Textures)
+            foreach (TextureMirage texture in Textures)
             {
-                if(texture.Name == null)
+                if (texture.Name == null)
                 {
                     memoryTextureCount = Math.Max(texture.MemoryDataIndex + 1, memoryTextureCount);
                 }
             }
 
-            if(memoryTextureCount > 0)
+            if (memoryTextureCount > 0)
             {
                 byte[][] textures = new byte[memoryTextureCount][];
                 reader.ReadOffset(() =>
                 {
-                    for(int i = 0; i < memoryTextureCount; i++)
+                    for (int i = 0; i < memoryTextureCount; i++)
                     {
                         textures[i] = reader.ReadArrayOffset<byte>((int)reader.ReadOffsetValue());
                     }
                 });
 
-                foreach(TextureMirage texture in Textures)
+                foreach (TextureMirage texture in Textures)
                 {
-                    if(texture.Name == null)
+                    if (texture.Name == null)
                     {
                         texture.Data = textures[texture.MemoryDataIndex];
                     }
@@ -59,22 +59,22 @@ public class TextureListMirage : ITextureList
         writer.Write(0x10); // List offset, untracked
         writer.Write(FieldC);
         int memoryTextureCount = 0;
-        foreach(TextureMirage texture in Textures)
+        foreach (TextureMirage texture in Textures)
         {
-            if(texture.Name == null)
+            if (texture.Name == null)
             {
                 texture.MemoryDataIndex = memoryTextureCount++;
             }
         }
 
         writer.WriteObject<BinaryList<TextureMirage>>(Textures);
-        if(memoryTextureCount > 0)
+        if (memoryTextureCount > 0)
         {
             writer.WriteOffset(() =>
             {
-                foreach(TextureMirage texture in Textures)
+                foreach (TextureMirage texture in Textures)
                 {
-                    if(texture.Name != null)
+                    if (texture.Name != null)
                     {
                         continue;
                     }
@@ -113,7 +113,7 @@ public class TextureListMirage : ITextureList
 
     public void CopyTo(ITexture[] array, int arrayIndex)
     {
-        for(int i = 0; i < Count; i++)
+        for (int i = 0; i < Count; i++)
         {
             array[arrayIndex + i] = Textures[i];
         }

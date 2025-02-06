@@ -13,7 +13,7 @@ public struct BitSet<T> : IEnumerable<bool> where T : INumberBase<T>, IBinaryInt
     public BitSet(params T[] activeBits) : this()
     {
         Value = default!;
-        foreach(T bit in activeBits)
+        foreach (T bit in activeBits)
         {
             Set(NumberHelper.Create<int, T>(bit));
         }
@@ -69,7 +69,7 @@ public struct BitSet<T> : IEnumerable<bool> where T : INumberBase<T>, IBinaryInt
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Set(int bit, bool value)
     {
-        if(value)
+        if (value)
         {
             Set(bit);
         }
@@ -99,7 +99,7 @@ public struct BitSet<T> : IEnumerable<bool> where T : INumberBase<T>, IBinaryInt
 
     public IEnumerator<bool> GetEnumerator()
     {
-        for(int i = 0; i < BitCount; i++)
+        for (int i = 0; i < BitCount; i++)
         {
             yield return Test(i);
         }

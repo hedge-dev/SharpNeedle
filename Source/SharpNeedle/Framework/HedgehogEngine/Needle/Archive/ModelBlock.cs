@@ -8,7 +8,7 @@ public class ModelBlock : SampleChunkResourceBlock<ModelBase>
 
     public override string Signature => ModelSignature;
 
-    public ModelBlock() : base("model") 
+    public ModelBlock() : base("model")
     {
         Version = 5;
     }
@@ -22,7 +22,7 @@ public class ModelBlock : SampleChunkResourceBlock<ModelBase>
     {
         string extension = Path.GetExtension(filename).ToLower();
 
-        if(extension == ".terrain-model")
+        if (extension == ".terrain-model")
         {
             return new TerrainModel();
         }

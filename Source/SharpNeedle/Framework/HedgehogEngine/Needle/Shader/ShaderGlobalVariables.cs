@@ -40,16 +40,16 @@ public class ShaderGlobalVariables : IBinarySerializable
         // on the type "9", aka ComputeBuffer. This is easily
         // checkable by comparing pos + 4 to the end
 
-        while(reader.Position + 4 < end)
+        while (reader.Position + 4 < end)
         {
             VariantVariableType type = (VariantVariableType)reader.ReadInt32();
             long variablesStart = reader.Position;
             int variablesSize = reader.ReadInt32();
             long variablesEnd = variablesStart + variablesSize;
 
-            while(reader.Position < variablesEnd)
+            while (reader.Position < variablesEnd)
             {
-                switch(type)
+                switch (type)
                 {
                     case VariantVariableType.Boolean:
                     case VariantVariableType.Integer:
@@ -92,7 +92,7 @@ public class ShaderGlobalVariables : IBinarySerializable
     {
         void WriteArray<T>(List<T> list, VariantVariableType type) where T : IBinarySerializable
         {
-            if(list.Count == 0)
+            if (list.Count == 0)
             {
                 return;
             }
@@ -106,7 +106,7 @@ public class ShaderGlobalVariables : IBinarySerializable
             writer.WriteObjectCollection(list);
 
             long endPosition = writer.Position;
-            using(SeekToken temp = writer.At())
+            using (SeekToken temp = writer.At())
             {
                 sizeToken.Dispose();
                 writer.Write((int)(endPosition - startPosition));
@@ -125,13 +125,13 @@ public class ShaderGlobalVariables : IBinarySerializable
         WriteArray(CBFloats, VariantVariableType.CBFloat);
         WriteArray(ComputeBuffers, VariantVariableType.ComputeBuffer);
 
-        if(IncludeTerminator)
+        if (IncludeTerminator)
         {
             writer.WriteUInt32(9);
         }
 
         long endPosition = writer.Position;
-        using(SeekToken temp = writer.At())
+        using (SeekToken temp = writer.At())
         {
             sizeToken.Dispose();
             writer.Write((int)(endPosition - startPosition));

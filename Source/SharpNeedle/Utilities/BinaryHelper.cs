@@ -7,7 +7,7 @@ public static class BinaryHelper
 
     public static int GetOffsetSize(this BinaryObjectReader reader)
     {
-        switch(reader.OffsetBinaryFormat)
+        switch (reader.OffsetBinaryFormat)
         {
             case OffsetBinaryFormat.U32:
                 return 4;
@@ -21,7 +21,7 @@ public static class BinaryHelper
 
     public static int GetOffsetSize(this BinaryObjectWriter writer)
     {
-        switch(writer.OffsetBinaryFormat)
+        switch (writer.OffsetBinaryFormat)
         {
             case OffsetBinaryFormat.U32:
                 return 4;
@@ -36,7 +36,7 @@ public static class BinaryHelper
     public static T[] ReadObjectArray<T>(this BinaryObjectReader reader, int count) where T : IBinarySerializable, new()
     {
         T[] result = new T[count];
-        for(int i = 0; i < count; i++)
+        for (int i = 0; i < count; i++)
         {
             result[i] = reader.ReadObject<T>();
         }
@@ -47,7 +47,7 @@ public static class BinaryHelper
     public static T[] ReadObjectArray<T, TContext>(this BinaryObjectReader reader, TContext context, int count) where T : IBinarySerializable<TContext>, new()
     {
         T[] result = new T[count];
-        for(int i = 0; i < count; i++)
+        for (int i = 0; i < count; i++)
         {
             result[i] = reader.ReadObject<T, TContext>(context);
         }
@@ -61,7 +61,7 @@ public static class BinaryHelper
 
         reader.ReadOffset(() =>
         {
-            for(int i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
                 result[i] = reader.ReadObject<T>();
             }
@@ -76,7 +76,7 @@ public static class BinaryHelper
 
         reader.ReadOffset(() =>
         {
-            for(int i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
                 result[i] = reader.ReadObject<T, TContext>(context);
             }
@@ -91,7 +91,7 @@ public static class BinaryHelper
 
         reader.ReadAtOffset(offset, () =>
         {
-            for(int i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
                 result[i] = reader.ReadObject<T>();
             }
@@ -106,7 +106,7 @@ public static class BinaryHelper
 
         reader.ReadAtOffset(offset, () =>
         {
-            for(int i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
                 result[i] = reader.ReadObject<T, TContext>(context);
             }
@@ -117,7 +117,7 @@ public static class BinaryHelper
 
     public static void WriteObjectCollection<T>(this BinaryObjectWriter writer, IEnumerable<T> items) where T : IBinarySerializable
     {
-        foreach(T item in items)
+        foreach (T item in items)
         {
             writer.WriteObject(item);
         }
@@ -125,7 +125,7 @@ public static class BinaryHelper
 
     public static void WriteObjectCollection<T, TContext>(this BinaryObjectWriter writer, TContext context, IEnumerable<T> items) where T : IBinarySerializable<TContext>
     {
-        foreach(T item in items)
+        foreach (T item in items)
         {
             writer.WriteObject(item, context);
         }
@@ -135,7 +135,7 @@ public static class BinaryHelper
     {
         writer.WriteOffset(() =>
         {
-            foreach(T item in items)
+            foreach (T item in items)
             {
                 writer.WriteObject(item);
             }
@@ -146,7 +146,7 @@ public static class BinaryHelper
     {
         writer.WriteOffset(() =>
         {
-            foreach(T item in items)
+            foreach (T item in items)
             {
                 writer.WriteObject(item, context);
             }
@@ -155,7 +155,7 @@ public static class BinaryHelper
 
     public static unsafe TSize MakeSignature<TSize>(string sig, byte placeholder = 0) where TSize : unmanaged
     {
-        if(string.IsNullOrEmpty(sig))
+        if (string.IsNullOrEmpty(sig))
         {
             return default;
         }
@@ -163,7 +163,7 @@ public static class BinaryHelper
         Span<byte> result = stackalloc byte[Unsafe.SizeOf<TSize>()];
         result.Fill(placeholder);
 
-        for(int i = 0; i < Math.Min(sig.Length, Unsafe.SizeOf<TSize>()); i++)
+        for (int i = 0; i < Math.Min(sig.Length, Unsafe.SizeOf<TSize>()); i++)
         {
             result[i] = (byte)sig[i];
         }
@@ -174,7 +174,7 @@ public static class BinaryHelper
     public static string? ReadStringOffset(this BinaryObjectReader reader, StringBinaryFormat format = StringBinaryFormat.NullTerminated, int fixedLength = -1)
     {
         long offset = reader.ReadOffsetValue();
-        if(offset == 0)
+        if (offset == 0)
         {
             return null;
         }
@@ -192,12 +192,12 @@ public static class BinaryHelper
         TSignature expected, bool throwOnFail = true) where TSignature : unmanaged
     {
         TSignature sig = reader.ReadNative<TSignature>();
-        if(sig.Equals(expected))
+        if (sig.Equals(expected))
         {
             return true;
         }
 
-        if(throwOnFail)
+        if (throwOnFail)
         {
             throw new BadImageFormatException($"Signature mismatch. Expected: {expected}. Got: {sig}");
         }
@@ -209,12 +209,12 @@ public static class BinaryHelper
         TSignature expected, bool throwOnFail = true) where TSignature : unmanaged
     {
         TSignature sig = reader.Read<TSignature>();
-        if(sig.Equals(expected))
+        if (sig.Equals(expected))
         {
             return true;
         }
 
-        if(throwOnFail)
+        if (throwOnFail)
         {
             throw new BadImageFormatException($"Signature mismatch. Expected: {expected}. Got: {sig}");
         }
@@ -224,12 +224,12 @@ public static class BinaryHelper
 
     public static bool EnsureSignature<TSignature>(TSignature sig, bool throwOnFail, params TSignature[] expected)
     {
-        if(expected.Any(x => x?.Equals(sig) == true))
+        if (expected.Any(x => x?.Equals(sig) == true))
         {
             return true;
         }
 
-        if(throwOnFail)
+        if (throwOnFail)
         {
             throw new BadImageFormatException($"Signature mismatch. Expected: {expected}. Got: {sig}");
         }
@@ -240,7 +240,7 @@ public static class BinaryHelper
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteOffsetValue(this BinaryObjectWriter writer, long value)
     {
-        if(writer.OffsetBinaryFormat == OffsetBinaryFormat.U32)
+        if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U32)
         {
             writer.Write((uint)value);
         }
@@ -266,7 +266,7 @@ public static class BinaryHelper
 
     public static unsafe T* Pointer<T>(this T[] data) where T : unmanaged
     {
-        if(data == null || data.Length == 0)
+        if (data == null || data.Length == 0)
         {
             return null;
         }
@@ -286,7 +286,7 @@ public static class BinaryHelper
 
     public static void WriteArrayFixedLength<T>(this BinaryObjectWriter writer, Span<T> array, int length) where T : unmanaged
     {
-        if(array.Length != length)
+        if (array.Length != length)
         {
             throw new IndexOutOfRangeException($"Fixed array length mismatch. Expected: {length}. Got: {array.Length}");
         }

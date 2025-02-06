@@ -54,31 +54,31 @@ public class TextureList : List<Texture>, IBinarySerializable<ChunkBinaryOptions
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
         Clear();
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.OffsetBinaryFormat = OffsetBinaryFormat.U64;
         }
 
         Name = reader.ReadStringOffset();
-        if(options.Version >= 4)
+        if (options.Version >= 4)
         {
             Field08 = reader.Read<uint>();
         }
 
         Capacity = reader.Read<int>();
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.Align(8);
         }
 
         AddRange(reader.ReadObjectArrayOffset<Texture, ChunkBinaryOptions>(options, Capacity));
         long userDataOffset = reader.ReadOffsetValue();
-        if(userDataOffset != 0)
+        if (userDataOffset != 0)
         {
             UserData = reader.ReadObjectAtOffset<UserData, ChunkBinaryOptions>(userDataOffset, options);
         }
 
-        if(options.Version == 0)
+        if (options.Version == 0)
         {
             Field14 = reader.Read<uint>();
         }
@@ -86,21 +86,21 @@ public class TextureList : List<Texture>, IBinarySerializable<ChunkBinaryOptions
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             writer.OffsetBinaryFormat = OffsetBinaryFormat.U64;
             writer.DefaultAlignment = 8;
         }
 
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-        if(options.Version >= 4)
+        if (options.Version >= 4)
         {
             writer.Write(Field08);
         }
 
         writer.Write(Count);
         writer.WriteObjectCollectionOffset(options, this);
-        if(UserData != null)
+        if (UserData != null)
         {
             writer.WriteObjectOffset(UserData, options);
         }
@@ -109,7 +109,7 @@ public class TextureList : List<Texture>, IBinarySerializable<ChunkBinaryOptions
             writer.WriteOffsetValue(0);
         }
 
-        if(options.Version == 0)
+        if (options.Version == 0)
         {
             writer.Write(Field14);
         }

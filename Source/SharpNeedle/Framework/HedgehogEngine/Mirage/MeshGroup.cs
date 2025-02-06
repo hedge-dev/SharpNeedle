@@ -21,18 +21,18 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
         AddMeshes(transMeshes, Mesh.Type.Transparent);
         AddMeshes(punchMeshes, Mesh.Type.PunchThrough);
 
-        if(!readSpecial)
+        if (!readSpecial)
         {
             return;
         }
 
         int specialMeshCount = reader.Read<int>();
         Capacity += specialMeshCount;
-        
+
         (string Name, int Count)[] slots = new (string Name, int Count)[specialMeshCount];
         reader.ReadOffset(() =>
         {
-            for(int i = 0; i < specialMeshCount; i++)
+            for (int i = 0; i < specialMeshCount; i++)
             {
                 slots[i] = new(reader.ReadStringOffsetOrEmpty(), 0);
             }
@@ -41,7 +41,7 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
         // What the fuck
         reader.ReadOffset(() =>
         {
-            for(int i = 0; i < slots.Length; i++)
+            for (int i = 0; i < slots.Length; i++)
             {
                 slots[i].Count = reader.ReadValueOffset<int>();
             }
@@ -50,11 +50,11 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
         // It only gets worse
         reader.ReadOffset(() =>
         {
-            foreach((string Name, int Count) slot in slots)
+            foreach ((string Name, int Count) slot in slots)
             {
                 reader.ReadOffset(() =>
                 {
-                    for(int i = 0; i < slot.Count; i++)
+                    for (int i = 0; i < slot.Count; i++)
                     {
                         Mesh mesh = reader.ReadObjectOffset<Mesh>();
                         mesh.Slot = slot.Name;
@@ -68,7 +68,7 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
 
         void AddMeshes(BinaryList<BinaryPointer<Mesh, uint>, uint> meshes, MeshSlot slot)
         {
-            foreach(BinaryPointer<Mesh, uint> mesh in meshes)
+            foreach (BinaryPointer<Mesh, uint> mesh in meshes)
             {
                 mesh.Value.Slot = slot;
                 Add(mesh);
@@ -84,20 +84,20 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
         WriteMeshes(this.Where(x => x.Slot == Mesh.Type.Transparent));
         WriteMeshes(this.Where(x => x.Slot == Mesh.Type.PunchThrough));
 
-        if(!writeSpecial)
+        if (!writeSpecial)
         {
             return;
         }
 
         Dictionary<string, List<Mesh>> specialGroups = [];
-        foreach(Mesh mesh in this)
+        foreach (Mesh mesh in this)
         {
-            if(mesh.Slot != Mesh.Type.Special)
+            if (mesh.Slot != Mesh.Type.Special)
             {
                 continue;
             }
 
-            if(specialGroups.TryGetValue(mesh.Slot.Name!, out List<Mesh>? meshes))
+            if (specialGroups.TryGetValue(mesh.Slot.Name!, out List<Mesh>? meshes))
             {
                 meshes.Add(mesh);
             }
@@ -108,7 +108,7 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
         }
 
         writer.Write(specialGroups.Count);
-        if(specialGroups.Count == 0)
+        if (specialGroups.Count == 0)
         {
             writer.WriteUInt32(uint.MaxValue);
             writer.WriteUInt32(uint.MaxValue);
@@ -118,7 +118,7 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
         {
             writer.WriteOffset(() =>
             {
-                foreach(KeyValuePair<string, List<Mesh>> group in specialGroups)
+                foreach (KeyValuePair<string, List<Mesh>> group in specialGroups)
                 {
                     writer.WriteStringOffset(StringBinaryFormat.NullTerminated, group.Key);
                 }
@@ -126,7 +126,7 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
 
             writer.WriteOffset(() =>
             {
-                foreach(KeyValuePair<string, List<Mesh>> group in specialGroups)
+                foreach (KeyValuePair<string, List<Mesh>> group in specialGroups)
                 {
                     writer.WriteValueOffset(group.Value.Count);
                 }
@@ -134,11 +134,11 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
 
             writer.WriteOffset(() =>
             {
-                foreach(KeyValuePair<string, List<Mesh>> group in specialGroups)
+                foreach (KeyValuePair<string, List<Mesh>> group in specialGroups)
                 {
                     writer.WriteOffset(() =>
                     {
-                        foreach(Mesh mesh in group.Value)
+                        foreach (Mesh mesh in group.Value)
                         {
                             writer.WriteObjectOffset(mesh);
                         }
@@ -155,7 +155,7 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
             writer.Write(meshes.Count());
             writer.WriteOffset(() =>
             {
-                foreach(Mesh mesh in meshes)
+                foreach (Mesh mesh in meshes)
                 {
                     writer.WriteObjectOffset(mesh, version);
                 }
@@ -167,22 +167,22 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
     {
         List<ResourceResolveException> exceptions = [];
 
-        foreach(Mesh mesh in this)
+        foreach (Mesh mesh in this)
         {
             try
             {
                 mesh.ResolveDependencies(resolver);
             }
-            catch(ResourceResolveException exc)
+            catch (ResourceResolveException exc)
             {
                 exceptions.Add(exc);
             }
         }
 
-        if(exceptions.Count > 0)
+        if (exceptions.Count > 0)
         {
             throw new ResourceResolveException(
-                $"Failed tor resolve dependencies of {exceptions.Count} meshes", 
+                $"Failed tor resolve dependencies of {exceptions.Count} meshes",
                 exceptions.SelectMany(x => x.Resources).ToArray()
             );
         }
@@ -190,7 +190,7 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
 
     public void WriteDependencies(IDirectory dir)
     {
-        foreach(Mesh mesh in this)
+        foreach (Mesh mesh in this)
         {
             mesh.WriteDependencies(dir);
         }
@@ -198,7 +198,7 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
 
     public void Dispose()
     {
-        foreach(Mesh mesh in this)
+        foreach (Mesh mesh in this)
         {
             mesh.Dispose();
         }
@@ -214,7 +214,7 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
             Capacity = Capacity
         };
 
-        foreach(Mesh mesh in this)
+        foreach (Mesh mesh in this)
         {
             result.Add(mesh);
         }

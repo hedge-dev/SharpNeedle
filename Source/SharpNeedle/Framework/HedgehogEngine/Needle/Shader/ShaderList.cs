@@ -73,7 +73,7 @@ public class ShaderList : BinaryResource
         int inputsSize = reader.ReadInt32();
         Inputs = reader.ReadObjectArrayAtOffset<Input>(inputsOffset, inputsSize).ToList();
 
-        if(ShaderListVersion >= 2)
+        if (ShaderListVersion >= 2)
         {
             reader.Skip(4);
             long shadersOffset = reader.ReadOffsetValue();
@@ -93,20 +93,20 @@ public class ShaderList : BinaryResource
 
         writer.WriteOffset(() =>
         {
-            foreach(Input input in Inputs)
+            foreach (Input input in Inputs)
             {
                 writer.WriteObject(input);
             }
         });
         writer.WriteInt32(Inputs.Count);
 
-        if(ShaderListVersion >= 2)
+        if (ShaderListVersion >= 2)
         {
             writer.Align(8);
 
             writer.WriteOffset(() =>
             {
-                foreach(Shader input in Shaders)
+                foreach (Shader input in Shaders)
                 {
                     writer.WriteObject(input);
                 }
@@ -118,7 +118,7 @@ public class ShaderList : BinaryResource
         // Only done when any of the arrays have values,
         // and it affects the pointers too.
         // Way to save 4 bytes i guess.
-        if(Inputs.Count > 0 || (Shaders.Count > 0 && ShaderListVersion >= 2))
+        if (Inputs.Count > 0 || (Shaders.Count > 0 && ShaderListVersion >= 2))
         {
             writer.Align(8);
         }

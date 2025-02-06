@@ -16,13 +16,13 @@ public class KeyFrame : IBinarySerializable<uint>
 
         Frame = reader.Read<int>();
         Value = reader.ReadObject<KeyFrameUnion, uint>(flags);
-        if(interpolation >= InterpolationType.Hermite)
+        if (interpolation >= InterpolationType.Hermite)
         {
             InParam = reader.Read<float>();
             OutParam = reader.Read<float>();
         }
 
-        if(interpolation == InterpolationType.Individual)
+        if (interpolation == InterpolationType.Individual)
         {
             Field10 = reader.Read<int>();
         }
@@ -34,13 +34,13 @@ public class KeyFrame : IBinarySerializable<uint>
 
         writer.Write(Frame);
         writer.WriteObject(Value, flags);
-        if(interpolation >= InterpolationType.Hermite)
+        if (interpolation >= InterpolationType.Hermite)
         {
             writer.Write(InParam);
             writer.Write(OutParam);
         }
 
-        if(interpolation == InterpolationType.Individual)
+        if (interpolation == InterpolationType.Individual)
         {
             writer.Write(Field10);
         }
@@ -208,7 +208,7 @@ public struct KeyFrameUnion : IBinarySerializable<uint>
 
     public void Read(BinaryObjectReader reader, uint flags)
     {
-        switch(flags & 0xF0)
+        switch (flags & 0xF0)
         {
             case 0x10:
                 Float = reader.Read<float>();
@@ -243,7 +243,7 @@ public struct KeyFrameUnion : IBinarySerializable<uint>
 
     public readonly void Write(BinaryObjectWriter writer, uint flags)
     {
-        switch(flags & 0xF0)
+        switch (flags & 0xF0)
         {
             case 0x10:
                 writer.Write(Float);

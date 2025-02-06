@@ -28,7 +28,7 @@ public class TimeStopParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch(game)
+        switch (game)
         {
             case GameType.ShadowGenerations:
                 return (int)ShadowGensParams.TimeStop;

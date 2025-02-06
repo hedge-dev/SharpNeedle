@@ -14,12 +14,12 @@ public class SceneNode : IBinarySerializable
         SceneCollection scenes = reader.ReadObject<SceneCollection>();
         Children = reader.ReadObject<NodeCollection>();
 
-        foreach(KeyValuePair<string?, SceneNode> child in Children)
+        foreach (KeyValuePair<string?, SceneNode> child in Children)
         {
             child.Value.Parent = this;
         }
 
-        foreach(KeyValuePair<string?, BinaryPointer<Scene>> scene in scenes)
+        foreach (KeyValuePair<string?, BinaryPointer<Scene>> scene in scenes)
         {
             Scenes.Add(scene.Key, scene.Value);
         }
@@ -28,7 +28,7 @@ public class SceneNode : IBinarySerializable
     public void Write(BinaryObjectWriter writer)
     {
         SceneCollection scenes = [];
-        foreach(KeyValuePair<string?, Scene> scene in Scenes)
+        foreach (KeyValuePair<string?, Scene> scene in Scenes)
         {
             scenes.Add(scene.Key, scene.Value);
         }

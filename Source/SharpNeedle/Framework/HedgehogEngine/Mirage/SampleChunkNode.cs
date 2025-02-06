@@ -106,7 +106,7 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
     /// </summary>
     public void Detach()
     {
-        if(Parent != null)
+        if (Parent != null)
         {
             Parent._children.Remove(this);
             Parent = null;
@@ -118,7 +118,7 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
     /// </summary>
     public void DetachChildren()
     {
-        foreach(SampleChunkNode node in _children.ToArray())
+        foreach (SampleChunkNode node in _children.ToArray())
         {
             node.Detach();
         }
@@ -131,7 +131,7 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
     /// <exception cref="InvalidOperationException"></exception>
     public void AddChild(SampleChunkNode node)
     {
-        if(node.Parent != null)
+        if (node.Parent != null)
         {
             throw new InvalidOperationException($"Node \"{node.Name}\" still has a parent! Detach it before adding it to a node.");
         }
@@ -149,11 +149,11 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
     /// <exception cref="InvalidOperationException"></exception>
     public void InsertChild(int index, SampleChunkNode node)
     {
-        if(index < 0)
+        if (index < 0)
         {
             throw new IndexOutOfRangeException($"Index {index} out of range! Must be a positive value!");
         }
-        else if(node.Parent != null)
+        else if (node.Parent != null)
         {
             throw new InvalidOperationException($"Node \"{node.Name}\" still has a parent! Detach it before adding it to a node.");
         }
@@ -169,7 +169,7 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
     public SampleChunkNode GetRootNode()
     {
         SampleChunkNode root = this;
-        while(root.Parent != null)
+        while (root.Parent != null)
         {
             root = root.Parent;
         }
@@ -185,22 +185,22 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
     /// <param name="recursive">Whether to recursively look in child nodes too</param>
     public SampleChunkNode? FindNode(string name, bool recursive = true)
     {
-        if(string.IsNullOrEmpty(name))
+        if (string.IsNullOrEmpty(name))
         {
             return null;
         }
 
-        foreach(SampleChunkNode child in this)
+        foreach (SampleChunkNode child in this)
         {
-            if(child.Name == name)
+            if (child.Name == name)
             {
                 return child;
             }
 
-            if(recursive && child.Count > 0)
+            if (recursive && child.Count > 0)
             {
                 SampleChunkNode? item = child.FindNode(name, recursive);
-                if(item != null)
+                if (item != null)
                 {
                     return item;
                 }
@@ -228,12 +228,12 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
         Name = reader.ReadString(StringBinaryFormat.FixedLength, 8);
 
         int spaceIdx = Name.IndexOf(' ');
-        if(spaceIdx >= 0)
+        if (spaceIdx >= 0)
         {
             Name = Name[..spaceIdx];
         }
 
-        if(!flags.HasFlag(Flags.Leaf) || flags.HasFlag(Flags.Root))
+        if (!flags.HasFlag(Flags.Leaf) || flags.HasFlag(Flags.Root))
         {
             SampleChunkNode node;
             do
@@ -241,11 +241,11 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
                 node = new();
                 AddChild(node);
             }
-            while(node.Read(reader));
+            while (node.Read(reader));
         }
 
         long end = startPos + size;
-        if(end > reader.Position)
+        if (end > reader.Position)
         {
             DataOffset = reader.Position;
             DataSize = end - DataOffset;
@@ -267,7 +267,7 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
         writer.Write(0u);
 
         Flags flags = default;
-        if(Parent == null)
+        if (Parent == null)
         {
             flags = Flags.Root;
             writer.Write(RootSignature);
@@ -276,7 +276,7 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
         }
         else
         {
-            if(lastNode)
+            if (lastNode)
             {
                 flags = Flags.LastChild;
             }
@@ -285,9 +285,9 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
             writer.WriteLittle(BinaryHelper.MakeSignature<ulong>(Name, 0x20));
         }
 
-        if(Count > 0)
+        if (Count > 0)
         {
-            for(int i = 0; i < Count; i++)
+            for (int i = 0; i < Count; i++)
             {
                 Children[i].Write(writer, i == Count - 1);
             }
@@ -297,7 +297,7 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
             flags |= Flags.Leaf;
         }
 
-        if(Data != null)
+        if (Data != null)
         {
             DataOffset = writer.Position;
             writer.WriteObject(Data);
@@ -311,7 +311,7 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
             DataSize = 0;
         }
 
-        if(Parent == null)
+        if (Parent == null)
         {
             // Collect offsets and write them
             // instead of a name, the root node has an offset to the offset table, and an offset count
@@ -324,7 +324,7 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
             {
                 // Offsets are relative to beginning of node contents
                 long nodeContentOffset = start + 0x10;
-                foreach(long offset in offsets)
+                foreach (long offset in offsets)
                 {
                     writer.Write((uint)(offset - nodeContentOffset));
                 }
@@ -332,13 +332,13 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
 
             writer.Write(offsets.Length);
         }
-        else if(lastNode && Parent.Parent == null)
+        else if (lastNode && Parent.Parent == null)
         {
             // Right before offset table is written, align by 0x10
             int remainingAlignment = 0x10 - (int)(writer.Position % 0x10);
-            if(remainingAlignment < 0x10)
+            if (remainingAlignment < 0x10)
             {
-                if(DataOffset == 0)
+                if (DataOffset == 0)
                 {
                     DataOffset = writer.Position;
                 }

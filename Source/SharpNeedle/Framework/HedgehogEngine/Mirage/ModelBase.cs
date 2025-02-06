@@ -10,19 +10,19 @@ public abstract class ModelBase : SampleChunkResource
     {
         List<ResourceResolveException> exceptions = [];
 
-        foreach(MeshGroup group in Groups)
+        foreach (MeshGroup group in Groups)
         {
             try
             {
                 group.ResolveDependencies(resolver);
             }
-            catch(ResourceResolveException exc)
+            catch (ResourceResolveException exc)
             {
                 exceptions.Add(exc);
             }
         }
 
-        if(exceptions.Count > 0)
+        if (exceptions.Count > 0)
         {
             throw new ResourceResolveException(
                 $"Failed tor resolve dependencies of {exceptions.Count} mesh groups",
@@ -33,7 +33,7 @@ public abstract class ModelBase : SampleChunkResource
 
     public override void WriteDependencies(IDirectory dir)
     {
-        foreach(MeshGroup group in Groups)
+        foreach (MeshGroup group in Groups)
         {
             group.WriteDependencies(dir);
         }
@@ -41,7 +41,7 @@ public abstract class ModelBase : SampleChunkResource
 
     protected override void Dispose(bool disposing)
     {
-        foreach(MeshGroup group in Groups)
+        foreach (MeshGroup group in Groups)
         {
             group.Dispose();
         }
@@ -53,7 +53,7 @@ public abstract class ModelBase : SampleChunkResource
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     protected void CommonRead(BinaryObjectReader reader)
     {
-        if(DataVersion >= 5)
+        if (DataVersion >= 5)
         {
             Groups = reader.ReadObject<BinaryList<BinaryPointer<MeshGroup, uint>, uint>, uint>(DataVersion).Unwind();
         }
@@ -66,12 +66,12 @@ public abstract class ModelBase : SampleChunkResource
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     protected void CommonWrite(BinaryObjectWriter writer)
     {
-        if(DataVersion >= 5)
+        if (DataVersion >= 5)
         {
             writer.Write(Groups.Count);
             writer.WriteOffset(() =>
             {
-                foreach(MeshGroup group in Groups)
+                foreach (MeshGroup group in Groups)
                 {
                     writer.WriteObjectOffset(group, DataVersion);
                 }
@@ -79,7 +79,7 @@ public abstract class ModelBase : SampleChunkResource
         }
         else
         {
-            if(Groups.Count == 1)
+            if (Groups.Count == 1)
             {
                 writer.WriteObject(Groups[0], DataVersion);
             }

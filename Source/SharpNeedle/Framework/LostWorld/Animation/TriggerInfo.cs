@@ -57,7 +57,7 @@ public struct TriggerInfo : IBinarySerializable
         public void Read(BinaryObjectReader reader)
         {
             reader.Read(out Type);
-            switch(Type)
+            switch (Type)
             {
                 case TriggerValueType.Enum:
                 case TriggerValueType.Int:
@@ -77,7 +77,7 @@ public struct TriggerInfo : IBinarySerializable
         public void Write(BinaryObjectWriter writer)
         {
             writer.Write(Type);
-            switch(Type)
+            switch (Type)
             {
                 case TriggerValueType.Enum:
                 case TriggerValueType.Int:
@@ -96,7 +96,7 @@ public struct TriggerInfo : IBinarySerializable
 
         public override readonly string ToString()
         {
-            switch(Type)
+            switch (Type)
             {
                 case TriggerValueType.Int:
                 case TriggerValueType.Enum:

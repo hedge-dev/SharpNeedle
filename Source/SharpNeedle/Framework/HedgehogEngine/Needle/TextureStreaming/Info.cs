@@ -26,17 +26,17 @@ public class Info : ResourceBase, IBinarySerializable
 
     public void Read(BinaryObjectReader reader)
     {
-        if(reader.ReadInt32() != 0x4953544E)
+        if (reader.ReadInt32() != 0x4953544E)
         {
             throw new InvalidDataException("Invalid signature, expected NTSI");
         }
 
-        if(reader.ReadInt32() != 1)
+        if (reader.ReadInt32() != 1)
         {
             throw new InvalidDataException("Invalid version, expected 1");
         }
 
-        if(reader.ReadInt32() != 0)
+        if (reader.ReadInt32() != 0)
         {
             throw new InvalidDataException("Invalid reserved value, expected 0");
         }
@@ -51,12 +51,12 @@ public class Info : ResourceBase, IBinarySerializable
 
     public void Write(BinaryObjectWriter writer)
     {
-        if(Mip4x4 == null)
+        if (Mip4x4 == null)
         {
             throw new InvalidOperationException("Mip4x4 is null!");
         }
 
-        if(DdsHeader == null)
+        if (DdsHeader == null)
         {
             throw new InvalidOperationException("DdsHeader is null!");
         }
@@ -78,7 +78,7 @@ public class Info : ResourceBase, IBinarySerializable
     public byte[] UnpackDDS(Package package)
     {
         string entryName = Path.GetFileNameWithoutExtension(Name);
-        if(!package.TryFindEntry(entryName, out Package.EntryInfo entry))
+        if (!package.TryFindEntry(entryName, out Package.EntryInfo entry))
         {
             throw new InvalidDataException($"Package \"{package.Name}\" has no entry for info \"{entryName}\"");
         }
@@ -87,11 +87,11 @@ public class Info : ResourceBase, IBinarySerializable
 
         result.Write(DdsHeader);
 
-        for(int i = 0; i < entry.MipLevels; i++)
+        for (int i = 0; i < entry.MipLevels; i++)
         {
             DataBlock block = package.Blocks[entry.BlockIndex + i];
 
-            if(block.DataStream == null)
+            if (block.DataStream == null)
             {
                 throw new InvalidOperationException("Block has no datastream!");
             }

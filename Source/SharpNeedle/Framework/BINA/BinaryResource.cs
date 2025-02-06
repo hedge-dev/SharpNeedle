@@ -25,10 +25,10 @@ public abstract class BinaryResource : ResourceBase, IBinarySerializable
         Chunks.Clear();
         uint signature = reader.ReadNative<uint>();
         bool isV2 = BinaryHelper.EnsureSignature(signature, false, Signature);
-        if(isV2)
+        if (isV2)
         {
             Version = reader.ReadObject<Version>();
-            if(Version.Is64Bit)
+            if (Version.Is64Bit)
             {
                 reader.OffsetBinaryFormat = OffsetBinaryFormat.U64;
             }
@@ -44,12 +44,12 @@ public abstract class BinaryResource : ResourceBase, IBinarySerializable
                 Owner = this
             };
 
-            for(int i = 0; i < chunkCount; i++)
+            for (int i = 0; i < chunkCount; i++)
             {
                 ChunkHeader header = reader.ReadObject<ChunkHeader>();
                 options.Header = header;
 
-                if(header.Signature == DataChunk.BinSignature || header.Signature == DataChunk.AltBinSignature)
+                if (header.Signature == DataChunk.BinSignature || header.Signature == DataChunk.AltBinSignature)
                 {
                     DataChunk<IBinarySerializable> chunk = new(this);
                     chunk.Read(reader, options);
@@ -73,7 +73,7 @@ public abstract class BinaryResource : ResourceBase, IBinarySerializable
 
             reader.Endianness = Version.Endianness;
 
-            if(Version.Endianness != BinaryHelper.PlatformEndianness)
+            if (Version.Endianness != BinaryHelper.PlatformEndianness)
             {
                 offTableOffset = BinaryPrimitives.ReverseEndianness(offTableOffset);
                 offTableSize = BinaryPrimitives.ReverseEndianness(offTableSize);
@@ -94,12 +94,12 @@ public abstract class BinaryResource : ResourceBase, IBinarySerializable
     {
         BaseFile = file;
         using BinaryObjectWriter writer = new(file.Open(FileAccess.Write), StreamOwnership.Transfer, Version.Endianness);
-        if(Version.Is64Bit)
+        if (Version.Is64Bit)
         {
             writer.OffsetBinaryFormat = OffsetBinaryFormat.U64;
         }
 
-        if(Version.IsV1)
+        if (Version.IsV1)
         {
             WriteV1(writer);
         }
@@ -127,7 +127,7 @@ public abstract class BinaryResource : ResourceBase, IBinarySerializable
             Owner = this
         };
 
-        foreach(IChunk chunk in Chunks)
+        foreach (IChunk chunk in Chunks)
         {
             chunk.Write(writer, options);
         }
@@ -138,7 +138,7 @@ public abstract class BinaryResource : ResourceBase, IBinarySerializable
 
         OffsetTable offTable = [];
         long origin = writer.OffsetHandler.OffsetOrigin;
-        foreach(long offset in writer.OffsetHandler.OffsetPositions)
+        foreach (long offset in writer.OffsetHandler.OffsetPositions)
         {
             offTable.Add(offset - origin);
         }
@@ -173,7 +173,7 @@ public abstract class BinaryResource : ResourceBase, IBinarySerializable
         {
             Owner = this
         };
-        foreach(IChunk chunk in Chunks)
+        foreach (IChunk chunk in Chunks)
         {
             writer.WriteObject(chunk, options);
         }

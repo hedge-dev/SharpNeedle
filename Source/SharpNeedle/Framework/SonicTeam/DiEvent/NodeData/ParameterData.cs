@@ -35,7 +35,7 @@ public class ParameterData : BaseNodeData
 
     public void ReadFrontiersParameter(BinaryObjectReader reader, int type)
     {
-        switch((FrontiersParams)type)
+        switch ((FrontiersParams)type)
         {
             case FrontiersParams.DepthOfField:
                 Parameter = new DOFParam(reader, GameType.Frontiers);
@@ -141,7 +141,7 @@ public class ParameterData : BaseNodeData
 
     public void ReadShadowGensParameter(BinaryObjectReader reader, int type)
     {
-        switch((ShadowGensParams)type)
+        switch ((ShadowGensParams)type)
         {
             case ShadowGensParams.DepthOfField:
                 Parameter = new DOFParam(reader, GameType.ShadowGenerations);
@@ -203,7 +203,7 @@ public class ParameterData : BaseNodeData
 
     public void ReadGameSpecificParameter(BinaryObjectReader reader, GameType game, int type)
     {
-        switch(game)
+        switch (game)
         {
             case GameType.Frontiers:
                 ReadFrontiersParameter(reader, type);
@@ -230,9 +230,9 @@ public class ParameterData : BaseNodeData
         Field18 = reader.Read<int>();
         Field1C = reader.Read<int>();
 
-        if(type < 1000)
+        if (type < 1000)
         {
-            switch((ParameterType)type)
+            switch ((ParameterType)type)
             {
                 case ParameterType.DrawingOff:
                     Parameter = new DrawOffParam(reader, GameType.Common);
@@ -314,7 +314,7 @@ public class ParameterData : BaseNodeData
         writer.Write(Field18);
         writer.Write(Field1C);
 
-        if(Parameter != null)
+        if (Parameter != null)
         {
             writer.WriteObject(Parameter, game);
         }

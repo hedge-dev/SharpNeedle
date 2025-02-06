@@ -23,7 +23,7 @@ public class VirtualDirectory : IDirectory
         Name = name;
         Parent = parent;
 
-        if(parent != null)
+        if (parent != null)
         {
             Path = System.IO.Path.Combine(parent.Path, Name);
         }
@@ -49,7 +49,7 @@ public class VirtualDirectory : IDirectory
 
     public IDirectory CreateDirectory(string name)
     {
-        if(Directories.ContainsKey(name))
+        if (Directories.ContainsKey(name))
         {
             throw new InvalidOperationException($"Failed to create directory \"{name}\"! Virtual directory \"{Path}\" already has a directory with the same name!");
         }
@@ -70,9 +70,9 @@ public class VirtualDirectory : IDirectory
         string[] names = path.Split('/', '\\', StringSplitOptions.RemoveEmptyEntries);
         VirtualDirectory? current = this;
 
-        for(int i = 0; i < names.Length; i++)
+        for (int i = 0; i < names.Length; i++)
         {
-            if(current == null)
+            if (current == null)
             {
                 return null;
             }
@@ -80,7 +80,7 @@ public class VirtualDirectory : IDirectory
             string name = names[i];
             bool isLast = i == names.Length - 1;
 
-            switch(name)
+            switch (name)
             {
                 case ".":
                     continue;
@@ -91,7 +91,7 @@ public class VirtualDirectory : IDirectory
 
                 default:
                 {
-                    if(isLast && current.Files.TryGetValue(name, out VirtualFile? vFile))
+                    if (isLast && current.Files.TryGetValue(name, out VirtualFile? vFile))
                     {
                         return vFile;
                     }
@@ -107,7 +107,7 @@ public class VirtualDirectory : IDirectory
 
     public IFile CreateFile(string name, bool overwrite = true)
     {
-        if(Files.ContainsKey(name) && !overwrite)
+        if (Files.ContainsKey(name) && !overwrite)
         {
             throw new InvalidOperationException($"Creating of file \"{name}\" failed! Virtual directory \"{Path}\" already has a file with the same name!");
         }
@@ -119,12 +119,12 @@ public class VirtualDirectory : IDirectory
 
     public IFile AddFile(IFile file, bool overwrite = true)
     {
-        if(Files.ContainsKey(file.Name) && !overwrite)
+        if (Files.ContainsKey(file.Name) && !overwrite)
         {
             throw new InvalidOperationException($"Adding of file \"{file.Name}\" failed! Virtual directory \"{Path}\" already has a file with the same name!");
         }
 
-        if(file is VirtualFile vFile)
+        if (file is VirtualFile vFile)
         {
             vFile.Parent = this;
             vFile.Path = System.IO.Path.Combine(Path, vFile.Name);

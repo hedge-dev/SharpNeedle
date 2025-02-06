@@ -17,13 +17,13 @@ public struct DirectoryResourceResolver : IResourceResolver
     public readonly TRes? Open<TRes>(string fileName, bool resolveDependencies = true) where TRes : IResource, new()
     {
         IFile? file = GetFile(fileName);
-        if(file == null)
+        if (file == null)
         {
             return default;
         }
 
         TRes res;
-        if(Manager != null)
+        if (Manager != null)
         {
             res = Manager.Open<TRes>(file, false);
         }
@@ -33,7 +33,7 @@ public struct DirectoryResourceResolver : IResourceResolver
             res.Read(file);
         }
 
-        if(resolveDependencies)
+        if (resolveDependencies)
         {
             res.ResolveDependencies(this);
         }

@@ -19,7 +19,7 @@ public struct BinaryList<T> : IBinarySerializable, IList<T> where T : IBinarySer
 
         // Use token because accessing `this` with lambda on structs is a nightmare
         long offset = reader.ReadOffsetValue();
-        if(offset == 0)
+        if (offset == 0)
         {
             Items = [];
             return;
@@ -27,7 +27,7 @@ public struct BinaryList<T> : IBinarySerializable, IList<T> where T : IBinarySer
 
         Items = new List<T>((int)count);
         using SeekToken token = reader.AtOffset(offset);
-        for(long i = 0; i < count; i++)
+        for (long i = 0; i < count; i++)
         {
             T obj = reader.ReadObject<T>();
             Items.Add(obj);
@@ -37,7 +37,7 @@ public struct BinaryList<T> : IBinarySerializable, IList<T> where T : IBinarySer
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly void Write(BinaryObjectWriter writer)
     {
-        if(Items == null)
+        if (Items == null)
         {
             writer.WriteOffsetValue(0);
             writer.WriteOffsetValue(0);
@@ -47,7 +47,7 @@ public struct BinaryList<T> : IBinarySerializable, IList<T> where T : IBinarySer
         writer.WriteOffsetValue(Items.Count);
         writer.WriteOffset(writer.DefaultAlignment, null, Items, (_, items) =>
         {
-            foreach(T item in (List<T>)items)
+            foreach (T item in (List<T>)items)
             {
                 writer.WriteObject(item);
             }
@@ -140,14 +140,14 @@ public struct BinaryList<T, TContext> : IBinarySerializable<TContext>, IList<T> 
 
         // Use token because accessing `this` with lambda on structs is a nightmare
         long offset = reader.ReadOffsetValue();
-        if(offset == 0)
+        if (offset == 0)
         {
             return;
         }
 
         Items = new List<T>((int)count);
         using SeekToken token = reader.AtOffset(offset);
-        for(long i = 0; i < count; i++)
+        for (long i = 0; i < count; i++)
         {
             T obj = reader.ReadObject<T, TContext>(context);
             Items.Add(obj);
@@ -157,7 +157,7 @@ public struct BinaryList<T, TContext> : IBinarySerializable<TContext>, IList<T> 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly void Write(BinaryObjectWriter writer, TContext context)
     {
-        if(Items == null)
+        if (Items == null)
         {
             writer.WriteOffsetValue(0);
             writer.WriteOffsetValue(0);
@@ -167,7 +167,7 @@ public struct BinaryList<T, TContext> : IBinarySerializable<TContext>, IList<T> 
         writer.WriteOffsetValue(Items.Count);
         writer.WriteOffset(writer.DefaultAlignment, null, Items, (_, items) =>
         {
-            foreach(T item in (List<T>)items)
+            foreach (T item in (List<T>)items)
             {
                 writer.WriteObject(item, context);
             }

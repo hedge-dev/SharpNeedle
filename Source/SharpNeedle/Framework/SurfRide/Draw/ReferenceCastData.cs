@@ -10,7 +10,7 @@ public class ReferenceCastData : ICastData
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.Align(8);
         }
@@ -24,12 +24,12 @@ public class ReferenceCastData : ICastData
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
-        if(Layer == null)
+        if (Layer == null)
         {
             throw new InvalidOperationException("Layer is null");
         }
 
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             writer.Align(8);
         }

@@ -22,7 +22,7 @@ public class FalloffToggleParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch(game)
+        switch (game)
         {
             case GameType.ShadowGenerations:
                 return (int)ShadowGensParams.FalloffToggle;

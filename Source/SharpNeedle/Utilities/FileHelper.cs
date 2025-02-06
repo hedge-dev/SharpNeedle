@@ -4,7 +4,7 @@ public class FileHelper
 {
     public static FileMode FileAccessToMode(FileAccess access)
     {
-        switch(access)
+        switch (access)
         {
             case FileAccess.Read:
                 return FileMode.Open;

@@ -48,7 +48,7 @@ public class ShadowAfterimageParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch(game)
+        switch (game)
         {
             case GameType.ShadowGenerations:
                 return (int)ShadowGensParams.ShadowAfterimage;

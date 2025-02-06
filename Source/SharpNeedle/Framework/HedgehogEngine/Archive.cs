@@ -23,12 +23,12 @@ public class Archive : ResourceBase, IDirectory, IStreamable
 
     protected override void Dispose(bool disposing)
     {
-        if(!disposing)
+        if (!disposing)
         {
             return;
         }
 
-        foreach(IFile file in Files)
+        foreach (IFile file in Files)
         {
             file.Dispose();
         }
@@ -39,7 +39,7 @@ public class Archive : ResourceBase, IDirectory, IStreamable
     {
         long size = 0x10L;
 
-        foreach(IFile file in this)
+        foreach (IFile file in this)
         {
             size = AlignmentHelper.Align(size + 21 + file.Name.Length, DataAlignment) + file.Length;
         }
@@ -52,7 +52,7 @@ public class Archive : ResourceBase, IDirectory, IStreamable
         long size = 0x10L;
         PackedFileInfo pfi = new();
 
-        foreach(IFile file in this)
+        foreach (IFile file in this)
         {
             PackedFileInfo.File pfiFile = new();
             size = AlignmentHelper.Align(size + 21 + file.Name.Length, DataAlignment);
@@ -69,9 +69,9 @@ public class Archive : ResourceBase, IDirectory, IStreamable
 
     public void LoadToMemory()
     {
-        foreach(IFile file in Files)
+        foreach (IFile file in Files)
         {
-            if(file is ArchiveFile aFile)
+            if (file is ArchiveFile aFile)
             {
                 aFile.EnsureData();
             }
@@ -92,7 +92,7 @@ public class Archive : ResourceBase, IDirectory, IStreamable
         reader.Skip(0xC);
         DataAlignment = reader.Read<int>();
 
-        while(reader.Position < reader.Length)
+        while (reader.Position < reader.Length)
         {
             long baseOffset = reader.Position;
 
@@ -124,7 +124,7 @@ public class Archive : ResourceBase, IDirectory, IStreamable
         writer.Write(0x14u);
         writer.Write(DataAlignment);
 
-        foreach(IFile arFile in this)
+        foreach (IFile arFile in this)
         {
             long curPos = writer.Position;
             long dataOffset = AlignmentHelper.Align(curPos + 21 + Encoding.UTF8.GetByteCount(arFile.Name), DataAlignment);
@@ -157,7 +157,7 @@ public class Archive : ResourceBase, IDirectory, IStreamable
     {
         throw new NotSupportedException();
     }
-    
+
     public bool DeleteDirectory(string name)
     {
         throw new NotSupportedException();
@@ -172,9 +172,9 @@ public class Archive : ResourceBase, IDirectory, IStreamable
     private void OverwriteDelete(string name, bool overwrite)
     {
         IFile? overwriteFile = Files.FirstOrDefault(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-        if(overwriteFile != null)
+        if (overwriteFile != null)
         {
-            if(overwrite)
+            if (overwrite)
             {
                 Files.Remove(overwriteFile);
             }

@@ -23,7 +23,7 @@ public class ComplexAnimation : AnimationDef
         reader.ReadOffset(() =>
         {
             ComplexDataType type = reader.Read<ComplexDataType>();
-            switch(type)
+            switch (type)
             {
                 case ComplexDataType.SequenceTable:
                     Data = reader.ReadObject<SequenceTable>();
@@ -38,7 +38,7 @@ public class ComplexAnimation : AnimationDef
 
     public override void Write(BinaryObjectWriter writer)
     {
-        if(Data == null)
+        if (Data == null)
         {
             throw new InvalidOperationException("Data is null!");
         }

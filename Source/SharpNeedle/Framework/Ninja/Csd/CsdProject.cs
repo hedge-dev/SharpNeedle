@@ -31,16 +31,16 @@ public class CsdProject : ResourceBase, IBinarySerializable
         Package = reader.ReadObject<CsdPackage>();
         Endianness = Package.Endianness;
         ChunkBinaryOptions options = new();
-        for(int i = 0; i < Package.Files.Count; i++)
+        for (int i = 0; i < Package.Files.Count; i++)
         {
             Stream stream = Package.GetStream(i);
             using BinaryObjectReader infoReader = new(stream, StreamOwnership.Transfer, Package.Endianness);
             try
             {
                 InfoChunk info = infoReader.ReadObject<InfoChunk, ChunkBinaryOptions>(options);
-                foreach(IChunk chunk in info.Chunks)
+                foreach (IChunk chunk in info.Chunks)
                 {
-                    switch(chunk)
+                    switch (chunk)
                     {
                         case ProjectChunk project:
                             Project = project;
@@ -53,9 +53,9 @@ public class CsdProject : ResourceBase, IBinarySerializable
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                if(e is not InvalidDataException)
+                if (e is not InvalidDataException)
                 {
                     throw;
                 }
@@ -65,7 +65,7 @@ public class CsdProject : ResourceBase, IBinarySerializable
 
     public void Write(BinaryObjectWriter writer)
     {
-        if(Project == null)
+        if (Project == null)
         {
             throw new InvalidOperationException("Project is null!");
         }
@@ -75,18 +75,18 @@ public class CsdProject : ResourceBase, IBinarySerializable
             Endianness = Endianness
         };
 
-        if(Textures is TextureListMirage)
+        if (Textures is TextureListMirage)
         {
             Project.TextureFormat = TextureFormat.Mirage;
         }
-        else if(Textures is TextureListNN)
+        else if (Textures is TextureListNN)
         {
             Project.TextureFormat = TextureFormat.NextNinja;
         }
 
         CreatePackageFile(Project);
 
-        if(Textures != null)
+        if (Textures != null)
         {
             CreatePackageFile(Textures);
         }

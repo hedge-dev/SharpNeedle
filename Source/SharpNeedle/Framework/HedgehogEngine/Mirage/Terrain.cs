@@ -17,7 +17,7 @@ public class Terrain : SampleChunkResource
         writer.Write(Groups.Count);
         writer.WriteOffset(() =>
         {
-            foreach(GroupInfo group in Groups)
+            foreach (GroupInfo group in Groups)
             {
                 writer.WriteObjectOffset(group);
             }
@@ -42,7 +42,7 @@ public class Terrain : SampleChunkResource
             Instances = new List<Sphere>(instancesCount);
             reader.ReadOffset(() =>
             {
-                for(int i = 0; i < instancesCount; i++)
+                for (int i = 0; i < instancesCount; i++)
                 {
                     Instances.Add(reader.ReadValueOffset<Sphere>());
                 }
@@ -59,7 +59,7 @@ public class Terrain : SampleChunkResource
             writer.Write(Instances.Count);
             writer.WriteOffset(() =>
             {
-                foreach(Sphere instance in Instances)
+                foreach (Sphere instance in Instances)
                 {
                     writer.WriteValueOffset(instance);
                 }

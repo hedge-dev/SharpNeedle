@@ -9,7 +9,7 @@ public interface IDirectory : IEnumerable<IFile>
     /// Containing directory of this directory, if it exists.
     /// </summary>
     IDirectory? Parent { get; }
-    
+
     /// <summary>
     /// Full path to the directory (including name).
     /// </summary>

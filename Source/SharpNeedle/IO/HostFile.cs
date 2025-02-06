@@ -10,8 +10,8 @@ public class HostFile : IFile
     protected FileStream? BaseStream { get; set; }
 
 
-    public IDirectory Parent 
-        => HostDirectory.ParentFromPath(Path) 
+    public IDirectory Parent
+        => HostDirectory.ParentFromPath(Path)
         ?? throw new IOException("Could not find directory for file!");
 
     public string Path { get; }
@@ -33,7 +33,7 @@ public class HostFile : IFile
 
     public static HostFile Create(string fullPath, bool overwrite = true)
     {
-        if(File.Exists(fullPath) && !overwrite)
+        if (File.Exists(fullPath) && !overwrite)
         {
             throw new InvalidOperationException($"File \"{fullPath}\" already exists! Create failed!");
         }
@@ -49,7 +49,7 @@ public class HostFile : IFile
 
     public static bool Delete(string fullPath)
     {
-        if(!File.Exists(fullPath))
+        if (!File.Exists(fullPath))
         {
             return false;
         }
@@ -68,7 +68,7 @@ public class HostFile : IFile
 
     public HostFile(string filepath)
     {
-        if(!File.Exists(filepath))
+        if (!File.Exists(filepath))
         {
             throw new FileNotFoundException(filepath);
         }
@@ -89,7 +89,7 @@ public class HostFile : IFile
 
     public bool CheckDisposed()
     {
-        if(BaseStream == null)
+        if (BaseStream == null)
         {
             return false;
         }
@@ -107,14 +107,14 @@ public class HostFile : IFile
 
     public Stream Open(FileAccess access = FileAccess.Read)
     {
-        if(CheckDisposed())
+        if (CheckDisposed())
         {
             BaseStream = null;
         }
 
-        if(BaseStream != null)
+        if (BaseStream != null)
         {
-            if(Access == access)
+            if (Access == access)
             {
                 return BaseStream;
             }

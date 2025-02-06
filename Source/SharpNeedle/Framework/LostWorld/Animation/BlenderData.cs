@@ -4,7 +4,7 @@ public class BlenderData : List<Blender>, IComplexData
 {
     public void Read(BinaryObjectReader reader, bool readType)
     {
-        if(readType)
+        if (readType)
         {
             reader.EnsureSignatureNative(1);
         }
@@ -12,7 +12,7 @@ public class BlenderData : List<Blender>, IComplexData
         int nodeCount = reader.Read<int>();
         reader.ReadOffset(() =>
         {
-            for(int i = 0; i < nodeCount; i++)
+            for (int i = 0; i < nodeCount; i++)
             {
                 Add(reader.ReadObjectOffset<Blender>());
             }
@@ -21,7 +21,7 @@ public class BlenderData : List<Blender>, IComplexData
 
     public void Write(BinaryObjectWriter writer, bool writeType)
     {
-        if(writeType)
+        if (writeType)
         {
             writer.Write(1);
         }
@@ -29,7 +29,7 @@ public class BlenderData : List<Blender>, IComplexData
         writer.Write(Count);
         writer.WriteOffset(() =>
         {
-            foreach(Blender blender in this)
+            foreach (Blender blender in this)
             {
                 writer.WriteObjectOffset(blender);
             }

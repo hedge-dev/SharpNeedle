@@ -12,7 +12,7 @@ public static class ResourceExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Open<T>(this IResourceManager manager, string path, bool resolveDepends = true) where T : IResource, new()
     {
-        IFile file = FileSystem.Instance.Open(path) 
+        IFile file = FileSystem.Instance.Open(path)
             ?? throw new FileNotFoundException($"File \"{path}\" not found!", path);
 
         return manager.Open<T>(file, resolveDepends);
@@ -35,7 +35,7 @@ public static class ResourceExtensions
 
         resource.Read(file);
 
-        if(resolveDepends)
+        if (resolveDepends)
         {
             resource.ResolveDependencies(new DirectoryResourceResolver(file.Parent));
         }
@@ -46,7 +46,7 @@ public static class ResourceExtensions
         using IFile file = FileSystem.Instance.Create(path);
         resource.Write(file);
 
-        if(saveDepends)
+        if (saveDepends)
         {
             resource.WriteDependencies(file.Parent);
         }
@@ -57,7 +57,7 @@ public static class ResourceExtensions
         using IFile file = FileSystem.Instance.Create(path);
         resource.Write(file, writeNodes);
 
-        if(saveDepends)
+        if (saveDepends)
         {
             resource.WriteDependencies(file.Parent);
         }

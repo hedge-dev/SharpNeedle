@@ -41,12 +41,12 @@ public class SubStream : Stream
         Begin = begin;
         End = begin + length;
     }
-    
+
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     protected void EnsurePosition()
     {
-        if(BaseStream.Position - Begin != _position)
+        if (BaseStream.Position - Begin != _position)
         {
             Position = _position;
         }
@@ -56,12 +56,12 @@ public class SubStream : Stream
     public override int Read(byte[] buffer, int offset, int count)
     {
         EnsurePosition();
-        if(Position >= Length)
+        if (Position >= Length)
         {
             return 0;
         }
 
-        if(Position + count >= Length)
+        if (Position + count >= Length)
         {
             count = (int)(Length - Position);
         }
@@ -81,7 +81,7 @@ public class SubStream : Stream
 
     public override long Seek(long offset, SeekOrigin origin)
     {
-        switch(origin)
+        switch (origin)
         {
             case SeekOrigin.Begin:
                 Position = offset;

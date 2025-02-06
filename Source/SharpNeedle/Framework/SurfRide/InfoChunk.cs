@@ -19,9 +19,9 @@ public class InfoChunk : IChunk
         SeekToken beforeChunk = reader.At();
         reader.Skip(12);
         Version = reader.Read<int>();
-        if(options.Version <= 2)
+        if (options.Version <= 2)
         {
-            switch(Version)
+            switch (Version)
             {
                 case 20100420:
                     options.Version = 0;
@@ -42,17 +42,17 @@ public class InfoChunk : IChunk
         Chunks = new List<IChunk>(chunkCount);
         reader.ReadOffset(() =>
         {
-            for(int i = 0; i < chunkCount; i++)
+            for (int i = 0; i < chunkCount; i++)
             {
                 reader.OffsetBinaryFormat = OffsetBinaryFormat.U32;
                 ChunkHeader header = reader.ReadObject<ChunkHeader>();
                 long begin = reader.Position;
                 options.Header = header;
-                if(header.Signature == ProjectChunk.BinSignature)
+                if (header.Signature == ProjectChunk.BinSignature)
                 {
                     Chunks.Add(reader.ReadObject<ProjectChunk, ChunkBinaryOptions>(options));
                 }
-                else if(header.Signature == TextureListChunk.BinSignature)
+                else if (header.Signature == TextureListChunk.BinSignature)
                 {
                     Chunks.Add(reader.ReadObject<TextureListChunk, ChunkBinaryOptions>(options));
                 }
@@ -82,7 +82,7 @@ public class InfoChunk : IChunk
         writer.Write(0); // Padding
 
         SeekToken chunkBegin = writer.At();
-        foreach(IChunk chunk in Chunks)
+        foreach (IChunk chunk in Chunks)
         {
             writer.WriteObject(chunk, options);
         }
@@ -90,7 +90,7 @@ public class InfoChunk : IChunk
         SeekToken chunkEnd = writer.At();
 
         Offsets = [];
-        foreach(long offset in writer.OffsetHandler.OffsetPositions)
+        foreach (long offset in writer.OffsetHandler.OffsetPositions)
         {
             Offsets.Add((int)offset);
         }

@@ -11,7 +11,7 @@ public class HostDirectory : IDirectory
         get
         {
             string name = System.IO.Path.GetFileName(Path);
-            if(string.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(name))
             {
                 return Path;
             }
@@ -27,7 +27,7 @@ public class HostDirectory : IDirectory
 
     internal static HostDirectory? ParentFromPath(string path)
     {
-        if(!System.IO.Path.IsPathRooted(path.AsSpan()))
+        if (!System.IO.Path.IsPathRooted(path.AsSpan()))
         {
             path = System.IO.Path.TrimEndingDirectorySeparator(path);
         }
@@ -38,7 +38,7 @@ public class HostDirectory : IDirectory
 
     public static HostDirectory? FromPath(string? path)
     {
-        if(string.IsNullOrEmpty(path)
+        if (string.IsNullOrEmpty(path)
             || !Directory.Exists(path))
         {
             return null;
@@ -65,7 +65,7 @@ public class HostDirectory : IDirectory
     public HostDirectory(string path)
     {
         Path = System.IO.Path.GetFullPath(path);
-        if(!Directory.Exists(Path))
+        if (!Directory.Exists(Path))
         {
             throw new DirectoryNotFoundException(path);
         }
@@ -74,7 +74,7 @@ public class HostDirectory : IDirectory
 
     public IEnumerable<IDirectory> GetDirectories()
     {
-        foreach(string file in Directory.EnumerateDirectories(Path))
+        foreach (string file in Directory.EnumerateDirectories(Path))
         {
             yield return new HostDirectory(file);
         }
@@ -89,7 +89,7 @@ public class HostDirectory : IDirectory
     {
         string directoryPath = System.IO.Path.Combine(Path, Name);
 
-        if(Directory.Exists(directoryPath))
+        if (Directory.Exists(directoryPath))
         {
             throw new InvalidOperationException($"Failed to create directory \"{name}\"! Directory \"{Path}\" already has a directory with the same name!");
         }
@@ -100,7 +100,7 @@ public class HostDirectory : IDirectory
     public bool DeleteDirectory(string name)
     {
         string path = System.IO.Path.Combine(Path, name);
-        if(!Directory.Exists(path))
+        if (!Directory.Exists(path))
         {
             return false;
         }
@@ -128,7 +128,7 @@ public class HostDirectory : IDirectory
     {
         return HostFile.Create(System.IO.Path.Combine(Path, name), overwrite);
     }
-     
+
     public IFile AddFile(IFile file, bool overwrite = true)
     {
         HostFile destFile = (HostFile)CreateFile(file.Name, overwrite);
@@ -149,7 +149,7 @@ public class HostDirectory : IDirectory
 
     public IEnumerator<IFile> GetEnumerator()
     {
-        foreach(string file in Directory.EnumerateFiles(Path))
+        foreach (string file in Directory.EnumerateFiles(Path))
         {
             yield return new HostFile(file);
         }

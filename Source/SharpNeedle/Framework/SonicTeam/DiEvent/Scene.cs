@@ -20,7 +20,7 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
 
     private GameType LastGame { get; set; } = GameType.Common;
 
-    public Scene() 
+    public Scene()
     {
         // Register encoding provider for Shift-JIS strings
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -33,7 +33,7 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
 
     public void Read(string path, GameType game)
     {
-        IFile? file = FileSystem.Instance.Open(path) 
+        IFile? file = FileSystem.Instance.Open(path)
             ?? throw new FileNotFoundException($"Could not open file \"{path}\"", path);
 
         Read(file, game);

@@ -13,7 +13,7 @@ public class Model : ModelBase
     public override void Read(BinaryObjectReader reader)
     {
         CommonRead(reader);
-        if(DataVersion >= 4)
+        if (DataVersion >= 4)
         {
             Morphs = reader.ReadObject<BinaryList<BinaryPointer<MorphModel, uint>, uint>, uint>(DataVersion).Unwind();
         }
@@ -22,7 +22,7 @@ public class Model : ModelBase
         Nodes = new List<Node>(nodeCount);
         reader.ReadOffset(() =>
         {
-            for(int i = 0; i < nodeCount; i++)
+            for (int i = 0; i < nodeCount; i++)
             {
                 Nodes.Add(reader.ReadObjectOffset<Node>());
             }
@@ -30,7 +30,7 @@ public class Model : ModelBase
 
         reader.ReadOffset(() =>
         {
-            for(int i = 0; i < Nodes.Count; i++)
+            for (int i = 0; i < Nodes.Count; i++)
             {
                 Node node = Nodes[i];
                 node.Transform = Matrix4x4.Transpose(reader.Read<Matrix4x4>());
@@ -38,7 +38,7 @@ public class Model : ModelBase
             }
         });
 
-        if(DataVersion >= 2)
+        if (DataVersion >= 2)
         {
             Bounds = reader.ReadObjectOffset<AABB>();
         }
@@ -47,17 +47,17 @@ public class Model : ModelBase
     public override void Write(BinaryObjectWriter writer)
     {
         CommonWrite(writer);
-        if(DataVersion >= 4)
+        if (DataVersion >= 4)
         {
             writer.Write(Morphs?.Count ?? 0);
             writer.WriteOffset(() =>
             {
-                if(Morphs == null)
+                if (Morphs == null)
                 {
                     return;
                 }
 
-                foreach(MorphModel morph in Morphs)
+                foreach (MorphModel morph in Morphs)
                 {
                     writer.WriteObjectOffset<MorphModel, uint>(morph, DataVersion);
                 }
@@ -67,7 +67,7 @@ public class Model : ModelBase
         writer.Write(Nodes.Count);
         writer.WriteOffset(() =>
         {
-            foreach(Node node in Nodes)
+            foreach (Node node in Nodes)
             {
                 writer.WriteObjectOffset(node);
             }
@@ -75,13 +75,13 @@ public class Model : ModelBase
 
         writer.WriteOffset(() =>
         {
-            foreach(Node node in Nodes)
+            foreach (Node node in Nodes)
             {
                 writer.Write(Matrix4x4.Transpose(node.Transform));
             }
         });
 
-        if(DataVersion >= 2)
+        if (DataVersion >= 2)
         {
             writer.WriteObjectOffset(Bounds);
         }
@@ -91,9 +91,9 @@ public class Model : ModelBase
     {
         base.ResolveDependencies(resolver);
 
-        if(Morphs != null)
+        if (Morphs != null)
         {
-            foreach(MorphModel morph in Morphs)
+            foreach (MorphModel morph in Morphs)
             {
                 morph.ResolveDependencies(resolver);
             }
@@ -104,9 +104,9 @@ public class Model : ModelBase
     {
         base.WriteDependencies(dir);
 
-        if(Morphs != null)
+        if (Morphs != null)
         {
-            foreach(MorphModel morph in Morphs)
+            foreach (MorphModel morph in Morphs)
             {
                 morph.WriteDependencies(dir);
             }

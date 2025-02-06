@@ -13,13 +13,13 @@ public class Texture : List<Crop>, IBinarySerializable<ChunkBinaryOptions>
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
         Clear();
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.Align(8);
         }
 
         Name = reader.ReadStringOffset();
-        if(options.Version >= 5)
+        if (options.Version >= 5)
         {
             TextureFileName = reader.ReadStringOffset();
         }
@@ -29,7 +29,7 @@ public class Texture : List<Crop>, IBinarySerializable<ChunkBinaryOptions>
         Height = reader.Read<ushort>();
         Flags = reader.Read<uint>();
         Capacity = reader.Read<int>();
-        if(Capacity != 0)
+        if (Capacity != 0)
         {
             AddRange(reader.ReadObjectArrayOffset<Crop>(Capacity));
         }
@@ -39,7 +39,7 @@ public class Texture : List<Crop>, IBinarySerializable<ChunkBinaryOptions>
         }
 
         long userDataOffset = reader.ReadOffsetValue();
-        if(userDataOffset != 0)
+        if (userDataOffset != 0)
         {
             UserData = reader.ReadObjectAtOffset<UserData, ChunkBinaryOptions>(userDataOffset, options);
         }
@@ -47,18 +47,18 @@ public class Texture : List<Crop>, IBinarySerializable<ChunkBinaryOptions>
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             writer.Align(8);
         }
 
-        if(options.Version < 5 && TextureFileName != null)
+        if (options.Version < 5 && TextureFileName != null)
         {
             Name = TextureFileName;
         }
 
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-        if(options.Version >= 5)
+        if (options.Version >= 5)
         {
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, TextureFileName);
         }
@@ -68,7 +68,7 @@ public class Texture : List<Crop>, IBinarySerializable<ChunkBinaryOptions>
         writer.Write(Height);
         writer.Write(Flags);
         writer.Write(Count);
-        if(Count != 0)
+        if (Count != 0)
         {
             writer.WriteObjectCollectionOffset(this);
         }
@@ -77,7 +77,7 @@ public class Texture : List<Crop>, IBinarySerializable<ChunkBinaryOptions>
             writer.WriteOffsetValue(0);
         }
 
-        if(UserData != null)
+        if (UserData != null)
         {
             writer.WriteObjectOffset(UserData, options);
         }

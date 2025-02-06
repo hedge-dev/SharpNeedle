@@ -6,7 +6,7 @@ public static class SphereBVHTree
 {
     public static BVHNode<Sphere, TValue> Build<TValue>(List<KeyValuePair<Sphere, TValue>> nodes)
     {
-        if(nodes.Count == 1)
+        if (nodes.Count == 1)
         {
             return new(nodes[0].Key, nodes[0].Value);
         }
@@ -15,7 +15,7 @@ public static class SphereBVHTree
         Span<KeyValuePair<Sphere, TValue>> span = CollectionsMarshal.AsSpan(nodes);
         AABB bounds = new()
         { Center = span[0].Key.Center };
-        foreach(KeyValuePair<Sphere, TValue> node in span)
+        foreach (KeyValuePair<Sphere, TValue> node in span)
         {
             bounds.Add(node.Key);
         }
@@ -27,9 +27,9 @@ public static class SphereBVHTree
 
         List<KeyValuePair<Sphere, TValue>> leftNodes = [];
         List<KeyValuePair<Sphere, TValue>> rightNodes = [];
-        foreach(KeyValuePair<Sphere, TValue> node in span)
+        foreach (KeyValuePair<Sphere, TValue> node in span)
         {
-            if(node.Key.Center.GetAxis(maxAxis) < center)
+            if (node.Key.Center.GetAxis(maxAxis) < center)
             {
                 leftNodes.Add(node);
             }
@@ -39,16 +39,16 @@ public static class SphereBVHTree
             }
         }
 
-        if(leftNodes.Count == 0)
+        if (leftNodes.Count == 0)
         {
             (leftNodes, rightNodes) = (rightNodes, leftNodes);
         }
 
-        if(rightNodes.Count == 0)
+        if (rightNodes.Count == 0)
         {
-            for(int i = 0; i < leftNodes.Count; i++)
+            for (int i = 0; i < leftNodes.Count; i++)
             {
-                if((i & 1) == 0)
+                if ((i & 1) == 0)
                 {
                     continue;
                 }
@@ -58,12 +58,12 @@ public static class SphereBVHTree
             }
         }
 
-        if(leftNodes.Count != 0)
+        if (leftNodes.Count != 0)
         {
             bNode.Left = Build(leftNodes);
         }
 
-        if(rightNodes.Count != 0)
+        if (rightNodes.Count != 0)
         {
             bNode.Right = Build(rightNodes);
         }

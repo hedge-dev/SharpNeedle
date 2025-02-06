@@ -36,7 +36,7 @@ public struct AABB : IBinarySerializable, IIntersectable<Vector3>, IIntersectabl
         {
             float radius = 0f;
             Vector3 center = Center;
-            for(int i = 0; i < Length; i++)
+            for (int i = 0; i < Length; i++)
             {
                 radius = MathF.Max(radius, (center - GetCorner(i)).Length());
             }
@@ -65,32 +65,32 @@ public struct AABB : IBinarySerializable, IIntersectable<Vector3>, IIntersectabl
 
     public void Add(Vector3 point)
     {
-        if(point.X < Min.X)
+        if (point.X < Min.X)
         {
             Min.X = point.X;
         }
 
-        if(point.Y < Min.Y)
+        if (point.Y < Min.Y)
         {
             Min.Y = point.Y;
         }
 
-        if(point.Z < Min.Z)
+        if (point.Z < Min.Z)
         {
             Min.Z = point.Z;
         }
 
-        if(point.X > Max.X)
+        if (point.X > Max.X)
         {
             Max.X = point.X;
         }
 
-        if(point.Y > Max.Y)
+        if (point.Y > Max.Y)
         {
             Max.Y = point.Y;
         }
 
-        if(point.Z > Max.Z)
+        if (point.Z > Max.Z)
         {
             Max.Z = point.Z;
         }
@@ -98,32 +98,32 @@ public struct AABB : IBinarySerializable, IIntersectable<Vector3>, IIntersectabl
 
     public void Add(AABB other)
     {
-        if(other.Min.X < Min.X)
+        if (other.Min.X < Min.X)
         {
             Min.X = other.Min.X;
         }
 
-        if(other.Min.Y < Min.Y)
+        if (other.Min.Y < Min.Y)
         {
             Min.Y = other.Min.Y;
         }
 
-        if(other.Min.Z < Min.Z)
+        if (other.Min.Z < Min.Z)
         {
             Min.Z = other.Min.Z;
         }
 
-        if(other.Max.X > Max.X)
+        if (other.Max.X > Max.X)
         {
             Max.X = other.Max.X;
         }
 
-        if(other.Max.Y > Max.Y)
+        if (other.Max.Y > Max.Y)
         {
             Max.Y = other.Max.Y;
         }
 
-        if(other.Max.Z > Max.Z)
+        if (other.Max.Z > Max.Z)
         {
             Max.Z = other.Max.Z;
         }

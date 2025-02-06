@@ -85,7 +85,7 @@ public class QTEParam : BaseParam
         Field100 = reader.ReadString(StringBinaryFormat.FixedLength, 64);
         Field140 = reader.ReadString(StringBinaryFormat.FixedLength, 64);
 
-        if(game == GameType.ShadowGenerations)
+        if (game == GameType.ShadowGenerations)
         {
             Field180 = reader.ReadString(StringBinaryFormat.FixedLength, 64);
             Field1C0 = reader.Read<uint>();
@@ -131,7 +131,7 @@ public class QTEParam : BaseParam
         writer.WriteString(StringBinaryFormat.FixedLength, Field100, 64);
         writer.WriteString(StringBinaryFormat.FixedLength, Field140, 64);
 
-        if(game == GameType.ShadowGenerations)
+        if (game == GameType.ShadowGenerations)
         {
             writer.WriteString(StringBinaryFormat.FixedLength, Field180, 64);
             writer.Write(Field1C0);
@@ -140,7 +140,7 @@ public class QTEParam : BaseParam
 
     public override int GetTypeID(GameType game)
     {
-        switch(game)
+        switch (game)
         {
             case GameType.Frontiers:
                 return (int)FrontiersParams.QTE;

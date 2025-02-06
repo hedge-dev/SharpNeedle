@@ -13,7 +13,7 @@ public struct BinaryPointer<T> : IBinarySerializable where T : IBinarySerializab
     public void Read(BinaryObjectReader reader)
     {
         long offset = reader.ReadOffsetValue();
-        if(offset == 0)
+        if (offset == 0)
         {
             return;
         }
@@ -24,7 +24,7 @@ public struct BinaryPointer<T> : IBinarySerializable where T : IBinarySerializab
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly void Write(BinaryObjectWriter writer)
     {
-        if(Value is null)
+        if (Value is null)
         {
             writer.WriteOffsetValue(0);
         }
@@ -58,7 +58,7 @@ public struct BinaryPointer<T, TContext> : IBinarySerializable<TContext> where T
     public void Read(BinaryObjectReader reader, TContext context)
     {
         long offset = reader.ReadOffsetValue();
-        if(offset == 0)
+        if (offset == 0)
         {
             return;
         }
@@ -69,7 +69,7 @@ public struct BinaryPointer<T, TContext> : IBinarySerializable<TContext> where T
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly void Write(BinaryObjectWriter writer, TContext context)
     {
-        if(Value is null)
+        if (Value is null)
         {
             writer.WriteOffsetValue(0);
         }

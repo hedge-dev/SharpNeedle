@@ -46,7 +46,7 @@ public class Package : ResourceBase, IBinarySerializable, IStreamable
         {
             int hash = 0;
 
-            foreach(char c in str)
+            foreach (char c in str)
             {
                 hash = (hash * 31) + c;
             }
@@ -70,7 +70,7 @@ public class Package : ResourceBase, IBinarySerializable, IStreamable
 
     public EntryInfo FindEntry(string name)
     {
-        if(!TryFindEntry(name, out EntryInfo result))
+        if (!TryFindEntry(name, out EntryInfo result))
         {
             throw new KeyNotFoundException($"Package has no entry with the name \"{name}\"!");
         }
@@ -82,9 +82,9 @@ public class Package : ResourceBase, IBinarySerializable, IStreamable
     {
         int hash = EntryInfo.ComputeHash(name);
 
-        foreach(EntryInfo currentEntry in Entries)
+        foreach (EntryInfo currentEntry in Entries)
         {
-            if(currentEntry.Hash == hash)
+            if (currentEntry.Hash == hash)
             {
                 entry = currentEntry;
                 return true;
@@ -123,12 +123,12 @@ public class Package : ResourceBase, IBinarySerializable, IStreamable
 
     public void Read(BinaryObjectReader reader)
     {
-        if(reader.ReadInt32() != 0x4E545350)
+        if (reader.ReadInt32() != 0x4E545350)
         {
             throw new InvalidDataException("Invalid signature, expected NTSP");
         }
 
-        if(reader.ReadInt32() != 1)
+        if (reader.ReadInt32() != 1)
         {
             throw new InvalidDataException("Invalid version, expected 1");
         }
@@ -137,12 +137,12 @@ public class Package : ResourceBase, IBinarySerializable, IStreamable
         int blockCount = reader.ReadInt32();
         reader.Skip(8); // header size
 
-        for(int i = 0; i < entryCount; i++)
+        for (int i = 0; i < entryCount; i++)
         {
             Entries.Add(reader.ReadObject<EntryInfo>());
         }
 
-        for(int i = 0; i < blockCount; i++)
+        for (int i = 0; i < blockCount; i++)
         {
             Blocks.Add(reader.ReadObject<DataBlock>());
         }
@@ -158,7 +158,7 @@ public class Package : ResourceBase, IBinarySerializable, IStreamable
         long headerSizePosition = writer.Position;
         writer.WriteNulls(8); // header size placeholder
 
-        foreach(EntryInfo entry in Entries)
+        foreach (EntryInfo entry in Entries)
         {
             entry.Write(writer);
         }
@@ -176,7 +176,7 @@ public class Package : ResourceBase, IBinarySerializable, IStreamable
 
         writer.Seek(blockStartPosition, SeekOrigin.Begin);
 
-        foreach(DataBlock block in Blocks)
+        foreach (DataBlock block in Blocks)
         {
             block.Write(writer);
         }
@@ -188,7 +188,7 @@ public class Package : ResourceBase, IBinarySerializable, IStreamable
 
     public void LoadToMemory()
     {
-        foreach(DataBlock block in Blocks)
+        foreach (DataBlock block in Blocks)
         {
             block.EnsureData();
         }

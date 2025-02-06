@@ -39,12 +39,12 @@ public class SliceCastData : IImageDataBase
         Surface.CropRefs.Capacity = reader.Read<short>();
         reader.Skip(2); // Alignment
 
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.Align(8);
         }
 
-        if(Surface.CropRefs.Capacity != 0)
+        if (Surface.CropRefs.Capacity != 0)
         {
             Surface.CropRefs.AddRange(reader.ReadArrayOffset<CropRef>(Surface.CropRefs.Capacity));
         }
@@ -54,7 +54,7 @@ public class SliceCastData : IImageDataBase
         }
 
         EffectType type = reader.Read<EffectType>();
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.Align(8);
         }
@@ -81,12 +81,12 @@ public class SliceCastData : IImageDataBase
         writer.Write((short)Surface.CropRefs.Count);
         writer.Write((short)0); // Alignment
 
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             writer.Align(8);
         }
 
-        if(Surface.CropRefs.Count != 0)
+        if (Surface.CropRefs.Count != 0)
         {
             writer.WriteCollectionOffset(Surface.CropRefs);
         }
@@ -96,7 +96,7 @@ public class SliceCastData : IImageDataBase
         }
 
         writer.Write(Effect?.Type ?? EffectType.None);
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             writer.Align(8);
         }

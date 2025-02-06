@@ -27,7 +27,7 @@ public class KeyFrameList : IBinarySerializable, IList<KeyFrame>
     {
         reader.ReadOffset(() => reader.ReadOffset(() => reader.ReadOffset(() =>
                 {
-                    foreach(KeyFrame frame in Frames)
+                    foreach (KeyFrame frame in Frames)
                     {
                         frame.Correction = reader.ReadValueOffset<AspectRatioCorrection>();
                     }
@@ -38,7 +38,7 @@ public class KeyFrameList : IBinarySerializable, IList<KeyFrame>
     {
         writer.WriteOffset(() => writer.WriteOffset(() => writer.WriteOffset(() =>
                 {
-                    foreach(KeyFrame frame in Frames)
+                    foreach (KeyFrame frame in Frames)
                     {
                         writer.WriteValueOffset(frame.Correction ?? default);
                     }

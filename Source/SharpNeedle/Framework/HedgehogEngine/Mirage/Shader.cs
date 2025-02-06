@@ -14,7 +14,7 @@ public class Shader : SampleChunkResource
 
         reader.ReadOffset(() =>
         {
-            for(int i = 0; i < paramCount; i++)
+            for (int i = 0; i < paramCount; i++)
             {
                 Parameters.Add(reader.ReadStringOffsetOrEmpty());
             }
@@ -23,14 +23,14 @@ public class Shader : SampleChunkResource
 
     public override void Write(BinaryObjectWriter writer)
     {
-        if(ByteCode == null)
+        if (ByteCode == null)
         {
             throw new InvalidOperationException("ByteCode is null");
         }
 
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Path.GetFileNameWithoutExtension(ByteCode.Value.Name));
 
-        if(Parameters.Count == 0)
+        if (Parameters.Count == 0)
         {
             writer.WriteOffsetValue(0);
             writer.WriteOffsetValue(0);
@@ -40,7 +40,7 @@ public class Shader : SampleChunkResource
         writer.WriteOffsetValue(Parameters.Count);
         writer.WriteOffset(() =>
         {
-            foreach(ResourceReference<ShaderParameter> parameter in Parameters)
+            foreach (ResourceReference<ShaderParameter> parameter in Parameters)
             {
                 writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Path.GetFileNameWithoutExtension(parameter.Name));
             }

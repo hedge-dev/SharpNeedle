@@ -23,7 +23,7 @@ public class LODInfoBlock : NeedleArchiveBlock
     public List<LODItem> Items { get; set; } = [];
 
 
-    public LODInfoBlock() : base("lodinfo") 
+    public LODInfoBlock() : base("lodinfo")
     {
         Version = 1;
     }
@@ -42,17 +42,17 @@ public class LODInfoBlock : NeedleArchiveBlock
 
         LODItem[] items = new LODItem[32];
 
-        for(int i = 0; i < items.Length; i++)
+        for (int i = 0; i < items.Length; i++)
         {
             items[i].CascadeFlag = reader.ReadInt32();
         }
 
-        for(int i = 0; i < items.Length; i++)
+        for (int i = 0; i < items.Length; i++)
         {
             items[i].Unknown2 = reader.ReadSingle();
         }
 
-        for(int i = 0; i < items.Length; i++)
+        for (int i = 0; i < items.Length; i++)
         {
             items[i].CascadeLevel = reader.ReadByte();
         }
@@ -62,7 +62,7 @@ public class LODInfoBlock : NeedleArchiveBlock
 
     protected override void WriteBlockData(BinaryObjectWriter writer, string filename, NeedleArchvieDataOffsetMode offsetMode)
     {
-        if(Items.Count > 32)
+        if (Items.Count > 32)
         {
             throw new InvalidOperationException($"LOD Info has too many items! Must be <= 32, is {Items.Count}");
         }
@@ -71,21 +71,21 @@ public class LODInfoBlock : NeedleArchiveBlock
         writer.WriteByte((byte)Items.Count);
         writer.Align(4);
 
-        for(int i = 0; i < Items.Count; i++)
+        for (int i = 0; i < Items.Count; i++)
         {
             writer.WriteInt32(Items[i].CascadeFlag);
         }
 
         writer.WriteNulls(4 * (32 - Items.Count));
 
-        for(int i = 0; i < Items.Count; i++)
+        for (int i = 0; i < Items.Count; i++)
         {
             writer.WriteSingle(Items[i].Unknown2);
         }
 
         writer.WriteNulls(4 * (32 - Items.Count));
 
-        for(int i = 0; i < Items.Count; i++)
+        for (int i = 0; i < Items.Count; i++)
         {
             writer.WriteByte(Items[i].CascadeLevel);
         }

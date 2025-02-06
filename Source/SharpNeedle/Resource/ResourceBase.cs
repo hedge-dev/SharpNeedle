@@ -15,7 +15,7 @@ public abstract class ResourceBase : IResource
 
     public void Dispose()
     {
-        if(Disposed)
+        if (Disposed)
         {
             return;
         }
@@ -30,7 +30,7 @@ public abstract class ResourceBase : IResource
 
     protected virtual void Dispose(bool disposing)
     {
-        if(disposing)
+        if (disposing)
         {
             BaseFile?.Dispose();
         }
@@ -46,12 +46,12 @@ public abstract class ResourceBase : IResource
     /// </summary>
     public void Save()
     {
-        if(this is IStreamable streamable)
+        if (this is IStreamable streamable)
         {
             streamable.LoadToMemory();
         }
 
-        if(BaseFile == null)
+        if (BaseFile == null)
         {
             throw new IOException("No BaseFile to save to!");
         }

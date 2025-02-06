@@ -6,10 +6,10 @@ public class AggregateResourceResolver : List<IResourceResolver>, IResourceResol
 {
     public TRes? Open<TRes>(string fileName, bool resolveDependencies = true) where TRes : IResource, new()
     {
-        foreach(IResourceResolver resolver in this)
+        foreach (IResourceResolver resolver in this)
         {
             TRes? res = resolver.Open<TRes>(fileName, resolveDependencies);
-            if(res != null)
+            if (res != null)
             {
                 return res;
             }
@@ -20,10 +20,10 @@ public class AggregateResourceResolver : List<IResourceResolver>, IResourceResol
 
     public IFile? GetFile(string filename)
     {
-        foreach(IResourceResolver resolver in this)
+        foreach (IResourceResolver resolver in this)
         {
             IFile? file = resolver.GetFile(filename);
-            if(file != null)
+            if (file != null)
             {
                 return file;
             }

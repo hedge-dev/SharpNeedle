@@ -15,7 +15,7 @@ public class LightIndexMeshGroup : List<LightIndexMesh>, IBinarySerializable
 
         void AddMeshes(BinaryList<BinaryPointer<LightIndexMesh>> meshes, MeshSlot slot)
         {
-            foreach(BinaryPointer<LightIndexMesh> mesh in meshes)
+            foreach (BinaryPointer<LightIndexMesh> mesh in meshes)
             {
                 mesh.Value.Slot = slot;
                 Add(mesh);
@@ -34,7 +34,7 @@ public class LightIndexMeshGroup : List<LightIndexMesh>, IBinarySerializable
             writer.Write(meshes.Count());
             writer.WriteOffset(() =>
             {
-                foreach(LightIndexMesh mesh in meshes)
+                foreach (LightIndexMesh mesh in meshes)
                 {
                     writer.WriteObjectOffset(mesh);
                 }

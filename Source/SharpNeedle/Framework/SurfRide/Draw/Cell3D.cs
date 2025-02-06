@@ -24,7 +24,7 @@ public class Cell3D : ICell
         Field09 = reader.Read<byte>();
         Field0A = reader.Read<byte>();
         Field0B = reader.Read<byte>();
-        if(options.Version >= 4)
+        if (options.Version >= 4)
         {
             reader.Align(16);
             Position = reader.Read<Vector3>();
@@ -54,7 +54,7 @@ public class Cell3D : ICell
         writer.Write(Field09);
         writer.Write(Field0A);
         writer.Write(Field0B);
-        if(options.Version >= 4)
+        if (options.Version >= 4)
         {
             writer.Align(16);
             writer.Write(Position);

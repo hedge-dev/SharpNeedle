@@ -33,7 +33,7 @@ public struct CastInfo : IBinarySerializable
         Unsafe.As<Color<byte>, uint>(ref GradientBottomLeft) = reader.Read<uint>();
         Unsafe.As<Color<byte>, uint>(ref GradientTopRight) = reader.Read<uint>();
         Unsafe.As<Color<byte>, uint>(ref GradientBottomRight) = reader.Read<uint>();
-        
+
         Field30 = reader.Read<uint>();
         Field34 = reader.Read<uint>();
         Field38 = reader.Read<uint>();

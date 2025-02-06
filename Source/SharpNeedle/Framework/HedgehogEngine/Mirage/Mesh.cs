@@ -1,7 +1,6 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Mirage;
 
 using SharpNeedle.Structs;
-using System.Diagnostics;
 using System.Text.Json.Serialization;
 
 public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
@@ -28,10 +27,10 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
 
         reader.ReadOffset(() =>
         {
-            while(true)
+            while (true)
             {
                 VertexElement element = reader.Read<VertexElement>();
-                if(element.Format == VertexFormat.Invalid)
+                if (element.Format == VertexFormat.Invalid)
                 {
                     break;
                 }
@@ -43,12 +42,12 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
 
         int boneCount = reader.ReadInt32();
 
-        if(boneCount == 0)
+        if (boneCount == 0)
         {
             BoneIndices = [];
             reader.ReadOffsetValue();
         }
-        else if(version >= 6)
+        else if (version >= 6)
         {
             BoneIndices = reader.ReadArrayOffset<short>(boneCount);
         }
@@ -77,7 +76,7 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
 
         writer.WriteOffset(() =>
         {
-            foreach(VertexElement element in Elements)
+            foreach (VertexElement element in Elements)
             {
                 writer.Write(element);
                 writer.Align(4);
@@ -87,12 +86,12 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
         });
 
         writer.Write(BoneIndices.Length);
-        if(BoneIndices.Length == 0)
+        if (BoneIndices.Length == 0)
         {
             writer.WriteOffsetValue(0);
         }
         else
-        if(version >= 6)
+        if (version >= 6)
         {
             writer.WriteArrayOffset(BoneIndices);
         }
@@ -102,7 +101,7 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
         }
 
         writer.Write(Textures.Count);
-        if(Textures.Count == 0)
+        if (Textures.Count == 0)
         {
             writer.WriteOffsetValue(0);
         }
@@ -110,7 +109,7 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
         {
             writer.WriteOffset(() =>
             {
-                foreach(TextureUnit texture in Textures)
+                foreach (TextureUnit texture in Textures)
                 {
                     writer.WriteObjectOffset(texture);
                 }
@@ -120,7 +119,7 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
 
     public void SwapVertexEndianness()
     {
-        if(Vertices.Length == 0)
+        if (Vertices.Length == 0)
         {
             return;
         }
@@ -136,19 +135,19 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
 
     public void ResolveDependencies(IResourceResolver resolver)
     {
-        if(Material.IsValid())
+        if (Material.IsValid())
         {
             return;
         }
 
         string resource = $"{Material.Name}.material";
-        Material = resolver.Open<Material>(resource) 
+        Material = resolver.Open<Material>(resource)
             ?? throw new ResourceResolveException("Failed to resolve Material", [resource]);
     }
 
     public void WriteDependencies(IDirectory dir)
     {
-        if(!Material.IsValid())
+        if (!Material.IsValid())
         {
             return;
         }
@@ -204,7 +203,7 @@ public struct MeshSlot
     {
         Type = type;
 
-        if(type == Mesh.Type.Special)
+        if (type == Mesh.Type.Special)
         {
             Name = name;
         }
@@ -213,7 +212,7 @@ public struct MeshSlot
     public MeshSlot(string name)
     {
         Name = default;
-        switch(name.ToLower())
+        switch (name.ToLower())
         {
             case "opaq":
             case "opaque":
@@ -250,13 +249,13 @@ public struct MeshSlot
 
     public readonly override bool Equals(object? obj)
     {
-        if(obj is Mesh.Type type)
+        if (obj is Mesh.Type type)
         {
             return this == type;
         }
-        else if(obj is MeshSlot slot)
+        else if (obj is MeshSlot slot)
         {
-            if(slot.Type == Mesh.Type.Special && Type == Mesh.Type.Special)
+            if (slot.Type == Mesh.Type.Special && Type == Mesh.Type.Special)
             {
                 return slot.Name == Name;
             }

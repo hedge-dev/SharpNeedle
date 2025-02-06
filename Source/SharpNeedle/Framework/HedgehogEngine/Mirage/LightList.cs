@@ -11,7 +11,7 @@ public class LightList : SampleChunkResource
         Lights = new(count);
         reader.ReadOffset(() =>
         {
-            for(int i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
                 Lights.Add(new(reader.ReadStringOffsetOrEmpty()));
             }
@@ -24,7 +24,7 @@ public class LightList : SampleChunkResource
         writer.Write(count);
         writer.WriteOffset(() =>
         {
-            foreach(ResourceReference<Light> light in Lights)
+            foreach (ResourceReference<Light> light in Lights)
             {
                 writer.WriteStringOffset(StringBinaryFormat.NullTerminated, light.Name);
             }
@@ -33,14 +33,14 @@ public class LightList : SampleChunkResource
 
     public override void WriteDependencies(IDirectory dir)
     {
-        if(Lights == null)
+        if (Lights == null)
         {
             return;
         }
 
-        foreach(ResourceReference<Light> light in Lights)
+        foreach (ResourceReference<Light> light in Lights)
         {
-            if(!light.IsValid())
+            if (!light.IsValid())
             {
                 continue;
             }
@@ -53,12 +53,12 @@ public class LightList : SampleChunkResource
 
     public override IEnumerable<ResourceDependency> GetDependencies()
     {
-        if(Lights.Count == 0)
+        if (Lights.Count == 0)
         {
             yield break;
         }
 
-        foreach(ResourceReference<Light> light in Lights)
+        foreach (ResourceReference<Light> light in Lights)
         {
             yield return new ResourceDependency()
             {
@@ -72,11 +72,11 @@ public class LightList : SampleChunkResource
     {
         List<string> unresolved = [];
 
-        for(int i = 0; i < Lights.Count; i++)
+        for (int i = 0; i < Lights.Count; i++)
         {
             ResourceReference<Light> light = Lights[i];
 
-            if(light.IsValid())
+            if (light.IsValid())
             {
                 continue;
             }
@@ -84,7 +84,7 @@ public class LightList : SampleChunkResource
             string filename = $"{light.Name}{Light.Extension}";
             light.Resource = resolver.Open<Light>(filename);
 
-            if(light.Resource == null)
+            if (light.Resource == null)
             {
                 unresolved.Add(filename);
             }
@@ -94,7 +94,7 @@ public class LightList : SampleChunkResource
             }
         }
 
-        if(unresolved.Count > 0)
+        if (unresolved.Count > 0)
         {
             throw new ResourceResolveException($"Failed to resolve {unresolved.Count} lights!", [.. unresolved]);
         }

@@ -24,7 +24,7 @@ public class TextureMirage : IBinarySerializable, ITexture
 
     public void Write(BinaryObjectWriter writer)
     {
-        if(Name == null)
+        if (Name == null)
         {
             writer.WriteOffsetValue(0);
         }

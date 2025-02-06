@@ -35,12 +35,12 @@ public class ArchiveFile : IFile
 
     public void EnsureData()
     {
-        if(DataStream != null)
+        if (DataStream != null)
         {
             return;
         }
 
-        if(Parent.BaseStream == null)
+        if (Parent.BaseStream == null)
         {
             throw new InvalidDataException("Parent archvie has no stream");
         }
@@ -54,18 +54,18 @@ public class ArchiveFile : IFile
 
     public Stream Open(FileAccess access)
     {
-        if(access.HasFlag(FileAccess.Write))
+        if (access.HasFlag(FileAccess.Write))
         {
             EnsureData();
         }
 
-        if(DataStream != null)
+        if (DataStream != null)
         {
             DataStream.Position = 0;
             return new WrappedStream<MemoryStream>(DataStream);
         }
 
-        if(Parent.BaseStream == null)
+        if (Parent.BaseStream == null)
         {
             throw new InvalidDataException("Parent archvie has no stream");
         }

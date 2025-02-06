@@ -22,12 +22,12 @@ public class Motion : IBinarySerializable
         Scene = scene;
 
         // Attach to families that we don't have
-        for(int i = FamilyMotions.Count; i < scene.Families.Count; i++)
+        for (int i = FamilyMotions.Count; i < scene.Families.Count; i++)
         {
             FamilyMotions.Add(new FamilyMotion(scene.Families[i]));
         }
 
-        for(int i = 0; i < FamilyMotions.Count; i++)
+        for (int i = 0; i < FamilyMotions.Count; i++)
         {
             scene.Families[i].AttachMotion(FamilyMotions[i]);
         }
@@ -40,12 +40,12 @@ public class Motion : IBinarySerializable
 
     public void Write(BinaryObjectWriter writer)
     {
-        if(Scene == null)
+        if (Scene == null)
         {
             throw new InvalidOperationException("Scene is null!");
         }
 
-        if(FamilyMotions.Any(x => x.Family == null))
+        if (FamilyMotions.Any(x => x.Family == null))
         {
             throw new InvalidOperationException("Not all family motions have a family!");
         }
@@ -54,14 +54,14 @@ public class Motion : IBinarySerializable
         FamilyMotions.RemoveAll(x => !Scene.Families.Contains(x.Family!));
 
         // Sanity checks
-        for(int i = FamilyMotions.Count; i < Scene.Families.Count; i++)
+        for (int i = FamilyMotions.Count; i < Scene.Families.Count; i++)
         {
             FamilyMotions.Add(new FamilyMotion(Scene.Families[i]));
         }
 
-        for(int i = 0; i < FamilyMotions.Count; i++)
+        for (int i = 0; i < FamilyMotions.Count; i++)
         {
-            if(Scene.Families[i] == FamilyMotions[i].Family)
+            if (Scene.Families[i] == FamilyMotions[i].Family)
             {
                 continue;
             }
@@ -80,7 +80,7 @@ public class Motion : IBinarySerializable
     {
         reader.ReadOffset(() =>
         {
-            foreach(FamilyMotion motion in FamilyMotions)
+            foreach (FamilyMotion motion in FamilyMotions)
             {
                 motion.ReadExtended(reader);
             }
@@ -91,7 +91,7 @@ public class Motion : IBinarySerializable
     {
         writer.WriteOffset(() =>
         {
-            foreach(FamilyMotion motion in FamilyMotions)
+            foreach (FamilyMotion motion in FamilyMotions)
             {
                 motion.WriteExtended(writer);
             }

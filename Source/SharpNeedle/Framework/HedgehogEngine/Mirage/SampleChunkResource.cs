@@ -10,7 +10,7 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
     public void SetupNodes()
     {
         NeedleResourceAttribute? attribute = GetType().GetCustomAttribute<NeedleResourceAttribute>();
-        if(attribute == null || attribute.Type == ResourceType.Raw)
+        if (attribute == null || attribute.Type == ResourceType.Raw)
         {
             SetupNodes(GetType().Name);
             return;
@@ -51,7 +51,7 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
         SampleChunkNode.Flags v2Flags = reader.Read<SampleChunkNode.Flags>();
         reader.Seek(-4, SeekOrigin.Current);
 
-        if(v2Flags.HasFlag(SampleChunkNode.Flags.Root))
+        if (v2Flags.HasFlag(SampleChunkNode.Flags.Root))
         {
             ReadResourceV2(reader);
         }
@@ -69,7 +69,7 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
         uint dataSize = reader.Read<uint>();
         long dataOffset = reader.ReadOffsetValue();
 
-        using(SeekToken token = reader.At())
+        using (SeekToken token = reader.At())
         {
             // Using a substream to ensure we can't read outside the nodes data
             SubStream dataStream = new(reader.GetBaseStream(), dataOffset, dataSize);
@@ -80,7 +80,7 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
         reader.ReadOffsetValue(); // offset table 
 
         string? name = reader.ReadStringOffset();
-        if(!string.IsNullOrEmpty(name))
+        if (!string.IsNullOrEmpty(name))
         {
             Name = Path.GetFileNameWithoutExtension(name);
         }
@@ -97,17 +97,17 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
         DataVersion = contexts.Value;
 
         SampleChunkNode? dataNode = contexts;
-        while(dataNode != null && dataNode.DataSize == 0)
+        while (dataNode != null && dataNode.DataSize == 0)
         {
             dataNode = dataNode.Parent;
         }
 
-        if(dataNode == null || dataNode == Root)
+        if (dataNode == null || dataNode == Root)
         {
             throw new InvalidDataException("No data found!");
         }
 
-        using(SeekToken token = reader.At())
+        using (SeekToken token = reader.At())
         {
             // Using a substream to ensure we can't read outside the nodes data
             SubStream dataStream = new(reader.GetBaseStream(), dataNode.DataOffset, dataNode.DataSize);
@@ -140,13 +140,13 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
 
     public void WriteResource(BinaryObjectWriter writer, bool writeNodes, string filename)
     {
-        if(!writeNodes)
+        if (!writeNodes)
         {
             WriteResourceV1(filename, writer);
         }
         else
         {
-            if(Root == null)
+            if (Root == null)
             {
                 SetupNodes();
             }
@@ -195,7 +195,7 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
         {
             long[] offsets = writer.OffsetHandler.OffsetPositions.ToArray();
             writer.Write(offsets.Length - 1);
-            for(int i = 0; i < offsets.Length - 1; i++)
+            for (int i = 0; i < offsets.Length - 1; i++)
             {
                 writer.Write((uint)(offsets[i] - baseOffset));
             }
@@ -221,7 +221,7 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
     private void WriteResourceV2(BinaryObjectWriter writer)
     {
         SampleChunkNode? contexts = Root?.FindNode("Contexts");
-        if(contexts != null)
+        if (contexts != null)
         {
             contexts.Value = DataVersion;
         }

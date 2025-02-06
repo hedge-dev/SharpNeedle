@@ -54,7 +54,7 @@ public class Node : IBinarySerializable<GameType>
 
         Name = reader.ReadDiString(64);
 
-        switch((NodeType)Type)
+        switch ((NodeType)Type)
         {
             case NodeType.Path:
                 Data = new PathData(reader, game);

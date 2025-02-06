@@ -29,9 +29,9 @@ public class SrdProject : ResourceBase, IBinarySerializable<uint>
     public void Read(BinaryObjectReader reader, uint version)
     {
         InfoChunk info = reader.ReadObject<InfoChunk, ChunkBinaryOptions>(new() { Version = version });
-        foreach(IChunk chunk in info.Chunks)
+        foreach (IChunk chunk in info.Chunks)
         {
-            switch(chunk)
+            switch (chunk)
             {
                 case ProjectChunk project:
                     Project = project;
@@ -53,12 +53,12 @@ public class SrdProject : ResourceBase, IBinarySerializable<uint>
             Version = Version
         };
 
-        if(TextureLists != null)
+        if (TextureLists != null)
         {
             info.Chunks.Add(TextureLists);
         }
 
-        if(Project != null)
+        if (Project != null)
         {
             info.Chunks.Add(Project);
         }

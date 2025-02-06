@@ -25,7 +25,7 @@ public class Family : IBinarySerializable<Scene>, IList<Cast>
         CastBuffer = new List<Cast>(castCount);
         reader.ReadOffset(() =>
         {
-            for(int i = 0; i < castCount; i++)
+            for (int i = 0; i < castCount; i++)
             {
                 CastBuffer.Add(reader.ReadObjectOffset<Cast, Family>(this));
             }
@@ -33,18 +33,18 @@ public class Family : IBinarySerializable<Scene>, IList<Cast>
 
         int root = reader.Read<int>();
         TreeDescriptorNode[] tree = reader.ReadArrayOffset<TreeDescriptorNode>(CastBuffer.Count);
-        if(CastBuffer.Count != 0)
+        if (CastBuffer.Count != 0)
         {
             ParseTree(root);
         }
 
         Children = new List<Cast>(CastBuffer.Count);
-        for(int i = 0; i < CastBuffer.Count; i++)
+        for (int i = 0; i < CastBuffer.Count; i++)
         {
             Cast cast = CastBuffer[i];
             cast.Priority = i;
             cast.Family = this;
-            if(cast.Parent == null)
+            if (cast.Parent == null)
             {
                 Children.Add(cast);
             }
@@ -54,15 +54,15 @@ public class Family : IBinarySerializable<Scene>, IList<Cast>
         {
             TreeDescriptorNode node = tree[idx];
 
-            if(node.ChildIndex != -1)
+            if (node.ChildIndex != -1)
             {
                 CastBuffer[idx].Add(CastBuffer[node.ChildIndex]);
                 ParseTree(node.ChildIndex, idx);
             }
 
-            if(node.SiblingIndex != -1)
+            if (node.SiblingIndex != -1)
             {
-                if(p != -1)
+                if (p != -1)
                 {
                     CastBuffer[p].Add(CastBuffer[node.SiblingIndex]);
                 }
@@ -77,7 +77,7 @@ public class Family : IBinarySerializable<Scene>, IList<Cast>
         writer.Write(CastBuffer.Count);
         writer.WriteOffset(() =>
         {
-            foreach(Cast cast in CastBuffer)
+            foreach (Cast cast in CastBuffer)
             {
                 writer.WriteObjectOffset(cast, this);
             }
@@ -88,7 +88,7 @@ public class Family : IBinarySerializable<Scene>, IList<Cast>
         TreeDescriptorNode[] nodes = new TreeDescriptorNode[CastBuffer.Count];
 
         // Initialise items because, the runtime doesn't
-        for(int i = 0; i < nodes.Length; i++)
+        for (int i = 0; i < nodes.Length; i++)
         {
             nodes[i] = new TreeDescriptorNode();
         }
@@ -99,17 +99,17 @@ public class Family : IBinarySerializable<Scene>, IList<Cast>
 
         void BuildTree(IList<Cast> casts)
         {
-            for(int i = 0; i < casts.Count; i++)
+            for (int i = 0; i < casts.Count; i++)
             {
                 Cast cast = casts[i];
                 int idx = CastBuffer.IndexOf(cast);
 
-                if(cast.Children.Count > 0)
+                if (cast.Children.Count > 0)
                 {
                     nodes[idx].ChildIndex = CastBuffer.IndexOf(cast.Children[0]);
                 }
 
-                if(i + 1 < casts.Count)
+                if (i + 1 < casts.Count)
                 {
                     nodes[idx].SiblingIndex = CastBuffer.IndexOf(casts[i + 1]);
                 }
@@ -142,7 +142,7 @@ public class Family : IBinarySerializable<Scene>, IList<Cast>
 
         cast.Family = this;
         CastBuffer.Add(cast);
-        foreach(Cast child in cast)
+        foreach (Cast child in cast)
         {
             TakeOwnership(child);
         }
@@ -151,7 +151,7 @@ public class Family : IBinarySerializable<Scene>, IList<Cast>
     private void Disown(Cast cast)
     {
         CastBuffer.Remove(cast);
-        foreach(Cast child in cast.Children)
+        foreach (Cast child in cast.Children)
         {
             Disown(child);
         }
@@ -172,23 +172,23 @@ public class Family : IBinarySerializable<Scene>, IList<Cast>
         Children.Add(item);
         TakeOwnership(item);
 
-        if(HasPriority(item))
+        if (HasPriority(item))
         {
             CastBuffer.Sort((x, y) => x.Priority - y.Priority);
         }
 
         static bool HasPriority(Cast cast)
         {
-            if(cast.Priority != 0)
+            if (cast.Priority != 0)
             {
                 return true;
             }
 
             bool hasPrio = false;
-            foreach(Cast child in cast)
+            foreach (Cast child in cast)
             {
                 hasPrio = HasPriority(child);
-                if(hasPrio)
+                if (hasPrio)
                 {
                     break;
                 }
@@ -200,7 +200,7 @@ public class Family : IBinarySerializable<Scene>, IList<Cast>
 
     public void Clear()
     {
-        foreach(Cast cast in CastBuffer)
+        foreach (Cast cast in CastBuffer)
         {
             cast.Family = null;
         }
@@ -221,7 +221,7 @@ public class Family : IBinarySerializable<Scene>, IList<Cast>
 
     public bool Remove(Cast item)
     {
-        if(item?.Family != this)
+        if (item?.Family != this)
         {
             return false;
         }

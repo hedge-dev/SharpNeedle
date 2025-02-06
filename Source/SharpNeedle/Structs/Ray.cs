@@ -18,7 +18,7 @@ public struct Ray : IIntersectable<Sphere>, IIntersectable<AABB>
         float tmax = Vector3.Dot(aabb.Max - Origin, Direction);
         float t1 = Math.Min(tmin, tmax);
         float t2 = Math.Max(tmin, tmax);
-        if(t1 > 0 && t2 > 0)
+        if (t1 > 0 && t2 > 0)
         {
             return Origin + (Direction * t1);
         }
@@ -34,7 +34,7 @@ public struct Ray : IIntersectable<Sphere>, IIntersectable<AABB>
 
         float discriminant = (b * b) - (4 * a * c);
 
-        if(discriminant < 0)
+        if (discriminant < 0)
         {
             return null;
         }
@@ -60,7 +60,7 @@ public struct Ray : IIntersectable<Sphere>, IIntersectable<AABB>
         float tmin = Vector3.Dot(aabb.Min - Origin, Direction) / Vector3.Dot(Direction, Direction);
         float tmax = Vector3.Dot(aabb.Max - Origin, Direction) / Vector3.Dot(Direction, Direction);
 
-        if(tmin > tmax)
+        if (tmin > tmax)
         {
             (tmin, tmax) = (tmax, tmin);
         }

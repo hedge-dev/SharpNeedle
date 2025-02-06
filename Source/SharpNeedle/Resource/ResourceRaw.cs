@@ -20,7 +20,7 @@ public class ResourceRaw : IResource
 
     public void Dispose()
     {
-        if(Disposed)
+        if (Disposed)
         {
             return;
         }
@@ -42,7 +42,7 @@ public class ResourceRaw : IResource
 
     public void Write(IFile file)
     {
-        if(Data == null)
+        if (Data == null)
         {
             throw new InvalidOperationException("Data is null");
         }

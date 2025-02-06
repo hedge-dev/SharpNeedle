@@ -29,7 +29,7 @@ public struct Version : IBinarySerializable
         Revision = r < 0x30 ? r : (byte)(r - 0x30);
 
         byte e = reader.Read<byte>();
-        switch(e)
+        switch (e)
         {
             case 0x4C:
                 Endianness = Endianness.Little;
@@ -43,7 +43,7 @@ public struct Version : IBinarySerializable
 
     public readonly void Write(BinaryObjectWriter writer)
     {
-        if(Major == 0)
+        if (Major == 0)
         {
             writer.Write(Major);
             writer.Write(Minor);
@@ -56,7 +56,7 @@ public struct Version : IBinarySerializable
             writer.Write((byte)(Revision + 0x30));
         }
 
-        switch(Endianness)
+        switch (Endianness)
         {
             case Endianness.Little:
                 writer.Write((byte)0x4C);

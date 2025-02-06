@@ -31,7 +31,7 @@ public class BulletShape : IBinarySerializable<int>
         Flags = (BulletShapeFlags)reader.ReadByte();
         reader.Align(4);
 
-        if(version == 3)
+        if (version == 3)
         {
             Layer = reader.ReadUInt32();
         }
@@ -43,27 +43,27 @@ public class BulletShape : IBinarySerializable<int>
 
         Unknown1 = reader.ReadUInt32();
 
-        if(version == 3)
+        if (version == 3)
         {
             Unknown2 = reader.ReadUInt32();
         }
 
         Vertices = reader.ReadArrayOffset<Vector3>((int)vertexCount);
 
-        if(IsConvex)
+        if (IsConvex)
         {
             reader.ReadOffsetValue(); // skip faces
             reader.ReadOffsetValue(); // skip bvh
         }
         else
         {
-            if(Flags.HasFlag(BulletShapeFlags.UShortIndexFormat))
+            if (Flags.HasFlag(BulletShapeFlags.UShortIndexFormat))
             {
                 Faces = new uint[faceCount * 3];
 
                 reader.ReadOffset(() =>
                 {
-                    for(int i = 0; i < Faces.Length; i++)
+                    for (int i = 0; i < Faces.Length; i++)
                     {
                         Faces[i] = reader.ReadUInt16();
                     }
@@ -77,7 +77,7 @@ public class BulletShape : IBinarySerializable<int>
             BVH = reader.ReadArrayOffset<byte>((int)bvhSize);
         }
 
-        if(version == 1)
+        if (version == 1)
         {
             Types = reader.ReadArrayOffset<ulong>((int)typeCount);
         }
@@ -87,7 +87,7 @@ public class BulletShape : IBinarySerializable<int>
 
             reader.ReadOffset(() =>
             {
-                for(int i = 0; i < Types.Length; i++)
+                for (int i = 0; i < Types.Length; i++)
                 {
                     Types[i] = reader.ReadUInt32();
                 }
@@ -97,7 +97,7 @@ public class BulletShape : IBinarySerializable<int>
 
     public void Write(BinaryObjectWriter writer, int version)
     {
-        if(IsConvex || Faces!.Any(x => x > ushort.MaxValue))
+        if (IsConvex || Faces!.Any(x => x > ushort.MaxValue))
         {
             Flags &= ~BulletShapeFlags.UShortIndexFormat;
         }
@@ -105,11 +105,11 @@ public class BulletShape : IBinarySerializable<int>
         {
             Flags |= BulletShapeFlags.UShortIndexFormat;
         }
-        
+
         writer.WriteByte((byte)Flags);
         writer.Align(4);
 
-        if(version == 3)
+        if (version == 3)
         {
             writer.WriteUInt32(Layer);
         }
@@ -120,25 +120,25 @@ public class BulletShape : IBinarySerializable<int>
         writer.WriteUInt32((uint)Types.Length);
         writer.WriteUInt32(Unknown1);
 
-        if(version == 3)
+        if (version == 3)
         {
             writer.WriteUInt32(Unknown2);
         }
 
         writer.WriteArrayOffset(Vertices, 0x10);
 
-        if(IsConvex)
+        if (IsConvex)
         {
             writer.WriteOffsetValue(0);
             writer.WriteOffsetValue(0);
         }
         else
         {
-            if(Flags.HasFlag(BulletShapeFlags.UShortIndexFormat))
+            if (Flags.HasFlag(BulletShapeFlags.UShortIndexFormat))
             {
                 writer.WriteOffset(() =>
                 {
-                    for(int i = 0; i < Faces!.Length; i++)
+                    for (int i = 0; i < Faces!.Length; i++)
                     {
                         writer.WriteUInt16((ushort)Faces[i]);
                     }
@@ -152,7 +152,7 @@ public class BulletShape : IBinarySerializable<int>
             writer.WriteArrayOffset(BVH, 0x10);
         }
 
-        if(version == 1)
+        if (version == 1)
         {
             writer.WriteArrayOffset(Types, 0x10);
         }
@@ -160,7 +160,7 @@ public class BulletShape : IBinarySerializable<int>
         {
             writer.WriteOffset(() =>
             {
-                for(int i = 0; i < Types!.Length; i++)
+                for (int i = 0; i < Types!.Length; i++)
                 {
                     writer.WriteUInt32((uint)Types[i]);
                 }
@@ -170,7 +170,7 @@ public class BulletShape : IBinarySerializable<int>
 
     public unsafe void GenerateBVH()
     {
-        if(Faces == null || Faces.Length == 0 || Vertices.Length == 0)
+        if (Faces == null || Faces.Length == 0 || Vertices.Length == 0)
         {
             BVH = [];
             return;
@@ -179,7 +179,7 @@ public class BulletShape : IBinarySerializable<int>
         Vector3 aabbMin = new(float.PositiveInfinity);
         Vector3 aabbMax = new(float.NegativeInfinity);
 
-        foreach(Vector3 vertex in Vertices)
+        foreach (Vector3 vertex in Vertices)
         {
             aabbMin = Vector3.Min(vertex, aabbMin);
             aabbMax = Vector3.Max(vertex, aabbMax);
@@ -196,7 +196,7 @@ public class BulletShape : IBinarySerializable<int>
         uint size = bvhBuider.CalculateSerializeBufferSize();
         BVH = new byte[size];
 
-        fixed(byte* bvh = BVH)
+        fixed (byte* bvh = BVH)
         {
             bvhBuider.SerializeInPlace((nint)bvh, (uint)BVH.Length, false);
         }

@@ -72,7 +72,7 @@ public class ShadowMesh : IBinarySerializable
         int bufferCount = reader.Read<int>();
         reader.ReadOffset(() =>
         {
-            for(int i = 0; i < bufferCount; i++)
+            for (int i = 0; i < bufferCount; i++)
             {
                 ShadowPrimitiveBuffer buffer = new();
                 buffer.Read(reader);
@@ -92,7 +92,7 @@ public class ShadowMesh : IBinarySerializable
         writer.Write(Buffers.Count);
         writer.WriteOffset(() =>
         {
-            foreach(ShadowPrimitiveBuffer buffer in Buffers)
+            foreach (ShadowPrimitiveBuffer buffer in Buffers)
             {
                 buffer.Write(writer);
             }
@@ -140,12 +140,12 @@ public struct ShadowVertex
 
     public void AddBlendWeight(int weight, int index)
     {
-        for(int i = 0; i < 4; i++)
+        for (int i = 0; i < 4; i++)
         {
             int offset = i * 8;
             int mask = 0xFF << offset;
 
-            if((BlendWeight & mask) != 0)
+            if ((BlendWeight & mask) != 0)
             {
                 continue;
             }

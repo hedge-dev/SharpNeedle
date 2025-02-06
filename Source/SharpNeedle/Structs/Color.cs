@@ -18,7 +18,7 @@ public struct Color<T> where T : struct, INumber<T>
 
     public Color(ReadOnlySpan<T> values)
     {
-        if(values.Length < 4)
+        if (values.Length < 4)
         {
             throw new IndexOutOfRangeException();
         }

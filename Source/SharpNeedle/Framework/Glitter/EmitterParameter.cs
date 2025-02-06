@@ -71,25 +71,25 @@ public class EmitterParameter : IBinarySerializable<EffectParameter>
         Field100 = reader.Read<int>();
         Field104 = reader.Read<int>();
 
-        for(int i = 0; i < Animations.Capacity; i++)
+        for (int i = 0; i < Animations.Capacity; i++)
         {
             Animations.Add(new());
 
             long animationOffset = reader.ReadOffsetValue();
-            if(animationOffset != 0)
+            if (animationOffset != 0)
             {
                 Animations[i] = reader.ReadObjectAtOffset<AnimationParameter>(animationOffset);
             }
         }
 
         long particleOffset = reader.ReadOffsetValue();
-        if(particleOffset != 0)
+        if (particleOffset != 0)
         {
             Particles.AddFirst(reader.ReadObjectAtOffset<ParticleParameter, EmitterParameter>(particleOffset, this));
         }
 
         long nextOffset = reader.ReadOffsetValue();
-        if(nextOffset != 0)
+        if (nextOffset != 0)
         {
             parent.Emitters.AddLast(reader.ReadObjectAtOffset<EmitterParameter>(nextOffset));
         }
@@ -136,9 +136,9 @@ public class EmitterParameter : IBinarySerializable<EffectParameter>
         writer.Write(Field100);
         writer.Write(Field104);
 
-        foreach(AnimationParameter animation in Animations)
+        foreach (AnimationParameter animation in Animations)
         {
-            if(animation.Keyframes.Count != 0)
+            if (animation.Keyframes.Count != 0)
             {
                 writer.WriteObjectOffset(animation);
             }
@@ -148,7 +148,7 @@ public class EmitterParameter : IBinarySerializable<EffectParameter>
             }
         }
 
-        if(Particles.First != null)
+        if (Particles.First != null)
         {
             writer.WriteObjectOffset(Particles.First.Value, this, 16);
         }
@@ -157,7 +157,7 @@ public class EmitterParameter : IBinarySerializable<EffectParameter>
             writer.WriteOffsetValue(0);
         }
 
-        if(parent.Emitters.Find(this)?.Next is LinkedListNode<EmitterParameter> emitter)
+        if (parent.Emitters.Find(this)?.Next is LinkedListNode<EmitterParameter> emitter)
         {
             writer.WriteObjectOffset(emitter.Value, parent, 16);
         }

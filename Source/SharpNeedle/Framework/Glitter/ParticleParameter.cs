@@ -116,13 +116,13 @@ public class ParticleParameter : IBinarySerializable<EmitterParameter>
         MultiPurposeColor = reader.Read<Vector4>().AsColor();
 
         long colorTableOffset = reader.ReadOffsetValue();
-        if(colorTableOffset != 0)
+        if (colorTableOffset != 0)
         {
             ColorTables.AddRange(reader.ReadArrayAtOffset<Color<float>>(colorTableOffset, reader.Read<int>()));
         }
 
         long colorTable2Offset = reader.ReadOffsetValue();
-        if(colorTable2Offset != 0)
+        if (colorTable2Offset != 0)
         {
             ColorTable2s.AddRange(reader.ReadArrayAtOffset<Color<float>>(colorTable2Offset, reader.Read<int>()));
         }
@@ -194,7 +194,7 @@ public class ParticleParameter : IBinarySerializable<EmitterParameter>
         Field1A0 = reader.Read<int>();
 
         long materialOffset = reader.ReadOffsetValue();
-        if(materialOffset != 0)
+        if (materialOffset != 0)
         {
             Material = reader.ReadObjectAtOffset<MaterialParameter>(materialOffset);
         }
@@ -206,7 +206,7 @@ public class ParticleParameter : IBinarySerializable<EmitterParameter>
         TextureAddressMode = reader.Read<ETextureAddressMode>();
 
         Field1BC = (int)reader.ReadOffsetValue();
-        if(ParticleType == EParticleType.Mesh && Field1BC != 0)
+        if (ParticleType == EParticleType.Mesh && Field1BC != 0)
         {
             Mesh = reader.ReadObjectAtOffset<MeshParameter>(Field1BC);
         }
@@ -226,19 +226,19 @@ public class ParticleParameter : IBinarySerializable<EmitterParameter>
 
         Flags = reader.Read<int>();
 
-        for(int i = 0; i < Animations.Capacity; i++)
+        for (int i = 0; i < Animations.Capacity; i++)
         {
             Animations.Add(new());
 
             long animationOffset = reader.ReadOffsetValue();
-            if(animationOffset != 0)
+            if (animationOffset != 0)
             {
                 Animations[i] = reader.ReadObjectAtOffset<AnimationParameter>(animationOffset);
             }
         }
 
         long nextOffset = reader.ReadOffsetValue();
-        if(nextOffset != 0)
+        if (nextOffset != 0)
         {
             parent.Particles.AddLast(reader.ReadObjectAtOffset<ParticleParameter>(nextOffset));
         }
@@ -270,7 +270,7 @@ public class ParticleParameter : IBinarySerializable<EmitterParameter>
 
         writer.WriteOffset(() =>
         {
-            foreach(Color<float> colorTable in ColorTables)
+            foreach (Color<float> colorTable in ColorTables)
             {
                 writer.Write(colorTable);
             }
@@ -279,7 +279,7 @@ public class ParticleParameter : IBinarySerializable<EmitterParameter>
 
         writer.WriteOffset(() =>
         {
-            foreach(Color<float> colorTable2 in ColorTable2s)
+            foreach (Color<float> colorTable2 in ColorTable2s)
             {
                 writer.Write(colorTable2);
             }
@@ -352,7 +352,7 @@ public class ParticleParameter : IBinarySerializable<EmitterParameter>
         writer.Write(Field19C);
         writer.Write(Field1A0);
 
-        if(Material != null)
+        if (Material != null)
         {
             writer.WriteObjectOffset(Material);
         }
@@ -367,7 +367,7 @@ public class ParticleParameter : IBinarySerializable<EmitterParameter>
         writer.Write(SecondaryBlend);
         writer.Write(TextureAddressMode);
 
-        if(ParticleType == EParticleType.Mesh && Mesh != null)
+        if (ParticleType == EParticleType.Mesh && Mesh != null)
         {
             writer.WriteObjectOffset(Mesh);
         }
@@ -391,9 +391,9 @@ public class ParticleParameter : IBinarySerializable<EmitterParameter>
 
         writer.Write(Flags);
 
-        foreach(AnimationParameter animation in Animations)
+        foreach (AnimationParameter animation in Animations)
         {
-            if(animation.Keyframes.Count != 0)
+            if (animation.Keyframes.Count != 0)
             {
                 writer.WriteObjectOffset(animation);
             }
@@ -403,7 +403,7 @@ public class ParticleParameter : IBinarySerializable<EmitterParameter>
             }
         }
 
-        if(parent.Particles.Find(this)?.Next is LinkedListNode<ParticleParameter> particle)
+        if (parent.Particles.Find(this)?.Next is LinkedListNode<ParticleParameter> particle)
         {
             writer.WriteObjectOffset(particle.Value, parent, 16);
         }

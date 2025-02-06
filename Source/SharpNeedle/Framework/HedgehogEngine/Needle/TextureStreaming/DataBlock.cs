@@ -14,7 +14,7 @@ public class DataBlock : IBinarySerializable
 
     public void Write(BinaryObjectWriter writer)
     {
-        if(DataStream == null)
+        if (DataStream == null)
         {
             throw new InvalidOperationException("Data block has no buffered data!");
         }
@@ -25,7 +25,7 @@ public class DataBlock : IBinarySerializable
 
     private void WriteData(BinaryObjectWriter writer)
     {
-        if(DataStream == null)
+        if (DataStream == null)
         {
             throw new InvalidOperationException("Datastream is null!");
         }
@@ -39,7 +39,7 @@ public class DataBlock : IBinarySerializable
 
     public void EnsureData()
     {
-        if(DataStream == null)
+        if (DataStream == null)
         {
             return;
         }

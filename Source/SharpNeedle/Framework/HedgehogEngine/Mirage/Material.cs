@@ -33,7 +33,7 @@ public class Material : SampleChunkResource
 
     public override void Read(BinaryObjectReader reader)
     {
-        if(Root != null)
+        if (Root != null)
         {
             DataVersion = 3;
         }
@@ -45,17 +45,17 @@ public class Material : SampleChunkResource
         long textureNamesOffset = 0;
         long texturesOffset = 0;
 
-        if(DataVersion <= 1)
+        if (DataVersion <= 1)
         {
             texsetNameOffset = reader.ReadOffsetValue();
             reader.Skip(4); // Reserved
         }
-        else if(DataVersion == 2)
+        else if (DataVersion == 2)
         {
             texsetNameOffset = reader.ReadOffsetValue();
             textureNamesOffset = reader.ReadOffsetValue();
         }
-        else if(DataVersion >= 3)
+        else if (DataVersion >= 3)
         {
             textureNamesOffset = reader.ReadOffsetValue();
             texturesOffset = reader.ReadOffsetValue();
@@ -79,10 +79,10 @@ public class Material : SampleChunkResource
         ReadParameters(IntParameters, intParamOffset, intParamsCount);
         ReadParameters(BoolParameters, boolParamOffset, boolParamsCount);
 
-        if(DataVersion >= 2)
+        if (DataVersion >= 2)
         {
             using SeekToken token = reader.AtOffset(textureNamesOffset);
-            for(byte i = 0; i < textureCount; i++)
+            for (byte i = 0; i < textureCount; i++)
             {
                 Texset.Textures.Add(new Texture
                 {
@@ -91,17 +91,17 @@ public class Material : SampleChunkResource
             }
         }
 
-        if(DataVersion <= 2)
+        if (DataVersion <= 2)
         {
             using SeekToken token = reader.AtOffset(texsetNameOffset);
             Texset.Name = reader.ReadString(StringBinaryFormat.NullTerminated);
         }
 
-        if(DataVersion >= 3)
+        if (DataVersion >= 3)
         {
             using SeekToken token = reader.AtOffset(texturesOffset);
 
-            foreach(Texture texture in Texset.Textures)
+            foreach (Texture texture in Texset.Textures)
             {
                 reader.ReadOffset(() => texture.Read(reader));
             }
@@ -110,13 +110,13 @@ public class Material : SampleChunkResource
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         void ReadParameters<T>(Dictionary<string, Parameter<T>> paramsOut, long offset, int count) where T : unmanaged
         {
-            if(offset == 0 || count == 0)
+            if (offset == 0 || count == 0)
             {
                 return;
             }
 
             using SeekToken token = reader.AtOffset(offset);
-            for(byte i = 0; i < count; i++)
+            for (byte i = 0; i < count; i++)
             {
                 global::SharpNeedle.Framework.HedgehogEngine.Mirage.Material.Parameter<T> param = reader.ReadObjectOffset<Parameter<T>>();
                 paramsOut.TryAdd(param.Name, param);
@@ -127,7 +127,7 @@ public class Material : SampleChunkResource
     public override void Write(BinaryObjectWriter writer)
     {
         // Fix texset name
-        if(string.IsNullOrEmpty(Texset.Name))
+        if (string.IsNullOrEmpty(Texset.Name))
         {
             Texset.Name = Name;
         }
@@ -135,22 +135,22 @@ public class Material : SampleChunkResource
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, ShaderName);
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, ShaderName); // Unused vertex shader name
 
-        if(DataVersion <= 1)
+        if (DataVersion <= 1)
         {
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Texset.Name);
             writer.Write(0); // Reserved
         }
-        else if(DataVersion == 2)
+        else if (DataVersion == 2)
         {
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Texset.Name);
             WriteTextureNames();
         }
-        else if(DataVersion >= 3)
+        else if (DataVersion >= 3)
         {
             WriteTextureNames();
             writer.WriteOffset(() =>
             {
-                foreach(Texture texture in Texset.Textures)
+                foreach (Texture texture in Texset.Textures)
                 {
                     writer.WriteObjectOffset(texture);
                 }
@@ -175,7 +175,7 @@ public class Material : SampleChunkResource
         {
             writer.WriteOffset(() =>
             {
-                foreach(Texture texture in Texset.Textures)
+                foreach (Texture texture in Texset.Textures)
                 {
                     writer.WriteStringOffset(StringBinaryFormat.NullTerminated, texture.Name);
                 }
@@ -184,20 +184,20 @@ public class Material : SampleChunkResource
 
         void WriteParameters<T>(Dictionary<string, Parameter<T>> parameters) where T : unmanaged
         {
-            if(parameters.Count == 0)
+            if (parameters.Count == 0)
             {
                 writer.Write(0);
                 return;
             }
 
-            foreach(KeyValuePair<string, Parameter<T>> parameter in parameters)
-            { 
+            foreach (KeyValuePair<string, Parameter<T>> parameter in parameters)
+            {
                 parameter.Value.Name = parameter.Key;
             }
 
             writer.WriteOffset(() =>
             {
-                foreach(KeyValuePair<string, Parameter<T>> parameter in parameters)
+                foreach (KeyValuePair<string, Parameter<T>> parameter in parameters)
                 {
                     writer.WriteOffset(() => writer.WriteObject(parameter.Value));
                 }
@@ -207,14 +207,14 @@ public class Material : SampleChunkResource
 
     public override void ResolveDependencies(IResourceResolver resolver)
     {
-        if(DataVersion <= 1)
+        if (DataVersion <= 1)
         {
             string resource = $"{Texset.Name}.texset";
-            Texset = resolver.Open<Texset>(resource) 
+            Texset = resolver.Open<Texset>(resource)
                 ?? throw new ResourceResolveException("Failed resolve texset", [resource]);
         }
 
-        if(DataVersion <= 2)
+        if (DataVersion <= 2)
         {
             Texset.ResolveDependencies(resolver);
         }
@@ -222,12 +222,12 @@ public class Material : SampleChunkResource
 
     public override void WriteDependencies(IDirectory dir)
     {
-        if(DataVersion >= 3)
+        if (DataVersion >= 3)
         {
             return;
         }
 
-        if(DataVersion <= 1)
+        if (DataVersion <= 1)
         {
             IFile texSetFile = dir.CreateFile($"{Texset.Name}.texset");
             Texset.Write(texSetFile);
@@ -247,7 +247,7 @@ public class Material : SampleChunkResource
         {
             get
             {
-                if(Values.Count == 0 || Values == null)
+                if (Values.Count == 0 || Values == null)
                 {
                     return default;
                 }
@@ -258,7 +258,7 @@ public class Material : SampleChunkResource
             {
                 Values ??= new List<T>(1);
 
-                if(Values.Count == 0)
+                if (Values.Count == 0)
                 {
                     Values.Add(value);
                 }
@@ -276,13 +276,13 @@ public class Material : SampleChunkResource
             reader.Skip(1);
 
             Name = reader.ReadStringOffsetOrEmpty();
-            if(valueCount != 0)
+            if (valueCount != 0)
             {
                 using SeekToken token = reader.ReadOffset();
-                for(byte i = 0; i < valueCount; i++)
+                for (byte i = 0; i < valueCount; i++)
                 {
                     // Handle booleans
-                    if(typeof(T) == typeof(bool))
+                    if (typeof(T) == typeof(bool))
                     {
                         Unsafe.As<List<bool>>(Values)!.Add(reader.Read<int>() != 0);
                     }
@@ -302,7 +302,7 @@ public class Material : SampleChunkResource
             writer.Write((byte)0);
 
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-            if(typeof(T) != typeof(bool))
+            if (typeof(T) != typeof(bool))
             {
                 writer.WriteCollectionOffset(Values, 4);
             }
@@ -311,7 +311,7 @@ public class Material : SampleChunkResource
                 List<bool> values = Unsafe.As<List<bool>>(Values);
                 writer.WriteOffset(() =>
                 {
-                    foreach(bool value in values!)
+                    foreach (bool value in values!)
                     {
                         writer.Write(value ? 1 : 0);
                     }

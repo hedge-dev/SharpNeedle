@@ -33,14 +33,14 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
 
     protected override void Dispose(bool disposing)
     {
-        if(!disposing)
+        if (!disposing)
         {
             return;
         }
 
-        if(Archives != null)
+        if (Archives != null)
         {
-            foreach(Archive archive in Archives)
+            foreach (Archive archive in Archives)
             {
                 archive.Dispose();
             }
@@ -49,17 +49,17 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
 
     private void EnsureSplit()
     {
-        if(Archives.Last().CalculateFileSize() <= MaxSplitSize)
+        if (Archives.Last().CalculateFileSize() <= MaxSplitSize)
         {
             return;
         }
 
         Archives.Add([]);
     }
-    
+
     public void LoadToMemory()
     {
-        foreach(Archive archive in Archives)
+        foreach (Archive archive in Archives)
         {
             archive.LoadToMemory();
         }
@@ -77,27 +77,27 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
         using BinaryValueReader reader = new(stream, StreamOwnership.Retain, Endianness.Little);
 
         uint sig = reader.ReadUInt32();
-        if(sig != Signature)
+        if (sig != Signature)
         {
             throw new Exception("Invalid ARL file");
         }
 
         int count = reader.ReadInt32();
-        for(int i = 0; i < count; i++)
+        for (int i = 0; i < count; i++)
         {
             ArchiveSizes.Add(reader.ReadUInt32());
         }
 
-        while(stream.Position < stream.Length)
+        while (stream.Position < stream.Length)
         {
             string name = reader.ReadString(StringBinaryFormat.PrefixedLength8);
 
-            if(!Files.Contains(name))
+            if (!Files.Contains(name))
             {
                 Files.Add(name);
             }
         }
-     }
+    }
 
     public override void Write(IFile file)
     {
@@ -105,15 +105,15 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
         using BinaryValueWriter writer = new(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness.Little);
 
         writer.Write(Signature);
-        if(Archives == null)
+        if (Archives == null)
         {
             writer.Write(ArchiveSizes.Count);
-            foreach(uint size in ArchiveSizes)
+            foreach (uint size in ArchiveSizes)
             {
                 writer.Write(size);
             }
 
-            foreach(string name in Files)
+            foreach (string name in Files)
             {
                 writer.WriteString(StringBinaryFormat.PrefixedLength8, name);
             }
@@ -121,32 +121,32 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
         else
         {
             writer.Write(Archives.Count);
-            foreach(Archive archive in Archives)
+            foreach (Archive archive in Archives)
             {
                 writer.Write((uint)archive.CalculateFileSize());
             }
 
-            foreach(IFile aFile in this)
+            foreach (IFile aFile in this)
             {
                 writer.WriteString(StringBinaryFormat.PrefixedLength8, aFile.Name);
             }
         }
     }
-    
+
     public override void ResolveDependencies(IResourceResolver resolver)
     {
-        if(DependsResolved)
+        if (DependsResolved)
         {
             return;
         }
 
-        if(ArchiveSizes.Count > 0)
+        if (ArchiveSizes.Count > 0)
         {
             Archives = new List<Archive>(ArchiveSizes.Count);
         }
 
         string baseName = System.IO.Path.GetFileNameWithoutExtension(Name);
-        for(int i = 0; i < ArchiveSizes.Count; i++)
+        for (int i = 0; i < ArchiveSizes.Count; i++)
         {
             string name = $"{baseName}.ar.{i:00}";
             Archive archive = resolver.Open<Archive>(name) ?? throw new FileNotFoundException($"Archive file \"{name}\" not found!");
@@ -159,7 +159,7 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
     public override void WriteDependencies(IDirectory dir)
     {
         string baseName = System.IO.Path.GetFileNameWithoutExtension(Name);
-        for(int i = 0; i < Archives.Count; i++)
+        for (int i = 0; i < Archives.Count; i++)
         {
             Archive archive = Archives[i];
             using IFile file = dir.CreateFile($"{baseName}.ar.{i:00}");
@@ -171,7 +171,7 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
     {
         string baseName = System.IO.Path.GetFileNameWithoutExtension(Name);
 
-        for(int i = 0; i < ArchiveSizes.Count; i++)
+        for (int i = 0; i < ArchiveSizes.Count; i++)
         {
             yield return new ResourceDependency()
             {
@@ -208,10 +208,10 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
 
     public IFile? GetFile(string name)
     {
-        foreach(Archive archive in Archives)
+        foreach (Archive archive in Archives)
         {
             IFile? file = archive.GetFile(name);
-            if(file != null)
+            if (file != null)
             {
                 return file;
             }
@@ -222,7 +222,7 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
 
     public IFile CreateFile(string name, bool overwrite = true)
     {
-        if(Archives == null)
+        if (Archives == null)
         {
             Archives = [[]];
         }
@@ -236,7 +236,7 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
 
     public IFile AddFile(IFile file, bool overwrite = true)
     {
-        if(Archives == null)
+        if (Archives == null)
         {
             Archives = [[]];
         }
@@ -250,9 +250,9 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
 
     public bool DeleteFile(string name)
     {
-        foreach(Archive archive in Archives)
+        foreach (Archive archive in Archives)
         {
-            if(archive.DeleteFile(name))
+            if (archive.DeleteFile(name))
             {
                 return true;
             }
@@ -265,14 +265,14 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
 
     public IEnumerator<IFile> GetEnumerator()
     {
-        if(Archives == null)
+        if (Archives == null)
         {
             yield break;
         }
 
-        foreach(Archive archive in Archives)
+        foreach (Archive archive in Archives)
         {
-            foreach(IFile file in archive)
+            foreach (IFile file in archive)
             {
                 yield return file;
             }

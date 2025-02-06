@@ -9,7 +9,7 @@ public class Motion : IBinarySerializable<ChunkBinaryOptions>
     {
         CastID = reader.Read<ushort>();
         ushort trackCount = reader.Read<ushort>();
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.Align(8);
         }
@@ -21,7 +21,7 @@ public class Motion : IBinarySerializable<ChunkBinaryOptions>
     {
         writer.Write(CastID);
         writer.Write((ushort)Tracks.Count);
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             writer.Align(8);
         }

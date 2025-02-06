@@ -38,7 +38,7 @@ public class MetaInstancer : ResourceBase, IBinarySerializable
         int instanceCount = reader.Read<int>();
         int instanceSize = reader.Read<int>();
 
-        if(instanceSize != InstanceSize)
+        if (instanceSize != InstanceSize)
         {
             throw new BadImageFormatException($"Instance size mismatch. Expected: {InstanceSize}. Got: {instanceSize}");
         }

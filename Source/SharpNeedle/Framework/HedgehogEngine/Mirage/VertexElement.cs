@@ -17,15 +17,15 @@ public struct VertexElement
     public static unsafe void SwapEndianness(VertexElement[] elements, Span<byte> vertices, nint count, nint size)
     {
         // I'm going to have a breakdown
-        fixed(byte* pBegin = vertices)
+        fixed (byte* pBegin = vertices)
         {
             byte* pVertex = pBegin;
-            for(nint i = 0; i < count; i++)
+            for (nint i = 0; i < count; i++)
             {
-                foreach(VertexElement element in elements)
+                foreach (VertexElement element in elements)
                 {
                     byte* pData = pVertex + element.Offset;
-                    switch(element.Format)
+                    switch (element.Format)
                     {
                         case VertexFormat.Float1:
                             Swap<float>();

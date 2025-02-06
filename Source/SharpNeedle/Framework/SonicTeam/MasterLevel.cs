@@ -24,7 +24,7 @@ public class MasterLevel : BinaryResource
         {
             LevelInfoBinaryOptions options = new();
 
-            for(int i = 0; i < levelCount; i++)
+            for (int i = 0; i < levelCount; i++)
             {
                 options.IsLast = i + 1 == levelCount;
                 Levels.Add(reader.ReadObjectOffset<LevelInfo, LevelInfoBinaryOptions>(options));
@@ -49,7 +49,7 @@ public class MasterLevel : BinaryResource
         {
             LevelInfoBinaryOptions options = new();
 
-            for(int i = 0; i < Levels.Count; i++)
+            for (int i = 0; i < Levels.Count; i++)
             {
                 options.IsLast = i + 1 == Levels.Count;
                 writer.WriteObjectOffset(Levels[i], options, writer.GetOffsetSize());
@@ -80,9 +80,9 @@ public class MasterLevel : BinaryResource
 
             reader.ReadOffset(() =>
             {
-                if(fileCount != 0)
+                if (fileCount != 0)
                 {
-                    for(int i = 0; i < fileCount; i++)
+                    for (int i = 0; i < fileCount; i++)
                     {
                         reader.ReadOffset(() => Files.Add(reader.ReadObject<FileInfo>()));
                     }
@@ -91,7 +91,7 @@ public class MasterLevel : BinaryResource
 
             reader.ReadOffset(() =>
             {
-                if(dependencyCount != 0)
+                if (dependencyCount != 0)
                 {
                     FileInfoBinaryOptions fileOptions = new()
                     {
@@ -99,7 +99,7 @@ public class MasterLevel : BinaryResource
                         IsLastLevel = options.IsLast
                     };
 
-                    for(int i = 0; i < dependencyCount; i++)
+                    for (int i = 0; i < dependencyCount; i++)
                     {
                         fileOptions.IsLast = i + 1 == dependencyCount;
 
@@ -132,7 +132,7 @@ public class MasterLevel : BinaryResource
 
             writer.WriteOffset(() =>
             {
-                for(int i = 0; i < Files.Count; i++)
+                for (int i = 0; i < Files.Count; i++)
                 {
                     writer.WriteObjectOffset(Files[i], writer.GetOffsetSize());
                 }
@@ -146,7 +146,7 @@ public class MasterLevel : BinaryResource
                     IsLastLevel = options.IsLast
                 };
 
-                for(int i = 0; i < Dependencies.Count; i++)
+                for (int i = 0; i < Dependencies.Count; i++)
                 {
                     fileOptions.IsLast = i + 1 == Dependencies.Count;
 
@@ -178,7 +178,7 @@ public class MasterLevel : BinaryResource
 
             Name = reader.ReadStringOffset();
 
-            if(options.IsDependency)
+            if (options.IsDependency)
             {
                 reader.ReadOffsetValue();
             }
@@ -187,14 +187,14 @@ public class MasterLevel : BinaryResource
                 reader.ReadOffset(() => Field08 = reader.Read<bool>());
             }
 
-            if(!options.IsLastLevel)
+            if (!options.IsLastLevel)
             {
                 long offset = reader.ReadOffsetValue();
-                if(offset != 0)
+                if (offset != 0)
                 {
                     reader.ReadAtOffset(offset, () =>
                     {
-                        if(options.IsLast)
+                        if (options.IsLast)
                         {
                             NextFileInfo = reader.ReadObject<FileInfo>();
                         }
@@ -213,7 +213,7 @@ public class MasterLevel : BinaryResource
 
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name, writer.GetOffsetSize());
 
-            if(options.IsDependency)
+            if (options.IsDependency)
             {
                 writer.WriteOffsetValue(0);
             }
@@ -222,11 +222,11 @@ public class MasterLevel : BinaryResource
                 writer.WriteOffset(() => writer.Write(Field08));
             }
 
-            if(!options.IsLastLevel)
+            if (!options.IsLastLevel)
             {
-                if(string.IsNullOrEmpty(NextDependencyName))
+                if (string.IsNullOrEmpty(NextDependencyName))
                 {
-                    if(NextFileInfo == null)
+                    if (NextFileInfo == null)
                     {
                         writer.WriteOffsetValue(0);
                     }

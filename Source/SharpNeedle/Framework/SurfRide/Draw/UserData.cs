@@ -6,7 +6,7 @@ public class UserData : List<Data>, IBinarySerializable<ChunkBinaryOptions>
     {
         Clear();
         Capacity = reader.Read<int>();
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.Align(8);
         }
@@ -17,7 +17,7 @@ public class UserData : List<Data>, IBinarySerializable<ChunkBinaryOptions>
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
         writer.Write(Count);
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             writer.Align(8);
         }
@@ -35,19 +35,19 @@ public class Data : IBinarySerializable<ChunkBinaryOptions>
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.Align(8);
         }
 
         Name = reader.ReadStringOffset();
         Type = reader.Read<int>();
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.Align(8);
         }
 
-        switch(Type)
+        switch (Type)
         {
             case 0:
                 Value = reader.ReadValueOffset<bool>();
@@ -69,7 +69,7 @@ public class Data : IBinarySerializable<ChunkBinaryOptions>
                 break;
         }
 
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.Align(8);
         }
@@ -81,19 +81,19 @@ public class Data : IBinarySerializable<ChunkBinaryOptions>
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             writer.Align(8);
         }
 
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         writer.Write(Type);
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             writer.Align(8);
         }
 
-        switch(Type)
+        switch (Type)
         {
             case 0:
                 writer.WriteValueOffset(Value.Boolean);
@@ -115,7 +115,7 @@ public class Data : IBinarySerializable<ChunkBinaryOptions>
                 break;
         }
 
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             writer.Align(8);
         }

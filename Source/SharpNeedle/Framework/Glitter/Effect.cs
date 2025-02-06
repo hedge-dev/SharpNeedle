@@ -14,7 +14,7 @@ public class Effect : BinaryResource
         reader.EnsureSignature(Signature);
 
         Version = reader.Read<uint>();
-        if(Version != 0x01060000)
+        if (Version != 0x01060000)
         {
             throw new NotSupportedException();
         }
@@ -26,7 +26,7 @@ public class Effect : BinaryResource
 
     public override void Write(BinaryObjectWriter writer)
     {
-        if(Version != 0x01060000)
+        if (Version != 0x01060000)
         {
             throw new NotSupportedException();
         }
@@ -36,7 +36,7 @@ public class Effect : BinaryResource
 
         writer.Write(0); // Always 0?
 
-        if(Parameters.First != null)
+        if (Parameters.First != null)
         {
             writer.WriteObjectOffset(Parameters.First.Value, this, 16);
         }

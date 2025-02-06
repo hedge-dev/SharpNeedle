@@ -50,7 +50,7 @@ public class Shader : ResourceBase
 
     public List<int> Permutations { get; set; } = [];
 
-    public List<ShaderVariant> Variants { get; set; } = []; 
+    public List<ShaderVariant> Variants { get; set; } = [];
 
     public override void Read(IFile file)
     {
@@ -108,7 +108,7 @@ public class Shader : ResourceBase
         writer.WriteObjectCollection(Features);
 
         int variantCount = 1 << Permutations.Count;
-        if(Permutations.Count != variantCount)
+        if (Permutations.Count != variantCount)
         {
             throw new InvalidOperationException($"Shader is supposed to have {variantCount} variants, but has {Permutations.Count}!");
         }
@@ -119,13 +119,13 @@ public class Shader : ResourceBase
         writer.WriteObjectCollection(Variants);
 
         long dataEnd = writer.Position;
-        using(SeekToken temp = writer.At())
+        using (SeekToken temp = writer.At())
         {
             fileSizeToken.Dispose();
             writer.Write((int)(dataEnd - fileDataStart));
         }
 
-        using(SeekToken temp = writer.At())
+        using (SeekToken temp = writer.At())
         {
             shaderSizeToken.Dispose();
             writer.Write((int)(dataEnd - shaderDataStart));

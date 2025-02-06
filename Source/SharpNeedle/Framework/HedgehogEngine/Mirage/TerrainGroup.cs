@@ -10,9 +10,9 @@ public class TerrainGroup : SampleChunkResource
 
     public Subset? GetSubset(Vector3 point)
     {
-        foreach(Subset set in Subsets)
+        foreach (Subset set in Subsets)
         {
-            if(set.Bounds.Intersects(point))
+            if (set.Bounds.Intersects(point))
             {
                 return set;
             }
@@ -29,7 +29,7 @@ public class TerrainGroup : SampleChunkResource
 
         reader.ReadOffset(() =>
         {
-            for(int i = 0; i < modelCount; i++)
+            for (int i = 0; i < modelCount; i++)
             {
                 ModelNames.Add(reader.ReadStringOffset());
             }
@@ -41,7 +41,7 @@ public class TerrainGroup : SampleChunkResource
         writer.Write(Subsets.Count);
         writer.WriteOffset(() =>
         {
-            foreach(Subset set in Subsets)
+            foreach (Subset set in Subsets)
             {
                 writer.WriteObjectOffset(set);
             }
@@ -50,7 +50,7 @@ public class TerrainGroup : SampleChunkResource
         writer.Write(ModelNames.Count);
         writer.WriteOffset(() =>
         {
-            foreach(string? name in ModelNames)
+            foreach (string? name in ModelNames)
             {
                 writer.WriteStringOffset(StringBinaryFormat.NullTerminated, name);
             }
@@ -69,7 +69,7 @@ public class TerrainGroup : SampleChunkResource
 
             reader.ReadOffset(() =>
             {
-                for(int i = 0; i < instanceCount; i++)
+                for (int i = 0; i < instanceCount; i++)
                 {
                     Add(reader.ReadStringOffset());
                 }
@@ -84,7 +84,7 @@ public class TerrainGroup : SampleChunkResource
 
             writer.WriteOffset(() =>
             {
-                foreach(string? instance in this)
+                foreach (string? instance in this)
                 {
                     writer.WriteStringOffset(StringBinaryFormat.NullTerminated, instance);
                 }

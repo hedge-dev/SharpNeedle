@@ -26,7 +26,7 @@ public abstract class SampleChunkResourceBlock<T> : NeedleArchiveBlock where T :
         uint[] rawOffsets = reader.ReadArray<uint>(offsetsCount);
         long[] result = new long[rawOffsets.Length];
 
-        for(int i = 0; i < rawOffsets.Length; i++)
+        for (int i = 0; i < rawOffsets.Length; i++)
         {
             result[i] = rawOffsets[i] + startPosition + 0x10;
         }
@@ -36,7 +36,7 @@ public abstract class SampleChunkResourceBlock<T> : NeedleArchiveBlock where T :
 
     private static void FlipEndianOfOffsets(long[] offsets, byte[] resourceData)
     {
-        foreach(long offset in offsets)
+        foreach (long offset in offsets)
         {
             (resourceData[offset], resourceData[offset + 3]) = (resourceData[offset + 3], resourceData[offset]);
             (resourceData[offset + 1], resourceData[offset + 2]) = (resourceData[offset + 2], resourceData[offset + 1]);
@@ -45,12 +45,12 @@ public abstract class SampleChunkResourceBlock<T> : NeedleArchiveBlock where T :
 
     private static void SelfRelativeToAbsoluteOffsets(long[] offsets, byte[] resourceData)
     {
-        using(MemoryStream stream = new(resourceData))
+        using (MemoryStream stream = new(resourceData))
         {
             using BinaryObjectReader reader = new(stream, StreamOwnership.Retain, Endianness.Little);
             using BinaryObjectWriter writer = new(stream, StreamOwnership.Retain, Endianness.Big);
 
-            foreach(uint offset in offsets)
+            foreach (uint offset in offsets)
             {
                 reader.Seek(offset, SeekOrigin.Begin);
                 int relativeOffset = reader.ReadInt32();
@@ -66,12 +66,12 @@ public abstract class SampleChunkResourceBlock<T> : NeedleArchiveBlock where T :
 
     private static void AbsoluteToSelfRelativeOffsets(long[] offsets, byte[] resourceData)
     {
-        using(MemoryStream stream = new(resourceData))
+        using (MemoryStream stream = new(resourceData))
         {
             using BinaryObjectReader reader = new(stream, StreamOwnership.Retain, Endianness.Big);
             using BinaryObjectWriter writer = new(stream, StreamOwnership.Retain, Endianness.Little);
 
-            foreach(uint offset in offsets)
+            foreach (uint offset in offsets)
             {
                 reader.Seek(offset, SeekOrigin.Begin);
                 uint realOffset = reader.ReadUInt32();
@@ -89,14 +89,14 @@ public abstract class SampleChunkResourceBlock<T> : NeedleArchiveBlock where T :
     {
         BinaryObjectReader adjustedReader = reader;
 
-        if(offsetMode != NeedleArchvieDataOffsetMode.Default)
+        if (offsetMode != NeedleArchvieDataOffsetMode.Default)
         {
-            using(SeekToken startToken = reader.At())
+            using (SeekToken startToken = reader.At())
             {
                 long[] offsets = GetOffsetTable(reader);
                 byte[] adjustedData = reader.GetBaseStream().ReadAllBytes();
 
-                switch(offsetMode)
+                switch (offsetMode)
                 {
                     case NeedleArchvieDataOffsetMode.Flipped:
                         FlipEndianOfOffsets(offsets, adjustedData);
@@ -114,7 +114,7 @@ public abstract class SampleChunkResourceBlock<T> : NeedleArchiveBlock where T :
         Resource = CreateResourceInstance(filename);
         Resource.ReadResource(adjustedReader);
 
-        if(adjustedReader != reader)
+        if (adjustedReader != reader)
         {
             adjustedReader.Dispose();
         }
@@ -122,11 +122,11 @@ public abstract class SampleChunkResourceBlock<T> : NeedleArchiveBlock where T :
 
     protected abstract T CreateResourceInstance(string filename);
 
-    
+
 
     protected override void WriteBlockData(BinaryObjectWriter writer, string filename, NeedleArchvieDataOffsetMode offsetMode)
     {
-        if(Resource == null)
+        if (Resource == null)
         {
             throw new InvalidOperationException("Model block has no model!");
         }
@@ -142,16 +142,16 @@ public abstract class SampleChunkResourceBlock<T> : NeedleArchiveBlock where T :
             resourceData = resourceStream.ToArray();
         }
 
-        if(offsetMode != NeedleArchvieDataOffsetMode.Default)
+        if (offsetMode != NeedleArchvieDataOffsetMode.Default)
         {
             long[] offsets;
-            using(MemoryStream offsetsStream = new(resourceData))
+            using (MemoryStream offsetsStream = new(resourceData))
             {
                 using BinaryObjectReader offsetsReader = new(offsetsStream, StreamOwnership.Retain, Endianness.Big);
                 offsets = GetOffsetTable(offsetsReader);
             }
 
-            switch(offsetMode)
+            switch (offsetMode)
             {
                 case NeedleArchvieDataOffsetMode.Flipped:
                     FlipEndianOfOffsets(offsets, resourceData);

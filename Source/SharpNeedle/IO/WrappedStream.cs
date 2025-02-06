@@ -57,7 +57,7 @@ public class WrappedStream<TStream> : Stream where TStream : Stream
 
     protected override void Dispose(bool disposing)
     {
-        if(!disposing || Disposed)
+        if (!disposing || Disposed)
         {
             return;
         }
@@ -65,7 +65,7 @@ public class WrappedStream<TStream> : Stream where TStream : Stream
         Disposed = true;
         OnClosing?.Invoke(BaseStream);
 
-        if(!KeepOpen)
+        if (!KeepOpen)
         {
             BaseStream.Dispose();
         }

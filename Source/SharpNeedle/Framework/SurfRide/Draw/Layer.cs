@@ -13,7 +13,7 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.Align(8);
         }
@@ -22,13 +22,13 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>
         ID = reader.Read<int>();
         Flags = reader.Read<uint>();
         int castCount = reader.Read<int>();
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.Align(8);
         }
 
         Nodes.AddRange(reader.ReadObjectArrayOffset<CastNode, ChunkBinaryOptions>(options, castCount));
-        switch(Flags & 0xF)
+        switch (Flags & 0xF)
         {
             case 0:
                 Cells.AddRange(reader.ReadObjectArrayOffset<Cell2D, ChunkBinaryOptions>(options, castCount));
@@ -43,20 +43,20 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>
         }
 
         int animCount = reader.Read<int>();
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.Align(8);
         }
 
         Animations.AddRange(reader.ReadObjectArrayOffset<Animation, ChunkBinaryOptions>(options, animCount));
         CurrentAnimationIndex = reader.Read<uint>();
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.Align(8);
         }
 
         long userDataOffset = reader.ReadOffsetValue();
-        if(userDataOffset != 0)
+        if (userDataOffset != 0)
         {
             UserData = reader.ReadObjectAtOffset<UserData, ChunkBinaryOptions>(userDataOffset, options);
         }
@@ -64,7 +64,7 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             writer.Align(8);
         }
@@ -73,19 +73,19 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>
         writer.Write(ID);
         writer.Write(Flags);
         writer.Write(Nodes.Count);
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             writer.Align(8);
         }
 
-        if(Nodes.Count != 0)
+        if (Nodes.Count != 0)
         {
             writer.WriteObjectCollectionOffset(options, Nodes);
-            if(options.Version >= 4)
+            if (options.Version >= 4)
             {
                 writer.WriteOffset(() =>
                 {
-                    foreach(ICell cell in Cells)
+                    foreach (ICell cell in Cells)
                     {
                         writer.WriteObject(cell, options);
                     }
@@ -103,12 +103,12 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>
         }
 
         writer.Write(Animations.Count);
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             writer.Align(8);
         }
 
-        if(Animations.Count != 0)
+        if (Animations.Count != 0)
         {
             writer.WriteObjectCollectionOffset(options, Animations);
         }
@@ -118,12 +118,12 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>
         }
 
         writer.Write(CurrentAnimationIndex);
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             writer.Align(8);
         }
 
-        if(UserData != null)
+        if (UserData != null)
         {
             writer.WriteObjectOffset(UserData, options);
         }
@@ -141,7 +141,7 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>
     public ICell? GetCastCell(string? name)
     {
         int index = Nodes.FindIndex(item => item.Name == name);
-        if(index == -1)
+        if (index == -1)
         {
             return null;
         }

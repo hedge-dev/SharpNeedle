@@ -48,7 +48,7 @@ public class CharAnimScript : BinaryResource
 
         Traverse(SimpleAnimations);
 
-        foreach(ComplexAnimation animation in ComplexAnimations)
+        foreach (ComplexAnimation animation in ComplexAnimations)
         {
             Traverse(animation.Animations);
         }
@@ -57,16 +57,16 @@ public class CharAnimScript : BinaryResource
 
         void Traverse(List<SimpleAnimation> animations)
         {
-            foreach(SimpleAnimation animation in animations)
+            foreach (SimpleAnimation animation in animations)
             {
-                if(animation.Triggers == null)
+                if (animation.Triggers == null)
                 {
                     continue;
                 }
 
-                foreach(TriggerInfo trigger in animation.Triggers)
+                foreach (TriggerInfo trigger in animation.Triggers)
                 {
-                    if(trigger.ID < triggerCount)
+                    if (trigger.ID < triggerCount)
                     {
                         continue;
                     }
@@ -81,14 +81,14 @@ public class CharAnimScript : BinaryResource
     {
         int maxLayer = 0;
 
-        if(SimpleAnimations != null)
+        if (SimpleAnimations != null)
         {
             Traverse(SimpleAnimations);
         }
 
-        if(ComplexAnimations != null)
+        if (ComplexAnimations != null)
         {
-            foreach(ComplexAnimation animation in ComplexAnimations)
+            foreach (ComplexAnimation animation in ComplexAnimations)
             {
                 Traverse(animation.Animations);
             }
@@ -98,14 +98,14 @@ public class CharAnimScript : BinaryResource
 
         void Traverse(List<SimpleAnimation> animations)
         {
-            if(animations == null)
+            if (animations == null)
             {
                 return;
             }
 
-            foreach(SimpleAnimation animation in animations)
+            foreach (SimpleAnimation animation in animations)
             {
-                if(animation.Layer <= maxLayer)
+                if (animation.Layer <= maxLayer)
                 {
                     continue;
                 }

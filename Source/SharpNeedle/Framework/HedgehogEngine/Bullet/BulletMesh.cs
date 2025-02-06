@@ -22,7 +22,7 @@ public class BulletMesh : BinaryResource
         reader.Skip(4);
         int version = reader.ReadInt32();
 
-        if(version is 0 or 2)
+        if (version is 0 or 2)
         {
             throw new InvalidDataException($"Unknown bullet mesh version ({version})");
         }
@@ -33,12 +33,12 @@ public class BulletMesh : BinaryResource
 
         reader.ReadAtOffset(shapesOffset, () =>
         {
-            for(int i = 0; i < Shapes.Length; i++)
+            for (int i = 0; i < Shapes.Length; i++)
             {
                 Shapes[i] = reader.ReadObject<BulletShape, int>(BulletMeshVersion);
             }
         });
-        
+
         int primitiveCount = reader.ReadInt32();
         Primitives = reader.ReadObjectArrayOffset<BulletPrimitive>(primitiveCount);
     }
@@ -48,7 +48,7 @@ public class BulletMesh : BinaryResource
         writer.WriteNulls(4);
         writer.WriteInt32(BulletMeshVersion);
 
-        if(Shapes.Length == 0)
+        if (Shapes.Length == 0)
         {
             writer.WriteOffsetValue(0);
         }
@@ -56,7 +56,7 @@ public class BulletMesh : BinaryResource
         {
             writer.WriteOffset(() =>
             {
-                foreach(BulletShape shape in Shapes)
+                foreach (BulletShape shape in Shapes)
                 {
                     writer.WriteObject(shape, BulletMeshVersion);
                 }
@@ -66,7 +66,7 @@ public class BulletMesh : BinaryResource
         writer.WriteInt32(Shapes.Length);
 
         writer.WriteInt32(Primitives.Length);
-        if(Primitives.Length == 0)
+        if (Primitives.Length == 0)
         {
             writer.WriteOffsetValue(0);
         }

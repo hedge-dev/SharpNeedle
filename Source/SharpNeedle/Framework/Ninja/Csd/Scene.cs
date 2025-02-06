@@ -28,7 +28,7 @@ public class Scene : IBinarySerializable
         Families = new List<Family>(familyCount);
         reader.ReadOffset(() =>
         {
-            for(int i = 0; i < familyCount; i++)
+            for (int i = 0; i < familyCount; i++)
             {
                 Families.Add(reader.ReadObject<Family, Scene>(this));
             }
@@ -37,44 +37,44 @@ public class Scene : IBinarySerializable
         CastInfoTable castInfo = reader.ReadObject<CastInfoTable>();
         Motions = reader.ReadObject<CsdDictionary<Motion>>();
 
-        foreach(KeyValuePair<string?, Motion> motion in Motions)
+        foreach (KeyValuePair<string?, Motion> motion in Motions)
         {
             motion.Value.Attach(this);
         }
 
-        for(int i = 0; i < Motions.Count; i++)
+        for (int i = 0; i < Motions.Count; i++)
         {
             Motions[i].StartFrame = motionBegin;
             Motions[i].EndFrame = motionEnd;
         }
 
-        if(Version >= 1)
+        if (Version >= 1)
         {
             AspectRatio = reader.Read<float>();
         }
 
-        if(Version >= 2)
+        if (Version >= 2)
         {
             (float, float)[] frameInfo = reader.ReadArrayOffset<FrameInfo>(Motions.Count);
-            for(int i = 0; i < Motions.Count; i++)
+            for (int i = 0; i < Motions.Count; i++)
             {
                 Motions[i].StartFrame = frameInfo[i].Item1;
                 Motions[i].EndFrame = frameInfo[i].Item2;
             }
         }
 
-        if(Version >= 3)
+        if (Version >= 3)
         {
             reader.ReadOffset(() =>
             {
-                for(int i = 0; i < Motions.Count; i++)
+                for (int i = 0; i < Motions.Count; i++)
                 {
                     Motions[i].ReadExtended(reader);
                 }
             });
         }
 
-        foreach((string? Name, int FamilyIdx, int CastIdx) in castInfo)
+        foreach ((string? Name, int FamilyIdx, int CastIdx) in castInfo)
         {
             Families[FamilyIdx].Casts[CastIdx].Name = Name;
         }
@@ -97,7 +97,7 @@ public class Scene : IBinarySerializable
         writer.Write(Families.Count);
         writer.WriteOffset(() =>
         {
-            foreach(Family family in Families)
+            foreach (Family family in Families)
             {
                 writer.WriteObject(family);
             }
@@ -106,27 +106,27 @@ public class Scene : IBinarySerializable
         writer.WriteObject(BuildCastTable());
         writer.WriteObject(Motions);
 
-        if(Version >= 1)
+        if (Version >= 1)
         {
             writer.Write(AspectRatio);
         }
 
-        if(Version >= 2)
+        if (Version >= 2)
         {
             writer.WriteOffset(() =>
             {
-                for(int i = 0; i < Motions.Count; i++)
+                for (int i = 0; i < Motions.Count; i++)
                 {
                     writer.Write(new FrameInfo(Motions[i].StartFrame, Motions[i].EndFrame));
                 }
             });
         }
 
-        if(Version >= 3)
+        if (Version >= 3)
         {
             writer.WriteOffset(() =>
             {
-                for(int i = 0; i < Motions.Count; i++)
+                for (int i = 0; i < Motions.Count; i++)
                 {
                     Motions[i].WriteExtended(writer);
                 }
@@ -137,10 +137,10 @@ public class Scene : IBinarySerializable
     public CastInfoTable BuildCastTable()
     {
         CastInfoTable result = [];
-        for(int i = 0; i < Families.Count; i++)
+        for (int i = 0; i < Families.Count; i++)
         {
             Family family = Families[i];
-            for(int c = 0; c < family.Casts.Count; c++)
+            for (int c = 0; c < family.Casts.Count; c++)
             {
                 result.Add(new(family.Casts[c].Name, i, c));
             }

@@ -5,7 +5,7 @@ public static class ResourceUtility
     public static TRes? Open<TRes>(string path, bool resolveDepends = true) where TRes : IResource, new()
     {
         IFile? file = FileSystem.Instance.Open(path);
-        if(file == null)
+        if (file == null)
         {
             return default;
         }
@@ -16,7 +16,7 @@ public static class ResourceUtility
     public static IResource? Open(string path, bool resolveDepends = true)
     {
         IFile? file = FileSystem.Instance.Open(path);
-        if(file == null)
+        if (file == null)
         {
             return null;
         }

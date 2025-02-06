@@ -23,7 +23,7 @@ public class Light : SampleChunkResource
         Position = reader.Read<Vector3>();
         Color = reader.Read<Vector3>();
 
-        if(Type != LightType.Point)
+        if (Type != LightType.Point)
         {
             return;
         }
@@ -38,12 +38,12 @@ public class Light : SampleChunkResource
         writer.Write(Position);
         writer.Write(Color);
 
-        if(DataVersion == 0)
+        if (DataVersion == 0)
         {
             return;
         }
 
-        switch(Type)
+        switch (Type)
         {
             case LightType.Point:
             {

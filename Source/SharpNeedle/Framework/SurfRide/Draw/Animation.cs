@@ -11,7 +11,7 @@ public class Animation : List<Motion>, IBinarySerializable<ChunkBinaryOptions>
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
         Clear();
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.Align(8);
         }
@@ -20,24 +20,24 @@ public class Animation : List<Motion>, IBinarySerializable<ChunkBinaryOptions>
         ID = reader.Read<int>();
         Capacity = reader.Read<int>();
         EndFrame = reader.Read<uint>();
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.Align(8);
         }
 
         AddRange(reader.ReadObjectArrayOffset<Motion, ChunkBinaryOptions>(options, Capacity));
-        if(options.Version >= 1)
+        if (options.Version >= 1)
         {
             long userDataOffset = reader.ReadOffsetValue();
-            if(userDataOffset != 0)
+            if (userDataOffset != 0)
             {
                 UserData = reader.ReadObjectAtOffset<UserData, ChunkBinaryOptions>(userDataOffset, options);
             }
 
-            if(options.Version >= 2)
+            if (options.Version >= 2)
             {
                 IsLooping = reader.Read<bool>();
-                if(options.Version >= 3)
+                if (options.Version >= 3)
                 {
                     reader.Align(8);
                 }
@@ -51,7 +51,7 @@ public class Animation : List<Motion>, IBinarySerializable<ChunkBinaryOptions>
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             writer.Align(8);
         }
@@ -60,12 +60,12 @@ public class Animation : List<Motion>, IBinarySerializable<ChunkBinaryOptions>
         writer.Write(ID);
         writer.Write(Count);
         writer.Write(EndFrame);
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             writer.Align(8);
         }
 
-        if(Count != 0)
+        if (Count != 0)
         {
             writer.WriteObjectCollectionOffset(options, this);
         }
@@ -74,9 +74,9 @@ public class Animation : List<Motion>, IBinarySerializable<ChunkBinaryOptions>
             writer.WriteOffsetValue(0);
         }
 
-        if(options.Version >= 1)
+        if (options.Version >= 1)
         {
-            if(UserData != null)
+            if (UserData != null)
             {
                 writer.WriteObjectOffset(UserData, options);
             }
@@ -85,10 +85,10 @@ public class Animation : List<Motion>, IBinarySerializable<ChunkBinaryOptions>
                 writer.WriteOffsetValue(0);
             }
 
-            if(options.Version >= 2)
+            if (options.Version >= 2)
             {
                 writer.Write(IsLooping);
-                if(options.Version >= 3)
+                if (options.Version >= 3)
                 {
                     writer.Align(8);
                 }

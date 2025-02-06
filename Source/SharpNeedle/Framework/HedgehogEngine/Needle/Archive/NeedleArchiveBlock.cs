@@ -15,12 +15,12 @@ public abstract class NeedleArchiveBlock : ResourceBase
         get => _version;
         set
         {
-            if(value > 9)
+            if (value > 9)
             {
                 throw new ArgumentException("Needle archive block version cannot be greater than 9!");
             }
 
-            if(!IsVersionValid(value))
+            if (!IsVersionValid(value))
             {
                 throw new ArgumentException("Needle archive block version invalid!");
             }
@@ -54,7 +54,7 @@ public abstract class NeedleArchiveBlock : ResourceBase
 
         byte versionCharacter = reader.ReadByte();
         int version = reader.ReadByte() - (byte)'0';
-        if(versionCharacter != (byte)'V' || version < 0 || version > 9)
+        if (versionCharacter != (byte)'V' || version < 0 || version > 9)
         {
             throw new InvalidDataException($"Needle archive block does not have a valid version in its signature!");
         }
@@ -64,7 +64,7 @@ public abstract class NeedleArchiveBlock : ResourceBase
         reader.Align(4);
 
         int size = reader.ReadInt32();
-        using(SeekToken dataStart = reader.At())
+        using (SeekToken dataStart = reader.At())
         {
             using SubStream dataStream = new(reader.GetBaseStream(), reader.Position, size);
             using BinaryObjectReader dataReader = new(dataStream, StreamOwnership.Retain, Endianness.Big);
@@ -101,7 +101,7 @@ public abstract class NeedleArchiveBlock : ResourceBase
 
     public void WriteBlock(BinaryObjectWriter writer, string filename, NeedleArchvieDataOffsetMode offsetMode)
     {
-        if(Version > 9)
+        if (Version > 9)
         {
             throw new InvalidOperationException($"Version invalid! Must be <= 9, is {Version}");
         }
@@ -121,7 +121,7 @@ public abstract class NeedleArchiveBlock : ResourceBase
 
         long dataEndPos = writer.Position;
 
-        using(SeekToken temp = writer.At())
+        using (SeekToken temp = writer.At())
         {
             sizeToken.Dispose();
             writer.WriteInt32((int)(dataEndPos - dataStartPos));

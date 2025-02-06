@@ -22,7 +22,7 @@ public class CameraData : BaseNodeData
         Field08 = reader.Read<int>();
         Field0C = reader.Read<int>();
 
-        if(FrameCount > 0)
+        if (FrameCount > 0)
         {
             reader.ReadCollection(FrameCount, FrameTimes);
             reader.ReadCollection(FrameCount, FrameData);
@@ -36,7 +36,7 @@ public class CameraData : BaseNodeData
         writer.Write(Field08);
         writer.Write(Field0C);
 
-        if(FrameCount > 0)
+        if (FrameCount > 0)
         {
             writer.WriteCollection(FrameTimes);
             writer.WriteCollection(FrameData);

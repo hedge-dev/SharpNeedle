@@ -29,12 +29,12 @@ public class ImageCastData : IImageDataBase
         Surface1.CropIndex = reader.Read<short>();
         Surface.CropRefs.Capacity = reader.Read<short>();
         Surface1.CropRefs.Capacity = reader.Read<short>();
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.Align(8);
         }
 
-        if(Surface.CropRefs.Capacity > 0)
+        if (Surface.CropRefs.Capacity > 0)
         {
             Surface.CropRefs.AddRange(reader.ReadArrayOffset<CropRef>(Surface.CropRefs.Capacity));
         }
@@ -43,7 +43,7 @@ public class ImageCastData : IImageDataBase
             reader.ReadOffsetValue();
         }
 
-        if(Surface1.CropRefs.Capacity > 0)
+        if (Surface1.CropRefs.Capacity > 0)
         {
             Surface1.CropRefs.AddRange(reader.ReadArrayOffset<CropRef>(Surface1.CropRefs.Capacity));
         }
@@ -52,7 +52,7 @@ public class ImageCastData : IImageDataBase
             reader.ReadOffsetValue();
         }
 
-        if((Flags & CastAttribute.UseFont) == CastAttribute.UseFont)
+        if ((Flags & CastAttribute.UseFont) == CastAttribute.UseFont)
         {
             FontData = reader.ReadObjectOffset<FontData, ChunkBinaryOptions>(options);
         }
@@ -62,7 +62,7 @@ public class ImageCastData : IImageDataBase
         }
 
         EffectType type = reader.Read<EffectType>();
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.Align(8);
         }
@@ -83,12 +83,12 @@ public class ImageCastData : IImageDataBase
         writer.Write(Surface1.CropIndex);
         writer.Write((short)Surface.CropRefs.Count);
         writer.Write((short)Surface1.CropRefs.Count);
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             writer.Align(8);
         }
 
-        if(Surface.CropRefs.Count != 0)
+        if (Surface.CropRefs.Count != 0)
         {
             writer.WriteCollectionOffset(Surface.CropRefs);
         }
@@ -97,7 +97,7 @@ public class ImageCastData : IImageDataBase
             writer.WriteOffsetValue(0);
         }
 
-        if(Surface1.CropRefs.Count != 0)
+        if (Surface1.CropRefs.Count != 0)
         {
             writer.WriteCollectionOffset(Surface1.CropRefs);
         }
@@ -106,7 +106,7 @@ public class ImageCastData : IImageDataBase
             writer.WriteOffsetValue(0);
         }
 
-        if(FontData != null)
+        if (FontData != null)
         {
             writer.WriteObjectOffset(FontData, options);
         }
@@ -116,7 +116,7 @@ public class ImageCastData : IImageDataBase
         }
 
         writer.Write(Effect?.Type ?? EffectType.None);
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             writer.Align(8);
         }
@@ -141,7 +141,7 @@ public class FontData : IBinarySerializable<ChunkBinaryOptions>
     {
         Field00 = reader.Read<uint>();
         FontListIndex = reader.Read<uint>();
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.Align(8);
         }
@@ -152,7 +152,7 @@ public class FontData : IBinarySerializable<ChunkBinaryOptions>
         Field18 = reader.Read<uint>();
         SpaceCorrection = reader.Read<short>();
         Field1E = reader.Read<ushort>();
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.Align(8);
         }
@@ -164,7 +164,7 @@ public class FontData : IBinarySerializable<ChunkBinaryOptions>
     {
         writer.Write(Field00);
         writer.Write(FontListIndex);
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             writer.Align(8);
         }
@@ -175,12 +175,12 @@ public class FontData : IBinarySerializable<ChunkBinaryOptions>
         writer.Write(Field18);
         writer.Write(SpaceCorrection);
         writer.Write(Field1E);
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             writer.Align(8);
         }
 
-        if(Font == null)
+        if (Font == null)
         {
             throw new InvalidOperationException("Font is null!");
         }

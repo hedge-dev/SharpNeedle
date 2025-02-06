@@ -11,7 +11,7 @@ public class PackedFileInfo : SampleChunkResource
 
         reader.ReadOffset(() =>
         {
-            for(int i = 0; i < fileCount; i++)
+            for (int i = 0; i < fileCount; i++)
             {
                 Files.Add(reader.ReadObjectOffset<File>());
             }
@@ -23,7 +23,7 @@ public class PackedFileInfo : SampleChunkResource
         writer.Write(Files.Count);
         writer.WriteOffset(() =>
         {
-            foreach(File file in Files)
+            foreach (File file in Files)
             {
                 writer.WriteObjectOffset(file);
             }

@@ -81,7 +81,7 @@ public static class MathHelper
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static unsafe ref float GetAxis(this Vector2 vector, int idx)
     {
-        if(idx is < 0 or >= 2)
+        if (idx is < 0 or >= 2)
         {
             throw new IndexOutOfRangeException($"{idx} is < 0 or >= 2");
         }
@@ -92,7 +92,7 @@ public static class MathHelper
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static unsafe ref float GetAxis(this Vector3 vector, int idx)
     {
-        if(idx is < 0 or >= 3)
+        if (idx is < 0 or >= 3)
         {
             throw new IndexOutOfRangeException($"{idx} is < 0 or >= 3");
         }
@@ -103,7 +103,7 @@ public static class MathHelper
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static unsafe ref float GetAxis(this Vector4 vector, int idx)
     {
-        if(idx is < 0 or >= 4)
+        if (idx is < 0 or >= 4)
         {
             throw new IndexOutOfRangeException($"{idx} is < 0 or >= 4");
         }
@@ -114,7 +114,7 @@ public static class MathHelper
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static Vector4 GetColumn(this Matrix4x4 matrix, int idx)
     {
-        switch(idx)
+        switch (idx)
         {
             case 0:
                 return new Vector4(matrix.M11, matrix.M21, matrix.M31, matrix.M41);
@@ -135,7 +135,7 @@ public static class MathHelper
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public static void SetColumn(ref this Matrix4x4 matrix, int idx, Vector4 value)
     {
-        switch(idx)
+        switch (idx)
         {
             case 0:
                 matrix.M11 = value.X;
@@ -171,12 +171,12 @@ public static class MathHelper
 
     public static unsafe ref Vector4 GetRow(ref this Matrix4x4 matrix, int idx)
     {
-        if(idx is < 0 or >= 4)
+        if (idx is < 0 or >= 4)
         {
             throw new IndexOutOfRangeException($"{idx} is < 0 or >= 4");
         }
 
-        fixed(Matrix4x4* pMatrix = &matrix)
+        fixed (Matrix4x4* pMatrix = &matrix)
         {
             return ref ((Vector4*)pMatrix)[idx];
         }
@@ -192,12 +192,12 @@ public static class MathHelper
         float unit = sqx + sqy + sqz + sqw;
         float test = (quaternion.X * quaternion.Y) + (quaternion.Z * quaternion.W);
 
-        if(test > 0.499f * unit)
+        if (test > 0.499f * unit)
         {
             return new Vector3(2.0f * MathF.Atan2(quaternion.X, quaternion.W), MathF.PI / 2.0f, 0.0f);
         }
 
-        if(test < -0.499f * unit)
+        if (test < -0.499f * unit)
         {
             return new Vector3(-2.0f * MathF.Atan2(quaternion.X, quaternion.W), -MathF.PI / 2.0f, 0.0f);
         }

@@ -15,21 +15,21 @@ public class MorphModel : IBinarySerializable<uint>
         long vertexOffset = reader.ReadOffsetValue();
 
         uint flags = reader.Read<uint>();
-        if(flags != 1)
+        if (flags != 1)
         {
             throw new Exception($"{flags} is not 1! Report this model!");
         }
 
         reader.Read(out uint shapeCount);
         Targets = new List<MorphTarget>((int)shapeCount);
-        for(uint i = 0; i < shapeCount; i++)
+        for (uint i = 0; i < shapeCount; i++)
         {
             Targets.Add(new());
         }
 
         reader.ReadOffset(() =>
         {
-            for(int i = 0; i < shapeCount; i++)
+            for (int i = 0; i < shapeCount; i++)
             {
                 Targets[i].Name = reader.ReadStringOffsetOrEmpty();
             }
@@ -37,7 +37,7 @@ public class MorphModel : IBinarySerializable<uint>
 
         reader.ReadOffset(() =>
         {
-            foreach(MorphTarget mesh in Targets)
+            foreach (MorphTarget mesh in Targets)
             {
                 mesh.Positions = reader.ReadArrayOffset<Vector3>((int)vertexCount);
             }
@@ -47,11 +47,11 @@ public class MorphModel : IBinarySerializable<uint>
 
         byte[] vertexData = [];
 
-        for(int i = 0; i < Meshgroup.Count; i++)
+        for (int i = 0; i < Meshgroup.Count; i++)
         {
             Mesh mesh = Meshgroup[i];
 
-            if(i == 0)
+            if (i == 0)
             {
                 vertexData = reader.ReadArrayAtOffset<byte>(vertexOffset, (int)(vertexCount * mesh.VertexSize));
             }
@@ -59,7 +59,7 @@ public class MorphModel : IBinarySerializable<uint>
             mesh.VertexCount = vertexCount;
             mesh.Vertices = vertexData;
 
-            if(i == 0)
+            if (i == 0)
             {
                 mesh.SwapVertexEndianness();
             }
@@ -68,12 +68,12 @@ public class MorphModel : IBinarySerializable<uint>
 
     public void Write(BinaryObjectWriter writer, uint version)
     {
-        if(Meshgroup == null)
+        if (Meshgroup == null)
         {
             throw new InvalidOperationException("Meshgroup is null");
         }
 
-        if(Meshgroup.Count == 0)
+        if (Meshgroup.Count == 0)
         {
             throw new InvalidOperationException("Meshgroup has no meshes");
         }
@@ -92,7 +92,7 @@ public class MorphModel : IBinarySerializable<uint>
 
         writer.WriteOffset(() =>
         {
-            foreach(MorphTarget shape in Targets)
+            foreach (MorphTarget shape in Targets)
             {
                 writer.WriteStringOffset(StringBinaryFormat.NullTerminated, shape.Name);
             }
@@ -100,7 +100,7 @@ public class MorphModel : IBinarySerializable<uint>
 
         writer.WriteOffset(() =>
         {
-            foreach(MorphTarget shape in Targets)
+            foreach (MorphTarget shape in Targets)
             {
                 writer.WriteArrayOffset(shape.Positions);
             }

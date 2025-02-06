@@ -8,7 +8,7 @@ public class ShaderParameter : SampleChunkResource
 
     public ShaderParameter()
     {
-        for(int i = 0; i < UsageSet.Length; i++)
+        for (int i = 0; i < UsageSet.Length; i++)
         {
             UsageSet[i] = [];
         }
@@ -16,9 +16,9 @@ public class ShaderParameter : SampleChunkResource
 
     public IEnumerable<ShaderConstantUsage> AllUsages()
     {
-        foreach(List<ShaderConstantUsage> set in UsageSet)
+        foreach (List<ShaderConstantUsage> set in UsageSet)
         {
-            foreach(ShaderConstantUsage usage in set)
+            foreach (ShaderConstantUsage usage in set)
             {
                 yield return usage;
             }
@@ -63,10 +63,10 @@ public class ShaderParameter : SampleChunkResource
 
     public override void Read(BinaryObjectReader reader)
     {
-        for(int i = 0; i < UsageSet.Length; i++)
+        for (int i = 0; i < UsageSet.Length; i++)
         {
             UsageSet[i] = reader.ReadObject<BinaryList<BinaryPointer<ShaderConstantUsage>>>().Unwind();
-            foreach(ShaderConstantUsage usage in UsageSet[i])
+            foreach (ShaderConstantUsage usage in UsageSet[i])
             {
                 usage.Type = (ShaderConstantType)i;
             }
@@ -77,13 +77,13 @@ public class ShaderParameter : SampleChunkResource
     {
         Debug.Assert(UsageSet.Length == (int)ShaderConstantType.Count);
 
-        foreach(List<ShaderConstantUsage> usages in UsageSet)
+        foreach (List<ShaderConstantUsage> usages in UsageSet)
         {
             writer.Write(usages.Count);
             ;
             writer.WriteOffset(() =>
             {
-                foreach(ShaderConstantUsage c in usages)
+                foreach (ShaderConstantUsage c in usages)
                 {
                     writer.WriteObjectOffset(c);
                 }

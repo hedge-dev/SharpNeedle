@@ -11,7 +11,7 @@ public class DataChunk<T> : DataChunk, IChunk where T : IBinarySerializable
 
     public void Read(BinaryObjectReader reader, ChunkParseOptions options)
     {
-        if(options.Owner.Version.IsV1)
+        if (options.Owner.Version.IsV1)
         {
             Data.Read(reader);
             return;
@@ -38,7 +38,7 @@ public class DataChunk<T> : DataChunk, IChunk where T : IBinarySerializable
 
     public void Write(BinaryObjectWriter writer, ChunkParseOptions options)
     {
-        if(options.Owner.Version.IsV1)
+        if (options.Owner.Version.IsV1)
         {
             Data.Write(writer);
             return;

@@ -12,7 +12,7 @@ public sealed unsafe class UnmanagedMemoryManager<T> : MemoryManager<T> where T 
 
     public UnmanagedMemoryManager(ReadOnlySpan<T> span)
     {
-        fixed(T* ptr = &MemoryMarshal.GetReference(span))
+        fixed (T* ptr = &MemoryMarshal.GetReference(span))
         {
             Swap(ptr, span.Length);
         }
@@ -34,7 +34,7 @@ public sealed unsafe class UnmanagedMemoryManager<T> : MemoryManager<T> where T 
 
     public override MemoryHandle Pin(int elementIndex = 0)
     {
-        if(elementIndex < 0 || elementIndex >= _length)
+        if (elementIndex < 0 || elementIndex >= _length)
         {
             throw new ArgumentOutOfRangeException(nameof(elementIndex));
         }

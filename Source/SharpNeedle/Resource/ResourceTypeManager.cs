@@ -19,20 +19,20 @@ public static class ResourceTypeManager
 
     public static void RegisterResourceTypes(Assembly assembly, bool ignoreRegistered = true)
     {
-        foreach(Type type in assembly.GetTypes().Where(t => t.GetCustomAttribute<NeedleResourceAttribute>() != null))
+        foreach (Type type in assembly.GetTypes().Where(t => t.GetCustomAttribute<NeedleResourceAttribute>() != null))
         {
             NeedleResourceAttribute attribute = type.GetCustomAttribute<NeedleResourceAttribute>()!;
             attribute.Owner = type;
 
-            if(_resourceTypes.ContainsKey(attribute.Id) && ignoreRegistered)
+            if (_resourceTypes.ContainsKey(attribute.Id) && ignoreRegistered)
             {
                 continue;
             }
 
-            foreach(MethodInfo method in type.GetMethods())
+            foreach (MethodInfo method in type.GetMethods())
             {
                 ResourceCheckFunctionAttribute? checkAttribute = method.GetCustomAttribute<ResourceCheckFunctionAttribute>();
-                if(checkAttribute == null)
+                if (checkAttribute == null)
                 {
                     continue;
                 }
@@ -48,9 +48,9 @@ public static class ResourceTypeManager
 
     public static NeedleResourceAttribute? DetectType(IFile file)
     {
-        foreach(NeedleResourceAttribute value in _resourceTypes.Values)
+        foreach (NeedleResourceAttribute value in _resourceTypes.Values)
         {
-            if(value.CheckResource(file))
+            if (value.CheckResource(file))
             {
                 return value;
             }
@@ -67,7 +67,7 @@ public static class ResourceTypeManager
 
     public static ResourceType? GetType(Type type)
     {
-        if(_types.TryGetValue(type, out string? value))
+        if (_types.TryGetValue(type, out string? value))
         {
             return _resourceTypes[value].Type;
         }

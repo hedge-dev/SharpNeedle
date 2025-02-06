@@ -19,7 +19,7 @@ public class TerrainInstanceInfo : SampleChunkResource
         {
             LightGroups = reader.ReadObject<BinaryList<BinaryPointer<LightIndexMeshGroup>>>().Unwind();
         }
-        else if(DataVersion > 0)
+        else if (DataVersion > 0)
         {
             LightGroups = new List<LightIndexMeshGroup>(2) { reader.ReadObject<LightIndexMeshGroup>() };
         }
@@ -30,12 +30,12 @@ public class TerrainInstanceInfo : SampleChunkResource
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Model.Name);
         writer.WriteValueOffset(Matrix4x4.Transpose(Transform));
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-        if(DataVersion >= 5)
+        if (DataVersion >= 5)
         {
             writer.Write(LightGroups.Count);
             writer.WriteOffset(() =>
             {
-                foreach(LightIndexMeshGroup group in LightGroups)
+                foreach (LightIndexMeshGroup group in LightGroups)
                 {
                     writer.WriteObjectOffset(group);
                 }
@@ -43,7 +43,7 @@ public class TerrainInstanceInfo : SampleChunkResource
         }
         else if (DataVersion > 0)
         {
-            if(LightGroups.Count == 1)
+            if (LightGroups.Count == 1)
             {
                 LightGroups[0].Write(writer);
             }
@@ -59,7 +59,7 @@ public class TerrainInstanceInfo : SampleChunkResource
 
     public override void ResolveDependencies(IResourceResolver resolver)
     {
-        if(Model.IsValid())
+        if (Model.IsValid())
         {
             return;
         }
@@ -72,7 +72,7 @@ public class TerrainInstanceInfo : SampleChunkResource
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
-        if(!disposing)
+        if (!disposing)
         {
             return;
         }

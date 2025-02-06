@@ -13,7 +13,7 @@ public class RawChunk : IChunk
 
     public void Write(BinaryObjectWriter writer, ChunkParseOptions options)
     {
-        if(Data == null)
+        if (Data == null)
         {
             throw new InvalidDataException("RawChunk has no data");
         }
@@ -25,7 +25,7 @@ public class RawChunk : IChunk
 
     public T Parse<T>() where T : IBinarySerializable, new()
     {
-        if(Data == null)
+        if (Data == null)
         {
             throw new InvalidDataException("RawChunk has no data");
         }

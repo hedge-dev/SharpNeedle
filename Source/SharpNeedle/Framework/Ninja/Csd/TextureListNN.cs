@@ -58,7 +58,7 @@ public class TextureListNN : ITextureList
 
     public void CopyTo(ITexture[] array, int arrayIndex)
     {
-        for(int i = 0; i < Count; i++)
+        for (int i = 0; i < Count; i++)
         {
             array[arrayIndex + i] = Textures[i];
         }

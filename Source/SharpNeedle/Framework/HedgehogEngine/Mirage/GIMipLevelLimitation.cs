@@ -28,7 +28,7 @@ public class GIMipLevelLimitation : SampleChunkResource
     {
         get
         {
-            switch(index)
+            switch (index)
             {
                 case 0:
                     return Level0;
@@ -43,7 +43,7 @@ public class GIMipLevelLimitation : SampleChunkResource
 
         set
         {
-            switch(index)
+            switch (index)
             {
                 case 0:
                     Level0 = value;

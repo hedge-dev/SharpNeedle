@@ -44,7 +44,7 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
             int oldPriority = _priority;
             _priority = value;
 
-            if(oldPriority != _priority)
+            if (oldPriority != _priority)
             {
                 Family?.NotifyPriorityChanged(this);
             }
@@ -73,12 +73,12 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
 
         Field4C = reader.Read<uint>();
 
-        if(family.Scene == null)
+        if (family.Scene == null)
         {
             throw new InvalidOperationException("Family scene is null!");
         }
 
-        if(family.Scene.Version >= 3)
+        if (family.Scene.Version >= 3)
         {
             Width = reader.Read<uint>();
             Height = reader.Read<uint>();
@@ -117,17 +117,17 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
 
         family ??= Family;
 
-        if(family == null)
+        if (family == null)
         {
             throw new InvalidOperationException("family is null!");
         }
 
-        if(family.Scene == null)
+        if (family.Scene == null)
         {
             throw new InvalidOperationException("Family scene is null!");
         }
 
-        if(family.Scene.Version >= 3)
+        if (family.Scene.Version >= 3)
         {
             writer.Write(Width);
             writer.Write(Height);
@@ -147,7 +147,7 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
 
     public void Add(Cast item)
     {
-        if(item == null)
+        if (item == null)
         {
             throw new ArgumentNullException(nameof(item));
         }
@@ -160,7 +160,7 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
 
     public void Clear()
     {
-        foreach(Cast child in this)
+        foreach (Cast child in this)
         {
             child.Parent = null;
             Family?.NotifyCastRemoved(child);
@@ -181,7 +181,7 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
 
     public bool Remove(Cast item)
     {
-        if(item?.Parent != this)
+        if (item?.Parent != this)
         {
             return false;
         }
@@ -199,7 +199,7 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
 
     public void Insert(int index, Cast item)
     {
-        if(item == null)
+        if (item == null)
         {
             throw new ArgumentNullException(nameof(item));
         }

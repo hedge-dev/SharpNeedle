@@ -13,7 +13,7 @@ public class Font : List<CharData>, IBinarySerializable<ChunkBinaryOptions>
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
         Clear();
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.Align(8);
         }
@@ -21,14 +21,14 @@ public class Font : List<CharData>, IBinarySerializable<ChunkBinaryOptions>
         Name = reader.ReadStringOffset();
         ID = reader.Read<int>();
         Field0C = reader.Read<uint>();
-        if(options.Version >= 4)
+        if (options.Version >= 4)
         {
             Field10 = reader.Read<short>();
         }
 
         Capacity = reader.Read<ushort>();
         Field14 = reader.Read<ushort>();
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             reader.Align(8);
         }
@@ -40,7 +40,7 @@ public class Font : List<CharData>, IBinarySerializable<ChunkBinaryOptions>
         AddRange(reader.ReadObjectArrayOffset<CharData>(Capacity));
         Field20 = reader.ReadOffsetValue();
         long userDataOffset = reader.ReadOffsetValue();
-        if(userDataOffset != 0)
+        if (userDataOffset != 0)
         {
             UserData = reader.ReadObjectAtOffset<UserData, ChunkBinaryOptions>(userDataOffset, options);
         }
@@ -48,7 +48,7 @@ public class Font : List<CharData>, IBinarySerializable<ChunkBinaryOptions>
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             writer.Align(8);
         }
@@ -56,14 +56,14 @@ public class Font : List<CharData>, IBinarySerializable<ChunkBinaryOptions>
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         writer.Write(ID);
         writer.Write(Field0C);
-        if(options.Version >= 4)
+        if (options.Version >= 4)
         {
             writer.Write(Field10);
         }
 
         writer.Write((ushort)Count);
         writer.Write(Field14);
-        if(options.Version >= 3)
+        if (options.Version >= 3)
         {
             writer.Align(8);
         }
@@ -74,7 +74,7 @@ public class Font : List<CharData>, IBinarySerializable<ChunkBinaryOptions>
 
         writer.WriteObjectCollectionOffset(this);
         writer.WriteOffsetValue(Field20);
-        if(UserData != null)
+        if (UserData != null)
         {
             writer.WriteObjectOffset(UserData, options);
         }

@@ -21,7 +21,7 @@ public class VirtualFile : IFile
         get => _name;
         set
         {
-            if(_name == value)
+            if (_name == value)
             {
                 return;
             }
@@ -49,7 +49,7 @@ public class VirtualFile : IFile
 
     public Stream Open(FileAccess access = FileAccess.Read)
     {
-        if(BaseStream == null)
+        if (BaseStream == null)
         {
             BaseStream = new MemoryStream();
             _leaveOpen = false;
@@ -61,7 +61,7 @@ public class VirtualFile : IFile
 
     public void Dispose()
     {
-        if(!_leaveOpen)
+        if (!_leaveOpen)
         {
             BaseStream?.Dispose();
         }

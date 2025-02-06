@@ -35,13 +35,13 @@ public class OffsetTable : List<long>
     {
         long lastOffset = 0L;
 
-        for(int i = 0; i < table.Length; i++)
+        for (int i = 0; i < table.Length; i++)
         {
             byte b = table[i];
             OffsetEncoding type = (OffsetEncoding)(b & 0xC0);
             byte v = (byte)(b & 0x3F);
 
-            switch(type)
+            switch (type)
             {
                 case OffsetEncoding.SixBit:
                     outOffsets.Add((v << 2) + lastOffset);
@@ -85,17 +85,17 @@ public class OffsetTable : List<long>
     public static void Encode(IEnumerable<long> offsets, BinaryValueWriter writer)
     {
         long lastOffset = 0L;
-        foreach(long offset in offsets)
+        foreach (long offset in offsets)
         {
             long d = (offset - lastOffset) >> 2;
-            if(d > 0x3FFF)
+            if (d > 0x3FFF)
             {
                 writer.WriteBig((byte)(0xC0 | (d >> 24)));
                 writer.WriteBig((byte)(d >> 16));
                 writer.WriteBig((byte)(d >> 8));
                 writer.WriteBig((byte)(d & 0xFF));
             }
-            else if(d > 0x3F)
+            else if (d > 0x3F)
             {
                 writer.WriteBig((byte)(0x80 | (d >> 8)));
                 writer.WriteBig((byte)d);

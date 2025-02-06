@@ -4,7 +4,7 @@ public static class Utilities
 {
     public static IEffectData? ReadEffectOffset(BinaryObjectReader reader, EffectType type, ChunkBinaryOptions options)
     {
-        switch(type)
+        switch (type)
         {
             case EffectType.None:
                 return null;
