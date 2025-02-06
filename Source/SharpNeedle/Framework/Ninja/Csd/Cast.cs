@@ -63,7 +63,7 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
         BottomRight = reader.Read<Vector2>();
 
         Field2C = reader.Read<uint>();
-        Info = reader.ReadValueOffset<CastInfo>();
+        Info = reader.ReadObjectOffset<CastInfo>();
         InheritanceFlags = reader.Read<BitSet<uint>>();
         Field38 = reader.Read<uint>();
         SpriteIndices = reader.ReadArrayOffset<int>(reader.Read<int>());
@@ -103,7 +103,7 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
         writer.Write(BottomRight);
 
         writer.Write(Field2C);
-        writer.WriteValueOffset(Info);
+        writer.WriteObjectOffset(Info);
         writer.Write(InheritanceFlags);
         writer.Write(Field38);
 
