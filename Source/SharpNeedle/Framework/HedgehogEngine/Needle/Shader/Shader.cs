@@ -9,7 +9,7 @@ public class Shader : ResourceBase
     public static readonly ulong FileSignature = BinaryHelper.MakeSignature<ulong>("HHNEEDLE");
     public static readonly ulong ShaderSignature = BinaryHelper.MakeSignature<ulong>("HNSHV002");
 
-    public struct Permutation : IBinarySerializable
+    public struct Feature : IBinarySerializable
     {
         private string? _name;
 
@@ -48,13 +48,9 @@ public class Shader : ResourceBase
     /// </summary>
     public uint Unknown1 { get; set; }
 
-    public List<Permutation> Permutations { get; set; } = [];
+    public List<Feature> Features { get; set; } = [];
 
-    /// <summary>
-    /// One-based index to <see cref="ShaderVariants"/>. 
-    /// <br/> 0 Probably means "null" here, so 1 is used to access index 0.
-    /// </summary>
-    public List<int> Variants { get; set; } = [];
+    public List<int> PermutationVariant { get; set; } = [];
 
     public List<ShaderVariant> ShaderVariants { get; set; } = []; 
 
@@ -76,10 +72,10 @@ public class Shader : ResourceBase
         reader.Endianness = Endianness.Big;
         Unknown1 = reader.ReadUInt32();
         int permutationCount = reader.ReadInt32();
-        Permutations = [.. reader.ReadObjectArray<Permutation>(permutationCount)];
+        Features = [.. reader.ReadObjectArray<Feature>(permutationCount)];
 
-        int variantCount = 1 << Permutations.Count;
-        Variants = [.. reader.ReadArray<int>(variantCount)];
+        int variantCount = 1 << Features.Count;
+        PermutationVariant = [.. reader.ReadArray<int>(variantCount)];
 
         int shaderVariantCount = reader.ReadInt32();
         ShaderVariants = [.. reader.ReadObjectArray<ShaderVariant>(shaderVariantCount)];
@@ -106,16 +102,16 @@ public class Shader : ResourceBase
 
         writer.Endianness = Endianness.Big;
         writer.WriteUInt32(Unknown1);
-        writer.WriteInt32(Permutations.Count);
-        writer.WriteObjectCollection(Permutations);
+        writer.WriteInt32(Features.Count);
+        writer.WriteObjectCollection(Features);
 
-        int variantCount = 1 << Variants.Count;
-        if(Variants.Count != variantCount)
+        int variantCount = 1 << PermutationVariant.Count;
+        if(PermutationVariant.Count != variantCount)
         {
-            throw new InvalidOperationException($"Shader is supposed to have {variantCount} variants, but has {Variants.Count}!");
+            throw new InvalidOperationException($"Shader is supposed to have {variantCount} variants, but has {PermutationVariant.Count}!");
         }
 
-        writer.WriteArray(Variants.ToArray());
+        writer.WriteArray(PermutationVariant.ToArray());
 
         writer.WriteInt32(ShaderVariants.Count);
         writer.WriteObjectCollection(ShaderVariants);
