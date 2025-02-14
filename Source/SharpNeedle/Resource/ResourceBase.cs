@@ -1,9 +1,12 @@
 ﻿namespace SharpNeedle.Resource;
 
+using System.Text.Json.Serialization;
+
 public abstract class ResourceBase : IResource
 {
     public string Name { get; set; } = string.Empty;
 
+    [JsonIgnore]
     public IFile? BaseFile { get; protected set; }
 
     protected bool Disposed { get; private set; }

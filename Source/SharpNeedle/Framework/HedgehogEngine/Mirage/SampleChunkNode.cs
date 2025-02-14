@@ -1,9 +1,85 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Mirage;
 
 using System.Collections.ObjectModel;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
+[JsonConverter(typeof(JsonConverter))]
 public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
 {
+    private class JsonConverter : JsonConverter<SampleChunkNode>
+    {
+        public override SampleChunkNode? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            if(reader.TokenType != JsonTokenType.StartObject)
+            {
+                throw new JsonException();
+            }
+
+            SampleChunkNode result = new();
+
+            while(reader.Read() && reader.TokenType != JsonTokenType.EndObject)
+            {
+                if(reader.TokenType != JsonTokenType.PropertyName)
+                {
+                    throw new JsonException();
+                }
+
+                string? propertyName = reader.GetString();
+                reader.Read();
+
+                switch (propertyName)
+                {
+                    case nameof(Name):
+                        result.Name = reader.GetString() ?? string.Empty;
+                        break;
+                    case nameof(Value):
+                        result.Value = reader.GetUInt32();
+                        break;
+                    case nameof(Children):
+                        SampleChunkNode[] children = JsonSerializer.Deserialize<SampleChunkNode[]>(ref reader, options) ?? throw new JsonException();
+
+                        foreach (SampleChunkNode child in children)
+                        {
+                            result.AddChild(child);
+                        }
+
+                        break;
+                }
+            }
+
+            return result;            
+        }
+
+        public override void Write(Utf8JsonWriter writer, SampleChunkNode value, JsonSerializerOptions options)
+        {
+            writer.WriteStartObject();
+
+            if (!string.IsNullOrEmpty(value.Name))
+            {
+                writer.WriteString(nameof(SampleChunkNode.Name), value.Name);
+            }
+
+            if (value.Value != 0)
+            {
+                writer.WriteNumber(nameof(SampleChunkNode.Value), value.Value);
+            }
+
+            if (value.Count > 0)
+            {
+                writer.WriteStartArray("Children");
+
+                foreach (SampleChunkNode child in value.Children)
+                {
+                    JsonSerializer.Serialize(writer, child, options);
+                }
+
+                writer.WriteEndArray();
+            }
+            writer.WriteEndObject();
+        }
+    }
+
     public const uint RootSignature = 0x133054A;
 
     private readonly List<SampleChunkNode> _children = [];
@@ -65,6 +141,7 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
     /// <summary>
     /// Number of children inside this node
     /// </summary>
+    [JsonIgnore]
     public int Count => Children.Count;
 
 
