@@ -20,7 +20,7 @@ public class ModelBlock : SampleChunkResourceBlock<ModelBase>
 
     protected override ModelBase CreateResourceInstance(string filename)
     {
-        string extension = Path.GetExtension(filename).ToLower();
+        string extension = Path.GetExtension(filename).ToLowerInvariant();
 
         if (extension == ".terrain-model")
         {

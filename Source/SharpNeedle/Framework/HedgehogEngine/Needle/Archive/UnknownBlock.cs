@@ -21,12 +21,12 @@ public class UnknownBlock : NeedleArchiveBlock
         return true;
     }
 
-    protected override void ReadBlockData(BinaryObjectReader reader, string filename, NeedleArchvieDataOffsetMode offsetMode)
+    protected override void ReadBlockData(BinaryObjectReader reader, string filename, NeedleArchiveDataOffsetMode offsetMode)
     {
         Data = reader.ReadArray<byte>((int)reader.Length);
     }
 
-    protected override void WriteBlockData(BinaryObjectWriter writer, string filename, NeedleArchvieDataOffsetMode offsetMode)
+    protected override void WriteBlockData(BinaryObjectWriter writer, string filename, NeedleArchiveDataOffsetMode offsetMode)
     {
         writer.WriteArray(Data);
     }

@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Needle.Archive;
 
-public enum NeedleArchvieDataOffsetMode
+public enum NeedleArchiveDataOffsetMode
 {
     Default,
 

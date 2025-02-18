@@ -26,7 +26,7 @@ public class NeedleArchive : ResourceBase
 
     public string Type { get; set; } = "arc";
 
-    public NeedleArchvieDataOffsetMode OffsetMode { get; set; }
+    public NeedleArchiveDataOffsetMode OffsetMode { get; set; }
 
     public List<NeedleArchiveBlock> DataBlocks { get; set; } = [];
 

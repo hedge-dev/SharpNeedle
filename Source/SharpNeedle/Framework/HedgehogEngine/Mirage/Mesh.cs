@@ -212,7 +212,7 @@ public struct MeshSlot
     public MeshSlot(string name)
     {
         Name = default;
-        switch (name.ToLower())
+        switch (name.ToLowerInvariant())
         {
             case "opaq":
             case "opaque":

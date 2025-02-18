@@ -45,10 +45,10 @@ public abstract class NeedleArchiveBlock : ResourceBase
         BaseFile = file;
         Name = Path.GetFileNameWithoutExtension(file.Name);
         using BinaryObjectReader reader = new(file.Open(), StreamOwnership.Transfer, Endianness.Big);
-        ReadBlockData(reader, file.Name, NeedleArchvieDataOffsetMode.Default);
+        ReadBlockData(reader, file.Name, NeedleArchiveDataOffsetMode.Default);
     }
 
-    public void ReadBlock(BinaryObjectReader reader, string filename, NeedleArchvieDataOffsetMode offsetMode)
+    public void ReadBlock(BinaryObjectReader reader, string filename, NeedleArchiveDataOffsetMode offsetMode)
     {
         // this occurs *after* the first 6 signature bytes have been read
 
@@ -74,9 +74,9 @@ public abstract class NeedleArchiveBlock : ResourceBase
         reader.Skip(size);
     }
 
-    protected abstract void ReadBlockData(BinaryObjectReader reader, string filename, NeedleArchvieDataOffsetMode offsetMode);
+    protected abstract void ReadBlockData(BinaryObjectReader reader, string filename, NeedleArchiveDataOffsetMode offsetMode);
 
-    public static NeedleArchiveBlock ReadArchiveBlock(BinaryObjectReader reader, string filename, NeedleArchvieDataOffsetMode offsetMode)
+    public static NeedleArchiveBlock ReadArchiveBlock(BinaryObjectReader reader, string filename, NeedleArchiveDataOffsetMode offsetMode)
     {
         string signature = reader.ReadString(StringBinaryFormat.FixedLength, 6);
 
@@ -96,10 +96,10 @@ public abstract class NeedleArchiveBlock : ResourceBase
     {
         BaseFile = file;
         using BinaryObjectWriter writer = new(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness.Big);
-        WriteBlockData(writer, file.Name, NeedleArchvieDataOffsetMode.Default);
+        WriteBlockData(writer, file.Name, NeedleArchiveDataOffsetMode.Default);
     }
 
-    public void WriteBlock(BinaryObjectWriter writer, string filename, NeedleArchvieDataOffsetMode offsetMode)
+    public void WriteBlock(BinaryObjectWriter writer, string filename, NeedleArchiveDataOffsetMode offsetMode)
     {
         if (Version > 9)
         {
@@ -128,7 +128,7 @@ public abstract class NeedleArchiveBlock : ResourceBase
         }
     }
 
-    protected abstract void WriteBlockData(BinaryObjectWriter writer, string filename, NeedleArchvieDataOffsetMode offsetMode);
+    protected abstract void WriteBlockData(BinaryObjectWriter writer, string filename, NeedleArchiveDataOffsetMode offsetMode);
 
     public override string ToString()
     {

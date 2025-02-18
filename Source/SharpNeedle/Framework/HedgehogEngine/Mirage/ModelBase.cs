@@ -25,7 +25,7 @@ public abstract class ModelBase : SampleChunkResource
         if (exceptions.Count > 0)
         {
             throw new ResourceResolveException(
-                $"Failed tor resolve dependencies of {exceptions.Count} mesh groups",
+                $"Failed to resolve dependencies of {exceptions.Count} mesh groups",
                 exceptions.SelectMany(x => x.Resources).ToArray()
             );
         }

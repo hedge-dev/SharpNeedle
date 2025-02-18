@@ -34,7 +34,7 @@ public class LODInfoBlock : NeedleArchiveBlock
         return version == 1;
     }
 
-    protected override void ReadBlockData(BinaryObjectReader reader, string filename, NeedleArchvieDataOffsetMode offsetMode)
+    protected override void ReadBlockData(BinaryObjectReader reader, string filename, NeedleArchiveDataOffsetMode offsetMode)
     {
         Unknown1 = reader.ReadByte();
         byte lodCount = reader.ReadByte();
@@ -60,7 +60,7 @@ public class LODInfoBlock : NeedleArchiveBlock
         Items = [.. items[..lodCount]];
     }
 
-    protected override void WriteBlockData(BinaryObjectWriter writer, string filename, NeedleArchvieDataOffsetMode offsetMode)
+    protected override void WriteBlockData(BinaryObjectWriter writer, string filename, NeedleArchiveDataOffsetMode offsetMode)
     {
         if (Items.Count > 32)
         {

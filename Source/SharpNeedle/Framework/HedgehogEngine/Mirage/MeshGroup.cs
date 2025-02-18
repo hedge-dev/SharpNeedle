@@ -182,7 +182,7 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
         if (exceptions.Count > 0)
         {
             throw new ResourceResolveException(
-                $"Failed tor resolve dependencies of {exceptions.Count} meshes",
+                $"Failed to resolve dependencies of {exceptions.Count} meshes",
                 exceptions.SelectMany(x => x.Resources).ToArray()
             );
         }

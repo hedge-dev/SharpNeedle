@@ -7,7 +7,7 @@ using SharpNeedle.Utilities;
 public class MorphModel : IBinarySerializable<uint>
 {
     public List<MorphTarget> Targets { get; set; } = [];
-    public MeshGroup? Meshgroup { get; set; }
+    public MeshGroup? MeshGroup { get; set; }
 
     public void Read(BinaryObjectReader reader, uint version)
     {
@@ -43,13 +43,13 @@ public class MorphModel : IBinarySerializable<uint>
             }
         });
 
-        Meshgroup = reader.ReadObject<MeshGroup, uint>(version);
+        MeshGroup = reader.ReadObject<MeshGroup, uint>(version);
 
         byte[] vertexData = [];
 
-        for (int i = 0; i < Meshgroup.Count; i++)
+        for (int i = 0; i < MeshGroup.Count; i++)
         {
-            Mesh mesh = Meshgroup[i];
+            Mesh mesh = MeshGroup[i];
 
             if (i == 0)
             {
@@ -68,17 +68,17 @@ public class MorphModel : IBinarySerializable<uint>
 
     public void Write(BinaryObjectWriter writer, uint version)
     {
-        if (Meshgroup == null)
+        if (MeshGroup == null)
         {
             throw new InvalidOperationException("Meshgroup is null");
         }
 
-        if (Meshgroup.Count == 0)
+        if (MeshGroup.Count == 0)
         {
             throw new InvalidOperationException("Meshgroup has no meshes");
         }
 
-        Mesh mesh = Meshgroup.First();
+        Mesh mesh = MeshGroup.First();
 
         byte[] verticesClone = new byte[mesh.Vertices.Length];
         Array.Copy(mesh.Vertices, verticesClone, verticesClone.LongLength);
@@ -106,17 +106,17 @@ public class MorphModel : IBinarySerializable<uint>
             }
         });
 
-        writer.WriteObject(Meshgroup, version);
+        writer.WriteObject(MeshGroup, version);
     }
 
     public void ResolveDependencies(IResourceResolver dir)
     {
-        Meshgroup?.ResolveDependencies(dir);
+        MeshGroup?.ResolveDependencies(dir);
     }
 
     public void WriteDependencies(IDirectory dir)
     {
-        Meshgroup?.WriteDependencies(dir);
+        MeshGroup?.WriteDependencies(dir);
     }
 }
 

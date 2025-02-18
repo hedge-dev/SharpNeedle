@@ -66,7 +66,7 @@ public class TerrainInstanceInfo : SampleChunkResource
 
         string filename = $"{Model.Name}.terrain-model";
         Model = resolver.Open<TerrainModel>(filename)
-            ?? throw new ResourceResolveException($"Failed tor esolve {filename}", [filename]);
+            ?? throw new ResourceResolveException($"Failed to resolve {filename}", [filename]);
     }
 
     protected override void Dispose(bool disposing)

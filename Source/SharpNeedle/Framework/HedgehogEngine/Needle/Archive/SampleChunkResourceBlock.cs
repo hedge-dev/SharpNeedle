@@ -85,11 +85,11 @@ public abstract class SampleChunkResourceBlock<T> : NeedleArchiveBlock where T :
         }
     }
 
-    protected override void ReadBlockData(BinaryObjectReader reader, string filename, NeedleArchvieDataOffsetMode offsetMode)
+    protected override void ReadBlockData(BinaryObjectReader reader, string filename, NeedleArchiveDataOffsetMode offsetMode)
     {
         BinaryObjectReader adjustedReader = reader;
 
-        if (offsetMode != NeedleArchvieDataOffsetMode.Default)
+        if (offsetMode != NeedleArchiveDataOffsetMode.Default)
         {
             using (SeekToken startToken = reader.At())
             {
@@ -98,10 +98,10 @@ public abstract class SampleChunkResourceBlock<T> : NeedleArchiveBlock where T :
 
                 switch (offsetMode)
                 {
-                    case NeedleArchvieDataOffsetMode.Flipped:
+                    case NeedleArchiveDataOffsetMode.Flipped:
                         FlipEndianOfOffsets(offsets, adjustedData);
                         break;
-                    case NeedleArchvieDataOffsetMode.SelfRelative:
+                    case NeedleArchiveDataOffsetMode.SelfRelative:
                         SelfRelativeToAbsoluteOffsets(offsets, adjustedData);
                         break;
                 }
@@ -124,7 +124,7 @@ public abstract class SampleChunkResourceBlock<T> : NeedleArchiveBlock where T :
 
 
 
-    protected override void WriteBlockData(BinaryObjectWriter writer, string filename, NeedleArchvieDataOffsetMode offsetMode)
+    protected override void WriteBlockData(BinaryObjectWriter writer, string filename, NeedleArchiveDataOffsetMode offsetMode)
     {
         if (Resource == null)
         {
@@ -142,7 +142,7 @@ public abstract class SampleChunkResourceBlock<T> : NeedleArchiveBlock where T :
             resourceData = resourceStream.ToArray();
         }
 
-        if (offsetMode != NeedleArchvieDataOffsetMode.Default)
+        if (offsetMode != NeedleArchiveDataOffsetMode.Default)
         {
             long[] offsets;
             using (MemoryStream offsetsStream = new(resourceData))
@@ -153,10 +153,10 @@ public abstract class SampleChunkResourceBlock<T> : NeedleArchiveBlock where T :
 
             switch (offsetMode)
             {
-                case NeedleArchvieDataOffsetMode.Flipped:
+                case NeedleArchiveDataOffsetMode.Flipped:
                     FlipEndianOfOffsets(offsets, resourceData);
                     break;
-                case NeedleArchvieDataOffsetMode.SelfRelative:
+                case NeedleArchiveDataOffsetMode.SelfRelative:
                     AbsoluteToSelfRelativeOffsets(offsets, resourceData);
                     break;
             }
