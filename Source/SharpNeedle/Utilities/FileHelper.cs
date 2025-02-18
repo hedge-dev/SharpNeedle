@@ -1,5 +1,4 @@
 ﻿namespace SharpNeedle.Utilities;
-using System.IO;
 
 public class FileHelper
 {
@@ -14,6 +13,7 @@ public class FileHelper
             case FileAccess.ReadWrite:
                 return FileMode.OpenOrCreate;
         }
+
         return FileMode.OpenOrCreate;
     }
 }

@@ -1,5 +1,7 @@
 ﻿namespace SharpNeedle.Studio.Models;
 
+using SharpNeedle.Resource;
+
 [AttributeUsage(AttributeTargets.Class)]
 public class ResourceEditorAttribute : Attribute
 {

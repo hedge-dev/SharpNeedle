@@ -1,79 +1,98 @@
 ﻿namespace SharpNeedle.IO;
-using System.IO;
 
 public class HostFile : IFile
 {
-    private DateTime mLastModified;
-    public IDirectory Parent
-        => HostDirectory.FromPath(Path.GetDirectoryName(Path.IsPathRooted(FullPath.AsSpan())
-            ? FullPath
-            : Path.TrimEndingDirectorySeparator(FullPath)));
+    private DateTime _lastModified;
 
-    string IFile.Path => FullPath;
+
+    protected FileAccess Access { get; set; }
+
+    protected FileStream? BaseStream { get; set; }
+
+
+    public IDirectory Parent
+        => HostDirectory.ParentFromPath(Path)
+        ?? throw new IOException("Could not find directory for file!");
+
+    public string Path { get; }
+
     public string Name { get; set; }
+
     public long Length { get; }
-    public string FullPath { get; }
 
     public DateTime LastModified
     {
-        get => mLastModified;
+        get => _lastModified;
         set
         {
-            mLastModified = value;
-            File.SetLastWriteTime(FullPath, value);
+            _lastModified = value;
+            File.SetLastWriteTime(Path, value);
         }
     }
 
-    protected FileAccess Access { get; set; }
-    protected FileStream BaseStream { get; set; }
-    
-    public HostFile(string fullPath)
-    {
-        if (!File.Exists(fullPath))
-            throw new FileNotFoundException(fullPath);
 
-        var info = new FileInfo(fullPath);
-        Name = info.Name;
-        FullPath = fullPath;
-        Length = info.Length;
-        LastModified = info.LastWriteTime;
-    }
-
-    public static HostFile Create(string fullPath)
+    public static HostFile Create(string fullPath, bool overwrite = true)
     {
-        File.WriteAllBytes(fullPath, Array.Empty<byte>());
+        if (File.Exists(fullPath) && !overwrite)
+        {
+            throw new InvalidOperationException($"File \"{fullPath}\" already exists! Create failed!");
+        }
+
+        File.WriteAllBytes(fullPath, []);
         return new HostFile(fullPath);
     }
 
-    public static HostFile Open(string fullPath)
+    public static HostFile? Open(string fullPath)
     {
         return !File.Exists(fullPath) ? null : new HostFile(fullPath);
     }
 
-    public Stream Open(FileAccess access = FileAccess.Read)
+    public static bool Delete(string fullPath)
     {
-        if (CheckDisposed())
-            BaseStream = null;
-
-        Access = access;
-
-        if (BaseStream != null && Access == access)
-            return BaseStream;
-            
-        if (BaseStream != null && Access == access)
+        if (!File.Exists(fullPath))
         {
-            Dispose();
-            return Open(access);
+            return false;
         }
 
-        BaseStream = new FileStream(FullPath, FileHelper.FileAccessToMode(access), access, FileShare.ReadWrite);
-        return BaseStream;
+        try
+        {
+            File.Delete(fullPath);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+
+    public HostFile(string filepath)
+    {
+        if (!File.Exists(filepath))
+        {
+            throw new FileNotFoundException(filepath);
+        }
+
+        FileInfo info = new(filepath);
+        Name = info.Name;
+        Path = filepath;
+        Length = info.Length;
+        LastModified = info.LastWriteTime;
+    }
+
+
+    public void Dispose()
+    {
+        BaseStream?.Dispose();
+        BaseStream = null;
     }
 
     public bool CheckDisposed()
     {
         if (BaseStream == null)
+        {
             return false;
+        }
 
         try
         {
@@ -86,23 +105,49 @@ public class HostFile : IFile
         }
     }
 
-    public override string ToString()
-        => Name;
+    public Stream Open(FileAccess access = FileAccess.Read)
+    {
+        if (CheckDisposed())
+        {
+            BaseStream = null;
+        }
 
-    public override bool Equals(object obj)
-        => obj is HostFile file && Equals(file);
+        if (BaseStream != null)
+        {
+            if (Access == access)
+            {
+                return BaseStream;
+            }
+            else
+            {
+                Dispose();
+            }
+        }
+
+        Access = access;
+        BaseStream = new FileStream(Path, FileHelper.FileAccessToMode(Access), Access, FileShare.ReadWrite);
+        return BaseStream;
+    }
+
 
     protected bool Equals(HostFile other)
-        => FullPath == other.FullPath;
+    {
+        return Path == other.Path;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is HostFile file && Equals(file);
+    }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Length, FullPath);
+        return HashCode.Combine(Path);
     }
 
-    public void Dispose()
+    public override string ToString()
     {
-        BaseStream?.Dispose();
-        BaseStream = null;
+        return Name;
     }
+
 }

@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Windows;
 using Ookii.Dialogs.Wpf;
+using SharpNeedle.Resource;
 
 public class MainViewModel : IViewModel
 {

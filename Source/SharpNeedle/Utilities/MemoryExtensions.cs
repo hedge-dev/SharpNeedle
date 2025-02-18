@@ -10,7 +10,7 @@ public static class MemoryExtensions
     /// <returns></returns>
     public static Memory<T> AsMemory<T>(this Span<T> span) where T : unmanaged
     {
-        var manager = new UnmanagedMemoryManager<T>(span);
+        UnmanagedMemoryManager<T> manager = new(span);
         return manager.Memory;
     }
 }

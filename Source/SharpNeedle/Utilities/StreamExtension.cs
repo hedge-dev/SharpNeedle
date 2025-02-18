@@ -1,5 +1,6 @@
 ﻿namespace SharpNeedle.Utilities;
-using System.IO;
+
+using System.Diagnostics.CodeAnalysis;
 
 public static class StreamExtension
 {
@@ -15,7 +16,7 @@ public static class StreamExtension
 
         GCHandle handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
 
-        T structure = (T)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(T));
+        T structure = (T)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(T))!;
 
         handle.Free();
 
@@ -34,7 +35,7 @@ public static class StreamExtension
 
         GCHandle handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
 
-        T structure = (T)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(T));
+        T structure = (T)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(T))!;
 
         handle.Free();
 
@@ -59,7 +60,7 @@ public static class StreamExtension
 
         for (int i = 0; i < count; i++)
         {
-            structArray[i] = (T)Marshal.PtrToStructure(bufferPtr, typeof(T));
+            structArray[i] = (T)Marshal.PtrToStructure(bufferPtr, typeof(T))!;
             bufferPtr += structureSize;
         }
 
@@ -68,7 +69,7 @@ public static class StreamExtension
         return structArray;
     }
 
-    public static void WriteStructure<T>(this Stream stream, T structure)
+    public static void WriteStructure<T>(this Stream stream, [DisallowNull] T structure)
     {
         int structureSize = Marshal.SizeOf(typeof(T));
         byte[] buffer = new byte[structureSize];
@@ -81,7 +82,7 @@ public static class StreamExtension
         stream.Write(buffer, 0, buffer.Length);
     }
 
-    public static void WriteStructure<T>(this Stream stream, T structure, int size)
+    public static void WriteStructure<T>(this Stream stream, [DisallowNull] T structure, int size)
     {
         int structureSize = Marshal.SizeOf(typeof(T));
         byte[] buffer = new byte[Math.Max(structureSize, size)];
@@ -103,7 +104,7 @@ public static class StreamExtension
 
         for (int i = 0; i < count; i++)
         {
-            Marshal.StructureToPtr(structArray[i], bufferPtr, false);
+            Marshal.StructureToPtr(structArray[i]!, bufferPtr, false);
             bufferPtr += structureSize;
         }
 

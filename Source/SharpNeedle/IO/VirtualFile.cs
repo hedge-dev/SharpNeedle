@@ -1,38 +1,43 @@
-﻿using System.IO;
-
-namespace SharpNeedle.IO;
+﻿namespace SharpNeedle.IO;
 
 public class VirtualFile : IFile
 {
-    private string mName;
+    private string _name = string.Empty;
+    private bool _leaveOpen = true;
+
 
     IDirectory IFile.Parent => Parent;
-    public string Path { get; internal set; }
-    public VirtualDirectory Parent { get; internal set; }
-    public long Length => BaseStream?.Length ?? 0;
-    public DateTime LastModified { get; set; }
-    public Stream BaseStream { get; set; }
 
-    private bool mLeaveOpen = true;
+
+    /// <summary>
+    /// Directory containing this file.
+    /// </summary>
+    public VirtualDirectory Parent { get; internal set; }
+
+    public string Path { get; internal set; }
 
     public string Name
     {
-        get => mName;
+        get => _name;
         set
         {
-            if (mName == value) return;
-            Parent?.FileNameChanged(this, mName, value);
+            if (_name == value)
+            {
+                return;
+            }
+
+            Parent?.FileNameChanged(this, _name, value);
             Path = System.IO.Path.Combine(Parent?.Path ?? string.Empty, value);
-            mName = value;
+            _name = value;
         }
     }
 
-    public VirtualFile(string name, Stream baseStream, bool leaveOpen = false)
-    {
-        Name = name;
-        mLeaveOpen = leaveOpen;
-        BaseStream = baseStream;
-    }
+    public long Length => BaseStream?.Length ?? 0;
+
+    public DateTime LastModified { get; set; }
+
+    public Stream? BaseStream { get; set; }
+
 
     public VirtualFile(string name, VirtualDirectory parent)
     {
@@ -40,13 +45,14 @@ public class VirtualFile : IFile
         Name = name;
         Path = System.IO.Path.Combine(parent.Path, name);
     }
-    
+
+
     public Stream Open(FileAccess access = FileAccess.Read)
     {
         if (BaseStream == null)
         {
             BaseStream = new MemoryStream();
-            mLeaveOpen = false;
+            _leaveOpen = false;
         }
 
         BaseStream.Position = 0;
@@ -55,8 +61,14 @@ public class VirtualFile : IFile
 
     public void Dispose()
     {
-        if (!mLeaveOpen) BaseStream.Dispose();
+        if (!_leaveOpen)
+        {
+            BaseStream?.Dispose();
+        }
     }
 
-    public override string ToString() => Name;
+    public override string ToString()
+    {
+        return Name;
+    }
 }
