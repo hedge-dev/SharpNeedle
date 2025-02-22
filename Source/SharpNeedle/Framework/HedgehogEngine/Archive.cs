@@ -59,6 +59,7 @@ public class Archive : ResourceBase, IDirectory, IStreamable
             pfiFile.Name = file.Name;
             pfiFile.Offset = (uint)size;
             pfiFile.Size = (uint)file.Length;
+            pfi.Files.Add(pfiFile);
 
             size += file.Length;
         }
