@@ -14,7 +14,7 @@ public class Archive : ResourceBase, IDirectory, IStreamable
 
     public IFile? this[string name] => GetFile(Name);
 
-    public int DataAlignment { get; set; }
+    public int DataAlignment { get; set; } = 16;
 
     public Stream? BaseStream { get; private set; }
 
