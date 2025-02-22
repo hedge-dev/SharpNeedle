@@ -36,7 +36,7 @@ public class TextureListNN : ITextureList
 
         long size = (long)end - (long)start;
         writer.At((long)start - sizeof(int), SeekOrigin.Begin);
-        writer.Write((int)size);
+        writer.WriteLittle((int)size);
 
         end.Dispose();
     }
