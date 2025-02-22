@@ -65,7 +65,7 @@ public class InfoChunk : IChunk
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
         writer.WriteLittle(Signature);
-        writer.Write(0x18); // Always constant
+        writer.WriteLittle(0x18); // Always constant
         writer.Write(Chunks.Count);
 
         writer.Write(0x20); // Always at the end of the chunk
