@@ -13,7 +13,7 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
     public Cast? Parent { get; set; }
     public string? Name { get; set; }
     public uint Field00 { get; set; }
-    public uint Field04 { get; set; }
+    public EType Type { get; set; }
     public bool Enabled { get; set; }
     public Vector2 TopLeft { get; set; }
     public Vector2 BottomLeft { get; set; }
@@ -21,10 +21,10 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
     public Vector2 BottomRight { get; set; }
     public uint Field2C { get; set; }
     public BitSet<uint> InheritanceFlags { get; set; }
-    public uint Field38 { get; set; }
+    public BitSet<uint> MaterialFlags { get; set; }
     public string? Text { get; set; }
     public string? FontName { get; set; }
-    public uint Field4C { get; set; }
+    public float FontKerning { get; set; }
     public uint Width { get; set; }
     public uint Height { get; set; }
     public uint Field58 { get; set; }
@@ -54,7 +54,7 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
     public void Read(BinaryObjectReader reader, Family family)
     {
         Field00 = reader.Read<uint>();
-        Field04 = reader.Read<uint>();
+        Type = reader.Read<EType>();
         Enabled = reader.Read<uint>() != 0;
 
         TopLeft = reader.Read<Vector2>();
@@ -65,13 +65,12 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
         Field2C = reader.Read<uint>();
         Info = reader.ReadObjectOffset<CastInfo>();
         InheritanceFlags = reader.Read<BitSet<uint>>();
-        Field38 = reader.Read<uint>();
+        MaterialFlags = reader.Read<BitSet<uint>>();
         SpriteIndices = reader.ReadArrayOffset<int>(reader.Read<int>());
 
         Text = reader.ReadStringOffset();
         FontName = reader.ReadStringOffset();
-
-        Field4C = reader.Read<uint>();
+        FontKerning = reader.ReadSingle();
 
         if (family.Scene == null)
         {
@@ -94,7 +93,7 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
     public void Write(BinaryObjectWriter writer, Family? family)
     {
         writer.Write(Field00);
-        writer.Write(Field04);
+        writer.Write(Type);
         writer.Write(Convert.ToInt32(Enabled));
 
         writer.Write(TopLeft);
@@ -105,7 +104,7 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
         writer.Write(Field2C);
         writer.WriteObjectOffset(Info);
         writer.Write(InheritanceFlags);
-        writer.Write(Field38);
+        writer.Write(MaterialFlags);
 
         writer.Write(SpriteIndices.Length);
         writer.WriteArrayOffset(SpriteIndices);
@@ -113,7 +112,7 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Text);
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, FontName);
 
-        writer.Write(Field4C);
+        writer.Write(FontKerning);
 
         family ??= Family;
 
@@ -235,5 +234,11 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
     public override string ToString()
     {
         return Name ?? string.Empty;
+    }
+    public enum EType : int
+    {
+        Null,
+        Sprite,
+        Font
     }
 }
