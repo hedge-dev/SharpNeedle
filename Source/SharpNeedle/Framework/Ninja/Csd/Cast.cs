@@ -19,7 +19,7 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
     public Vector2 BottomLeft { get; set; }
     public Vector2 TopRight { get; set; }
     public Vector2 BottomRight { get; set; }
-    public uint Field2C { get; set; }
+    public BitSet<uint> Field2C { get; set; }
     public BitSet<uint> InheritanceFlags { get; set; }
     public BitSet<uint> MaterialFlags { get; set; }
     public string? Text { get; set; }
@@ -62,7 +62,7 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
         TopRight = reader.Read<Vector2>();
         BottomRight = reader.Read<Vector2>();
 
-        Field2C = reader.Read<uint>();
+        Field2C = reader.Read<BitSet<uint>>();
         Info = reader.ReadObjectOffset<CastInfo>();
         InheritanceFlags = reader.Read<BitSet<uint>>();
         MaterialFlags = reader.Read<BitSet<uint>>();
