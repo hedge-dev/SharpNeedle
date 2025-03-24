@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Needle.Archive;
 
-using SharpNeedle.Framework.HedgehogEngine.Mirage;
+using SharpNeedle.Framework.HedgehogEngine.Mirage.ModelData;
 
 public class ModelBlock : SampleChunkResourceBlock<ModelBase>
 {
