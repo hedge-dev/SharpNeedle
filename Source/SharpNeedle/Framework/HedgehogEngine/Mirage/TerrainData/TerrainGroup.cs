@@ -1,5 +1,4 @@
-﻿namespace SharpNeedle.Framework.HedgehogEngine.Mirage.ModelData;
-
+﻿namespace SharpNeedle.Framework.HedgehogEngine.Mirage.TerrainData;
 [NeedleResource("hh/terrain-group", @"\.terrain-group$")]
 public class TerrainGroup : SampleChunkResource
 {

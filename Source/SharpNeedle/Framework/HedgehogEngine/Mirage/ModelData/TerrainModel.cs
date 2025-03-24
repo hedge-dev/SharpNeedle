@@ -3,20 +3,20 @@
 [NeedleResource("hh/model", ResourceType.Model, @"\.terrain-model$")]
 public class TerrainModel : ModelBase
 {
-    public TerrainFlags Flags { get; set; }
+    public TerrainModelFlags Flags { get; set; }
 
     public bool Instanced
     {
-        get => Flags.HasFlag(TerrainFlags.Instanced);
+        get => Flags.HasFlag(TerrainModelFlags.Instanced);
         set
         {
             if (value)
             {
-                Flags |= TerrainFlags.Instanced;
+                Flags |= TerrainModelFlags.Instanced;
             }
             else
             {
-                Flags &= ~TerrainFlags.Instanced;
+                Flags &= ~TerrainModelFlags.Instanced;
             }
         }
     }
@@ -27,7 +27,7 @@ public class TerrainModel : ModelBase
         if (DataVersion >= 5)
         {
             Name = reader.ReadStringOffsetOrEmpty();
-            Flags = reader.Read<TerrainFlags>();
+            Flags = reader.Read<TerrainModelFlags>();
         }
     }
 

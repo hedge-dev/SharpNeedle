@@ -1,4 +1,4 @@
-﻿namespace SharpNeedle.Framework.HedgehogEngine.Mirage.ModelData;
+﻿namespace SharpNeedle.Framework.HedgehogEngine.Mirage.TerrainData;
 using SharpNeedle.Framework.HedgehogEngine.Mirage;
 
 using SharpNeedle.Structs;

@@ -3,7 +3,7 @@
 using System;
 
 [Flags]
-public enum TerrainFlags : uint
+public enum TerrainModelFlags : uint
 {
     None,
     Instanced = 1
