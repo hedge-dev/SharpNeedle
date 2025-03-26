@@ -5,14 +5,14 @@ using System.Collections.Generic;
 
 public class GITextureGroup : IBinarySerializable
 {
-    public QualityLevel Quality { get; set; }
+    public GIQualityLevel Quality { get; set; }
     public Sphere Bounds { get; set; }
     public List<int> Indices { get; set; } = [];
     public uint MemorySize { get; set; }
 
     public void Read(BinaryObjectReader reader)
     {
-        Quality = reader.Read<QualityLevel>();
+        Quality = reader.Read<GIQualityLevel>();
         reader.Read(out int indexCount);
         Indices = new List<int>(indexCount);
         reader.ReadOffset(() =>
@@ -42,8 +42,4 @@ public class GITextureGroup : IBinarySerializable
         writer.Write(MemorySize);
     }
 
-    public enum QualityLevel : int
-    {
-        High, Medium, Low
-    }
 }

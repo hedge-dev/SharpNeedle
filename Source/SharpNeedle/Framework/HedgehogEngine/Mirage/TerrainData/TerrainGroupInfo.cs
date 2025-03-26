@@ -1,11 +1,7 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Mirage.TerrainData;
 
 using SharpNeedle.Structs;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 public class TerrainGroupInfo : IBinarySerializable
 {

@@ -1,15 +1,6 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Mirage.MaterialData;
 using SharpNeedle.Framework.HedgehogEngine.Mirage;
 
-public enum WrapMode : byte
-{
-    Repeat = 0,
-    Mirror = 1,
-    Clamp = 2,
-    MirrorOnce = 3,
-    Border = 4
-}
-
 [NeedleResource("hh/texture", @"\.texture$")]
 public class Texture : SampleChunkResource
 {
