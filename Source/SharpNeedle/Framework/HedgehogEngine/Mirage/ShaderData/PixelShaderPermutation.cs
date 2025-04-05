@@ -3,15 +3,42 @@
 using SharpNeedle.IO;
 using SharpNeedle.Resource;
 
-public class PixelShaderPermutation : BaseShaderPermutation<PixelShaderSubPermutations, PixelShader>
+[Flags]
+public enum PixelShaderSubPermutations
+{
+    None = 1 << 0,
+    ConstTexCoord = 1 << 1,
+    NoGI = 1 << 2,
+    NoGI_ConstTexCoord = 1 << 3,
+    NoLight = 1 << 4,
+    NoLight_ConstTexCoord = 1 << 5,
+    NoLight_NoGI = 1 << 6,
+    NoLight_NoGI_ConstTexCoord = 1 << 7,
+    All = 0xFF
+}
+
+[Flags]
+public enum PixelShaderSubPermutationFlags
+{
+    None = 0,
+    ConstTexCoord = 1 << 0,
+    NoGI = 1 << 1,
+    NoLight = 1 << 2,
+}
+
+public class PixelShaderPermutation : BaseShaderPermutation<PixelShaderSubPermutations, PixelShaderSubPermutationFlags, PixelShader>
 {
     public List<VertexShaderPermutation> VertexShaderPermutations { get; } = [];
 
     public override string ShaderFileExtension => ".pixelshader";
+    public override PixelShaderSubPermutationFlags SubPermutationFlagMask => 
+        PixelShaderSubPermutationFlags.ConstTexCoord 
+        | PixelShaderSubPermutationFlags.NoGI 
+        | PixelShaderSubPermutationFlags.NoLight;
 
     public PixelShaderPermutation(PixelShaderSubPermutations subPermutations, string permutationName, string shaderName) : base(subPermutations, permutationName, shaderName) { }
 
-    public PixelShaderPermutation() : base(PixelShaderSubPermutations.None, string.Empty, string.Empty) { }
+    public PixelShaderPermutation() : base(default, string.Empty, string.Empty) { }
 
     public override void Read(BinaryObjectReader reader)
     {

@@ -2,63 +2,177 @@
 
 using SharpNeedle.Resource;
 using System;
+using System.Collections.ObjectModel;
 
-public abstract class BaseShaderPermutation<P, S> : IBinarySerializable
-    where P : struct, Enum
-    where S : BaseShader, new()
+public abstract class BaseShaderPermutation<TSubPermutation, TSubPermutationFlag, TShader> : IBinarySerializable
+    where TSubPermutation : struct, Enum
+    where TSubPermutationFlag : struct, Enum
+    where TShader : BaseShader, new()
 {
-    public abstract string ShaderFileExtension { get; }
+    private TSubPermutation _subPermutations;
+    private string _shaderName = string.Empty;
+    private readonly Dictionary<TSubPermutationFlag, ResourceReference<TShader>> _shaders;
 
-    public P SubPermutations { get; set; }
+    public abstract string ShaderFileExtension { get; }
+    public abstract TSubPermutationFlag SubPermutationFlagMask { get; }
+
+    public TSubPermutation SubPermutations
+    {
+        get => _subPermutations;
+        set
+        {
+            if(_subPermutations.Equals(value))
+            {
+                return;
+            }
+
+            _subPermutations = value;
+            UpdateShaderDictionary();
+        }
+    }
+
     public string PermutationName { get; set; }
-    public ResourceReference<S> Shader { get; set; }
+    public string ShaderName
+    {
+        get => _shaderName;
+        set
+        {
+            if(_shaderName == value)
+            {
+                return;
+            }
+
+            _shaderName = value;
+            UpdateShaderDictionary();
+        }
+    }
+
+    public ReadOnlyDictionary<TSubPermutationFlag, ResourceReference<TShader>> Shaders { get; }
+
+    public BaseShaderPermutation(TSubPermutation subPermutations, string permutationName, string shaderName)
+    {
+        _shaders = [];
+        Shaders = new(_shaders);
+
+        _subPermutations = subPermutations;
+        PermutationName = permutationName;
+        _shaderName = shaderName;
+
+        UpdateShaderDictionary();
+    }
+
+    private static T UIntToFlag<T>(uint value) where T : struct, Enum
+    {
+        return (T)Enum.ToObject(typeof(T), value);
+    }
 
     public virtual void Read(BinaryObjectReader reader)
     {
-        SubPermutations = (P)Enum.ToObject(typeof(P), reader.ReadUInt32());
+        _subPermutations = UIntToFlag<TSubPermutation>(reader.ReadUInt32());
         reader.ReadOffset(() => PermutationName = reader.ReadString(StringBinaryFormat.NullTerminated));
-        reader.ReadOffset(() => Shader = reader.ReadString(StringBinaryFormat.NullTerminated));
+        reader.ReadOffset(() => _shaderName = reader.ReadString(StringBinaryFormat.NullTerminated));
+        UpdateShaderDictionary();
     }
 
     public virtual void Write(BinaryObjectWriter writer)
     {
         writer.Write(Convert.ToUInt32(SubPermutations));
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, PermutationName, -1, 1);
-        writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Shader.Name, -1, 1);
+        writer.WriteStringOffset(StringBinaryFormat.NullTerminated, ShaderName, -1, 1);
     }
 
-    public BaseShaderPermutation(P subPermutations, string permutationName, ResourceReference<S> shader)
+    private void UpdateShaderDictionary()
     {
-        SubPermutations = subPermutations;
-        PermutationName = permutationName;
-        Shader = shader;
+        if(SubPermutations.Equals(default(TSubPermutation)))
+        {
+            _shaders.Clear();
+            return;
+        }
+
+        Dictionary<TSubPermutationFlag, ResourceReference<TShader>> shaders = [];
+        uint permutations = Convert.ToUInt32(SubPermutations);
+
+        uint flag = 0;
+        while (permutations != 0)
+        {
+            if ((permutations & 1) != 0)
+            {
+                TSubPermutationFlag key = UIntToFlag<TSubPermutationFlag>(flag);
+
+                if(!_shaders.TryGetValue(key, out ResourceReference<TShader> shader))
+                {
+                    shader = ShaderName;
+
+                    if(flag != 0)
+                    {
+                        TSubPermutation permutation = UIntToFlag<TSubPermutation>(1u << (int)flag);
+                        shader += "_" + permutation.ToString();
+                    }
+                }
+
+                shaders[key] = shader;
+            }
+
+            permutations >>= 1;
+            flag++;
+        }
+
+        _shaders.Clear();
+
+        foreach (KeyValuePair<TSubPermutationFlag, ResourceReference<TShader>> item in shaders)
+        {
+            _shaders.Add(item.Key, item.Value);
+        }
     }
 
     public virtual void ResolveDependencies(IResourceResolver resolver)
     {
-        if (Shader.IsValid())
+        List<string> unresolvedResources = [];
+
+        foreach (TSubPermutationFlag key in _shaders.Keys)
         {
-            return;
+            ResourceReference<TShader> shader = _shaders[key];
+
+            if (shader.IsValid())
+            {
+                continue;
+            }
+
+            string filename = $"{shader.Name}{ShaderFileExtension}";
+
+            if(resolver.Open<TShader>(filename) is TShader resource)
+            {
+                shader.Resource = resource;
+            }
+            else
+            {
+                unresolvedResources.Add(filename);
+                continue;
+            }
+
+            _shaders[key] = shader;
+
+            shader.Resource!.ResolveDependencies(resolver);
         }
 
-        ResourceReference<S> shader = Shader;
-
-        string filename = $"{Shader.Name}{ShaderFileExtension}";
-        shader.Resource = resolver.Open<S>(filename)
-            ?? throw new ResourceResolveException("Failed resolve shader", [filename]);
-
-        Shader = shader;
-
-        Shader.Resource!.ResolveDependencies(resolver);
+        if(unresolvedResources.Count > 0)
+        {
+            throw new ResourceResolveException("Failed to resolve shaders", [.. unresolvedResources]);
+        }
     }
 
     public virtual void WriteDependencies(IDirectory directory)
     {
-        if (Shader.IsValid())
+        foreach (ResourceReference<TShader> shader in _shaders.Values)
         {
-            using IFile file = directory.CreateFile($"{Shader.Name}{ShaderFileExtension}");
-            Shader.Resource!.Write(file);
-            Shader.Resource.WriteDependencies(directory);
+            if (!shader.IsValid())
+            {
+                continue;
+            }
+
+            using IFile file = directory.CreateFile($"{shader.Name}{ShaderFileExtension}");
+            shader.Resource!.Write(file);
+            shader.Resource!.WriteDependencies(directory);
         }
     }
 }
