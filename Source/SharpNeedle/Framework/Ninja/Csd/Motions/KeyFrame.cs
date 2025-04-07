@@ -4,7 +4,7 @@ using SharpNeedle.Structs;
 
 public class KeyFrame : IBinarySerializable
 {
-    public uint Frame { get; set; }
+    public int Frame { get; set; }
     public Union Value { get; set; }
     public InterpolationType Interpolation { get; set; }
     public float InTangent { get; set; }
@@ -14,7 +14,7 @@ public class KeyFrame : IBinarySerializable
 
     public void Read(BinaryObjectReader reader)
     {
-        Frame = reader.Read<uint>();
+        Frame = reader.Read<int>();
         Value = reader.Read<uint>();
         Interpolation = reader.Read<InterpolationType>();
         InTangent = reader.Read<float>();

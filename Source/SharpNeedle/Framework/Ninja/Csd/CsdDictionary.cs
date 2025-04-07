@@ -237,7 +237,13 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string?, T> whe
 
         public void Write(BinaryObjectWriter writer)
         {
-            writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
+            string? name = Name;
+
+            writer.WriteOffset(() => 
+            {
+                writer.WriteString(StringBinaryFormat.NullTerminated, name);
+                writer.Write<byte>(0);
+            });
             writer.Write(ref Index);
         }
 

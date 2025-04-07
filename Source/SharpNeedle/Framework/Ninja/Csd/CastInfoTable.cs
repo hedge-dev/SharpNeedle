@@ -35,7 +35,11 @@ public class CastInfoTable : List<(string? Name, int FamilyIdx, int CastIdx)>, I
         {
             foreach ((string? Name, int FamilyIdx, int CastIdx) in this)
             {
-                writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
+                writer.WriteOffset(() => 
+                {
+                    writer.WriteString(StringBinaryFormat.NullTerminated, Name);
+                    writer.Write<byte>(0);
+                });
                 writer.Write(FamilyIdx);
                 writer.Write(CastIdx);
             }

@@ -80,10 +80,15 @@ public class Motion : IBinarySerializable
     {
         reader.ReadOffset(() =>
         {
-            foreach (FamilyMotion motion in FamilyMotions)
-            {
-                motion.ReadExtended(reader);
-            }
+            int unused = reader.Read<int>();
+
+            reader.ReadOffset(() =>
+            { 
+                foreach (FamilyMotion motion in FamilyMotions)
+                {
+                    motion.ReadExtended(reader);
+                }
+            });
         });
     }
 
@@ -91,10 +96,15 @@ public class Motion : IBinarySerializable
     {
         writer.WriteOffset(() =>
         {
-            foreach (FamilyMotion motion in FamilyMotions)
-            {
-                motion.WriteExtended(writer);
-            }
+            writer.Write(0);
+
+            writer.WriteOffset(() =>
+            { 
+                foreach (FamilyMotion motion in FamilyMotions)
+                {
+                    motion.WriteExtended(writer);
+                }
+            });
         });
     }
 }

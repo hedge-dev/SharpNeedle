@@ -70,25 +70,25 @@ public class FamilyMotion : IBinarySerializable
 
     public void ReadExtended(BinaryObjectReader reader)
     {
-        int unused = reader.Read<int>();
-        reader.ReadOffset(() => reader.ReadOffset(() => reader.ReadOffset(() =>
+        reader.ReadOffset(() => 
+            reader.ReadOffset(() =>
+            {
+                foreach (CastMotion motion in CastMotions)
                 {
-                    foreach (CastMotion motion in CastMotions)
-                    {
-                        motion.ReadExtended(reader);
-                    }
-                })));
+                    motion.ReadExtended(reader);
+                }
+            }));
     }
 
     public void WriteExtended(BinaryObjectWriter writer)
     {
-        writer.Write(0);
-        writer.WriteOffset(() => writer.WriteOffset(() => writer.WriteOffset(() =>
+        writer.WriteOffset(() =>
+            writer.WriteOffset(() =>
+            {
+                foreach (CastMotion motion in CastMotions)
                 {
-                    foreach (CastMotion motion in CastMotions)
-                    {
-                        motion.WriteExtended(writer);
-                    }
-                })));
+                    motion.WriteExtended(writer);
+                }
+            }));
     }
 }

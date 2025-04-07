@@ -35,7 +35,7 @@ public class ProjectChunk : IChunk
         writer.Write(Field08);
         writer.Write(Field0C);
         writer.WriteObjectOffset(Root);
-        writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
+        writer.WriteOffset(() => writer.WriteString(StringBinaryFormat.NullTerminated, Name));
         writer.Write(TextureFormat);
         writer.WriteObjectOffset(Fonts);
         writer.Flush();
