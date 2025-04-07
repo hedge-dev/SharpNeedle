@@ -15,9 +15,9 @@ public struct CastInfo : IBinarySerializable
     public Color<byte> GradientBottomLeft;
     public Color<byte> GradientTopRight;
     public Color<byte> GradientBottomRight;
-    public uint Field30;
-    public uint Field34;
-    public uint Field38;
+    public uint UserData0;
+    public uint UserData1;
+    public uint UserData2;
 
     public void Read(BinaryObjectReader reader)
     {
@@ -34,9 +34,9 @@ public struct CastInfo : IBinarySerializable
         Unsafe.As<Color<byte>, uint>(ref GradientTopRight) = reader.Read<uint>();
         Unsafe.As<Color<byte>, uint>(ref GradientBottomRight) = reader.Read<uint>();
 
-        Field30 = reader.Read<uint>();
-        Field34 = reader.Read<uint>();
-        Field38 = reader.Read<uint>();
+        UserData0 = reader.Read<uint>();
+        UserData1 = reader.Read<uint>();
+        UserData2 = reader.Read<uint>();
     }
 
     public void Write(BinaryObjectWriter writer)
@@ -54,8 +54,8 @@ public struct CastInfo : IBinarySerializable
         writer.Write(Unsafe.As<Color<byte>, uint>(ref GradientTopRight));
         writer.Write(Unsafe.As<Color<byte>, uint>(ref GradientBottomRight));
 
-        writer.Write(Field30);
-        writer.Write(Field34);
-        writer.Write(Field38);
+        writer.Write(UserData0);
+        writer.Write(UserData1);
+        writer.Write(UserData2);
     }
 }

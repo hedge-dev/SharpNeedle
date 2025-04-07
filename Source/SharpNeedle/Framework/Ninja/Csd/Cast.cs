@@ -102,15 +102,54 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
         writer.Write(BottomRight);
 
         writer.Write(Field2C);
-        writer.WriteObjectOffset(Info);
+
+        // Info is written after the sprite indices, despite appearing in the struct earlier.
+        long infoOffset = writer.Position;
+        writer.OffsetHandler.RegisterOffsetPosition(infoOffset);
+        writer.WriteOffsetValue(0);
+
         writer.Write(InheritanceFlags);
         writer.Write(MaterialFlags);
 
         writer.Write(SpriteIndices.Length);
-        writer.WriteArrayOffset(SpriteIndices);
+        writer.WriteOffset(() =>
+        {
+            writer.WriteArray(SpriteIndices);
 
-        writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Text);
-        writer.WriteStringOffset(StringBinaryFormat.NullTerminated, FontName);
+            long offset = writer.Position;
+            using (SeekToken token = writer.At(infoOffset, SeekOrigin.Begin))
+            {
+                writer.WriteOffsetValue(writer.OffsetHandler.CalculateOffset(offset, writer.OffsetHandler.OffsetOrigin));
+            }
+
+            writer.WriteObject(Info);
+        });
+
+        if (Text != null)
+        { 
+            writer.WriteOffset(() =>
+            { 
+                writer.WriteString(StringBinaryFormat.NullTerminated, Text);
+                writer.Write<byte>(0);
+            });
+        }
+        else
+        {
+            writer.WriteOffsetValue(0);
+        }
+
+        if (FontName != null)
+        {
+            writer.WriteOffset(() =>
+            {
+                writer.WriteString(StringBinaryFormat.NullTerminated, FontName);
+                writer.Write<byte>(0);
+            });
+        }
+        else
+        {
+            writer.WriteOffsetValue(0);
+        }
 
         writer.Write(FontKerning);
 

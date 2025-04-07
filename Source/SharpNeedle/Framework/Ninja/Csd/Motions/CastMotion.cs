@@ -66,26 +66,32 @@ public class CastMotion : List<KeyFrameList>, IBinarySerializable
     public void ReadExtended(BinaryObjectReader reader)
     {
         reader.ReadOffset(() =>
-        {
-            foreach (KeyFrameList list in this)
+            reader.ReadOffset(() => 
             {
-                list.ReadExtended(reader);
-            }
-        });
+                foreach (KeyFrameList list in this)
+                {
+                    list.ReadExtended(reader);
+                }
+            }));
     }
 
     public void WriteExtended(BinaryObjectWriter writer)
     {
         writer.WriteOffset(() =>
-        {
-            if (Count == 0)
+        { 
+            if (Count != 0)
+            { 
+                writer.WriteOffset(() => 
+                {
+                    foreach (KeyFrameList list in this)
+                    {
+                        list.WriteExtended(writer);
+                    }
+                });
+            }
+            else
             {
                 writer.WriteOffsetValue(0);
-            }
-
-            foreach (KeyFrameList list in this)
-            {
-                list.WriteExtended(writer);
             }
         });
     }
