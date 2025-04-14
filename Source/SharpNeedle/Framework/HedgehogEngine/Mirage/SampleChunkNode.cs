@@ -11,16 +11,16 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
     {
         public override SampleChunkNode? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            if(reader.TokenType != JsonTokenType.StartObject)
+            if (reader.TokenType != JsonTokenType.StartObject)
             {
                 throw new JsonException();
             }
 
             SampleChunkNode result = new();
 
-            while(reader.Read() && reader.TokenType != JsonTokenType.EndObject)
+            while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
             {
-                if(reader.TokenType != JsonTokenType.PropertyName)
+                if (reader.TokenType != JsonTokenType.PropertyName)
                 {
                     throw new JsonException();
                 }
@@ -48,7 +48,7 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
                 }
             }
 
-            return result;            
+            return result;
         }
 
         public override void Write(Utf8JsonWriter writer, SampleChunkNode value, JsonSerializerOptions options)

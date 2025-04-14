@@ -20,9 +20,9 @@ public class ResourceResolveException : Exception
         List<string> result = new(Resources);
 
         Exception? current = InnerException;
-        while(current != null)
+        while (current != null)
         {
-            if(current is ResourceResolveException rre)
+            if (current is ResourceResolveException rre)
             {
                 result.AddRange(rre.Resources);
             }

@@ -32,9 +32,9 @@ public class ShaderList : SampleChunkResource
         int parameterCount = reader.ReadInt32();
         reader.ReadOffset(() =>
         {
-            for(int i = 0; i < parameterCount; i++)
+            for (int i = 0; i < parameterCount; i++)
             {
-                 ParameterInputs.Add(reader.ReadObjectOffset<ShaderListParameter>());
+                ParameterInputs.Add(reader.ReadObjectOffset<ShaderListParameter>());
             }
         });
 
@@ -59,7 +59,7 @@ public class ShaderList : SampleChunkResource
             }
         }, 4);
 
-        if(!HasInputs)
+        if (!HasInputs)
         {
             return;
         }

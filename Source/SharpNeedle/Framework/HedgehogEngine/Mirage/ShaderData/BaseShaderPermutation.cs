@@ -21,7 +21,7 @@ public abstract class BaseShaderPermutation<TSubPermutation, TSubPermutationFlag
         get => _subPermutations;
         set
         {
-            if(_subPermutations.Equals(value))
+            if (_subPermutations.Equals(value))
             {
                 return;
             }
@@ -32,12 +32,13 @@ public abstract class BaseShaderPermutation<TSubPermutation, TSubPermutationFlag
     }
 
     public string PermutationName { get; set; }
+
     public string ShaderName
     {
         get => _shaderName;
         set
         {
-            if(_shaderName == value)
+            if (_shaderName == value)
             {
                 return;
             }
@@ -83,7 +84,7 @@ public abstract class BaseShaderPermutation<TSubPermutation, TSubPermutationFlag
 
     private void UpdateShaderDictionary()
     {
-        if(SubPermutations.Equals(default(TSubPermutation)))
+        if (SubPermutations.Equals(default(TSubPermutation)))
         {
             _shaders.Clear();
             return;
@@ -99,11 +100,11 @@ public abstract class BaseShaderPermutation<TSubPermutation, TSubPermutationFlag
             {
                 TSubPermutationFlag key = UIntToFlag<TSubPermutationFlag>(flag);
 
-                if(!_shaders.TryGetValue(key, out ResourceReference<TShader> shader))
+                if (!_shaders.TryGetValue(key, out ResourceReference<TShader> shader))
                 {
                     shader = ShaderName;
 
-                    if(flag != 0)
+                    if (flag != 0)
                     {
                         TSubPermutation permutation = UIntToFlag<TSubPermutation>(1u << (int)flag);
                         shader += "_" + permutation.ToString();
@@ -140,7 +141,7 @@ public abstract class BaseShaderPermutation<TSubPermutation, TSubPermutationFlag
 
             string filename = $"{shader.Name}{ShaderFileExtension}";
 
-            if(resolver.Open<TShader>(filename) is TShader resource)
+            if (resolver.Open<TShader>(filename) is TShader resource)
             {
                 shader.Resource = resource;
             }
@@ -155,7 +156,7 @@ public abstract class BaseShaderPermutation<TSubPermutation, TSubPermutationFlag
             shader.Resource!.ResolveDependencies(resolver);
         }
 
-        if(unresolvedResources.Count > 0)
+        if (unresolvedResources.Count > 0)
         {
             throw new ResourceResolveException("Failed to resolve shaders", [.. unresolvedResources]);
         }

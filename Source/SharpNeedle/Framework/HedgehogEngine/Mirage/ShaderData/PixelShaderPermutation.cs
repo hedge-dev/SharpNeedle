@@ -31,9 +31,9 @@ public class PixelShaderPermutation : BaseShaderPermutation<PixelShaderSubPermut
     public List<VertexShaderPermutation> VertexShaderPermutations { get; } = [];
 
     public override string ShaderFileExtension => ".pixelshader";
-    public override PixelShaderSubPermutationFlags SubPermutationFlagMask => 
-        PixelShaderSubPermutationFlags.ConstTexCoord 
-        | PixelShaderSubPermutationFlags.NoGI 
+    public override PixelShaderSubPermutationFlags SubPermutationFlagMask =>
+        PixelShaderSubPermutationFlags.ConstTexCoord
+        | PixelShaderSubPermutationFlags.NoGI
         | PixelShaderSubPermutationFlags.NoLight;
 
     public PixelShaderPermutation(PixelShaderSubPermutations subPermutations, string permutationName, string shaderName) : base(subPermutations, permutationName, shaderName) { }

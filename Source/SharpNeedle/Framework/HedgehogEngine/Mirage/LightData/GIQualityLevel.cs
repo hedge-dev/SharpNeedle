@@ -2,7 +2,7 @@
 
 public enum GIQualityLevel : int
 {
-    High, 
-    Medium, 
+    High,
+    Medium,
     Low
 }
