@@ -4,6 +4,6 @@ public enum ShaderByteCodePlatform : byte
 {
     None = 0,
     Windows = (byte)'w',
-    XBOX = (byte)'x',
+    Xbox = (byte)'x',
     Playstation = (byte)'p',
 }
