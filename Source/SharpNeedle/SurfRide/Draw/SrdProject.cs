@@ -20,10 +20,12 @@ public class SrdProject : ResourceBase, IBinarySerializable<uint>
     
     public override void Write(IFile file)
     {
+        System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
         Name = file.Name;
         BaseFile = file;
         
-        using var writer = new BinaryObjectWriter(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness);
+        using var writer = new BinaryObjectWriter(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness.Little);
         Write(writer, 2);
     }
 

@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace SharpNeedle.SurfRide.Draw;
 
-public class CastNode : IBinarySerializable<ChunkBinaryOptions>, IList<CastNode>
+public class CastNode : IBinarySerializable<ChunkBinaryOptions>, IList<CastNode>, ICloneable
 {
     private int mPriority;
     public int Count => Children.Count;
@@ -38,7 +38,7 @@ public class CastNode : IBinarySerializable<ChunkBinaryOptions>, IList<CastNode>
     {
         Layer = (Layer)options.Data;
 
-        Name = reader.ReadStringOffset();
+        Name = reader.ReadStringOffset(Encoding.GetEncoding(932));
         ID = reader.Read<int>();
         Flags = reader.Read<CastNodeAttribute>();
         switch ((int)Flags & 0xF)
@@ -74,7 +74,7 @@ public class CastNode : IBinarySerializable<ChunkBinaryOptions>, IList<CastNode>
         if (options.Version >= 3)
             writer.Align(8);
         
-        writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
+        writer.WriteStringOffset(Encoding.GetEncoding(932), StringBinaryFormat.NullTerminated, Name);
         writer.Write(ID);
         writer.Write(Flags);
         if (Data != null)
@@ -191,5 +191,15 @@ public class CastNode : IBinarySerializable<ChunkBinaryOptions>, IList<CastNode>
         BlendIlluminationColor = 0x80,
         HasIlluminationColor = 0x100,
         LocalScale = 0x10000
+    }
+
+    public object Clone()
+    {
+        CastNode clone = MemberwiseClone() as CastNode;
+        clone.Cell = Cell.Clone() as Cell;
+        if (Data != null)
+            clone.Data = Data.Clone() as ICastData;
+
+        return clone;
     }
 }

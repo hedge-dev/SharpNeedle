@@ -132,6 +132,16 @@ public static class BinaryHelper
         return reader.ReadString(format, fixedLength);
     }
 
+    public static string ReadStringOffset(this BinaryObjectReader reader, Encoding encoding, StringBinaryFormat format = StringBinaryFormat.NullTerminated, int fixedLength = -1)
+    {
+        var offset = reader.ReadOffsetValue();
+        if (offset == 0)
+            return null;
+
+        using var token = reader.AtOffset(offset);
+        return reader.ReadString(encoding, format, fixedLength);
+    }
+
     public static bool EnsureSignatureNative<TSignature>(this BinaryValueReader reader, 
         TSignature expected, bool throwOnFail = true) where TSignature: unmanaged
     {

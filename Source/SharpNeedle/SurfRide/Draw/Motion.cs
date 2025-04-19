@@ -1,11 +1,25 @@
 ﻿namespace SharpNeedle.SurfRide.Draw;
 
-public class Motion : IBinarySerializable<ChunkBinaryOptions>
+public class Motion : IBinarySerializable<ChunkBinaryOptions>, ICloneable
 {
     public ushort CastID { get; set; }
     public CastNode Cast { get; set; }
     public Animation Animation { get; set; }
     public List<Track> Tracks { get; set; } = new();
+
+    public Motion()
+    {
+
+    }
+
+    public Motion(Motion motion)
+    {
+        CastID = motion.CastID;
+        Cast = motion.Cast;
+        Animation = motion.Animation;
+        foreach (var track in motion.Tracks)
+            Tracks.Add(new(track));
+    }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
@@ -25,5 +39,14 @@ public class Motion : IBinarySerializable<ChunkBinaryOptions>
             writer.Align(8);
         
         writer.WriteObjectCollectionOffset(options, Tracks);
+    }
+
+    public object Clone()
+    {
+        Motion clone = MemberwiseClone() as Motion;
+        for (int i = 0; i < Tracks.Count; i++)
+            clone.Tracks[i] = Tracks[i].Clone() as Track;
+
+        return clone;
     }
 }

@@ -1,11 +1,28 @@
 ﻿namespace SharpNeedle.SurfRide.Draw;
 
-public class Track : List<KeyFrame>, IBinarySerializable<ChunkBinaryOptions>
+public class Track : List<KeyFrame>, IBinarySerializable<ChunkBinaryOptions>, ICloneable
 {
     public FCurveType CurveType { get; set; }
     public int Flags { get; set; }
     public uint StartFrame { get; set; }
     public uint EndFrame { get; set; }
+
+    public Track()
+    {
+
+    }
+
+    public Track(Track track)
+    {
+        CurveType = track.CurveType;
+        Flags = track.Flags;
+        StartFrame = track.StartFrame;
+        EndFrame = track.EndFrame;
+        foreach (var keyframe in track)
+        {
+            Add(new(keyframe));
+        }
+    }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
@@ -32,6 +49,15 @@ public class Track : List<KeyFrame>, IBinarySerializable<ChunkBinaryOptions>
             writer.Align(8);
         
         writer.WriteObjectCollectionOffset(Flags, this);
+    }
+
+    public object Clone()
+    {
+        Track clone = MemberwiseClone() as Track;
+        for (int i = 0; i < Count; i++)
+            clone[i] = this[i].Clone() as KeyFrame;
+
+        return clone;
     }
 }
 

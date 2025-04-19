@@ -45,15 +45,15 @@ public static class LayerExtensions
         void SwapPositions()
         {
             var childPos = child.Cell.Translation;
-            child.Cell.Translation = parent.Cell.Translation + childPos / 2.0f;
+            child.Cell.Translation = parent.Cell.Translation + child.Cell.Translation * child.Cell.Scale * parent.Cell.Scale;
             parent.Cell.Translation = -childPos;
         }
 
         void SwapScale()
         {
             var originalChildScale = child.Cell.Scale;
-            child.Cell.Scale = parent.Cell.Scale;
-            parent.Cell.Scale = originalChildScale;
+            child.Cell.Scale *= parent.Cell.Scale;
+            parent.Cell.Scale = new Vector3(1.0f) / originalChildScale;
 
             var childFlags = child.Flags;
             if ((parent.Flags & CastNode.CastNodeAttribute.LocalScale) == CastNode.CastNodeAttribute.LocalScale)
@@ -77,11 +77,47 @@ public static class LayerExtensions
                     {
                         motion.CastID = (ushort)parent.ID;
                         motion.Cast = parent;
+
+                        foreach (var track in motion.Tracks)
+                        {
+                            if (track.CurveType == FCurveType.Sx)
+                            {
+                                foreach (var keyFrame in track)
+                                {
+                                    keyFrame.Value *= child.Cell.Scale.X;
+                                }
+                            }
+                            else if (track.CurveType == FCurveType.Sy)
+                            {
+                                foreach (var keyFrame in track)
+                                {
+                                    keyFrame.Value *= child.Cell.Scale.Y;
+                                }
+                            }
+                        }
                     }
                     else if (motion.CastID == parent.ID)
                     {
                         motion.CastID = (ushort)child.ID;
                         motion.Cast = child;
+
+                        foreach (var track in motion.Tracks)
+                        {
+                            if (track.CurveType == FCurveType.Sx)
+                            {
+                                foreach (var keyFrame in track)
+                                {
+                                    keyFrame.Value *= child.Cell.Scale.X;
+                                }
+                            }
+                            else if (track.CurveType == FCurveType.Sy)
+                            {
+                                foreach (var keyFrame in track)
+                                {
+                                    keyFrame.Value *= child.Cell.Scale.Y;
+                                }
+                            }
+                        }
                     }
 
                     /*foreach (var track in motion.Tracks)

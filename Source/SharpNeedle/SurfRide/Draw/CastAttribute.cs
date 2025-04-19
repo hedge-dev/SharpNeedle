@@ -21,5 +21,6 @@ public enum CastAttribute
     PivotPositionMiddleLeft = 0x280000,
     PivotPositionTopRight = 0x300000,
     PivotPositionTopCenter = 0x380000,
-    PivotPositionTopLeft = 0x400000
+    PivotPositionTopLeft = 0x400000,
+    PivotPositionCustom = 0x480000
 }

@@ -89,9 +89,24 @@ public class ImageCastData : IImageDataBase
 
         writer.WriteObjectOffset(Effect, options, 16);
     }
+
+    public object Clone()
+    {
+        ImageCastData clone = MemberwiseClone() as ImageCastData;
+        if (TextData != null)
+            clone.TextData = TextData.Clone() as TextData;
+
+        if (Surface != null)
+            clone.Surface = Surface.Clone() as ImageCastSurface;
+
+        if (Surface1 != null)
+            clone.Surface1 = Surface1.Clone() as ImageCastSurface;
+
+        return clone;
+    }
 }
 
-public class TextData : IBinarySerializable<ChunkBinaryOptions>
+public class TextData : IBinarySerializable<ChunkBinaryOptions>, ICloneable
 {
     public uint Field00 { get; set; }
     public int FontIndex { get; set; }
@@ -142,5 +157,10 @@ public class TextData : IBinarySerializable<ChunkBinaryOptions>
             writer.Align(8);
         
         writer.WriteObjectOffset(Font, options);
+    }
+
+    public object Clone()
+    {
+        return MemberwiseClone();
     }
 }

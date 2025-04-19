@@ -67,53 +67,8 @@ public static class CastExtensions
                 ConvertFontData(data);
 
             // The TopLeft/BottomRight values of Ninja Cell Sprite Draw Project Casts can be used to convert into the SurfRide Draw Project Pivot Position Attribute
-            Vector2 topLeft = new(Math.Abs(cast.TopLeft.X + cast.BottomLeft.X), Math.Abs(cast.TopLeft.Y + cast.TopRight.Y));
-            Vector2 bottomRight = new(Math.Abs(cast.TopRight.X + cast.BottomRight.X), Math.Abs(cast.BottomLeft.Y + cast.BottomRight.Y));
-            if (topLeft.Y - bottomRight.Y < 0.0001 && topLeft.Y - bottomRight.Y > -0.0001 && topLeft.X - bottomRight.X > 0.0001)
-            {
-                data.Flags |= SurfRide.Draw.CastAttribute.PivotPositionMiddleLeft;
-                data.PivotPoint = new(0.0f, data.Size.Y / 2.0f);
-            }
-            else if (topLeft.Y - bottomRight.Y < 0.0001 && topLeft.Y - bottomRight.Y > -0.0001 && topLeft.X - bottomRight.X < -0.0001)
-            {
-                data.Flags |= SurfRide.Draw.CastAttribute.PivotPositionMiddleRight;
-                data.PivotPoint = new(data.Size.X, data.Size.Y / 2.0f);
-            }
-            else if (topLeft.Y - bottomRight.Y < 0.0001 && topLeft.Y - bottomRight.Y > -0.0001)
-            {
-                data.Flags |= SurfRide.Draw.CastAttribute.PivotPositionMiddleCenter;
-                data.PivotPoint = data.Size / 2.0f;
-            }
-            else if (topLeft.Y - bottomRight.Y > 0.0001 && topLeft.X - bottomRight.X > 0.0001)
-            {
-                data.Flags |= SurfRide.Draw.CastAttribute.PivotPositionTopLeft;
-                data.PivotPoint = new(0.0f, 0.0f);
-            }
-            else if (topLeft.Y - bottomRight.Y > 0.0001 && topLeft.X - bottomRight.X < -0.0001)
-            {
-                data.Flags |= SurfRide.Draw.CastAttribute.PivotPositionTopRight;
-                data.PivotPoint = new(data.Size.X, 0.0f);
-            }
-            else if (topLeft.Y - bottomRight.Y > 0.0001)
-            {
-                data.Flags |= SurfRide.Draw.CastAttribute.PivotPositionTopCenter;
-                data.PivotPoint = new(data.Size.X / 2.0f, 0.0f);
-            }
-            else if (topLeft.Y - bottomRight.Y < -0.0001 && topLeft.X - bottomRight.X > 0.0001)
-            {
-                data.Flags |= SurfRide.Draw.CastAttribute.PivotPositionBottomLeft;
-                data.PivotPoint = new(0.0f, data.Size.Y / 2.0f);
-            }
-            else if (topLeft.Y - bottomRight.Y < -0.0001 && topLeft.X - bottomRight.X < -0.0001)
-            {
-                data.Flags |= SurfRide.Draw.CastAttribute.PivotPositionBottomRight;
-                data.PivotPoint = new(data.Size.X, data.Size.Y / 2.0f);
-            }
-            else if (topLeft.Y - bottomRight.Y < -0.0001)
-            {
-                data.Flags |= SurfRide.Draw.CastAttribute.PivotPositionBottomCenter;
-                data.PivotPoint = new(data.Size.X / 2.0f, data.Size.Y);
-            }
+            data.PivotPoint = -cast.TopLeft * srdLayer.Scene.Resolution;
+            data.Flags |= SurfRide.Draw.CastAttribute.PivotPositionCustom;
 
             return data;
         }

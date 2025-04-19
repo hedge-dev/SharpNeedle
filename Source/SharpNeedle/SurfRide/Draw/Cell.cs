@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.SurfRide.Draw;
 
-public class Cell : IBinarySerializable<ChunkBinaryOptions>
+public class Cell : IBinarySerializable<ChunkBinaryOptions>, ICloneable
 {
     public Color<byte> MaterialColor { get; set; }
     public Color<byte> IlluminationColor { get; set; }
@@ -130,5 +130,10 @@ public class Cell : IBinarySerializable<ChunkBinaryOptions>
                 writer.Write(RotationZ);
             }
         }
+    }
+
+    public object Clone()
+    {
+        return MemberwiseClone();
     }
 }

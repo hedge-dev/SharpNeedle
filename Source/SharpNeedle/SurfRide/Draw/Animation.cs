@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.SurfRide.Draw;
 
-public class Animation : List<Motion>, IBinarySerializable<ChunkBinaryOptions>
+public class Animation : List<Motion>, IBinarySerializable<ChunkBinaryOptions>, ICloneable
 {
     public string Name { get; set; }
     public int ID { get; set; }
@@ -8,6 +8,23 @@ public class Animation : List<Motion>, IBinarySerializable<ChunkBinaryOptions>
     public bool IsLooping { get; set; }
     public UserData UserData { get; set; }
     public Layer Layer { get; set; }
+
+    public Animation()
+    {
+
+    }
+
+    public Animation(Animation animation)
+    {
+        Name = animation.Name;
+        ID = animation.ID;
+        EndFrame = animation.EndFrame;
+        Layer = animation.Layer;
+        UserData = animation.UserData;
+        Layer = animation.Layer;
+        foreach (var motion in animation)
+            Add(new(motion));
+    }
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
@@ -77,5 +94,14 @@ public class Animation : List<Motion>, IBinarySerializable<ChunkBinaryOptions>
                     writer.Align(4);
             }
         }
+    }
+
+    public object Clone()
+    {
+        Animation clone = MemberwiseClone() as Animation;
+        for (int i = 0; i < Count; i++)
+            clone[i] = this[i].Clone() as Motion;
+
+        return clone;
     }
 }

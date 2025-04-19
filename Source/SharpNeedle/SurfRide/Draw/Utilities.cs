@@ -7,6 +7,7 @@ public static class Utilities
         switch (type)
         {
             case EffectType.None:
+                reader.ReadOffsetValue();
                 return null;
 
             case EffectType.Blur:

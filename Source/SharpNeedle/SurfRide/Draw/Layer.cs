@@ -52,6 +52,9 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>, IList<CastNode>
             tree[i].SiblingIndex = CastBuffer[i].SiblingIndex;
         }
 
+        /*if (CastBuffer.Count != 0)
+            ParseTree(0);
+
         Children = new List<CastNode>(CastBuffer.Count);
         for (int i = 0; i < CastBuffer.Count; i++)
         {
@@ -60,7 +63,7 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>, IList<CastNode>
             cast.Layer = this;
             if (cast.Parent == null)
                 Children.Add(cast);
-        }
+        }*/
 
         var animCount = reader.Read<int>();
         if (options.Version >= 3)

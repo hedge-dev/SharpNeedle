@@ -1,3 +1,3 @@
 ﻿namespace SharpNeedle.SurfRide.Draw;
 
-public interface ICastData : IBinarySerializable<ChunkBinaryOptions> { }
+public interface ICastData : IBinarySerializable<ChunkBinaryOptions>, ICloneable { }

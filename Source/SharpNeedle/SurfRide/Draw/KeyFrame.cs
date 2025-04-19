@@ -1,12 +1,26 @@
 ﻿namespace SharpNeedle.SurfRide.Draw;
 
-public class KeyFrame : IBinarySerializable<int>
+public class KeyFrame : IBinarySerializable<int>, ICloneable
 {
     public int Frame { get; set; }
     public KeyFrameUnion Value { get; set; }
     public float InParam { get; set; }
     public float OutParam { get; set; }
     public int Field10 { get; set; }
+
+    public KeyFrame()
+    {
+
+    }
+
+    public KeyFrame(KeyFrame keyframe)
+    {
+        Frame = keyframe.Frame;
+        Value = keyframe.Value;
+        InParam = keyframe.InParam;
+        OutParam = keyframe.OutParam;
+        Field10 = keyframe.Field10;
+    }
 
     public void Read(BinaryObjectReader reader, int flags)
     {
@@ -38,6 +52,11 @@ public class KeyFrame : IBinarySerializable<int>
 
         if (interpolation == InterpolationType.Individual)
             writer.Write(Field10);
+    }
+
+    public object Clone()
+    {
+        return MemberwiseClone() as KeyFrame;
     }
 }
 

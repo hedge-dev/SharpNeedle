@@ -17,6 +17,7 @@ public class SliceCastData : IImageDataBase
     public short VerticalFixedCount { get; set; }
     public IEffectData Effect { get; set; }
     public ImageCastSurface Surface { get; set; } = new();
+    public ImageCastSurface Surface1 { get; set; } = new();
     public List<Slice> Slices { get; set; } = new();
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
@@ -35,7 +36,7 @@ public class SliceCastData : IImageDataBase
         HorizontalFixedCount = reader.Read<short>();
         VerticalFixedCount = reader.Read<short>();
         Surface.CropRefs.Capacity = reader.Read<short>();
-        reader.Skip(2); // Alignment
+        Surface1.CropRefs.Capacity = reader.Read<short>();
 
         if (options.Version >= 3)
             reader.Align(8);
@@ -45,11 +46,15 @@ public class SliceCastData : IImageDataBase
         else
             reader.ReadOffsetValue();
 
-        var type = reader.Read<EffectType>();
+        if (Surface1.CropRefs.Capacity != 0)
+            Surface1.CropRefs.AddRange(reader.ReadArrayOffset<CropRef>(Surface1.CropRefs.Capacity));
+        else
+            reader.ReadOffsetValue();
+
         if (options.Version >= 3)
             reader.Align(8);
 
-        Effect = Utilities.ReadEffectOffset(reader, type, options);
+        Effect = Utilities.ReadEffectOffset(reader, EffectType.None, options);
         Slices.AddRange(reader.ReadObjectArray<Slice>(SliceHorizontalCount * SliceVerticalCount));
     }
 
@@ -69,7 +74,7 @@ public class SliceCastData : IImageDataBase
         writer.Write(HorizontalFixedCount);
         writer.Write(VerticalFixedCount);
         writer.Write((short)Surface.CropRefs.Count);
-        writer.Write((short)0); // Alignment
+        writer.Write((short)Surface1.CropRefs.Count); // Alignment
 
         if (options.Version >= 3)
             writer.Align(8);
@@ -79,12 +84,29 @@ public class SliceCastData : IImageDataBase
         else
             writer.WriteOffsetValue(0);
 
-        writer.Write(Effect?.Type ?? EffectType.None);
+        if (Surface1.CropRefs.Count != 0)
+            writer.WriteCollectionOffset(Surface1.CropRefs);
+        else
+            writer.WriteOffsetValue(0);
+
         if (options.Version >= 3)
             writer.Align(8);
 
         writer.WriteObjectOffset(Effect, options, 16);
         writer.WriteObjectCollection(Slices);
+    }
+
+    public object Clone()
+    {
+        SliceCastData clone = MemberwiseClone() as SliceCastData;
+
+        if (Surface != null)
+            clone.Surface = Surface.Clone() as ImageCastSurface;
+
+        if (Surface1 != null)
+            clone.Surface1 = Surface1.Clone() as ImageCastSurface;
+
+        return clone;
     }
 }
 

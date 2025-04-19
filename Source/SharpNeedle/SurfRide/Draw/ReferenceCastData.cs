@@ -31,4 +31,9 @@ public class ReferenceCastData : ICastData
         writer.Write(AnimationFrame);
         writer.Write(Field10);
     }
+
+    public object Clone()
+    {
+        return MemberwiseClone();
+    }
 }
