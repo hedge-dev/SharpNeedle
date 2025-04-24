@@ -17,7 +17,6 @@ public class ResourceManager : IResourceManager
     }
 
 
-
     public void Dispose()
     {
         foreach (WeakReference<IResource> resource in _resources.Values)
@@ -28,14 +27,20 @@ public class ResourceManager : IResourceManager
             }
         }
 
-        _resources.Clear();
-        _resourceTable.Clear();
+        lock (_resources)
+        {
+            _resources.Clear();
+            _resourceTable.Clear();
+        }
+
     }
 
 
     private T OpenBase<T>(IFile file, ref T res, bool resolveDepends = true) where T : IResource
     {
         string path = file.Path;
+        bool remove = false;
+
         if (_resources.TryGetValue(path, out WeakReference<IResource>? resRef))
         {
             if (resRef.TryGetTarget(out IResource? cacheRes))
@@ -43,19 +48,40 @@ public class ResourceManager : IResourceManager
                 return (T)cacheRes;
             }
 
-            _resources.Remove(path);
+            remove = true;
         }
 
-
-        res.Read(file);
-        _resources.Add(path, new WeakReference<IResource>(res));
-        _resourceTable.Add(res, path);
-        if (resolveDepends)
+        lock (_resources)
         {
-            res.ResolveDependencies(new DirectoryResourceResolver(file.Parent, this));
+            // Doing it again in case 2 processes locked at the same time.
+            // That way, we can still perform a read outside of the lock, decreasing
+            // read times
+            if (!remove && _resources.TryGetValue(path, out resRef))
+            {
+                if (resRef.TryGetTarget(out IResource? cacheRes))
+                {
+                    return (T)cacheRes;
+                }
+
+                remove = true;
+            }
+
+            if (remove)
+            {
+                _resources.Remove(path);
+            }
+
+            res.Read(file);
+            _resources.Add(path, new WeakReference<IResource>(res));
+            _resourceTable.Add(res, path);
+            if (resolveDepends)
+            {
+                res.ResolveDependencies(new DirectoryResourceResolver(file.Parent, this));
+            }
+
+            return res;
         }
 
-        return res;
     }
 
     public T Open<T>(IFile file, bool resolveDepends = true) where T : IResource, new()
@@ -78,14 +104,21 @@ public class ResourceManager : IResourceManager
 
     public void Close(IResource res)
     {
-        if (!_resourceTable.TryGetValue(res, out string? key))
+        lock (_resources)
         {
-            return;
-        }
+            // doing the read inside a lock, as the likelyhood of performing a close
+            // on something that isnt in the resource table is very unlikely, and if
+            // not, probably not time intensive
 
-        _resources.Remove(key);
-        _resourceTable.Remove(res);
-        res.Dispose();
+            if (!_resourceTable.TryGetValue(res, out string? key))
+            {
+                return;
+            }
+
+            _resources.Remove(key);
+            _resourceTable.Remove(res);
+            res.Dispose();
+        }
     }
 
 }
