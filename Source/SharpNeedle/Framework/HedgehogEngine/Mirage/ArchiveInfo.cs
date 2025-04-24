@@ -17,7 +17,7 @@ public class ArchiveInfo : SampleChunkResource
 
         reader.ReadOffset(() =>
         {
-            for(int i=0; i< entryCount; i++)
+            for (int i = 0; i < entryCount; i++)
             {
                 Entries[i].Field04 = reader.Read<byte>();
             }

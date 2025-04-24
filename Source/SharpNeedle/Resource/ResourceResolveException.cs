@@ -10,15 +10,26 @@ public class ResourceResolveException : Exception
         Resources = resources;
     }
 
-    public ResourceResolveException(string message, string[] resources, Exception inner) : base(message, inner is ResourceResolveException ? null : inner)
+    public ResourceResolveException(string message, string[] resources, Exception? inner) : base(message, inner)
     {
-        if (inner is ResourceResolveException innerRes)
+        Resources = resources;
+    }
+
+    public string[] GetRecursiveResources()
+    {
+        List<string> result = new(Resources);
+
+        Exception? current = InnerException;
+        while (current != null)
         {
-            Resources = [.. resources, .. innerRes.Resources];
+            if (current is ResourceResolveException rre)
+            {
+                result.AddRange(rre.Resources);
+            }
+
+            current = current.InnerException;
         }
-        else
-        {
-            Resources = resources;
-        }
+
+        return [.. result];
     }
 }

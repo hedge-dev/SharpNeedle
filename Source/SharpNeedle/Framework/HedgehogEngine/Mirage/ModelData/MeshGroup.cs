@@ -1,0 +1,224 @@
+﻿namespace SharpNeedle.Framework.HedgehogEngine.Mirage.ModelData;
+
+using SharpNeedle.Structs;
+
+public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICloneable<MeshGroup>
+{
+    public string? Name { get; set; }
+
+    public void Read(BinaryObjectReader reader, uint version)
+    {
+        bool readSpecial = version >= 5;
+
+        BinaryList<BinaryPointer<Mesh, uint>, uint> opaqMeshes = reader.ReadObject<BinaryList<BinaryPointer<Mesh, uint>, uint>, uint>(version);
+        BinaryList<BinaryPointer<Mesh, uint>, uint> transMeshes = reader.ReadObject<BinaryList<BinaryPointer<Mesh, uint>, uint>, uint>(version);
+        BinaryList<BinaryPointer<Mesh, uint>, uint> punchMeshes = reader.ReadObject<BinaryList<BinaryPointer<Mesh, uint>, uint>, uint>(version);
+
+        Clear();
+
+        Capacity = opaqMeshes.Count + transMeshes.Count + punchMeshes.Count;
+        AddMeshes(opaqMeshes, MeshType.Opaque);
+        AddMeshes(transMeshes, MeshType.Transparent);
+        AddMeshes(punchMeshes, MeshType.PunchThrough);
+
+        if (!readSpecial)
+        {
+            return;
+        }
+
+        int specialMeshCount = reader.Read<int>();
+        Capacity += specialMeshCount;
+
+        (string Name, int Count)[] slots = new (string Name, int Count)[specialMeshCount];
+        reader.ReadOffset(() =>
+        {
+            for (int i = 0; i < specialMeshCount; i++)
+            {
+                slots[i] = new(reader.ReadStringOffsetOrEmpty(), 0);
+            }
+        });
+
+        // What the fuck
+        reader.ReadOffset(() =>
+        {
+            for (int i = 0; i < slots.Length; i++)
+            {
+                slots[i].Count = reader.ReadValueOffset<int>();
+            }
+        });
+
+        // It only gets worse
+        reader.ReadOffset(() =>
+        {
+            foreach ((string Name, int Count) slot in slots)
+            {
+                reader.ReadOffset(() =>
+                {
+                    for (int i = 0; i < slot.Count; i++)
+                    {
+                        Mesh mesh = reader.ReadObjectOffset<Mesh>();
+                        mesh.Slot = slot.Name;
+                        Add(mesh);
+                    }
+                });
+            }
+        });
+
+        Name = reader.ReadString(StringBinaryFormat.NullTerminated);
+
+        void AddMeshes(BinaryList<BinaryPointer<Mesh, uint>, uint> meshes, MeshSlot slot)
+        {
+            foreach (BinaryPointer<Mesh, uint> mesh in meshes)
+            {
+                mesh.Value.Slot = slot;
+                Add(mesh);
+            }
+        }
+    }
+
+    public void Write(BinaryObjectWriter writer, uint version)
+    {
+        bool writeSpecial = version >= 5;
+
+        WriteMeshes(this.Where(x => x.Slot == MeshType.Opaque));
+        WriteMeshes(this.Where(x => x.Slot == MeshType.Transparent));
+        WriteMeshes(this.Where(x => x.Slot == MeshType.PunchThrough));
+
+        if (!writeSpecial)
+        {
+            return;
+        }
+
+        Dictionary<string, List<Mesh>> specialGroups = [];
+        foreach (Mesh mesh in this)
+        {
+            if (mesh.Slot != MeshType.Special)
+            {
+                continue;
+            }
+
+            if (specialGroups.TryGetValue(mesh.Slot.Name!, out List<Mesh>? meshes))
+            {
+                meshes.Add(mesh);
+            }
+            else
+            {
+                specialGroups.Add(mesh.Slot.Name!, [mesh]);
+            }
+        }
+
+        writer.Write(specialGroups.Count);
+        if (specialGroups.Count == 0)
+        {
+            writer.WriteUInt32(uint.MaxValue);
+            writer.WriteUInt32(uint.MaxValue);
+            writer.WriteUInt32(uint.MaxValue);
+        }
+        else
+        {
+            writer.WriteOffset(() =>
+            {
+                foreach (KeyValuePair<string, List<Mesh>> group in specialGroups)
+                {
+                    writer.WriteStringOffset(StringBinaryFormat.NullTerminated, group.Key);
+                }
+            });
+
+            writer.WriteOffset(() =>
+            {
+                foreach (KeyValuePair<string, List<Mesh>> group in specialGroups)
+                {
+                    writer.WriteValueOffset(group.Value.Count);
+                }
+            });
+
+            writer.WriteOffset(() =>
+            {
+                foreach (KeyValuePair<string, List<Mesh>> group in specialGroups)
+                {
+                    writer.WriteOffset(() =>
+                    {
+                        foreach (Mesh mesh in group.Value)
+                        {
+                            writer.WriteObjectOffset(mesh);
+                        }
+                    });
+                }
+            });
+        }
+
+        writer.WriteString(StringBinaryFormat.NullTerminated, Name ?? string.Empty);
+        writer.Align(4);
+
+        void WriteMeshes(IEnumerable<Mesh> meshes)
+        {
+            writer.Write(meshes.Count());
+            writer.WriteOffset(() =>
+            {
+                foreach (Mesh mesh in meshes)
+                {
+                    writer.WriteObjectOffset(mesh, version);
+                }
+            });
+        }
+    }
+
+    public void ResolveDependencies(IResourceResolver resolver)
+    {
+        List<ResourceResolveException> exceptions = [];
+
+        foreach (Mesh mesh in this)
+        {
+            try
+            {
+                mesh.ResolveDependencies(resolver);
+            }
+            catch (ResourceResolveException exc)
+            {
+                exceptions.Add(exc);
+            }
+        }
+
+        if (exceptions.Count > 0)
+        {
+            throw new ResourceResolveException(
+                $"Failed to resolve dependencies of {exceptions.Count} meshes",
+                exceptions.SelectMany(x => x.GetRecursiveResources()).ToArray()
+            );
+        }
+    }
+
+    public void WriteDependencies(IDirectory dir)
+    {
+        foreach (Mesh mesh in this)
+        {
+            mesh.WriteDependencies(dir);
+        }
+    }
+
+    public void Dispose()
+    {
+        foreach (Mesh mesh in this)
+        {
+            mesh.Dispose();
+        }
+
+        Clear();
+    }
+
+    public MeshGroup Clone()
+    {
+        MeshGroup result = new()
+        {
+            Name = Name,
+            Capacity = Capacity
+        };
+
+        foreach (Mesh mesh in this)
+        {
+            result.Add(mesh);
+        }
+
+        return result;
+    }
+}
