@@ -1,13 +1,15 @@
 ﻿namespace SharpNeedle.Resource;
 
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+
 public class ResourceManager : IResourceManager
 {
     public static ResourceManager Instance => Singleton.GetInstance<ResourceManager>()!;
 
     // Use weak references so resources can get garbage collected and we won't have to worry about leaving them open
-    private readonly Dictionary<string, WeakReference<IResource>> _resources = [];
-    private readonly ConditionalWeakTable<IResource, string> _resourceTable = [];
-
+    private readonly ConcurrentDictionary<string, WeakReference<IResource>> _resources = [];
+    private readonly HashSet<IResource> _readingResources = [];
 
     static ResourceManager()
     {
@@ -15,7 +17,6 @@ public class ResourceManager : IResourceManager
         Singleton.SetInstance(instance);
         Singleton.SetInstance<IResourceManager>(instance);
     }
-
 
 
     public void Dispose()
@@ -29,63 +30,90 @@ public class ResourceManager : IResourceManager
         }
 
         _resources.Clear();
-        _resourceTable.Clear();
     }
 
 
-    private T OpenBase<T>(IFile file, ref T res, bool resolveDepends = true) where T : IResource
+    private IResource OpenBase(IFile file, Type resourceType, bool resolveDepends = true)
     {
-        string path = file.Path;
-        if (_resources.TryGetValue(path, out WeakReference<IResource>? resRef))
+        Func<IResource, bool> addUpdateFunc;
+
+        if (!_resources.TryGetValue(file.Path, out WeakReference<IResource>? resRef))
         {
-            if (resRef.TryGetTarget(out IResource? cacheRes))
+            addUpdateFunc = (res) => _resources.TryAdd(file.Path, new(res));
+        }
+        else if(!resRef.TryGetTarget(out IResource? cacheRes))
+        {
+            addUpdateFunc = (res) => _resources.TryUpdate(file.Path, new(res), resRef);
+        }
+        else
+        {
+            if(_readingResources.Contains(cacheRes))
             {
-                return (T)cacheRes;
+                System.Threading.SpinWait.SpinUntil(() => !_readingResources.Contains(cacheRes));
             }
 
-            _resources.Remove(path);
+            return cacheRes;
         }
 
+        IResource result = (IResource)Activator.CreateInstance(resourceType)!;
+        
+        lock (_readingResources) 
+        { 
+            _readingResources.Add(result); 
+        }
 
-        res.Read(file);
-        _resources.Add(path, new WeakReference<IResource>(res));
-        _resourceTable.Add(res, path);
+        if(!addUpdateFunc(result))
+        {
+            lock (_readingResources) 
+            { 
+                _readingResources.Remove(result); 
+            }
+
+            // If the add fails, this means another thread was quicker than us.
+
+            // Return the data added by the winning thread.
+            if (!_resources.TryGetValue(file.Path, out resRef))
+            {
+                throw new Exception("TryGetValue return value is somehow false!");
+            }
+
+            if (!resRef.TryGetTarget(out IResource? cacheRes))
+            {
+                throw new Exception("Added resource somehow doesn't exist!");
+            }
+
+            System.Threading.SpinWait.SpinUntil(() => !_readingResources.Contains(cacheRes));
+            return cacheRes;    
+        }
+
+        result.Read(file);
+
         if (resolveDepends)
         {
-            res.ResolveDependencies(new DirectoryResourceResolver(file.Parent, this));
+            result.ResolveDependencies(new DirectoryResourceResolver(file.Parent, this));
         }
 
-        return res;
+        lock (_readingResources)
+        {
+            _readingResources.Remove(result);
+        }
+
+        return result;
     }
 
     public T Open<T>(IFile file, bool resolveDepends = true) where T : IResource, new()
     {
-        T res = new();
-        return OpenBase(file, ref res, resolveDepends);
+        return (T)OpenBase(file, typeof(T), resolveDepends);
     }
 
     public IResource Open(IFile file, bool resolveDepends = true)
     {
         Type type = ResourceTypeManager.DetectType(file)?.Owner ?? typeof(ResourceRaw);
-        IResource res = (IResource)Activator.CreateInstance(type)!;
-        return OpenBase(file, ref res, resolveDepends);
+        return OpenBase(file, type, resolveDepends);
     }
 
     public bool IsOpen(string path)
     {
         return _resources.TryGetValue(path, out WeakReference<IResource>? refRes) && refRes.TryGetTarget(out _);
     }
-
-    public void Close(IResource res)
-    {
-        if (!_resourceTable.TryGetValue(res, out string? key))
-        {
-            return;
-        }
-
-        _resources.Remove(key);
-        _resourceTable.Remove(res);
-        res.Dispose();
-    }
-
 }

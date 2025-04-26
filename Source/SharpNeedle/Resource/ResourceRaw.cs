@@ -29,7 +29,6 @@ public class ResourceRaw : IResource
         Data = null;
         File?.Dispose();
         GC.SuppressFinalize(this);
-        ResourceManager.Instance.Close(this);
     }
 
 

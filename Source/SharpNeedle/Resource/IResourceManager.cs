@@ -8,6 +8,4 @@ public interface IResourceManager : IDisposable
 
 
     bool IsOpen(string path);
-
-    void Close(IResource res);
 }

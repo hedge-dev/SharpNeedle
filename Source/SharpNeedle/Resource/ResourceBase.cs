@@ -26,9 +26,6 @@ public abstract class ResourceBase : IResource
         Disposed = true;
         Dispose(true);
         GC.SuppressFinalize(this);
-
-        // Stop tracking this
-        ResourceManager.Instance.Close(this);
     }
 
     protected virtual void Dispose(bool disposing)
