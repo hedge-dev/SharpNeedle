@@ -1,11 +1,13 @@
 ﻿namespace SharpNeedle.Resource;
 
+using System.Collections.Concurrent;
+
 public class ResourceManager : IResourceManager
 {
     public static ResourceManager Instance => Singleton.GetInstance<ResourceManager>()!;
 
     // Use weak references so resources can get garbage collected and we won't have to worry about leaving them open
-    private readonly Dictionary<string, WeakReference<IResource>> _resources = [];
+    private readonly ConcurrentDictionary<string, WeakReference<IResource>> _resources = [];
     private readonly ConditionalWeakTable<IResource, string> _resourceTable = [];
 
 
@@ -27,61 +29,46 @@ public class ResourceManager : IResourceManager
             }
         }
 
-        lock (_resources)
-        {
-            _resources.Clear();
-            _resourceTable.Clear();
-        }
-
+        _resources.Clear();
+        _resourceTable.Clear();
     }
 
 
     private T OpenBase<T>(IFile file, ref T res, bool resolveDepends = true) where T : IResource
     {
-        string path = file.Path;
-        bool remove = false;
-
-        if (_resources.TryGetValue(path, out WeakReference<IResource>? resRef))
+        if (_resources.TryGetValue(file.Path, out WeakReference<IResource>? resRef)
+            && resRef.TryGetTarget(out IResource? cacheRes))
         {
-            if (resRef.TryGetTarget(out IResource? cacheRes))
-            {
-                return (T)cacheRes;
-            }
-
-            remove = true;
+            return (T)cacheRes;
         }
 
-        lock (_resources)
+        res.Read(file);
+
+        if (!_resources.TryAdd(file.Path, new WeakReference<IResource>(res)))
         {
-            // Doing it again in case 2 processes locked at the same time.
-            // That way, we can still perform a read outside of the lock, decreasing
-            // read times
-            if (!remove && _resources.TryGetValue(path, out resRef))
-            {
-                if (resRef.TryGetTarget(out IResource? cacheRes))
-                {
-                    return (T)cacheRes;
-                }
+            // If the add fails, this means another thread was quicker than us.
 
-                remove = true;
+            // Return the data added by the winning thread.
+            if (!_resources.TryGetValue(file.Path, out resRef))
+            {
+                throw new Exception("TryGetValue return value is somehow false!");
             }
 
-            if (remove)
+            if (!resRef.TryGetTarget(out cacheRes))
             {
-                _resources.Remove(path);
+                throw new Exception("Added resource somehow doesn't exist!");
             }
 
-            res.Read(file);
-            _resources.Add(path, new WeakReference<IResource>(res));
-            _resourceTable.Add(res, path);
-            if (resolveDepends)
-            {
-                res.ResolveDependencies(new DirectoryResourceResolver(file.Parent, this));
-            }
-
-            return res;
+            return (T)cacheRes;
         }
 
+        _resourceTable.Add(res, file.Path);
+        if (resolveDepends)
+        {
+            res.ResolveDependencies(new DirectoryResourceResolver(file.Parent, this));
+        }
+
+        return res;
     }
 
     public T Open<T>(IFile file, bool resolveDepends = true) where T : IResource, new()
@@ -104,21 +91,17 @@ public class ResourceManager : IResourceManager
 
     public void Close(IResource res)
     {
-        lock (_resources)
+        if (!_resourceTable.TryGetValue(res, out string? key))
         {
-            // doing the read inside a lock, as the likelyhood of performing a close
-            // on something that isnt in the resource table is very unlikely, and if
-            // not, probably not time intensive
-
-            if (!_resourceTable.TryGetValue(res, out string? key))
-            {
-                return;
-            }
-
-            _resources.Remove(key);
-            _resourceTable.Remove(res);
-            res.Dispose();
+            return;
         }
+
+        if(_resources.TryRemove(key, out _))
+        {
+            _resourceTable.Remove(res);
+        }
+
+        res.Dispose();
     }
 
 }
