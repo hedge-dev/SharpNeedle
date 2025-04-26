@@ -90,10 +90,8 @@ public class ResourceManager : IResourceManager
             return;
         }
 
-        if(_resources.TryRemove(key, out _))
-        {
-            _resourceTable.Remove(res);
-        }
+        _resources.Remove(key, out _);
+        _resourceTable.Remove(res);
 
         res.Dispose();
     }
