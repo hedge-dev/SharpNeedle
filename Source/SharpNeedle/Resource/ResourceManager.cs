@@ -9,7 +9,7 @@ public class ResourceManager : IResourceManager
 
     // Use weak references so resources can get garbage collected and we won't have to worry about leaving them open
     private readonly ConcurrentDictionary<string, WeakReference<IResource>> _resources = [];
-
+    private readonly HashSet<IResource> _readingResources = [];
 
     static ResourceManager()
     {
@@ -47,14 +47,28 @@ public class ResourceManager : IResourceManager
         }
         else
         {
+            if(_readingResources.Contains(cacheRes))
+            {
+                System.Threading.SpinWait.SpinUntil(() => !_readingResources.Contains(cacheRes));
+            }
+
             return cacheRes;
         }
 
         IResource result = (IResource)Activator.CreateInstance(resourceType)!;
-        result.Read(file);
+        
+        lock (_readingResources) 
+        { 
+            _readingResources.Add(result); 
+        }
 
         if(!addUpdateFunc(result))
         {
+            lock (_readingResources) 
+            { 
+                _readingResources.Remove(result); 
+            }
+
             // If the add fails, this means another thread was quicker than us.
 
             // Return the data added by the winning thread.
@@ -68,12 +82,20 @@ public class ResourceManager : IResourceManager
                 throw new Exception("Added resource somehow doesn't exist!");
             }
 
-            return cacheRes;
+            System.Threading.SpinWait.SpinUntil(() => !_readingResources.Contains(cacheRes));
+            return cacheRes;    
         }
+
+        result.Read(file);
 
         if (resolveDepends)
         {
             result.ResolveDependencies(new DirectoryResourceResolver(file.Parent, this));
+        }
+
+        lock (_readingResources)
+        {
+            _readingResources.Remove(result);
         }
 
         return result;
