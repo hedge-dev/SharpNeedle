@@ -1,6 +1,7 @@
 ﻿namespace SharpNeedle.Resource;
 
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 public class ResourceManager : IResourceManager
 {
@@ -8,7 +9,6 @@ public class ResourceManager : IResourceManager
 
     // Use weak references so resources can get garbage collected and we won't have to worry about leaving them open
     private readonly ConcurrentDictionary<string, WeakReference<IResource>> _resources = [];
-    private readonly ConditionalWeakTable<IResource, string> _resourceTable = [];
 
 
     static ResourceManager()
@@ -30,41 +30,53 @@ public class ResourceManager : IResourceManager
         }
 
         _resources.Clear();
-        _resourceTable.Clear();
     }
 
 
     private IResource OpenBase(IFile file, Type resourceType, bool resolveDepends = true)
     {
-        if (_resources.TryGetValue(file.Path, out WeakReference<IResource>? resRef)
-            && resRef.TryGetTarget(out IResource? cacheRes))
+        Func<IResource, bool> addUpdateFunc;
+
+        if (!_resources.TryGetValue(file.Path, out WeakReference<IResource>? resRef))
+        {
+            addUpdateFunc = (res) => _resources.TryAdd(file.Path, new(res));
+        }
+        else if(!resRef.TryGetTarget(out IResource? cacheRes))
+        {
+            addUpdateFunc = (res) => _resources.TryUpdate(file.Path, new(res), resRef);
+        }
+        else
         {
             return cacheRes;
         }
 
-        WeakReference<IResource> AddFunc(string path)
+        IResource result = (IResource)Activator.CreateInstance(resourceType)!;
+        result.Read(file);
+
+        if(!addUpdateFunc(result))
         {
-            IResource res = (IResource)Activator.CreateInstance(resourceType)!;
-            res.Read(file);
+            // If the add fails, this means another thread was quicker than us.
 
-            _resourceTable.Add(res, file.Path);
+            // Return the data added by the winning thread.
+            if (!_resources.TryGetValue(file.Path, out resRef))
+            {
+                throw new Exception("TryGetValue return value is somehow false!");
+            }
 
-            return new(res);
-        }
+            if (!resRef.TryGetTarget(out IResource? cacheRes))
+            {
+                throw new Exception("Added resource somehow doesn't exist!");
+            }
 
-        resRef = _resources.AddOrUpdate(file.Path, AddFunc, (k, p) => AddFunc(k));
-
-        if (!resRef.TryGetTarget(out cacheRes))
-        {
-            throw new NullReferenceException("Result somehow null");
+            return cacheRes;
         }
 
         if (resolveDepends)
         {
-            cacheRes.ResolveDependencies(new DirectoryResourceResolver(file.Parent, this));
+            result.ResolveDependencies(new DirectoryResourceResolver(file.Parent, this));
         }
 
-        return cacheRes;
+        return result;
     }
 
     public T Open<T>(IFile file, bool resolveDepends = true) where T : IResource, new()
@@ -82,18 +94,4 @@ public class ResourceManager : IResourceManager
     {
         return _resources.TryGetValue(path, out WeakReference<IResource>? refRes) && refRes.TryGetTarget(out _);
     }
-
-    public void Close(IResource res)
-    {
-        if (!_resourceTable.TryGetValue(res, out string? key))
-        {
-            return;
-        }
-
-        _resources.Remove(key, out _);
-        _resourceTable.Remove(res);
-
-        res.Dispose();
-    }
-
 }
