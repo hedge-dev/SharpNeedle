@@ -34,54 +34,48 @@ public class ResourceManager : IResourceManager
     }
 
 
-    private T OpenBase<T>(IFile file, ref T res, bool resolveDepends = true) where T : IResource
+    private IResource OpenBase(IFile file, Type resourceType, bool resolveDepends = true)
     {
         if (_resources.TryGetValue(file.Path, out WeakReference<IResource>? resRef)
             && resRef.TryGetTarget(out IResource? cacheRes))
         {
-            return (T)cacheRes;
+            return cacheRes;
         }
 
-        res.Read(file);
-
-        if (!_resources.TryAdd(file.Path, new WeakReference<IResource>(res)))
+        WeakReference<IResource> AddFunc(string path)
         {
-            // If the add fails, this means another thread was quicker than us.
+            IResource res = (IResource)Activator.CreateInstance(resourceType)!;
+            res.Read(file);
 
-            // Return the data added by the winning thread.
-            if (!_resources.TryGetValue(file.Path, out resRef))
-            {
-                throw new Exception("TryGetValue return value is somehow false!");
-            }
+            _resourceTable.Add(res, file.Path);
 
-            if (!resRef.TryGetTarget(out cacheRes))
-            {
-                throw new Exception("Added resource somehow doesn't exist!");
-            }
-
-            return (T)cacheRes;
+            return new(res);
         }
 
-        _resourceTable.Add(res, file.Path);
+        resRef = _resources.AddOrUpdate(file.Path, AddFunc, (k, p) => AddFunc(k));
+
+        if (!resRef.TryGetTarget(out cacheRes))
+        {
+            throw new NullReferenceException("Result somehow null");
+        }
+
         if (resolveDepends)
         {
-            res.ResolveDependencies(new DirectoryResourceResolver(file.Parent, this));
+            cacheRes.ResolveDependencies(new DirectoryResourceResolver(file.Parent, this));
         }
 
-        return res;
+        return cacheRes;
     }
 
     public T Open<T>(IFile file, bool resolveDepends = true) where T : IResource, new()
     {
-        T res = new();
-        return OpenBase(file, ref res, resolveDepends);
+        return (T)OpenBase(file, typeof(T), resolveDepends);
     }
 
     public IResource Open(IFile file, bool resolveDepends = true)
     {
         Type type = ResourceTypeManager.DetectType(file)?.Owner ?? typeof(ResourceRaw);
-        IResource res = (IResource)Activator.CreateInstance(type)!;
-        return OpenBase(file, ref res, resolveDepends);
+        return OpenBase(file, type, resolveDepends);
     }
 
     public bool IsOpen(string path)
