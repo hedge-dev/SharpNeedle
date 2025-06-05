@@ -107,10 +107,10 @@ public class Shader : ResourceBase
         writer.WriteInt32(Features.Count);
         writer.WriteObjectCollection(Features);
 
-        int variantCount = 1 << Permutations.Count;
+        int variantCount = 1 << Features.Count;
         if (Permutations.Count != variantCount)
         {
-            throw new InvalidOperationException($"Shader is supposed to have {variantCount} variants, but has {Permutations.Count}!");
+            throw new InvalidOperationException($"Shader is supposed to have {variantCount} permutations, but has {Permutations.Count}!");
         }
 
         writer.WriteArray(Permutations.ToArray());
