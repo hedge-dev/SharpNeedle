@@ -4,7 +4,7 @@ using SharpNeedle.IO;
 using SharpNeedle.Utilities;
 
 [NeedleResource("hh/needle/shader-list", @"\.[pvc]so$")]
-public class Shader : ResourceBase
+public class Shader : ResourceBase, IBinarySerializable
 {
     public static readonly ulong FileSignature = BinaryHelper.MakeSignature<ulong>("HHNEEDLE");
     public static readonly ulong ShaderSignature = BinaryHelper.MakeSignature<ulong>("HNSHV002");
@@ -57,7 +57,11 @@ public class Shader : ResourceBase
         BaseFile = file;
         Name = Path.GetFileNameWithoutExtension(file.Name);
         using BinaryObjectReader reader = new(file.Open(), StreamOwnership.Transfer, Endianness.Little);
+        Read(reader);
+    }
 
+    public void Read(BinaryObjectReader reader)
+    {
         BinaryHelper.EnsureSignature(reader.ReadNative<ulong>(), true, FileSignature);
         reader.Skip(4); // file size
 
@@ -85,7 +89,11 @@ public class Shader : ResourceBase
     {
         BaseFile = file;
         using BinaryObjectWriter writer = new(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness.Little);
+        Write(writer);
+    }
 
+    public void Write(BinaryObjectWriter writer)
+    { 
         writer.WriteUInt64(FileSignature);
 
         long fileDataStart = writer.Position;
@@ -107,10 +115,10 @@ public class Shader : ResourceBase
         writer.WriteInt32(Features.Count);
         writer.WriteObjectCollection(Features);
 
-        int variantCount = 1 << Permutations.Count;
+        int variantCount = 1 << Features.Count;
         if (Permutations.Count != variantCount)
         {
-            throw new InvalidOperationException($"Shader is supposed to have {variantCount} variants, but has {Permutations.Count}!");
+            throw new InvalidOperationException($"Shader is supposed to have {variantCount} permutations, but has {Permutations.Count}!");
         }
 
         writer.WriteArray(Permutations.ToArray());

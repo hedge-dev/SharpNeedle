@@ -32,6 +32,11 @@ public class Model : ModelBase
         {
             for (int i = 0; i < Nodes.Count; i++)
             {
+                if (reader.Position + 64 >= reader.Length)
+                {
+                    break;
+                }
+
                 Node node = Nodes[i];
                 node.Transform = Matrix4x4.Transpose(reader.Read<Matrix4x4>());
                 Nodes[i] = node;
