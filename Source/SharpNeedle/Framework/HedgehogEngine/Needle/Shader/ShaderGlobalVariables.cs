@@ -19,7 +19,7 @@ public class ShaderGlobalVariables : IBinarySerializable
 
     public List<ConstantBufferField> CBFloats { get; set; } = [];
 
-    public List<ComputeBuffer> ComputeBuffers { get; set; } = [];
+    public List<UnorderedAccessView> UnorderedAccessViews { get; set; } = [];
 
 
     public void Read(BinaryObjectReader reader)
@@ -30,14 +30,14 @@ public class ShaderGlobalVariables : IBinarySerializable
         CBBooleans = [];
         CBIntegers = [];
         CBFloats = [];
-        ComputeBuffers = [];
+        UnorderedAccessViews = [];
 
         long start = reader.Position;
         int size = reader.ReadInt32();
         long end = start + size;
 
         // In games before SXSG, the lists seem to terminate
-        // on the type "9", aka ComputeBuffer. This is easily
+        // on the type "9", aka UAVs. This is easily
         // checkable by comparing pos + 4 to the end
 
         while (reader.Position + 4 < end)
@@ -73,8 +73,8 @@ public class ShaderGlobalVariables : IBinarySerializable
                     case VariantVariableType.CBFloat:
                         CBFloats.Add(reader.ReadObject<ConstantBufferField>());
                         break;
-                    case VariantVariableType.ComputeBuffer:
-                        ComputeBuffers.Add(reader.ReadObject<ComputeBuffer>());
+                    case VariantVariableType.UnorderedAccessView:
+                        UnorderedAccessViews.Add(reader.ReadObject<UnorderedAccessView>());
                         break;
                     default:
                         throw new InvalidDataException("Unknown variable type!");
@@ -130,7 +130,7 @@ public class ShaderGlobalVariables : IBinarySerializable
         }
         else
         {
-            WriteArray(ComputeBuffers, VariantVariableType.ComputeBuffer);
+            WriteArray(UnorderedAccessViews, VariantVariableType.UnorderedAccessView);
         }
 
         long endPosition = writer.Position;

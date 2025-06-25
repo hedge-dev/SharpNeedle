@@ -17,5 +17,5 @@ public enum VariantVariableType : int
     CBFloat = 8,
 
     // Only used in compute buffers in SXSG, so likely just "compute buffer"
-    ComputeBuffer = 9
+    UnorderedAccessView = 9
 }
