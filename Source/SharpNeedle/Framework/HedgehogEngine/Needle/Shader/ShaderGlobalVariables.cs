@@ -123,11 +123,14 @@ public class ShaderGlobalVariables : IBinarySerializable
         WriteArray(CBBooleans, VariantVariableType.CBBoolean);
         WriteArray(CBIntegers, VariantVariableType.CBInteger);
         WriteArray(CBFloats, VariantVariableType.CBFloat);
-        WriteArray(ComputeBuffers, VariantVariableType.ComputeBuffer);
 
         if (IncludeTerminator)
         {
             writer.WriteUInt32(9);
+        }
+        else
+        {
+            WriteArray(ComputeBuffers, VariantVariableType.ComputeBuffer);
         }
 
         long endPosition = writer.Position;
