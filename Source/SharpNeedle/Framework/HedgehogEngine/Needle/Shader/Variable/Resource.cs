@@ -1,16 +1,25 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Needle.Shader.Variable;
 
-public enum UnorderedAccessViewType
+public enum ResourceType : int
 {
-    RWTexture2D = 3,
-    RWBuffer = 10
+    Buffer = 0,
+    Texture1D = 1,
+    Texture1DArray = 2,
+    Texture2D = 3,
+    Texture2DArray = 4,
+    Texture2DMultisampled = 5,
+    Texture2DMultisampledArray = 6,
+    Texture3D = 7,
+    TextureCube = 8,
+    TextureCubeArray = 9,
+    BufferExtended = 10
 }
 
-public struct UnorderedAccessView : IBinarySerializable
+public struct Resource : IBinarySerializable
 {
     private string? _name;
 
-    public UnorderedAccessViewType Type { get; set; }
+    public ResourceType Type { get; set; }
 
     public int ID { get; set; }
 
@@ -22,7 +31,7 @@ public struct UnorderedAccessView : IBinarySerializable
 
     public void Read(BinaryObjectReader reader)
     {
-        Type = (UnorderedAccessViewType)reader.ReadInt32();
+        Type = (ResourceType)reader.ReadInt32();
         ID = reader.ReadInt32();
         Name = reader.ReadString(StringBinaryFormat.NullTerminated);
         reader.Align(4);

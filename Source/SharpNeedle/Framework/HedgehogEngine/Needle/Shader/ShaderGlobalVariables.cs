@@ -7,7 +7,7 @@ public class ShaderGlobalVariables : IBinarySerializable
 {
     public bool IncludeTerminator { get; set; }
 
-    public List<Texture> Textures { get; set; } = [];
+    public List<Resource> Textures { get; set; } = [];
 
     public List<Sampler> Samplers { get; set; } = [];
 
@@ -19,7 +19,7 @@ public class ShaderGlobalVariables : IBinarySerializable
 
     public List<ConstantBufferField> CBFloats { get; set; } = [];
 
-    public List<UnorderedAccessView> UnorderedAccessViews { get; set; } = [];
+    public List<Resource> UnorderedAccessViews { get; set; } = [];
 
 
     public void Read(BinaryObjectReader reader)
@@ -56,7 +56,7 @@ public class ShaderGlobalVariables : IBinarySerializable
                     case VariantVariableType.Float:
                         throw new NotImplementedException("Not implemented yet (if this occured with a vanilla file, please open a github issue for it!!!)");
                     case VariantVariableType.Texture:
-                        Textures.Add(reader.ReadObject<Texture>());
+                        Textures.Add(reader.ReadObject<Resource>());
                         break;
                     case VariantVariableType.Sampler:
                         Samplers.Add(reader.ReadObject<Sampler>());
@@ -74,7 +74,7 @@ public class ShaderGlobalVariables : IBinarySerializable
                         CBFloats.Add(reader.ReadObject<ConstantBufferField>());
                         break;
                     case VariantVariableType.UnorderedAccessView:
-                        UnorderedAccessViews.Add(reader.ReadObject<UnorderedAccessView>());
+                        UnorderedAccessViews.Add(reader.ReadObject<Resource>());
                         break;
                     default:
                         throw new InvalidDataException("Unknown variable type!");
