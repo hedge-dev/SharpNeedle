@@ -1,13 +1,25 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Needle.Shader.Variable;
 
-public struct ComputeBuffer : IBinarySerializable
+public enum ResourceType : int
+{
+    Buffer = 0,
+    Texture1D = 1,
+    Texture1DArray = 2,
+    Texture2D = 3,
+    Texture2DArray = 4,
+    Texture2DMultisampled = 5,
+    Texture2DMultisampledArray = 6,
+    Texture3D = 7,
+    TextureCube = 8,
+    TextureCubeArray = 9,
+    BufferExtended = 10
+}
+
+public struct Resource : IBinarySerializable
 {
     private string? _name;
 
-    /// <summary>
-    /// Might be type, no idea
-    /// </summary>
-    public int Unknown1 { get; set; }
+    public ResourceType Type { get; set; }
 
     public int ID { get; set; }
 
@@ -19,7 +31,7 @@ public struct ComputeBuffer : IBinarySerializable
 
     public void Read(BinaryObjectReader reader)
     {
-        Unknown1 = reader.ReadInt32();
+        Type = (ResourceType)reader.ReadInt32();
         ID = reader.ReadInt32();
         Name = reader.ReadString(StringBinaryFormat.NullTerminated);
         reader.Align(4);
@@ -27,7 +39,7 @@ public struct ComputeBuffer : IBinarySerializable
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.WriteInt32(Unknown1);
+        writer.WriteInt32((int)Type);
         writer.WriteInt32(ID);
         writer.WriteString(StringBinaryFormat.NullTerminated, Name);
         writer.Align(4);

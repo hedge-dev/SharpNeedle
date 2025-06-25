@@ -7,7 +7,7 @@ public class ShaderGlobalVariables : IBinarySerializable
 {
     public bool IncludeTerminator { get; set; }
 
-    public List<Texture> Textures { get; set; } = [];
+    public List<Resource> Textures { get; set; } = [];
 
     public List<Sampler> Samplers { get; set; } = [];
 
@@ -19,7 +19,7 @@ public class ShaderGlobalVariables : IBinarySerializable
 
     public List<ConstantBufferField> CBFloats { get; set; } = [];
 
-    public List<ComputeBuffer> ComputeBuffers { get; set; } = [];
+    public List<Resource> UnorderedAccessViews { get; set; } = [];
 
 
     public void Read(BinaryObjectReader reader)
@@ -30,14 +30,14 @@ public class ShaderGlobalVariables : IBinarySerializable
         CBBooleans = [];
         CBIntegers = [];
         CBFloats = [];
-        ComputeBuffers = [];
+        UnorderedAccessViews = [];
 
         long start = reader.Position;
         int size = reader.ReadInt32();
         long end = start + size;
 
         // In games before SXSG, the lists seem to terminate
-        // on the type "9", aka ComputeBuffer. This is easily
+        // on the type "9", aka UAVs. This is easily
         // checkable by comparing pos + 4 to the end
 
         while (reader.Position + 4 < end)
@@ -56,7 +56,7 @@ public class ShaderGlobalVariables : IBinarySerializable
                     case VariantVariableType.Float:
                         throw new NotImplementedException("Not implemented yet (if this occured with a vanilla file, please open a github issue for it!!!)");
                     case VariantVariableType.Texture:
-                        Textures.Add(reader.ReadObject<Texture>());
+                        Textures.Add(reader.ReadObject<Resource>());
                         break;
                     case VariantVariableType.Sampler:
                         Samplers.Add(reader.ReadObject<Sampler>());
@@ -73,8 +73,8 @@ public class ShaderGlobalVariables : IBinarySerializable
                     case VariantVariableType.CBFloat:
                         CBFloats.Add(reader.ReadObject<ConstantBufferField>());
                         break;
-                    case VariantVariableType.ComputeBuffer:
-                        ComputeBuffers.Add(reader.ReadObject<ComputeBuffer>());
+                    case VariantVariableType.UnorderedAccessView:
+                        UnorderedAccessViews.Add(reader.ReadObject<Resource>());
                         break;
                     default:
                         throw new InvalidDataException("Unknown variable type!");
@@ -123,11 +123,14 @@ public class ShaderGlobalVariables : IBinarySerializable
         WriteArray(CBBooleans, VariantVariableType.CBBoolean);
         WriteArray(CBIntegers, VariantVariableType.CBInteger);
         WriteArray(CBFloats, VariantVariableType.CBFloat);
-        WriteArray(ComputeBuffers, VariantVariableType.ComputeBuffer);
 
         if (IncludeTerminator)
         {
             writer.WriteUInt32(9);
+        }
+        else
+        {
+            WriteArray(UnorderedAccessViews, VariantVariableType.UnorderedAccessView);
         }
 
         long endPosition = writer.Position;
