@@ -34,25 +34,25 @@ public class ShaderList : BinaryResource
     public struct Input : IBinarySerializable
     {
         public string? Name { get; set; }
-        public int ID { get; set; }
+        public int UVIndex { get; set; }
 
         public void Read(BinaryObjectReader reader)
         {
             Name = reader.ReadStringOffset();
-            ID = reader.Read<int>();
+            UVIndex = reader.Read<int>();
             reader.Align(8);
         }
 
         public readonly void Write(BinaryObjectWriter writer)
         {
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-            writer.Write(ID);
+            writer.Write(UVIndex);
             writer.Align(8);
         }
 
         public override string ToString()
         {
-            return $"{Name}: {ID}";
+            return $"{Name}: {UVIndex}";
         }
     }
 
