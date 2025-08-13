@@ -20,4 +20,9 @@ public class Terrain : SampleChunkResource
             }
         });
     }
+
+    protected override void Reset()
+    {
+        Groups.Clear();
+    }
 }

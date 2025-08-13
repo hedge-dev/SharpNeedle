@@ -38,6 +38,14 @@ public class LightFieldTree : SampleChunkResource
         writer.Write(Indices.Count);
         writer.WriteCollectionOffset(Indices);
     }
+
+    protected override void Reset()
+    {
+        Bounds = default;
+        Cells.Clear();
+        Probes.Clear();
+        Indices.Clear();
+    }
 }
 
 public class LightFieldCell : IBinarySerializable

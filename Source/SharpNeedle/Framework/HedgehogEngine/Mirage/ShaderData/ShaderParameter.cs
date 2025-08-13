@@ -72,4 +72,12 @@ public class ShaderParameter : SampleChunkResource
             });
         }
     }
+
+    protected override void Reset()
+    {
+        for (int i = 0; i < UsageSet.Length; i++)
+        {
+            UsageSet[i] = [];
+        }
+    }
 }

@@ -83,6 +83,14 @@ public class ShaderList : SampleChunkResource
         }, 4);
     }
 
+    protected override void Reset()
+    {
+        PixelShaderPermutations.Clear();
+        HasInputs = default;
+        ParameterInputs.Clear();
+        TextureInputs.Clear();
+    }
+
     public override void ResolveDependencies(IResourceResolver dir)
     {
         foreach (PixelShaderPermutation permutation in PixelShaderPermutations)

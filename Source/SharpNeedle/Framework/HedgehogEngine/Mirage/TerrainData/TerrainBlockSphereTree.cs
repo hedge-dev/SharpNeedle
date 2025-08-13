@@ -121,6 +121,11 @@ public class TerrainBlockSphereTree : SampleChunkResource
         }
     }
 
+    protected override void Reset()
+    {
+        Root = new(default);
+    }
+
     [StructLayout(LayoutKind.Explicit)]
     private struct BinaryNode : IBinarySerializable
     {

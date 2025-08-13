@@ -92,6 +92,14 @@ public class Model : ModelBase
         }
     }
 
+    protected override void Reset()
+    {
+        base.Reset();
+        Morphs = null;
+        Nodes.Clear();
+        Bounds = default;
+    }
+
     public override void ResolveDependencies(IResourceResolver resolver)
     {
         base.ResolveDependencies(resolver);

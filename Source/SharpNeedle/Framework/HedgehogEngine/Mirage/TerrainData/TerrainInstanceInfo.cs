@@ -61,6 +61,13 @@ public class TerrainInstanceInfo : SampleChunkResource
         }
     }
 
+    protected override void Reset()
+    {
+        Model = default;
+        Transform = default;
+        LightGroups.Clear();
+    }
+
     public override void ResolveDependencies(IResourceResolver resolver)
     {
         if (Model.IsValid())

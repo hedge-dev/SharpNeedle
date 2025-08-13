@@ -54,4 +54,9 @@ public class TerrainGroup : SampleChunkResource
         });
     }
 
+    protected override void Reset()
+    {
+        ModelNames.Clear();
+        Subsets.Clear();
+    }
 }

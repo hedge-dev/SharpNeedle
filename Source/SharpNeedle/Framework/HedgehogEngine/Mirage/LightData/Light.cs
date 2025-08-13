@@ -57,4 +57,13 @@ public class Light : SampleChunkResource
                 break;
         }
     }
+
+    protected override void Reset()
+    {
+        Type = default;
+        Attribute = default;
+        Position = default;
+        Color = default;
+        Range = default;
+    }
 }

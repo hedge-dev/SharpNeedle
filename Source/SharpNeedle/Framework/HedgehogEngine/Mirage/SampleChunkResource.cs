@@ -32,6 +32,7 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
 
     public abstract void Read(BinaryObjectReader reader);
     public abstract void Write(BinaryObjectWriter writer);
+    protected abstract void Reset();
 
 
     // ReSharper disable AccessToDisposedClosure
@@ -107,18 +108,51 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
             throw new InvalidDataException("No data found!");
         }
 
-        using (SeekToken token = reader.At())
-        {
-            // Using a substream to ensure we can't read outside the nodes data
-            SubStream dataStream = new(reader.GetBaseStream(), dataNode.DataOffset, dataNode.DataSize);
-            BinaryObjectReader dataReader = new(dataStream, StreamOwnership.Retain, reader.Endianness);
-
-            dataReader.OffsetHandler.PushOffsetOrigin(rootStart + 0x10 - dataNode.DataOffset);
-            Read(dataReader);
-            dataReader.PopOffsetOrigin();
-        }
-
         dataNode.Data = this;
+
+        try
+        {
+            using (SeekToken token = reader.At())
+            {
+                // Using a substream to ensure we can't read outside the nodes data
+                SubStream dataStream = new(reader.GetBaseStream(), dataNode.DataOffset, dataNode.DataSize);
+                BinaryObjectReader dataReader = new(dataStream, StreamOwnership.Retain, reader.Endianness);
+
+                dataReader.OffsetHandler.PushOffsetOrigin(rootStart + 0x10 - dataNode.DataOffset);
+                Read(dataReader);
+                dataReader.PopOffsetOrigin();
+            }
+        }
+        catch(Exception exception)
+        {
+            try
+            {
+                // Some tools produces files with incorrectly set up data,
+                // so we try to read at the end of the sample chunk node data
+                Reset();
+
+                // get the last node in the tree
+                SampleChunkNode lastNode = Root;
+                while(lastNode.Children.Count != 0)
+                {
+                    lastNode = lastNode.Children[^1];
+                }
+
+                using (SeekToken token = reader.At())
+                {
+                    SubStream dataStream = new(reader.GetBaseStream(), lastNode.DataOffset, reader.Length - lastNode.DataOffset);
+                    BinaryObjectReader dataReader = new(dataStream, StreamOwnership.Retain, reader.Endianness);
+
+                    dataReader.OffsetHandler.PushOffsetOrigin(rootStart + 0x10 - lastNode.DataOffset);
+                    Read(dataReader);
+                    dataReader.PopOffsetOrigin();
+                }
+            }
+            catch
+            {
+                throw exception;
+            }
+        }
     }
 
 

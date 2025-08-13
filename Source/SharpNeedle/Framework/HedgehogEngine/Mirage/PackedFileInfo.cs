@@ -30,6 +30,11 @@ public class PackedFileInfo : SampleChunkResource
         });
     }
 
+    protected override void Reset()
+    {
+        Files.Clear();
+    }
+
     public struct File : IBinarySerializable
     {
         public string? Name { get; set; }

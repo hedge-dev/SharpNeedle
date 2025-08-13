@@ -94,4 +94,11 @@ public class GITextureGroupInfo : SampleChunkResource
             }
         });
     }
+
+    protected override void Reset()
+    {
+        Instances.Clear();
+        Groups.Clear();
+        LowQualityGroups.Clear();
+    }
 }

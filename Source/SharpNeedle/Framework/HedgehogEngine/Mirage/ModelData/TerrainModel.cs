@@ -40,4 +40,10 @@ public class TerrainModel : ModelBase
             writer.Write(Flags);
         }
     }
+
+    protected override void Reset()
+    {
+        base.Reset();
+        Flags = default;
+    }
 }
