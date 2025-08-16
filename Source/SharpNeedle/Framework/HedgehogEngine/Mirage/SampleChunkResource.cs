@@ -107,15 +107,18 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
             throw new InvalidDataException("No data found!");
         }
 
+        SampleChunkNode lastNode = Root;
+        while (lastNode.Children.Count != 0)
+        {
+            lastNode = lastNode.Children[^1];
+        }
+
         using (SeekToken token = reader.At())
         {
-            // Using a substream to ensure we can't read outside the nodes data
-            SubStream dataStream = new(reader.GetBaseStream(), dataNode.DataOffset, dataNode.DataSize);
-            BinaryObjectReader dataReader = new(dataStream, StreamOwnership.Retain, reader.Endianness);
-
-            dataReader.OffsetHandler.PushOffsetOrigin(rootStart + 0x10 - dataNode.DataOffset);
-            Read(dataReader);
-            dataReader.PopOffsetOrigin();
+            reader.Seek(lastNode.DataOffset, SeekOrigin.Begin);
+            reader.OffsetHandler.PushOffsetOrigin(0x10);
+            Read(reader);
+            reader.PopOffsetOrigin();
         }
 
         dataNode.Data = this;
