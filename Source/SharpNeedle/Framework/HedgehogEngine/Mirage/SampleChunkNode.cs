@@ -120,7 +120,7 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
     public float FloatValue
     {
         get => BitConverter.UInt32BitsToSingle(Value);
-        set => Value = BitConverter.SingleToUInt32Bits(Value);
+        set => Value = BitConverter.SingleToUInt32Bits(value);
     }
 
     /// <summary>
