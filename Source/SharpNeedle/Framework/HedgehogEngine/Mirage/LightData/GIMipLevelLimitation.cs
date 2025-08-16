@@ -24,13 +24,6 @@ public class GIMipLevelLimitation : SampleChunkResource
         writer.Align(4);
     }
 
-    protected override void Reset()
-    {
-        Level0 = default;
-        Level1 = default;
-        Level2 = default;
-    }
-
     public bool this[int index]
     {
         get

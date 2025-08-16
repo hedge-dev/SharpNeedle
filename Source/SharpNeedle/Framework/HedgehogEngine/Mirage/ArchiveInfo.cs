@@ -40,11 +40,6 @@ public class ArchiveInfo : SampleChunkResource
         });
     }
 
-    protected override void Reset()
-    {
-        Entries.Clear();
-    }
-
     public class Entry : IBinarySerializable
     {
         public string? Name { get; set; }

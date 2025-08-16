@@ -197,18 +197,6 @@ public class Material : SampleChunkResource
         }
     }
 
-    protected override void Reset()
-    {
-        ShaderName = default;
-        AlphaThreshold = default;
-        NoBackFaceCulling = default;
-        BlendMode = default;
-        FloatParameters.Clear();
-        IntParameters.Clear();
-        BoolParameters.Clear();
-        Texset = new();
-    }
-
     public override void ResolveDependencies(IResourceResolver resolver)
     {
         if (DataVersion <= 1)

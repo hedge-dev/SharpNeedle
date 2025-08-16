@@ -6,7 +6,7 @@ public abstract class BaseShader : SampleChunkResource
 
     public ResourceReference<ResourceRaw> ByteCode { get; set; }
 
-    public ShaderByteCodePlatform ByteCodePlatform { get; set; } = ShaderByteCodePlatform.None;
+    public ShaderByteCodePlatform ByteCodePlatform = ShaderByteCodePlatform.None;
 
     public List<ResourceReference<ShaderParameter>> Parameters { get; set; } = [];
 
@@ -44,13 +44,6 @@ public abstract class BaseShader : SampleChunkResource
                 writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Path.GetFileNameWithoutExtension(parameter.Name));
             }
         });
-    }
-
-    protected override void Reset()
-    {
-        ByteCode = default;
-        ByteCodePlatform = ShaderByteCodePlatform.None;
-        Parameters.Clear();
     }
 
     public override void ResolveDependencies(IResourceResolver resolver)

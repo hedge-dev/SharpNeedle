@@ -30,11 +30,6 @@ public class LightList : SampleChunkResource
         });
     }
 
-    protected override void Reset()
-    {
-        Lights.Clear();
-    }
-
     public override void WriteDependencies(IDirectory dir)
     {
         if (Lights == null)

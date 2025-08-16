@@ -6,11 +6,6 @@ public abstract class ModelBase : SampleChunkResource
 {
     public List<MeshGroup> Groups { get; set; } = [];
 
-    protected override void Reset()
-    {
-        Groups.Clear();
-    }
-
     public override void ResolveDependencies(IResourceResolver resolver)
     {
         List<ResourceResolveException> exceptions = [];

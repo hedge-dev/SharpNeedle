@@ -31,11 +31,6 @@ public class Texset : SampleChunkResource
         });
     }
 
-    protected override void Reset()
-    {
-        Textures.Clear();
-    }
-
     public override void ResolveDependencies(IResourceResolver resolver)
     {
         List<string> exception = [];

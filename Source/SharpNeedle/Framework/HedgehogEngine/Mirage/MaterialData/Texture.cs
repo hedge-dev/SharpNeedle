@@ -34,13 +34,4 @@ public class Texture : SampleChunkResource
         writer.Align(4);
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Type);
     }
-
-    protected override void Reset()
-    {
-        PictureName = default;
-        TexCoordIndex = default;
-        WrapModeU = default;
-        WrapModeV = default;
-        Type = default;
-    }
 }
