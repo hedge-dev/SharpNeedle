@@ -322,7 +322,7 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
         }
 
         long end = startPos + size;
-        if (end > reader.Position)
+        if (end >= reader.Position)
         {
             DataOffset = reader.Position;
             DataSize = end - DataOffset;
