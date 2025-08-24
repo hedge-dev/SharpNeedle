@@ -21,9 +21,12 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
 
     public void SetupNodes(string rootName)
     {
-        Root = new();
+        Root = new()
+        {
+            Value = SampleChunkNode.RootSignature
+        };
 
-        SampleChunkNode dataRoot = new(rootName);
+        SampleChunkNode dataRoot = new(rootName, 1);
         Root.AddChild(dataRoot);
 
         dataRoot.AddChild(new("Contexts", this, DataVersion));
