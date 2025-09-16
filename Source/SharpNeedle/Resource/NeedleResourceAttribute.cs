@@ -65,4 +65,5 @@ public enum ResourceType
     Material,
     Light,
     Archive,
+    ArchiveInfo
 }

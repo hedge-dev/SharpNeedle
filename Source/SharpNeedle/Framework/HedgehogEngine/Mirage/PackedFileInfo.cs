@@ -1,7 +1,9 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Mirage;
 
+[NeedleResource(ResourceId, ResourceType.ArchiveInfo, @"\.pfi$")]
 public class PackedFileInfo : SampleChunkResource
 {
+    public const string ResourceId = "hh/pfi";
     public List<File> Files { get; set; } = [];
 
     public override void Read(BinaryObjectReader reader)
