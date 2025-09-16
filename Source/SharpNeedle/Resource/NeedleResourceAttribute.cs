@@ -64,5 +64,6 @@ public enum ResourceType
     Animation,
     Material,
     Light,
-    Archive,
+    Archive,    
+    ArchiveInfo
 }
