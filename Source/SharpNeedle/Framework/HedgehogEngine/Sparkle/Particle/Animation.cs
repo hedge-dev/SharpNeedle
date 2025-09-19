@@ -2,22 +2,22 @@
 
 public class Animation : IBinarySerializable
 {
-    public Track? ColorA;
-    public Track? ColorB;
-    public Track? ColorG;
-    public Track? ColorR;
-    
-    public Track? TransX;
-    public Track? TransY;
-    public Track? TransZ;
-    
-    public Track? ScaleX;
-    public Track? ScaleY;
-    public Track? ScaleZ;
-    
-   
+    public Track ColorA { get; set; }
+    public Track ColorB { get; set; }
+    public Track ColorG { get; set; }
+    public Track ColorR { get; set; }
+
+    public Track TransX { get; set; }
+    public Track TransY { get; set; }
+    public Track TransZ { get; set; }
+
+    public Track ScaleX { get; set; }
+    public Track ScaleY { get; set; }
+    public Track ScaleZ { get; set; }
+
+
     public void Read(BinaryObjectReader reader)
-    {        
+    {
         //AnimationChunk
         reader.ReadStringPaddedByte();
 

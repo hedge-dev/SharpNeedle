@@ -2,33 +2,36 @@
 
 public class Emitter : IBinarySerializable
 {
-    public int ParticleCount;
-    public string? Name;
-    public int MaxGenerateCount;
-    public int GenerateCount;
-    public int ParticleDataFlags;
-    public bool Infinite;
-    public float InitialEmissionGap;
+    public int ParticleCount { get; set; }
+    public string? Name { get; set; }
+    public int MaxGenerateCount { get; set; }
+    public int GenerateCount { get; set; }
+    public int ParticleDataFlags { get; set; }
+    public bool Infinite { get; set; }
+    public float InitialEmissionGap { get; set; }
 
-    public Vector4 InitialPosition;
-    public Vector4 RotationXYZ;
-    public Vector4 RotationXYZBias;
-    public Vector4 InitialRotationXYZ;
-    public Vector4 InitialRotation;
+    public Vector4 InitialPosition { get; set; }
+    public Vector4 RotationXYZ { get; set; }
+    public Vector4 RotationXYZBias { get; set; }
+    public Vector4 InitialRotationXYZ { get; set; }
+    public Vector4 InitialRotation { get; set; }
 
-    public float InitialEmitterLifeTime;
-    public float EmitStartTime;
-    public int EmitCondition;
-    public int EmitterType;
+    public float InitialEmitterLifeTime { get; set; }
+    public float EmitStartTime { get; set; }
+    public int EmitCondition { get; set; }
+    public int EmitterType { get; set; }
 
-    public Cylinder? CylinderParams;
-    public Sphere? SphereParams;
-    public Vector4 Size;
-    public string? MeshName;
-    public int FieldU1, FieldU2, FieldU3, FieldU4;
-    public int AnimCount;
-    public Animation? EmitterAnim;
-    public List<Particle> ParticleSaveLoad = [];
+    public Cylinder? CylinderParams { get; set; }
+    public Sphere? SphereParams { get; set; }
+    public Vector4 Size { get; set; }
+    public string? MeshName { get; set; }
+    public int FieldU1 { get; set; }
+    public int FieldU2 { get; set; }
+    public int FieldU3 { get; set; }
+    public int FieldU4 { get; set; }
+    public int AnimCount { get; set; }
+    public Animation? EmitterAnim { get; set; }
+    public List<Particle> ParticleSaveLoad { get; set; } = [];
     
     public void Read(BinaryObjectReader reader)
     {

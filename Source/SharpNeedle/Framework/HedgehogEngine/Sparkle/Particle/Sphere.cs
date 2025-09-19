@@ -2,8 +2,8 @@
 
 public class Sphere : IBinarySerializable
 {
-    public float LatitudeMaxAngle;
-    public float LongitudeMaxAngle;
+    public float LatitudeMaxAngle { get; set; }
+    public float LongitudeMaxAngle { get; set; }
 
     public void Read(BinaryObjectReader reader)
     {

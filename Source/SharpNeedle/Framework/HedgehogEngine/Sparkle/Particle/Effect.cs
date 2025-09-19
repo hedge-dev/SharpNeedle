@@ -3,20 +3,23 @@ namespace SharpNeedle.Framework.HedgehogEngine.Sparkle;
 
 public class Effect : IBinarySerializable
 {
-    public string EffectName;
-    public float InitialLifeTime;
-    public float ScaleRatio;
-    public float GenerateCountRatio;
-    public Vector4 InitialPosition;
-    public Vector4 InitialRotation;
-    public bool IsLoop;
-    public bool DeleteChildren;
-    public float VelocityOffset;
-    public int FieldU1, FieldU2, FieldU3, FieldU4;
-   
+    public string Name { get; set; }
+    public float InitialLifeTime { get; set; }
+    public float ScaleRatio { get; set; }
+    public float GenerateCountRatio { get; set; }
+    public Vector4 InitialPosition { get; set; }
+    public Vector4 InitialRotation { get; set; }
+    public bool IsLoop { get; set; }
+    public bool DeleteChildren { get; set; }
+    public float VelocityOffset { get; set; }
+    public int FieldU1 { get; set; }
+    public int FieldU2 { get; set; }
+    public int FieldU3 { get; set; }
+    public int FieldU4 { get; set; }
+
     public void Read(BinaryObjectReader reader)
     {        
-        EffectName = reader.ReadStringPaddedByte();
+        Name = reader.ReadStringPaddedByte();
         InitialLifeTime = reader.ReadSingle();
         ScaleRatio = reader.ReadSingle();
         GenerateCountRatio = reader.ReadSingle();
@@ -39,7 +42,7 @@ public class Effect : IBinarySerializable
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.WriteStringPaddedByte(EffectName);
+        writer.WriteStringPaddedByte(Name);
         writer.Write(InitialLifeTime);
         writer.Write(ScaleRatio);
         writer.Write(GenerateCountRatio);

@@ -3,10 +3,10 @@
 [NeedleResource("hh/sparkle", @"\.part-bin$")]
 public class SparkleProject : ResourceBase, IBinarySerializable
 {
-    public ProjectInfo? ProjectInfo;
-    public Effect? Effect;
-    public Material? Material;
-    public List<Emitter> Emitters = [];
+    public ProjectInfo? ProjectInfo { get; set; }
+    public Effect? Effect { get; set; }
+    public Material? Material { get; set; }
+    public List<Emitter> Emitters { get; set; } = [];
 
     public override void Read(IFile file)
     {

@@ -1,11 +1,15 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Sparkle;
 
-public class Track : IBinarySerializable
+public struct Track : IBinarySerializable
 {
-    public int CurveType;
-    public int KeyCount;
-    public int FieldC;
-    public List<KeyFrame> KeyFrames = [];
+    public int CurveType { get; set; }
+    public int KeyCount { get; set; }
+    public int FieldC { get; set; }
+    public List<KeyFrame> KeyFrames { get; set; } = [];
+
+    public Track()
+    {
+    }
 
     public void Read(BinaryObjectReader reader)
     {

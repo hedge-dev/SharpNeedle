@@ -3,74 +3,74 @@
 using SharpNeedle.Structs;
 public class Particle : IBinarySerializable
 {
-    public string? ParticleName;
-    public float LifeTime;
-    public float LifeTimeBias;
+    public string? ParticleName { get; set; }
+    public float LifeTime { get; set; }
+    public float LifeTimeBias { get; set; }
 
-    public float RotationZ;
-    public float RotationZBias;
-    public float InitialRotationZ;
-    public float InitialRotationZBias;
+    public float RotationZ { get; set; }
+    public float RotationZBias { get; set; }
+    public float InitialRotationZ { get; set; }
+    public float InitialRotationZBias { get; set; }
 
-    public float InitialSpeed;
-    public float InitialSpeedBias;
-    public float ZOffset;
-    public float LocusDiff;
+    public float InitialSpeed { get; set; }
+    public float InitialSpeedBias { get; set; }
+    public float ZOffset { get; set; }
+    public float LocusDiff { get; set; }
 
-    public int NumDivision;
-    public int LocusUVType;
+    public int NumDivision { get; set; }
+    public int LocusUVType { get; set; }
 
-    public bool IsBillboard;
-    public bool IsEmitterLocal;
+    public bool IsBillboard { get; set; }
+    public bool IsEmitterLocal { get; set; }
 
-    public int LayerType;
-    public int PivotType;
-    public int UVDescType;
-    public int TextureIndexType;
-    public int TextureIndexChangeInterval;
-    public int TextureIndexChangeIntervalBias;
-    public int InitialTextureIndex;
-    public int DirectionType;
-    public int ParticleDataFlags;
+    public int LayerType { get; set; }
+    public int PivotType { get; set; }
+    public int UVDescType { get; set; }
+    public int TextureIndexType { get; set; }
+    public int TextureIndexChangeInterval { get; set; }
+    public int TextureIndexChangeIntervalBias { get; set; }
+    public int InitialTextureIndex { get; set; }
+    public int DirectionType { get; set; }
+    public int ParticleDataFlags { get; set; }
 
     //ARGB
-    public Vector4Int Color;
+    public Vector4Int Color { get; set; }
 
-    public Vector4 Gravity;
-    public Vector4 ExternalForce;
-    public Vector4 InitialDirection;
-    public Vector4 InitialDirectionBias;
-    public Vector4 InitialScale;
-    public Vector4 InitialScaleBias;
+    public Vector4 Gravity { get; set; }
+    public Vector4 ExternalForce { get; set; }
+    public Vector4 InitialDirection { get; set; }
+    public Vector4 InitialDirectionBias { get; set; }
+    public Vector4 InitialScale { get; set; }
+    public Vector4 InitialScaleBias { get; set; }
 
-    public string? MeshName;
+    public string? MeshName { get; set; }
 
-    public Vector4 RotationXYZ;
-    public Vector4 RotationXYZBias;
-    public Vector4 InitialRotationXYZ;
-    public Vector4 InitialRotationXYZBias;
-    public Vector4 UVScrollParam;
-    public Vector4 UVScrollParamAlpha;
+    public Vector4 RotationXYZ { get; set; }
+    public Vector4 RotationXYZBias { get; set; }
+    public Vector4 InitialRotationXYZ { get; set; }
+    public Vector4 InitialRotationXYZBias { get; set; }
+    public Vector4 UVScrollParam { get; set; }
+    public Vector4 UVScrollParamAlpha { get; set; }
 
-    public string? RefEffectName;
-    public int RefEffectEmitTimingType;
-    public float RefEffectDelayTime;
+    public string? RefEffectName { get; set; }
+    public int RefEffectEmitTimingType { get; set; }
+    public float RefEffectDelayTime { get; set; }
 
-    public float DirectionalVelocityRatio;
-    public float DeflectionScale;
-    public float SoftScale;
-    public float VelocityOffset;
-    public float UserData;
+    public float DirectionalVelocityRatio { get; set; }
+    public float DeflectionScale { get; set; }
+    public float SoftScale { get; set; }
+    public float VelocityOffset { get; set; }
+    public float UserData { get; set; }
 
-    public string? MaterialName;
+    public string? MaterialName { get; set; }
 
-    public int ukn0, ukn1, ukn2, ukn3;
+    public int FieldU1 { get; set; }
+    public int FieldU2 { get; set; }
+    public int FieldU3 { get; set; }
+    public int FieldU4 { get; set; }
 
-    public int AnimCount;
-    public Animation? ParticleAnim;
-
-    // Binary Functions
-
+    public int AnimCount { get; set; }
+    public Animation? ParticleAnim { get; set; }
 
     public void Read(BinaryObjectReader reader)
     {
@@ -139,17 +139,16 @@ public class Particle : IBinarySerializable
 
         MaterialName = reader.ReadStringPaddedByte();
 
-        ukn0 = reader.ReadInt32();
-        ukn1 = reader.ReadInt32();
-        ukn2 = reader.ReadInt32();
-        ukn3 = reader.ReadInt32();
+        FieldU1 = reader.ReadInt32();
+        FieldU2 = reader.ReadInt32();
+        FieldU3 = reader.ReadInt32();
+        FieldU4 = reader.ReadInt32();
         AnimCount = reader.ReadInt32();
         if (AnimCount > 0)
         {
             ParticleAnim = reader.ReadObject<Animation>();
         }
     }
-
     public void Write(BinaryObjectWriter writer)
     {
         writer.WriteStringPaddedByte("ParticleChunk");
@@ -213,10 +212,10 @@ public class Particle : IBinarySerializable
         writer.Write(UserData);
         writer.WriteStringPaddedByte(MaterialName);
 
-        writer.Write(ukn0);
-        writer.Write(ukn1);
-        writer.Write(ukn2);
-        writer.Write(ukn3);
+        writer.Write(FieldU1);
+        writer.Write(FieldU2);
+        writer.Write(FieldU3);
+        writer.Write(FieldU4);
 
         writer.Write(AnimCount);
         if (AnimCount > 0)

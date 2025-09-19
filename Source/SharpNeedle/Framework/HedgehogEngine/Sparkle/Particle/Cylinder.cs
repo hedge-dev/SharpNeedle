@@ -1,15 +1,15 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Sparkle;
 public class Cylinder : IBinarySerializable
 {
-    public bool Enquiangular;
-    public bool IsCircumference;
-    public bool IsCone;
-    public float Angle;
-    public float Radius;
-    public float Height;
-    public float MinAngle;
-    public float MaxAngle;
-    public CylinderEmissionType CylinderEmissionType;
+    public bool Enquiangular { get; set; }
+    public bool IsCircumference { get; set; }
+    public bool IsCone { get; set; }
+    public float Angle { get; set; }
+    public float Radius { get; set; }
+    public float Height { get; set; }
+    public float MinAngle { get; set; }
+    public float MaxAngle { get; set; }
+    public CylinderEmissionType CylinderEmissionType { get; set; }
 
     public void Read(BinaryObjectReader reader)
     {        

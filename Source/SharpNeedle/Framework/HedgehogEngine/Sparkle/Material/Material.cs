@@ -4,13 +4,13 @@ using SharpNeedle.Framework.HedgehogEngine.Mirage.MaterialData;
 
 public class Material : IBinarySerializable
 {
-    public string? Name;
-    public string? ShaderName;
-    public string? TextureName;
-    public string? DeflectionTextureName;
-    public MaterialAddress AddressMode; 
-    public MaterialBlendMode BlendMode;
-    
+    public string? Name { get; set; }
+    public string? ShaderName { get; set; }
+    public string? TextureName { get; set; }
+    public string? DeflectionTextureName { get; set; }
+    public MaterialAddress AddressMode { get; set; }
+    public MaterialBlendMode BlendMode { get; set; }
+
     public void Read(BinaryObjectReader reader)
     {
         Name = reader.ReadStringPaddedByte();
