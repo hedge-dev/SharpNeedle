@@ -1,5 +1,5 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Mirage.MaterialData;
-public enum MaterialBlendMode : int
+public enum MaterialBlendMode : byte
 {
     Normal,
     Additive,

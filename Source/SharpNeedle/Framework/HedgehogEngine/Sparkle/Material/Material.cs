@@ -9,7 +9,7 @@ public class Material : IBinarySerializable
     public string? TextureName { get; set; }
     public string? DeflectionTextureName { get; set; }
     public MaterialAddress AddressMode { get; set; }
-    public MaterialBlendMode BlendMode { get; set; }
+    public MaterialBlend BlendMode { get; set; }
 
     public void Read(BinaryObjectReader reader)
     {
@@ -18,7 +18,7 @@ public class Material : IBinarySerializable
         TextureName = reader.ReadStringPaddedByte();
         DeflectionTextureName = reader.ReadStringPaddedByte();
         AddressMode = (MaterialAddress)reader.ReadInt32();
-        BlendMode = (MaterialBlendMode)reader.ReadInt32();
+        BlendMode = (MaterialBlend)reader.ReadInt32();
         reader.Seek(16, SeekOrigin.Current);
     }
 
