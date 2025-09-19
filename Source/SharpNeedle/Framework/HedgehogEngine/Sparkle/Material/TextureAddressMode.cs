@@ -1,6 +1,7 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Sparkle;
 
-public enum EmitConditions
+public enum TextureAddressMode : int
 {
-    Time
+    Clamp,
+    Wrap
 }

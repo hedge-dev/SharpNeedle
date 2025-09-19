@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Sparkle;
 
-public enum LayerTypes
+public enum LayerType : int
 {
     TypeQuad,
     TypeVolume,

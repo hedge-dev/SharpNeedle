@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Sparkle;
 
-public enum TextureIndexTypes
+public enum TextureIndexType : int
 {
     FixedIndex,
     InitialRandom,

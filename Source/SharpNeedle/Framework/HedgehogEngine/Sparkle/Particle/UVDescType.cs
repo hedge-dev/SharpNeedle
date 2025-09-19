@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Sparkle;
 
-public enum UVDescTypes
+public enum UVDescType : int
 {
     UVDesc_1x1,
     UVDesc_2x2,

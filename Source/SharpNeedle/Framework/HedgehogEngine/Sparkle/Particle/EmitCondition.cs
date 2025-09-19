@@ -1,7 +1,6 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Sparkle;
 
-public enum LocusUVTypes
+public enum EmitCondition
 {
-    EAllOver,
-    ESeparate
+    Time
 }

@@ -1,7 +1,7 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Sparkle;
 
-public enum MaterialAddress : int
+public enum LocusUVType : int
 {
-    Clamp,
-    Wrap
+    EAllOver,
+    ESeparate
 }

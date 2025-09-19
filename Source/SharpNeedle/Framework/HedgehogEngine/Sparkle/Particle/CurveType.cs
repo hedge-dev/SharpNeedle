@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Sparkle;
 
-public enum CurveTypes
+public enum CurveType
 {
     Linear,
     Spline,

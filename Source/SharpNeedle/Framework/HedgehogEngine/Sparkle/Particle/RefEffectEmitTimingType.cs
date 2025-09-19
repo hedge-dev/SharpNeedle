@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Sparkle;
 
-public enum RefEffectEmitTimingTypes
+public enum RefEffectEmitTimingType
 {
     ECreated,
     EKilled,

@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Sparkle;
 
-public enum EmitterTypes
+public enum EmitterType
 {
     Box,
     Cylinder,

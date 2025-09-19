@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Sparkle;
 
-public enum DirectionTypes
+public enum DirectionType : int
 {
     EDirection_Billboard,
     EDirection_EmitterAxis,

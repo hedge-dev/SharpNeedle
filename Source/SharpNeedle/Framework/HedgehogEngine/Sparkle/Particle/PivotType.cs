@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Sparkle;
 
-public enum PivotTypes
+public enum PivotType : int
 {
     EPivot_Center,
     EPivot_Top,

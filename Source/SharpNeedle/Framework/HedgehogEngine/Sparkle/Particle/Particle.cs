@@ -18,19 +18,19 @@ public class Particle : IBinarySerializable
     public float LocusDiff { get; set; }
 
     public int NumDivision { get; set; }
-    public int LocusUVType { get; set; }
+    public LocusUVType LocusUVType { get; set; }
 
     public bool IsBillboard { get; set; }
     public bool IsEmitterLocal { get; set; }
 
-    public int LayerType { get; set; }
-    public int PivotType { get; set; }
-    public int UVDescType { get; set; }
-    public int TextureIndexType { get; set; }
+    public LayerType LayerType { get; set; }
+    public PivotType PivotType { get; set; }
+    public UVDescType UVDescType { get; set; }
+    public TextureIndexType TextureIndexType { get; set; }
     public int TextureIndexChangeInterval { get; set; }
     public int TextureIndexChangeIntervalBias { get; set; }
     public int InitialTextureIndex { get; set; }
-    public int DirectionType { get; set; }
+    public DirectionType DirectionType { get; set; }
     public int ParticleDataFlags { get; set; }
 
     //ARGB
@@ -91,19 +91,19 @@ public class Particle : IBinarySerializable
 
         LocusDiff = reader.ReadSingle();
         NumDivision = reader.ReadInt32();
-        LocusUVType = reader.ReadInt32();
+        LocusUVType = (LocusUVType)reader.ReadInt32();
 
         IsBillboard = reader.ReadUInt32() == 1;
         IsEmitterLocal = reader.ReadUInt32() == 1;
 
-        LayerType = reader.ReadInt32();
-        PivotType = reader.ReadInt32();
-        UVDescType = reader.ReadInt32();
-        TextureIndexType = reader.ReadInt32();
+        LayerType = (LayerType)reader.ReadInt32();
+        PivotType = (PivotType)reader.ReadInt32();
+        UVDescType = (UVDescType)reader.ReadInt32();
+        TextureIndexType = (TextureIndexType)reader.ReadInt32();
         TextureIndexChangeInterval = reader.ReadInt32();
         TextureIndexChangeIntervalBias = reader.ReadInt32();
         InitialTextureIndex = reader.ReadInt32();
-        DirectionType = reader.ReadInt32();
+        DirectionType = (DirectionType)reader.ReadInt32();
         ParticleDataFlags = reader.ReadInt32();
 
         Color = reader.Read<Vector4Int>();
