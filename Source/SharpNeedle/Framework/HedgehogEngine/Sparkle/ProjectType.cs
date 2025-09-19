@@ -1,6 +1,7 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Sparkle;
 
-public enum CylinderEmittionTypes
+public enum ProjectType
 {
-    ECylinder_UserVelocity
+    Effect,
+    Material
 }

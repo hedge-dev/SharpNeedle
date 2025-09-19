@@ -5,11 +5,7 @@ public class Track : IBinarySerializable
     public int CurveType;
     public int KeyCount;
     public int FieldC;
-    public List<KeyFrame> KeyFrames = new List<KeyFrame>();
-
-    public Track()
-    {
-    }
+    public List<KeyFrame> KeyFrames = [];
 
     public void Read(BinaryObjectReader reader)
     {

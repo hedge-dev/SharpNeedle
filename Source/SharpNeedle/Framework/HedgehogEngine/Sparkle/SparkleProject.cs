@@ -30,7 +30,7 @@ public class SparkleProject : ResourceBase, IBinarySerializable
 
         switch (ProjectInfo.Type)
         {
-            case "CEffect":
+            case ProjectType.Effect:
             {
                 //InportExportEffect
                 Effect = reader.ReadObject<Effect>();
@@ -40,7 +40,7 @@ public class SparkleProject : ResourceBase, IBinarySerializable
                 }
                 break;
             }
-            case "Material":
+            case ProjectType.Material:
             {
                 //InportExportMaterial
                 Material = reader.ReadObject<Material>();
@@ -52,7 +52,7 @@ public class SparkleProject : ResourceBase, IBinarySerializable
     {
         writer.WriteObject(ProjectInfo);
 
-        if (ProjectInfo.Type == "CEffect")
+        if (ProjectInfo.Type == ProjectType.Effect)
         {
             writer.WriteObject(Effect);
             for (int i = 0; i < ProjectInfo.EmitterCount; i++)
@@ -61,7 +61,7 @@ public class SparkleProject : ResourceBase, IBinarySerializable
             }
         }
 
-        if (ProjectInfo.Type == "Material")
+        if (ProjectInfo.Type == ProjectType.Material)
             writer.WriteObject(Material);
 
         //S E G A

@@ -2,14 +2,13 @@
 
 public class Emitter : IBinarySerializable
 {
-    public string Type;
     public int ParticleCount;
-    public string EmitterName;
+    public string? Name;
     public int MaxGenerateCount;
     public int GenerateCount;
     public int ParticleDataFlags;
     public bool Infinite;
-    public float InitialEmittionGap;
+    public float InitialEmissionGap;
 
     public Vector4 InitialPosition;
     public Vector4 RotationXYZ;
@@ -22,31 +21,27 @@ public class Emitter : IBinarySerializable
     public int EmitCondition;
     public int EmitterType;
 
-    public Cylinder CylinderParams;
-    public Sphere SphereParams;
-    public Vector4 m_size;
-    public string MeshName;
-    public int ukn0, ukn1, ukn2, ukn3;
-
+    public Cylinder? CylinderParams;
+    public Sphere? SphereParams;
+    public Vector4 Size;
+    public string? MeshName;
+    public int FieldU1, FieldU2, FieldU3, FieldU4;
     public int AnimCount;
-    public Animation EmitterAnim;
-
-    public List<Particle> ParticleSaveLoad = new List<Particle>();
-
-
+    public Animation? EmitterAnim;
+    public List<Particle> ParticleSaveLoad = [];
     
     public void Read(BinaryObjectReader reader)
     {
         // Emitter Params
-        Type = reader.ReadStringPaddedByte();
+        reader.ReadStringPaddedByte();
         ParticleCount = reader.ReadInt32();
-        EmitterName = reader.ReadStringPaddedByte();
+        Name = reader.ReadStringPaddedByte();
 
         MaxGenerateCount = reader.ReadInt32();
         GenerateCount = reader.ReadInt32();
         ParticleDataFlags = reader.ReadInt32();
         Infinite = reader.ReadUInt32() == 1;
-        InitialEmittionGap = reader.ReadSingle();
+        InitialEmissionGap = reader.ReadSingle();
 
         InitialPosition = reader.Read<Vector4>();
         RotationXYZ = reader.Read<Vector4>();
@@ -61,13 +56,13 @@ public class Emitter : IBinarySerializable
 
         CylinderParams = reader.ReadObject<Cylinder>();
         SphereParams = reader.ReadObject<Sphere>();
-        m_size = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+        Size = reader.Read<Vector4>();
         MeshName = reader.ReadStringPaddedByte();
 
-        ukn0 = reader.ReadInt32();
-        ukn1 = reader.ReadInt32();
-        ukn2 = reader.ReadInt32();
-        ukn3 = reader.ReadInt32();
+        FieldU1 = reader.ReadInt32();
+        FieldU2 = reader.ReadInt32();
+        FieldU3 = reader.ReadInt32();
+        FieldU4 = reader.ReadInt32();
 
         // Emitter Animation
         AnimCount = reader.ReadInt32();
@@ -82,11 +77,7 @@ public class Emitter : IBinarySerializable
             // ParticleSaveLoad
             for (int p = 0; p < ParticleCount; p++)
             {
-                Particle particleSaveLoad = new Particle();
-
-                particleSaveLoad.Type = reader.ReadStringPaddedByte();
-
-                if (particleSaveLoad.Type == "ParticleChunk")
+                if (reader.ReadStringPaddedByte() == "ParticleChunk")
                 {
                     ParticleSaveLoad.Add(reader.ReadObject<Particle>());
                 }
@@ -98,12 +89,12 @@ public class Emitter : IBinarySerializable
     {
         writer.WriteStringPaddedByte("EmitterChunk");
         writer.Write(ParticleCount);
-        writer.WriteStringPaddedByte(EmitterName);
+        writer.WriteStringPaddedByte(Name);
         writer.Write(MaxGenerateCount);
         writer.Write(GenerateCount);
         writer.Write(ParticleDataFlags);
         writer.Write(Infinite ? 1 : 0);
-        writer.Write(InitialEmittionGap);
+        writer.Write(InitialEmissionGap);
 
         writer.Write(InitialPosition);
         writer.Write(RotationXYZ);
@@ -118,13 +109,13 @@ public class Emitter : IBinarySerializable
 
         writer.WriteObject(CylinderParams);
         writer.WriteObject(SphereParams);
-        writer.Write(m_size);
+        writer.Write(Size);
         writer.WriteStringPaddedByte(MeshName);
 
-        writer.Write(ukn0);
-        writer.Write(ukn1);
-        writer.Write(ukn2);
-        writer.Write(ukn3);
+        writer.Write(FieldU1);
+        writer.Write(FieldU2);
+        writer.Write(FieldU3);
+        writer.Write(FieldU4);
 
         writer.Write(AnimCount);
         if (AnimCount > 0)

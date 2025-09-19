@@ -1,7 +1,7 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Sparkle;
 
-public enum MaterialAddress
+public enum MaterialAddress : int
 {
-    CLAMP,
-    WRAP
+    Clamp,
+    Wrap
 }

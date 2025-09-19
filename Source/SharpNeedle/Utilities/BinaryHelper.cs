@@ -317,7 +317,7 @@ public static class BinaryHelper
         writer.WriteArray(nulls);
     }
 
-    public static void WriteStringPaddedByte(this BinaryObjectWriter writer, string str, char paddingCharacter = '@')
+    public static void WriteStringPaddedByte(this BinaryObjectWriter writer, string? str, char paddingCharacter = '@')
     {
         writer.WriteString(StringBinaryFormat.PrefixedLength8, str);
         while ((writer.Position & 3) != 0)

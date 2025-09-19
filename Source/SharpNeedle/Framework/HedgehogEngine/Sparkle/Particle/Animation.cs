@@ -2,24 +2,24 @@
 
 public class Animation : IBinarySerializable
 {
-    public string TypeName;
-    public Track ColorA;
-    public Track ColorB;
-    public Track ColorG;
-    public Track ColorR;
+    public Track? ColorA;
+    public Track? ColorB;
+    public Track? ColorG;
+    public Track? ColorR;
     
-    public Track TransX;
-    public Track TransY;
-    public Track TransZ;
+    public Track? TransX;
+    public Track? TransY;
+    public Track? TransZ;
     
-    public Track ScaleX;
-    public Track ScaleY;
-    public Track ScaleZ;
+    public Track? ScaleX;
+    public Track? ScaleY;
+    public Track? ScaleZ;
     
    
     public void Read(BinaryObjectReader reader)
     {        
-        TypeName = reader.ReadStringPaddedByte();
+        //AnimationChunk
+        reader.ReadStringPaddedByte();
 
         ColorA = reader.ReadObject<Track>();
         ColorB = reader.ReadObject<Track>();

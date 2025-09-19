@@ -3,8 +3,7 @@
 using SharpNeedle.Structs;
 public class Particle : IBinarySerializable
 {
-    public string Type;
-    public string ParticleName;
+    public string? ParticleName;
     public float LifeTime;
     public float LifeTimeBias;
 
@@ -44,7 +43,7 @@ public class Particle : IBinarySerializable
     public Vector4 InitialScale;
     public Vector4 InitialScaleBias;
 
-    public string MeshName;
+    public string? MeshName;
 
     public Vector4 RotationXYZ;
     public Vector4 RotationXYZBias;
@@ -53,7 +52,7 @@ public class Particle : IBinarySerializable
     public Vector4 UVScrollParam;
     public Vector4 UVScrollParamAlpha;
 
-    public string RefEffectName;
+    public string? RefEffectName;
     public int RefEffectEmitTimingType;
     public float RefEffectDelayTime;
 
@@ -63,12 +62,12 @@ public class Particle : IBinarySerializable
     public float VelocityOffset;
     public float UserData;
 
-    public string MaterialName;
+    public string? MaterialName;
 
     public int ukn0, ukn1, ukn2, ukn3;
 
     public int AnimCount;
-    public Animation ParticleAnim;
+    public Animation? ParticleAnim;
 
     // Binary Functions
 

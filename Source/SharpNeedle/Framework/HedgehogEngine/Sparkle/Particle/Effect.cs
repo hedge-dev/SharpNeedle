@@ -12,7 +12,7 @@ public class Effect : IBinarySerializable
     public bool IsLoop;
     public bool DeleteChildren;
     public float VelocityOffset;
-    public int ukn0, ukn1, ukn2, ukn3;
+    public int FieldU1, FieldU2, FieldU3, FieldU4;
    
     public void Read(BinaryObjectReader reader)
     {        
@@ -21,25 +21,20 @@ public class Effect : IBinarySerializable
         ScaleRatio = reader.ReadSingle();
         GenerateCountRatio = reader.ReadSingle();
 
-        InitialPosition = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-        InitialRotation = new Vector4(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+        InitialPosition = reader.Read<Vector4>();
+        InitialRotation = reader.Read<Vector4>();
 
         IsLoop = reader.ReadUInt32() == 1;
         DeleteChildren = reader.ReadUInt32() == 1;
         VelocityOffset = reader.ReadSingle();
 
-        ukn0 = reader.ReadInt32();
-        ukn1 = reader.ReadInt32();
-        ukn2 = reader.ReadInt32();
-        ukn3 = reader.ReadInt32();
+        FieldU1 = reader.ReadInt32();
+        FieldU2 = reader.ReadInt32();
+        FieldU3 = reader.ReadInt32();
+        FieldU4 = reader.ReadInt32();
 
         //Footer SEGA
-        reader.Seek(4 * 4, SeekOrigin.Current);
-        //for (int i = 0; i < 4; i++)
-        //{
-        //    Console.Write(System.Text.Encoding.UTF8.GetString(reader.ReadArray<byte>(1)));
-        //    reader.Seek(3, SeekOrigin.Current);
-        //}
+        reader.Seek(16, SeekOrigin.Current);
     }
 
     public void Write(BinaryObjectWriter writer)
@@ -63,10 +58,10 @@ public class Effect : IBinarySerializable
         writer.Write(DeleteChildren ? 1 : 0);
         writer.Write(VelocityOffset);
 
-        writer.Write(ukn0);
-        writer.Write(ukn1);
-        writer.Write(ukn2);
-        writer.Write(ukn3);
+        writer.Write(FieldU1);
+        writer.Write(FieldU2);
+        writer.Write(FieldU3);
+        writer.Write(FieldU4);
 
         //S E G A
         writer.Write(83);
