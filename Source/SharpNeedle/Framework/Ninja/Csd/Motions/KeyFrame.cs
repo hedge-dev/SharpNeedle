@@ -16,7 +16,15 @@ public class KeyFrame : IBinarySerializable
     {
         Frame = reader.Read<int>();
         Value = reader.Read<uint>();
-        Interpolation = reader.Read<InterpolationType>();
+        if (reader.OffsetBinaryFormat == OffsetBinaryFormat.U64)
+        {
+            Interpolation = (InterpolationType)reader.Read<uint>();
+        }
+        else
+        {
+            Interpolation = reader.Read<InterpolationType>();
+        }
+
         InTangent = reader.Read<float>();
         OutTangent = reader.Read<float>();
         Field14 = reader.Read<uint>();
@@ -26,7 +34,10 @@ public class KeyFrame : IBinarySerializable
     {
         writer.Write(Frame);
         writer.Write(Value.Uint);
-        writer.Write(Interpolation);
+        if(writer.OffsetBinaryFormat == OffsetBinaryFormat.U64)
+            writer.Write((uint)Interpolation);
+        else
+            writer.Write(Interpolation);
         writer.Write(InTangent);
         writer.Write(OutTangent);
         writer.Write(Field14);

@@ -66,7 +66,15 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
         Info = reader.ReadObjectOffset<CastInfo>();
         InheritanceFlags = reader.Read<BitSet<uint>>();
         MaterialFlags = reader.Read<BitSet<uint>>();
-        SpriteIndices = reader.ReadArrayOffset<int>(reader.Read<int>());
+
+        if (reader.OffsetBinaryFormat == OffsetBinaryFormat.U64)
+        {
+            SpriteIndices = reader.ReadArrayOffset<int>((int)reader.Read<ulong>());
+        }
+        else
+        {
+            SpriteIndices = reader.ReadArrayOffset<int>(reader.Read<int>());
+        }
 
         Text = reader.ReadStringOffset();
         FontName = reader.ReadStringOffset();

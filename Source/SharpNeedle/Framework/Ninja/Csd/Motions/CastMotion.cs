@@ -18,7 +18,15 @@ public class CastMotion : List<KeyFrameList>, IBinarySerializable
     public void Read(BinaryObjectReader reader)
     {
         Clear();
-        Flags = reader.Read<BitSet<uint>>();
+        if (reader.OffsetBinaryFormat == OffsetBinaryFormat.U64)
+        {
+            Flags = (BitSet<uint>)reader.Read<BitSet<long>>().Value;
+        }
+        else
+        {
+            Flags = reader.Read<BitSet<uint>>();
+        }
+
         int count = Flags.PopCount();
 
         if (count == 0)

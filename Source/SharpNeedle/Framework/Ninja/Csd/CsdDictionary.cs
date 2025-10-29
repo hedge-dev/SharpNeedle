@@ -72,15 +72,16 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string?, T> whe
 
     public void Read(BinaryObjectReader reader)
     {
-        int count = reader.Read<int>();
+        // FYI: this is not an offset, this is just to read it as a long or int based on the format
+        long count = reader.ReadOffsetValue();
         if (count == 0)
         {
             reader.Skip(reader.GetOffsetSize() * 2);
             return;
         }
 
-        Items.AddRange(reader.ReadObjectArrayOffset<T>(count));
-        NameTable.AddRange(reader.ReadObjectArrayOffset<NameIndexPair>(count));
+        Items.AddRange(reader.ReadObjectArrayOffset<T>((int)count));
+        NameTable.AddRange(reader.ReadObjectArrayOffset<NameIndexPair>((int)count));
     }
 
     public void Write(BinaryObjectWriter writer)
@@ -232,14 +233,15 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string?, T> whe
         public void Read(BinaryObjectReader reader)
         {
             Name = reader.ReadStringOffset();
-            Index = reader.Read<int>();
+            // FYI: this is not an offset, this is just to read it as a long or int based on the format
+            Index = (int)reader.ReadOffsetValue();
         }
 
         public void Write(BinaryObjectWriter writer)
         {
             string? name = Name;
 
-            writer.WriteOffset(() => 
+            writer.WriteOffset(() =>
             {
                 writer.WriteString(StringBinaryFormat.NullTerminated, name);
                 writer.Write<byte>(0);

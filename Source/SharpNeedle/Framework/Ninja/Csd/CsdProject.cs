@@ -37,6 +37,7 @@ public class CsdProject : ResourceBase, IBinarySerializable
                 continue;
             Stream stream = Package.GetStream(i);
             using BinaryObjectReader infoReader = new(stream, StreamOwnership.Transfer, Package.Endianness);
+            infoReader.OffsetBinaryFormat = reader.OffsetBinaryFormat;
             try
             {
                 InfoChunk info = infoReader.ReadObject<InfoChunk, ChunkBinaryOptions>(options);

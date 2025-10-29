@@ -4,7 +4,8 @@ public class CastInfoTable : List<(string? Name, int FamilyIdx, int CastIdx)>, I
 {
     public void Read(BinaryObjectReader reader)
     {
-        int count = reader.Read<int>();
+        // FYI: this is not an offset, this is just to read it as a long or int based on the format
+        long count = reader.ReadOffsetValue();
         if (count == 0)
         {
             reader.Skip(reader.GetOffsetSize());
@@ -35,7 +36,7 @@ public class CastInfoTable : List<(string? Name, int FamilyIdx, int CastIdx)>, I
         {
             foreach ((string? Name, int FamilyIdx, int CastIdx) in this)
             {
-                writer.WriteOffset(() => 
+                writer.WriteOffset(() =>
                 {
                     writer.WriteString(StringBinaryFormat.NullTerminated, Name);
                     writer.Write<byte>(0);

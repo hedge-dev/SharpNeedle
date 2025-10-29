@@ -23,7 +23,8 @@ public class InfoChunk : IChunk
 
         Chunks.Clear();
         Chunks.Capacity = chunkCount;
-        reader.ReadOffset(() =>
+        uint offset = reader.ReadUInt32();
+        reader.ReadAtOffset(offset, () =>
         {
             reader.PushOffsetOrigin();
             for (int i = 0; i < chunkCount; i++)
@@ -56,7 +57,7 @@ public class InfoChunk : IChunk
         });
 
         reader.Skip(4); // size of all chunks
-        Offsets = reader.ReadObjectOffset<OffsetChunk>();
+        Offsets = reader.ReadObjectAtOffset<OffsetChunk>(reader.ReadUInt32());
         reader.Skip(4); // Offsets.BinarySize
 
         Field1C = reader.Read<uint>();
