@@ -16,15 +16,15 @@ public class AnimationDef : IBinarySerializable
     public virtual void Read(BinaryObjectReader reader)
     {
         Name = reader.ReadStringOffset();
-        reader.EnsureSignatureNative(Type);
-        Layer = reader.Read<short>();
+        reader.EnsureSignatureNative((short)Type);
+        Layer = reader.ReadInt16();
     }
 
     public virtual void Write(BinaryObjectWriter writer)
     {
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-        writer.Write(Type);
-        writer.Write(Layer);
+        writer.WriteInt16((short)Type);
+        writer.WriteInt16(Layer);
     }
 
     public override string ToString()

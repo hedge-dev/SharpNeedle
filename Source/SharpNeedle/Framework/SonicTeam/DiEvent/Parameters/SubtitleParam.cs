@@ -10,27 +10,23 @@ public class SubtitleParam : BaseParam
     public string CellName2 { get; set; } = string.Empty;
 
     public SubtitleParam() { }
-    public SubtitleParam(BinaryObjectReader reader, GameType game)
-    {
-        Read(reader, game);
-    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
         if (game == GameType.ShadowGenerations)
         {
             CellName = reader.ReadDiString(32);
-            Language = (SubtitleLanguage)reader.Read<int>();
-            Field14 = reader.Read<int>();
-            Field24 = reader.Read<int>();
-            Field28 = reader.Read<int>();
+            Language = (SubtitleLanguage)reader.ReadInt32();
+            Field14 = reader.ReadInt32();
+            Field24 = reader.ReadInt32();
+            Field28 = reader.ReadInt32();
             CellName2 = reader.ReadDiString(32);
         }
         else
         {
             CellName = reader.ReadDiString(16);
-            Language = (SubtitleLanguage)reader.Read<int>();
-            Field14 = reader.Read<int>();
+            Language = (SubtitleLanguage)reader.ReadInt32();
+            Field14 = reader.ReadInt32();
         }
     }
 
@@ -39,17 +35,17 @@ public class SubtitleParam : BaseParam
         if (game == GameType.ShadowGenerations)
         {
             writer.WriteDiString(CellName, 32);
-            writer.Write((int)Language);
-            writer.Write(Field14);
-            writer.Write(Field24);
-            writer.Write(Field28);
+            writer.WriteInt32((int)Language);
+            writer.WriteInt32(Field14);
+            writer.WriteInt32(Field24);
+            writer.WriteInt32(Field28);
             writer.WriteDiString(CellName2, 32);
         }
         else
         {
             writer.WriteDiString(CellName, 16);
-            writer.Write((int)Language);
-            writer.Write(Field14);
+            writer.WriteInt32((int)Language);
+            writer.WriteInt32(Field14);
         }
     }
 

@@ -17,9 +17,9 @@ public class Animation : List<Motion>, IBinarySerializable<ChunkBinaryOptions>
         }
 
         Name = reader.ReadStringOffset();
-        ID = reader.Read<int>();
-        Capacity = reader.Read<int>();
-        EndFrame = reader.Read<uint>();
+        ID = reader.ReadInt32();
+        Capacity = reader.ReadInt32();
+        EndFrame = reader.ReadUInt32();
         if (options.Version >= 3)
         {
             reader.Align(8);
@@ -57,9 +57,9 @@ public class Animation : List<Motion>, IBinarySerializable<ChunkBinaryOptions>
         }
 
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-        writer.Write(ID);
-        writer.Write(Count);
-        writer.Write(EndFrame);
+        writer.WriteInt32(ID);
+        writer.WriteInt32(Count);
+        writer.WriteUInt32(EndFrame);
         if (options.Version >= 3)
         {
             writer.Align(8);

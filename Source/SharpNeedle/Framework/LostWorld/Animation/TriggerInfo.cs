@@ -10,16 +10,16 @@ public struct TriggerInfo : IBinarySerializable
 
     public void Read(BinaryObjectReader reader)
     {
-        reader.Read(out Frame);
-        reader.Read(out ID);
-        reader.ReadObject(ref Param);
+        Frame = reader.ReadSingle();
+        ID = reader.ReadUInt32();
+        Param = reader.ReadObject<CallbackParam>();
     }
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.Write(ref Frame);
-        writer.Write(ref ID);
-        Param.Write(writer);
+        writer.WriteSingle(Frame);
+        writer.WriteUInt32(ID);
+        writer.WriteObject(Param);
     }
 
     public struct CallbackParam : IBinarySerializable
@@ -56,16 +56,16 @@ public struct TriggerInfo : IBinarySerializable
 
         public void Read(BinaryObjectReader reader)
         {
-            reader.Read(out Type);
+            Type = (TriggerValueType)reader.ReadInt32();
             switch (Type)
             {
                 case TriggerValueType.Enum:
                 case TriggerValueType.Int:
-                    reader.Read(out Integer);
+                    Integer = reader.ReadInt32();
                     break;
 
                 case TriggerValueType.Float:
-                    reader.Read(out Float);
+                    Float = reader.ReadSingle();
                     break;
 
                 case TriggerValueType.String:
@@ -76,16 +76,16 @@ public struct TriggerInfo : IBinarySerializable
 
         public void Write(BinaryObjectWriter writer)
         {
-            writer.Write(Type);
+            writer.WriteInt32((int)Type);
             switch (Type)
             {
                 case TriggerValueType.Enum:
                 case TriggerValueType.Int:
-                    writer.Write(Integer);
+                    writer.WriteInt32(Integer);
                     break;
 
                 case TriggerValueType.Float:
-                    writer.Write(ref Float);
+                    writer.WriteSingle(Float);
                     break;
 
                 case TriggerValueType.String:

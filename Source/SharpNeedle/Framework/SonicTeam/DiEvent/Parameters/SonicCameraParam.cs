@@ -14,36 +14,32 @@ public class SonicCameraParam : BaseParam
     public byte[] UnknownData { get; set; } = new byte[268];
 
     public SonicCameraParam() { }
-    public SonicCameraParam(BinaryObjectReader reader, GameType game)
-    {
-        Read(reader, game);
-    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
-        Flags = reader.Read<uint>();
-        Field04 = reader.Read<uint>();
-        Field08 = reader.Read<uint>();
-        Field0C = reader.Read<uint>();
-        Field10 = reader.Read<Vector3>();
-        Field1C = reader.Read<uint>();
-        Field20 = reader.Read<uint>();
-        Field24 = reader.Read<uint>();
-        Field28 = reader.Read<Vector3>();
+        Flags = reader.ReadUInt32();
+        Field04 = reader.ReadUInt32();
+        Field08 = reader.ReadUInt32();
+        Field0C = reader.ReadUInt32();
+        Field10 = reader.ReadVector3();
+        Field1C = reader.ReadUInt32();
+        Field20 = reader.ReadUInt32();
+        Field24 = reader.ReadUInt32();
+        Field28 = reader.ReadVector3();
         reader.ReadArray<byte>(268, UnknownData);
     }
 
     public override void Write(BinaryObjectWriter writer, GameType game)
     {
-        writer.Write(Flags);
-        writer.Write(Field04);
-        writer.Write(Field08);
-        writer.Write(Field0C);
-        writer.Write(Field10);
-        writer.Write(Field1C);
-        writer.Write(Field20);
-        writer.Write(Field24);
-        writer.Write(Field28);
+        writer.WriteUInt32(Flags);
+        writer.WriteUInt32(Field04);
+        writer.WriteUInt32(Field08);
+        writer.WriteUInt32(Field0C);
+        writer.WriteVector3(Field10);
+        writer.WriteUInt32(Field1C);
+        writer.WriteUInt32(Field20);
+        writer.WriteUInt32(Field24);
+        writer.WriteVector3(Field28);
         writer.WriteArrayFixedLength(UnknownData, 268);
     }
 

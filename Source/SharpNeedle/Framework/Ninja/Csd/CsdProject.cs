@@ -34,7 +34,10 @@ public class CsdProject : ResourceBase, IBinarySerializable
         for (int i = 0; i < Package.Files.Count; i++)
         {
             if (Package.Files[i].Length == 0)
+            {
                 continue;
+            }
+
             Stream stream = Package.GetStream(i);
             using BinaryObjectReader infoReader = new(stream, StreamOwnership.Transfer, Package.Endianness);
             try

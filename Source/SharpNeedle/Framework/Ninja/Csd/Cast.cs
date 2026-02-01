@@ -53,20 +53,20 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
 
     public void Read(BinaryObjectReader reader, Family family)
     {
-        Field00 = reader.Read<uint>();
-        Type = reader.Read<EType>();
-        Enabled = reader.Read<uint>() != 0;
+        Field00 = reader.ReadUInt32();
+        Type = (EType)reader.ReadInt32();
+        Enabled = reader.ReadInt32() != 0;
 
-        TopLeft = reader.Read<Vector2>();
-        BottomLeft = reader.Read<Vector2>();
-        TopRight = reader.Read<Vector2>();
-        BottomRight = reader.Read<Vector2>();
+        TopLeft = reader.ReadVector2();
+        BottomLeft = reader.ReadVector2();
+        TopRight = reader.ReadVector2();
+        BottomRight = reader.ReadVector2();
 
-        Field2C = reader.Read<BitSet<uint>>();
+        Field2C = reader.ReadObject<BitSet<uint>>();
         Info = reader.ReadObjectOffset<CastInfo>();
-        InheritanceFlags = reader.Read<BitSet<uint>>();
-        MaterialFlags = reader.Read<BitSet<uint>>();
-        SpriteIndices = reader.ReadArrayOffset<int>(reader.Read<int>());
+        InheritanceFlags = reader.ReadObject<BitSet<uint>>();
+        MaterialFlags = reader.ReadObject<BitSet<uint>>();
+        SpriteIndices = reader.ReadArrayOffset<int>(reader.ReadInt32());
 
         Text = reader.ReadStringOffset();
         FontName = reader.ReadStringOffset();
@@ -79,39 +79,39 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
 
         if (family.Scene.Version >= 3)
         {
-            Width = reader.Read<uint>();
-            Height = reader.Read<uint>();
-            Field58 = reader.Read<uint>();
-            Field5C = reader.Read<uint>();
+            Width = reader.ReadUInt32();
+            Height = reader.ReadUInt32();
+            Field58 = reader.ReadUInt32();
+            Field5C = reader.ReadUInt32();
 
-            Origin = reader.Read<Vector2>();
-            Position = reader.Read<Vector2>();
-            Field70 = reader.Read<uint>();
+            Origin = reader.ReadVector2();
+            Position = reader.ReadVector2();
+            Field70 = reader.ReadUInt32();
         }
     }
 
     public void Write(BinaryObjectWriter writer, Family? family)
     {
-        writer.Write(Field00);
-        writer.Write(Type);
-        writer.Write(Convert.ToInt32(Enabled));
+        writer.WriteUInt32(Field00);
+        writer.WriteInt32((int)Type);
+        writer.WriteInt32(Convert.ToInt32(Enabled));
 
-        writer.Write(TopLeft);
-        writer.Write(BottomLeft);
-        writer.Write(TopRight);
-        writer.Write(BottomRight);
+        writer.WriteVector2(TopLeft);
+        writer.WriteVector2(BottomLeft);
+        writer.WriteVector2(TopRight);
+        writer.WriteVector2(BottomRight);
 
-        writer.Write(Field2C);
+        writer.WriteObject(Field2C);
 
         // Info is written after the sprite indices, despite appearing in the struct earlier.
         long infoOffset = writer.Position;
         writer.OffsetHandler.RegisterOffsetPosition(infoOffset);
         writer.WriteOffsetValue(0);
 
-        writer.Write(InheritanceFlags);
-        writer.Write(MaterialFlags);
+        writer.WriteObject(InheritanceFlags);
+        writer.WriteObject(MaterialFlags);
 
-        writer.Write(SpriteIndices.Length);
+        writer.WriteInt32(SpriteIndices.Length);
         writer.WriteOffset(() =>
         {
             writer.WriteArray(SpriteIndices);
@@ -130,7 +130,7 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
             writer.WriteOffset(() =>
             { 
                 writer.WriteString(StringBinaryFormat.NullTerminated, Text);
-                writer.Write<byte>(0);
+                writer.WriteByte(0);
             });
         }
         else
@@ -143,7 +143,7 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
             writer.WriteOffset(() =>
             {
                 writer.WriteString(StringBinaryFormat.NullTerminated, FontName);
-                writer.Write<byte>(0);
+                writer.WriteByte(0);
             });
         }
         else
@@ -151,7 +151,7 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
             writer.WriteOffsetValue(0);
         }
 
-        writer.Write(FontKerning);
+        writer.WriteSingle(FontKerning);
 
         family ??= Family;
 
@@ -167,14 +167,14 @@ public class Cast : IBinarySerializable<Family>, IList<Cast>
 
         if (family.Scene.Version >= 3)
         {
-            writer.Write(Width);
-            writer.Write(Height);
-            writer.Write(Field58);
-            writer.Write(Field5C);
+            writer.WriteUInt32(Width);
+            writer.WriteUInt32(Height);
+            writer.WriteUInt32(Field58);
+            writer.WriteUInt32(Field5C);
 
-            writer.Write(Origin);
-            writer.Write(Position);
-            writer.Write(Field70);
+            writer.WriteVector2(Origin);
+            writer.WriteVector2(Position);
+            writer.WriteUInt32(Field70);
         }
     }
 

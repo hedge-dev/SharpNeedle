@@ -33,7 +33,7 @@ public class ResourceManager : IResourceManager
     }
 
 
-    private IResource OpenBase(IFile file, Type resourceType, bool resolveDepends = true)
+    private IResource OpenBase(IFile file, Func<IResource> createResource, bool resolveDepends = true)
     {
         Func<IResource, bool> addUpdateFunc;
 
@@ -55,7 +55,7 @@ public class ResourceManager : IResourceManager
             return cacheRes;
         }
 
-        IResource result = (IResource)Activator.CreateInstance(resourceType)!;
+        IResource result = createResource();
         
         lock (_readingResources) 
         { 
@@ -103,13 +103,13 @@ public class ResourceManager : IResourceManager
 
     public T Open<T>(IFile file, bool resolveDepends = true) where T : IResource, new()
     {
-        return (T)OpenBase(file, typeof(T), resolveDepends);
+        return (T)OpenBase(file, () => new T(), resolveDepends);
     }
 
     public IResource Open(IFile file, bool resolveDepends = true)
     {
         Type type = ResourceTypeManager.DetectType(file)?.Owner ?? typeof(ResourceRaw);
-        return OpenBase(file, type, resolveDepends);
+        return OpenBase(file, () => (IResource)Activator.CreateInstance(type)!, resolveDepends);
     }
 
     public bool IsOpen(string path)

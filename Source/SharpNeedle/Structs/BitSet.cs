@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.Structs;
 
-public struct BitSet<T> : IEnumerable<bool> where T : INumberBase<T>, IBinaryInteger<T>
+public struct BitSet<T> : IBinarySerializable, IEnumerable<bool> where T : unmanaged, INumberBase<T>, IBinaryInteger<T>
 {
     public T Value;
     public readonly int BitCount => Unsafe.SizeOf<T>() * 8;
@@ -17,6 +17,16 @@ public struct BitSet<T> : IEnumerable<bool> where T : INumberBase<T>, IBinaryInt
         {
             Set(NumberHelper.Create<int, T>(bit));
         }
+    }
+
+    public void Read(BinaryObjectReader reader)
+    {
+        Value = reader.Read<T>();
+    }
+
+    public void Write(BinaryObjectWriter writer)
+    {
+        writer.Write(Value);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]

@@ -24,56 +24,52 @@ public class AuraParam : BaseParam
     public float[] ValuesTimeline { get; set; } = new float[32];
 
     public AuraParam() { }
-    public AuraParam(BinaryObjectReader reader, GameType game)
-    {
-        Read(reader, game);
-    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
-        Field00 = reader.Read<int>();
-        Field04 = reader.Read<int>();
-        Field08 = reader.Read<int>();
-        Field0C = reader.Read<int>();
-        Field10 = reader.Read<float>();
-        Field14 = reader.Read<float>();
-        Field18 = reader.Read<float>();
-        Field1C = reader.Read<float>();
-        Field20 = reader.Read<float>();
-        Field24 = reader.Read<int>();
-        Field28 = reader.Read<int>();
-        Field2C = reader.Read<int>();
-        Field30 = reader.Read<int>();
-        Field34 = reader.Read<float>();
-        Field38 = reader.Read<float>();
-        Field3C = reader.Read<float>();
-        Field40 = reader.Read<float>();
-        Field44 = reader.Read<float>();
-        Field48 = reader.Read<int>();
+        Field00 = reader.ReadInt32();
+        Field04 = reader.ReadInt32();
+        Field08 = reader.ReadInt32();
+        Field0C = reader.ReadInt32();
+        Field10 = reader.ReadSingle();
+        Field14 = reader.ReadSingle();
+        Field18 = reader.ReadSingle();
+        Field1C = reader.ReadSingle();
+        Field20 = reader.ReadSingle();
+        Field24 = reader.ReadInt32();
+        Field28 = reader.ReadInt32();
+        Field2C = reader.ReadInt32();
+        Field30 = reader.ReadInt32();
+        Field34 = reader.ReadSingle();
+        Field38 = reader.ReadSingle();
+        Field3C = reader.ReadSingle();
+        Field40 = reader.ReadSingle();
+        Field44 = reader.ReadSingle();
+        Field48 = reader.ReadInt32();
         reader.ReadArray<float>(32, ValuesTimeline);
     }
 
     public override void Write(BinaryObjectWriter writer, GameType game)
     {
-        writer.Write(Field00);
-        writer.Write(Field04);
-        writer.Write(Field08);
-        writer.Write(Field0C);
-        writer.Write(Field10);
-        writer.Write(Field14);
-        writer.Write(Field18);
-        writer.Write(Field1C);
-        writer.Write(Field20);
-        writer.Write(Field24);
-        writer.Write(Field28);
-        writer.Write(Field2C);
-        writer.Write(Field30);
-        writer.Write(Field34);
-        writer.Write(Field38);
-        writer.Write(Field3C);
-        writer.Write(Field40);
-        writer.Write(Field44);
-        writer.Write(Field48);
+        writer.WriteInt32(Field00);
+        writer.WriteInt32(Field04);
+        writer.WriteInt32(Field08);
+        writer.WriteInt32(Field0C);
+        writer.WriteSingle(Field10);
+        writer.WriteSingle(Field14);
+        writer.WriteSingle(Field18);
+        writer.WriteSingle(Field1C);
+        writer.WriteSingle(Field20);
+        writer.WriteInt32(Field24);
+        writer.WriteInt32(Field28);
+        writer.WriteInt32(Field2C);
+        writer.WriteInt32(Field30);
+        writer.WriteSingle(Field34);
+        writer.WriteSingle(Field38);
+        writer.WriteSingle(Field3C);
+        writer.WriteSingle(Field40);
+        writer.WriteSingle(Field44);
+        writer.WriteInt32(Field48);
         writer.WriteArrayFixedLength(ValuesTimeline, 32);
     }
 

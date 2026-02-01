@@ -8,23 +8,19 @@ public class SoundParam : BaseParam
 
     public SoundParam() { }
 
-    public SoundParam(BinaryObjectReader reader, GameType game)
-    {
-        Read(reader, game);
-    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
         CueName = reader.ReadDiString(64);
-        Field40 = reader.Read<int>();
-        Field44 = reader.Read<int>();
+        Field40 = reader.ReadInt32();
+        Field44 = reader.ReadInt32();
     }
 
     public override void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.WriteDiString(CueName);
-        writer.Write(Field40);
-        writer.Write(Field44);
+        writer.WriteInt32(Field40);
+        writer.WriteInt32(Field44);
     }
 
     public override int GetTypeID(GameType game)

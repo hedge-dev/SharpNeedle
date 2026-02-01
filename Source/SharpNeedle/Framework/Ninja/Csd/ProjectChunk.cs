@@ -15,28 +15,28 @@ public class ProjectChunk : IChunk
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
-        options.Header ??= reader.ReadLittle<ChunkHeader>();
+        options.Header ??= reader.ReadObject<ChunkHeader>();
         Signature = options.Header.Value.Signature;
-        Field08 = reader.Read<uint>();
-        Field0C = reader.Read<uint>();
+        Field08 = reader.ReadUInt32();
+        Field0C = reader.ReadUInt32();
         Root = reader.ReadObjectOffset<SceneNode>();
         Name = reader.ReadStringOffset();
 
-        TextureFormat = reader.Read<TextureFormat>();
+        TextureFormat = (TextureFormat)reader.ReadInt32();
         Fonts = reader.ReadObjectOffset<FontCollection>();
     }
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
         writer.WriteLittle(Signature);
-        writer.Write(0); // Size
+        writer.WriteLittle(0); // Size
 
         SeekToken start = writer.At();
-        writer.Write(Field08);
-        writer.Write(Field0C);
+        writer.WriteUInt32(Field08);
+        writer.WriteUInt32(Field0C);
         writer.WriteObjectOffset(Root);
-        writer.WriteOffset(() => writer.WriteString(StringBinaryFormat.NullTerminated, Name));
-        writer.Write(TextureFormat);
+        writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
+        writer.WriteInt32((int)TextureFormat);
         writer.WriteObjectOffset(Fonts);
         writer.Flush();
         writer.Align(16);

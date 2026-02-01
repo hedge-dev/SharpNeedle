@@ -8,20 +8,16 @@ public class FadeParam : BaseParam
     public float[] CurveData { get; set; } = new float[32];
 
     public FadeParam() { }
-    public FadeParam(BinaryObjectReader reader, GameType game)
-    {
-        Read(reader, game);
-    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
-        Color = reader.Read<Color<uint>>();
+        Color = reader.ReadObject<Color<uint>>();
         reader.ReadArray<float>(32, CurveData);
     }
 
     public override void Write(BinaryObjectWriter writer, GameType game)
     {
-        writer.Write(Color);
+        writer.WriteObject(Color);
         writer.WriteArrayFixedLength(CurveData, 32);
     }
 

@@ -11,17 +11,17 @@ public class MorphModel : IBinarySerializable<uint>
 
     public void Read(BinaryObjectReader reader, uint version)
     {
-        reader.Read(out uint vertexCount);
+        int vertexCount = reader.ReadInt32();
         long vertexOffset = reader.ReadOffsetValue();
 
-        uint flags = reader.Read<uint>();
+        uint flags = reader.ReadUInt32();
         if (flags != 1)
         {
             throw new Exception($"{flags} is not 1! Report this model!");
         }
 
-        reader.Read(out uint shapeCount);
-        Targets = new List<MorphTarget>((int)shapeCount);
+        int shapeCount = reader.ReadInt32();
+        Targets = new List<MorphTarget>(shapeCount);
         for (uint i = 0; i < shapeCount; i++)
         {
             Targets.Add(new());
@@ -39,11 +39,11 @@ public class MorphModel : IBinarySerializable<uint>
         {
             foreach (MorphTarget mesh in Targets)
             {
-                mesh.Positions = reader.ReadArrayOffset<Vector3>((int)vertexCount);
+                reader.ReadOffset(() => mesh.Positions =  reader.ReadVector3Array(vertexCount));
             }
         });
 
-        MeshGroup = reader.ReadObject<MeshGroup, uint>(version);
+        MeshGroup = reader.ReadObject<MeshGroup, MeshSerializeContext>(new(version, true));
 
         byte[] vertexData = [];
 
@@ -56,7 +56,7 @@ public class MorphModel : IBinarySerializable<uint>
                 vertexData = reader.ReadArrayAtOffset<byte>(vertexOffset, (int)(vertexCount * mesh.VertexSize));
             }
 
-            mesh.VertexCount = vertexCount;
+            mesh.VertexCount = (uint)vertexCount;
             mesh.Vertices = vertexData;
 
             if (i == 0)
@@ -84,11 +84,11 @@ public class MorphModel : IBinarySerializable<uint>
         Array.Copy(mesh.Vertices, verticesClone, verticesClone.LongLength);
         VertexElement.SwapEndianness([.. mesh.Elements], verticesClone.AsSpan(), (nint)mesh.VertexCount, (nint)mesh.VertexSize);
 
-        writer.Write(mesh.VertexCount);
+        writer.WriteUInt32(mesh.VertexCount);
         writer.WriteArrayOffset(verticesClone);
 
-        writer.Write(1); // Some kind of flags
-        writer.Write(Targets.Count);
+        writer.WriteInt32(1); // Some kind of flags
+        writer.WriteInt32(Targets.Count);
 
         writer.WriteOffset(() =>
         {
@@ -102,11 +102,11 @@ public class MorphModel : IBinarySerializable<uint>
         {
             foreach (MorphTarget shape in Targets)
             {
-                writer.WriteArrayOffset(shape.Positions);
+                writer.WriteOffset(() => writer.WriteVector3Array(shape.Positions));
             }
         });
 
-        writer.WriteObject(MeshGroup, version);
+        writer.WriteObject(MeshGroup, new MeshSerializeContext(version, true));
     }
 
     public void ResolveDependencies(IResourceResolver dir)

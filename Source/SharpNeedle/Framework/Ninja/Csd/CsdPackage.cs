@@ -65,17 +65,17 @@ public class CsdPackage : ResourceBase, IBinarySerializable
         reader.Endianness = Endianness;
         while (reader.Position < reader.Length)
         {
-            Files.Add(reader.ReadArray<byte>(reader.Read<int>()));
+            Files.Add(reader.ReadArray<byte>(reader.ReadInt32()));
         }
     }
 
     public void Write(BinaryObjectWriter writer)
     {
         writer.Endianness = Endianness;
-        writer.Write(Signature);
+        writer.WriteUInt32(Signature);
         foreach (byte[] file in Files)
         {
-            writer.Write(file.Length);
+            writer.WriteInt32(file.Length);
             writer.WriteArray(file);
         }
     }

@@ -18,24 +18,24 @@ public class LightFieldTree : SampleChunkResource
 
     public override void Read(BinaryObjectReader reader)
     {
-        Bounds = reader.Read<AABB>();
+        Bounds = reader.ReadObject<AABB>();
 
-        Cells.AddRange(reader.ReadObjectArrayOffset<LightFieldCell>(reader.Read<int>()));
-        Probes.AddRange(reader.ReadObjectArrayOffset<LightFieldProbe, uint>(DataVersion, reader.Read<int>()));
-        Indices.AddRange(reader.ReadArrayOffset<uint>(reader.Read<int>()));
+        Cells.AddRange(reader.ReadObjectArrayOffset<LightFieldCell>(reader.ReadInt32()));
+        Probes.AddRange(reader.ReadObjectArrayOffset<LightFieldProbe, uint>(DataVersion, reader.ReadInt32()));
+        Indices.AddRange(reader.ReadArrayOffset<uint>(reader.ReadInt32()));
     }
 
     public override void Write(BinaryObjectWriter writer)
     {
-        writer.Write(Bounds);
+        writer.WriteObject(Bounds);
 
-        writer.Write(Cells.Count);
+        writer.WriteInt32(Cells.Count);
         writer.WriteObjectCollectionOffset(Cells);
 
-        writer.Write(Probes.Count);
+        writer.WriteInt32(Probes.Count);
         writer.WriteObjectCollectionOffset(DataVersion, Probes);
 
-        writer.Write(Indices.Count);
+        writer.WriteInt32(Indices.Count);
         writer.WriteCollectionOffset(Indices);
     }
 }
@@ -47,14 +47,14 @@ public class LightFieldCell : IBinarySerializable
 
     public void Read(BinaryObjectReader reader)
     {
-        Type = (CellType)reader.Read<int>();
-        Index = reader.Read<uint>();
+        Type = (CellType)reader.ReadInt32();
+        Index = reader.ReadUInt32();
     }
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.Write((int)Type);
-        writer.Write(Index);
+        writer.WriteInt32((int)Type);
+        writer.WriteUInt32(Index);
     }
 
     public enum CellType : int
@@ -73,14 +73,14 @@ public class LightFieldProbe : IBinarySerializable<uint>
 
     public void Read(BinaryObjectReader reader, uint version)
     {
-        for(int i=0; i<8; i++)
+        for (int i = 0; i < 8; i++)
         {
-            Colors[i] = new Color<byte>(reader.Read<byte>(), reader.Read<byte>(), reader.Read<byte>(), 255);
+            Colors[i] = new Color<byte>(reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), 255);
         }
 
-        if(version >= 1)
+        if (version >= 1)
         {
-            Shadow = reader.Read<byte>();
+            Shadow = reader.ReadByte();
         }
     }
 
@@ -88,14 +88,14 @@ public class LightFieldProbe : IBinarySerializable<uint>
     {
         for (int i = 0; i < 8; i++)
         {
-            writer.Write(Colors[i].R);
-            writer.Write(Colors[i].G);
-            writer.Write(Colors[i].B);
+            writer.WriteByte(Colors[i].R);
+            writer.WriteByte(Colors[i].G);
+            writer.WriteByte(Colors[i].B);
         }
 
-        if(version >= 1)
+        if (version >= 1)
         {
-            writer.Write(Shadow);
+            writer.WriteByte(Shadow);
         }
     }
 }

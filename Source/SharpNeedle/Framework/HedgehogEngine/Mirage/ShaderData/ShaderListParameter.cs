@@ -9,21 +9,13 @@ public struct ShaderListParameter : IBinarySerializable
     public void Read(BinaryObjectReader reader)
     {
         Name = reader.ReadStringOffset(StringBinaryFormat.NullTerminated);
-        DefaultValue = new(
-            reader.ReadSingle(),
-            reader.ReadSingle(),
-            reader.ReadSingle(),
-            reader.ReadSingle()
-        );
+        DefaultValue = reader.ReadVector4();
     }
 
     public void Write(BinaryObjectWriter writer)
     {
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name, alignment: 4);
-        writer.WriteSingle(DefaultValue.X);
-        writer.WriteSingle(DefaultValue.Y);
-        writer.WriteSingle(DefaultValue.Z);
-        writer.WriteSingle(DefaultValue.W);
+        writer.WriteVector4(DefaultValue);
     }
 
     public override string ToString()

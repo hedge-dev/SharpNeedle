@@ -16,10 +16,10 @@ public class ParameterData : BaseNodeData
     public BaseParam? Parameter { get; set; }
 
     public ParameterData() { }
-    public ParameterData(BinaryObjectReader reader, GameType game, int size)
+
+    public ParameterData(int dataSize)
     {
-        _unknownDataSize = size - 8;
-        Read(reader, game);
+        _unknownDataSize = dataSize - 8;
     }
 
     public ParameterData(float startTime, float endTime)
@@ -33,286 +33,135 @@ public class ParameterData : BaseNodeData
         Parameter = parameter;
     }
 
-    public void ReadFrontiersParameter(BinaryObjectReader reader, int type)
+    private static Func<GameType, BaseParam>? GetCommonReadFunc(BinaryObjectReader reader, int type)
     {
-        switch ((FrontiersParams)type)
+        return (ParameterType)type switch
         {
-            case FrontiersParams.DepthOfField:
-                Parameter = new DOFParam(reader, GameType.Frontiers);
-                break;
-
-            case FrontiersParams.ColorCorrection:
-                Parameter = new ColorCorrectionParam(reader, GameType.Frontiers);
-                break;
-
-            case FrontiersParams.CameraExposure:
-                Parameter = new CameraExposureParam(reader, GameType.Frontiers);
-                break;
-
-            case FrontiersParams.ShadowResolution:
-                Parameter = new ShadowResolutionParam(reader, GameType.Frontiers);
-                break;
-
-            case FrontiersParams.ChromaticAberration:
-                Parameter = new ChromaAberrationParam(reader, GameType.Frontiers);
-                break;
-
-            case FrontiersParams.Vignette:
-                Parameter = new VignetteParam(reader, GameType.Frontiers);
-                break;
-
-            case FrontiersParams.Fade:
-                Parameter = new FadeParam(reader, GameType.Frontiers);
-                break;
-
-            case FrontiersParams.Letterbox:
-                Parameter = new LetterboxParam(reader, GameType.Frontiers);
-                break;
-
-            case FrontiersParams.BossName:
-                Parameter = new BossNameParam(reader, GameType.Frontiers);
-                break;
-
-            case FrontiersParams.Subtitle:
-                Parameter = new SubtitleParam(reader, GameType.Frontiers);
-                break;
-
-            case FrontiersParams.Sound:
-                Parameter = new SoundParam(reader, GameType.Frontiers);
-                break;
-
-            case FrontiersParams.Time:
-                Parameter = new TimeParam(reader, GameType.Frontiers);
-                break;
-
-            case FrontiersParams.CameraBlur:
-                Parameter = new CameraBlurParam(reader, GameType.Frontiers);
-                break;
-
-            case FrontiersParams.GeneralPurposeTrigger:
-                Parameter = new GeneralTriggerParam(reader, GameType.Frontiers);
-                break;
-
-            case FrontiersParams.DitherDepth:
-                Parameter = new DitherDepthParam(reader, GameType.Frontiers);
-                break;
-
-            case FrontiersParams.QTE:
-                Parameter = new QTEParam(reader, GameType.Frontiers);
-                break;
-
-            case FrontiersParams.ASMForcedOverwrite:
-                Parameter = new ASMOverrideParam(reader, GameType.Frontiers);
-                break;
-
-            case FrontiersParams.Aura:
-                Parameter = new AuraParam(reader, GameType.Frontiers);
-                break;
-
-            case FrontiersParams.TimescaleChange:
-                Parameter = new TimescaleParam(reader, GameType.Frontiers);
-                break;
-
-            case FrontiersParams.CyberNoise:
-                Parameter = new CyberNoiseParam(reader, GameType.Frontiers);
-                break;
-
-            case FrontiersParams.MovieDisplay:
-                Parameter = new MovieDisplayParam(reader, GameType.Frontiers);
-                break;
-
-            case FrontiersParams.Weather:
-                Parameter = new WeatherParam(reader, GameType.Frontiers);
-                break;
-
-            case FrontiersParams.TheEndCable:
-                Parameter = new TheEndCableParam(reader, GameType.Frontiers);
-                break;
-
-            case FrontiersParams.FinalBossLighting:
-                Parameter = new FinalBossLightingParam(reader, GameType.Frontiers);
-                break;
-
-            default:
-                Parameter = new UnknownParam(reader, _unknownDataSize, type);
-                break;
-        }
+            ParameterType.DrawingOff => reader.ReadObject<DrawOffParam, GameType>,
+            ParameterType.PathAdjust => reader.ReadObject<PathAdjustParam, GameType>,
+            ParameterType.CameraShake => reader.ReadObject<CameraShakeParam, GameType>,
+            ParameterType.CameraShakeLoop => reader.ReadObject<CameraShakeLoopParam, GameType>,
+            ParameterType.Effect => reader.ReadObject<EffectParam, GameType>,
+            ParameterType.CullDisabled => reader.ReadObject<CullDisabledParam, GameType>,
+            ParameterType.UVAnimation => reader.ReadObject<UVAnimParam, GameType>,
+            ParameterType.VisibilityAnimation => reader.ReadObject<VisibilityAnimParam, GameType>,
+            ParameterType.MaterialAnimation => reader.ReadObject<MaterialAnimParam, GameType>,
+            ParameterType.CompositeAnimation => reader.ReadObject<CompositeAnimParam, GameType>,
+            ParameterType.SonicCamera => reader.ReadObject<SonicCameraParam, GameType>,
+            ParameterType.GameCamera => reader.ReadObject<GameCameraParam, GameType>,
+            ParameterType.ControllerVibration => reader.ReadObject<ControllerVibrationParam, GameType>,
+            ParameterType.MaterialParameter => reader.ReadObject<MaterialParameterParam, GameType>,
+            _ => null,
+        };
     }
 
-    public void ReadShadowGensParameter(BinaryObjectReader reader, int type)
+    private static Func<GameType, BaseParam>? GetFrontiersReadFunc(BinaryObjectReader reader, int type)
     {
-        switch ((ShadowGensParams)type)
+        return (FrontiersParams)type switch
         {
-            case ShadowGensParams.DepthOfField:
-                Parameter = new DOFParam(reader, GameType.ShadowGenerations);
-                break;
-
-            case ShadowGensParams.Fade:
-                Parameter = new FadeParam(reader, GameType.ShadowGenerations);
-                break;
-
-            case ShadowGensParams.BossName:
-                Parameter = new BossNameParam(reader, GameType.ShadowGenerations);
-                break;
-
-            case ShadowGensParams.Subtitle:
-                Parameter = new SubtitleParam(reader, GameType.ShadowGenerations);
-                break;
-
-            case ShadowGensParams.Sound:
-                Parameter = new SoundParam(reader, GameType.ShadowGenerations);
-                break;
-
-            case ShadowGensParams.GeneralPurposeTrigger:
-                Parameter = new GeneralTriggerParam(reader, GameType.ShadowGenerations);
-                break;
-
-            case ShadowGensParams.QTE:
-                Parameter = new QTEParam(reader, GameType.ShadowGenerations);
-                break;
-
-            case ShadowGensParams.MovieDisplay:
-                Parameter = new MovieDisplayParam(reader, GameType.ShadowGenerations);
-                break;
-
-            case ShadowGensParams.TimeStop:
-                Parameter = new TimeStopParam(reader, GameType.ShadowGenerations);
-                break;
-
-            case ShadowGensParams.TimeStopControl:
-                Parameter = new TimeStopControlParam(reader, GameType.ShadowGenerations);
-                break;
-
-            case ShadowGensParams.TimeStopObjectBehavior:
-                Parameter = new TimeStopObjectBehaviorParam(reader, GameType.ShadowGenerations);
-                break;
-
-            case ShadowGensParams.ShadowAfterimage:
-                Parameter = new ShadowAfterimageParam(reader, GameType.ShadowGenerations);
-                break;
-
-            case ShadowGensParams.FalloffToggle:
-                Parameter = new FalloffToggleParam(reader, GameType.ShadowGenerations);
-                break;
-
-            default:
-                Parameter = new UnknownParam(reader, _unknownDataSize, type);
-                break;
-        }
+            FrontiersParams.DepthOfField => reader.ReadObject<DOFParam, GameType>,
+            FrontiersParams.ColorCorrection => reader.ReadObject<ColorCorrectionParam, GameType>,
+            FrontiersParams.CameraExposure => reader.ReadObject<CameraExposureParam, GameType>,
+            FrontiersParams.ShadowResolution => reader.ReadObject<ShadowResolutionParam, GameType>,
+            FrontiersParams.ChromaticAberration => reader.ReadObject<ChromaAberrationParam, GameType>,
+            FrontiersParams.Vignette => reader.ReadObject<VignetteParam, GameType>,
+            FrontiersParams.Fade => reader.ReadObject<FadeParam, GameType>,
+            FrontiersParams.Letterbox => reader.ReadObject<LetterboxParam, GameType>,
+            FrontiersParams.BossName => reader.ReadObject<BossNameParam, GameType>,
+            FrontiersParams.Subtitle => reader.ReadObject<SubtitleParam, GameType>,
+            FrontiersParams.Sound => reader.ReadObject<SoundParam, GameType>,
+            FrontiersParams.Time => reader.ReadObject<TimeParam, GameType>,
+            FrontiersParams.CameraBlur => reader.ReadObject<CameraBlurParam, GameType>,
+            FrontiersParams.GeneralPurposeTrigger => reader.ReadObject<GeneralTriggerParam, GameType>,
+            FrontiersParams.DitherDepth => reader.ReadObject<DitherDepthParam, GameType>,
+            FrontiersParams.QTE => reader.ReadObject<QTEParam, GameType>,
+            FrontiersParams.ASMForcedOverwrite => reader.ReadObject<ASMOverrideParam, GameType>,
+            FrontiersParams.Aura => reader.ReadObject<AuraParam, GameType>,
+            FrontiersParams.TimescaleChange => reader.ReadObject<TimescaleParam, GameType>,
+            FrontiersParams.CyberNoise => reader.ReadObject<CyberNoiseParam, GameType>,
+            FrontiersParams.MovieDisplay => reader.ReadObject<MovieDisplayParam, GameType>,
+            FrontiersParams.Weather => reader.ReadObject<WeatherParam, GameType>,
+            FrontiersParams.TheEndCable => reader.ReadObject<TheEndCableParam, GameType>,
+            FrontiersParams.FinalBossLighting => reader.ReadObject<FinalBossLightingParam, GameType>,
+            _ => null,
+        };
     }
 
-    public void ReadGameSpecificParameter(BinaryObjectReader reader, GameType game, int type)
+    private static Func<GameType, BaseParam>? GetShadowGenerationsReadFunc(BinaryObjectReader reader, int type)
     {
-        switch (game)
+        return (ShadowGensParams)type switch
         {
-            case GameType.Frontiers:
-                ReadFrontiersParameter(reader, type);
-                break;
+            ShadowGensParams.DepthOfField => reader.ReadObject<DOFParam, GameType>,
+            ShadowGensParams.Fade => reader.ReadObject<FadeParam, GameType>,
+            ShadowGensParams.BossName => reader.ReadObject<BossNameParam, GameType>,
+            ShadowGensParams.Subtitle => reader.ReadObject<SubtitleParam, GameType>,
+            ShadowGensParams.Sound => reader.ReadObject<SoundParam, GameType>,
+            ShadowGensParams.GeneralPurposeTrigger => reader.ReadObject<GeneralTriggerParam, GameType>,
+            ShadowGensParams.QTE => reader.ReadObject<QTEParam, GameType>,
+            ShadowGensParams.MovieDisplay => reader.ReadObject<MovieDisplayParam, GameType>,
+            ShadowGensParams.TimeStop => reader.ReadObject<TimeStopParam, GameType>,
+            ShadowGensParams.TimeStopControl => reader.ReadObject<TimeStopControlParam, GameType>,
+            ShadowGensParams.TimeStopObjectBehavior => reader.ReadObject<TimeStopObjectBehaviorParam, GameType>,
+            ShadowGensParams.ShadowAfterimage => reader.ReadObject<ShadowAfterimageParam, GameType>,
+            ShadowGensParams.FalloffToggle => reader.ReadObject<FalloffToggleParam, GameType>,
+            _ => null,
+        };
+    }
 
-            case GameType.ShadowGenerations:
-                ReadShadowGensParameter(reader, type);
-                break;
+    private BaseParam ReadParameter(BinaryObjectReader reader, GameType game, int type)
+    {
+        Func<GameType, BaseParam>? readFunc;
 
-            default:
-                Parameter = new UnknownParam(reader, _unknownDataSize, type);
-                break;
+        if(type < 1000)
+        {
+            game = GameType.Common;
+        }
+
+        readFunc = game switch
+        {
+            GameType.Frontiers => GetFrontiersReadFunc(reader, type),
+            GameType.ShadowGenerations => GetShadowGenerationsReadFunc(reader, type),
+            _ => GetCommonReadFunc(reader, type),
+        };
+        
+
+        if(readFunc == null)
+        {
+            UnknownParam result = new(_unknownDataSize, type);
+            result.Read(reader, game);
+            return result;
+        }
+        else
+        {
+            return readFunc(game);
         }
     }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
-        int type = reader.Read<int>();
-        StartTime = reader.Read<float>();
-        EndTime = reader.Read<float>();
-        Field0C = reader.Read<int>();
-        Field10 = reader.Read<int>();
-        Field14 = reader.Read<int>();
-        Field18 = reader.Read<int>();
-        Field1C = reader.Read<int>();
-
-        if (type < 1000)
-        {
-            switch ((ParameterType)type)
-            {
-                case ParameterType.DrawingOff:
-                    Parameter = new DrawOffParam(reader, GameType.Common);
-                    break;
-
-                case ParameterType.PathAdjust:
-                    Parameter = new PathAdjustParam(reader, GameType.Common);
-                    break;
-
-                case ParameterType.CameraShake:
-                    Parameter = new CameraShakeParam(reader, GameType.Common);
-                    break;
-
-                case ParameterType.CameraShakeLoop:
-                    Parameter = new CameraShakeLoopParam(reader, GameType.Common);
-                    break;
-
-                case ParameterType.Effect:
-                    Parameter = new EffectParam(reader, GameType.Common);
-                    break;
-
-                case ParameterType.CullDisabled:
-                    Parameter = new CullDisabledParam(reader, GameType.Common);
-                    break;
-
-                case ParameterType.UVAnimation:
-                    Parameter = new UVAnimParam(reader, GameType.Common);
-                    break;
-
-                case ParameterType.VisibilityAnimation:
-                    Parameter = new VisibilityAnimParam(reader, GameType.Common);
-                    break;
-
-                case ParameterType.MaterialAnimation:
-                    Parameter = new MaterialAnimParam(reader, GameType.Common);
-                    break;
-
-                case ParameterType.CompositeAnimation:
-                    Parameter = new CompositeAnimParam(reader, GameType.Common);
-                    break;
-
-                case ParameterType.SonicCamera:
-                    Parameter = new SonicCameraParam(reader, GameType.Common);
-                    break;
-
-                case ParameterType.GameCamera:
-                    Parameter = new GameCameraParam(reader, GameType.Common);
-                    break;
-
-                case ParameterType.ControllerVibration:
-                    Parameter = new ControllerVibrationParam(reader, GameType.Common);
-                    break;
-
-                case ParameterType.MaterialParameter:
-                    Parameter = new MaterialParameterParam(reader, GameType.Common);
-                    break;
-
-                default:
-                    Parameter = new UnknownParam(reader, _unknownDataSize, type);
-                    break;
-            }
-        }
-        else
-        {
-            ReadGameSpecificParameter(reader, game, type);
-        }
+        int type = reader.ReadInt32();
+        StartTime = reader.ReadSingle();
+        EndTime = reader.ReadSingle();
+        Field0C = reader.ReadInt32();
+        Field10 = reader.ReadInt32();
+        Field14 = reader.ReadInt32();
+        Field18 = reader.ReadInt32();
+        Field1C = reader.ReadInt32();
+        Parameter = ReadParameter(reader, game, type);
     }
 
     public override void Write(BinaryObjectWriter writer, GameType game)
     {
         int type = Parameter == null ? 0 : Parameter.GetTypeID(game);
 
-        writer.Write(type);
-        writer.Write(StartTime);
-        writer.Write(EndTime);
-        writer.Write(Field0C);
-        writer.Write(Field10);
-        writer.Write(Field14);
-        writer.Write(Field18);
-        writer.Write(Field1C);
+        writer.WriteInt32(type);
+        writer.WriteSingle(StartTime);
+        writer.WriteSingle(EndTime);
+        writer.WriteInt32(Field0C);
+        writer.WriteInt32(Field10);
+        writer.WriteInt32(Field14);
+        writer.WriteInt32(Field18);
+        writer.WriteInt32(Field1C);
 
         if (Parameter != null)
         {

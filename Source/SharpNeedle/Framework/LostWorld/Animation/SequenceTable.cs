@@ -12,8 +12,8 @@ public class SequenceTable : List<string?>, IComplexData
         }
 
         Clear();
-        PlayMode = reader.Read<PlayModeInfo>();
-        int seqCount = reader.Read<int>();
+        PlayMode = reader.ReadObject<PlayModeInfo>();
+        int seqCount = reader.ReadInt32();
         if (seqCount == 0)
         {
             return;
@@ -32,11 +32,11 @@ public class SequenceTable : List<string?>, IComplexData
     {
         if (writeType)
         {
-            writer.Write(0);
+            writer.WriteInt32(0);
         }
 
-        writer.Write(PlayMode);
-        writer.Write(Count);
+        writer.WriteObject(PlayMode);
+        writer.WriteInt32(Count);
         writer.WriteOffset(() =>
         {
             foreach (string? seq in this)

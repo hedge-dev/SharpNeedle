@@ -18,8 +18,8 @@ public class RawChunk : IChunk
             throw new InvalidDataException("RawChunk has no data");
         }
 
-        writer.Write(Signature);
-        writer.Write(Data.Length + ChunkHeader.BinarySize);
+        writer.WriteUInt32(Signature);
+        writer.WriteInt32(Data.Length + ChunkHeader.BinarySize);
         writer.WriteArray(Data);
     }
 

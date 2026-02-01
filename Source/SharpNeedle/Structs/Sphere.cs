@@ -1,7 +1,7 @@
 ﻿namespace SharpNeedle.Structs;
 
 [StructLayout(LayoutKind.Sequential)]
-public struct Sphere : IIntersectable<Vector3>, IIntersectable<Sphere>
+public struct Sphere : IBinarySerializable, IIntersectable<Vector3>, IIntersectable<Sphere>
 {
     public Vector3 Center;
     public float Radius;
@@ -23,6 +23,20 @@ public struct Sphere : IIntersectable<Vector3>, IIntersectable<Sphere>
         Center = volume.Center;
         Radius = volume.Radius;
     }
+
+
+    public void Read(BinaryObjectReader reader)
+    {
+        Center = reader.ReadVector3();
+        Radius = reader.ReadSingle();
+    }
+
+    public void Write(BinaryObjectWriter writer)
+    {
+        writer.WriteVector3(Center);
+        writer.WriteSingle(Radius);
+    }
+
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly bool Intersects(Vector3 point)

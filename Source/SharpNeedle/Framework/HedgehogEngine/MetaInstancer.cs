@@ -33,10 +33,10 @@ public class MetaInstancer : ResourceBase, IBinarySerializable
     public void Read(BinaryObjectReader reader)
     {
         reader.EnsureSignatureNative(Signature);
-        FormatVersion = reader.Read<uint>();
+        FormatVersion = reader.ReadUInt32();
 
-        int instanceCount = reader.Read<int>();
-        int instanceSize = reader.Read<int>();
+        int instanceCount = reader.ReadInt32();
+        int instanceSize = reader.ReadInt32();
 
         if (instanceSize != InstanceSize)
         {
@@ -51,14 +51,14 @@ public class MetaInstancer : ResourceBase, IBinarySerializable
     public void Write(BinaryObjectWriter writer)
     {
         writer.WriteNative(Signature);
-        writer.Write(FormatVersion);
+        writer.WriteUInt32(FormatVersion);
 
-        writer.Write(Instances.Count);
-        writer.Write(InstanceSize);
+        writer.WriteInt32(Instances.Count);
+        writer.WriteUInt32(InstanceSize);
 
         writer.Skip(12);
 
-        writer.Write(HeaderSize);
+        writer.WriteUInt32(HeaderSize);
         writer.WriteObjectCollection(Instances);
     }
 
@@ -78,36 +78,36 @@ public class MetaInstancer : ResourceBase, IBinarySerializable
 
         public void Read(BinaryObjectReader reader)
         {
-            Position = reader.Read<Vector3>();
-            Type = reader.Read<byte>();
-            Sway = reader.Read<byte>();
+            Position = reader.ReadVector3();
+            Type = reader.ReadByte();
+            Sway = reader.ReadByte();
 
-            PitchAfterSway = reader.Read<byte>();
-            YawAfterSway = reader.Read<byte>();
+            PitchAfterSway = reader.ReadByte();
+            YawAfterSway = reader.ReadByte();
 
-            PitchBeforeSway = reader.Read<short>();
-            YawBeforeSway = reader.Read<short>();
+            PitchBeforeSway = reader.ReadInt16();
+            YawBeforeSway = reader.ReadInt16();
 
-            byte colorA = reader.Read<byte>();
-            Color = new Color<byte>(reader.Read<byte>(), reader.Read<byte>(), reader.Read<byte>(), colorA);
+            byte colorA = reader.ReadByte();
+            Color = new Color<byte>(reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), colorA);
         }
 
         public void Write(BinaryObjectWriter writer)
         {
-            writer.Write(Position);
-            writer.Write(Type);
-            writer.Write(Sway);
+            writer.WriteVector3(Position);
+            writer.WriteByte(Type);
+            writer.WriteByte(Sway);
 
-            writer.Write(PitchAfterSway);
-            writer.Write(YawAfterSway);
+            writer.WriteByte(PitchAfterSway);
+            writer.WriteByte(YawAfterSway);
 
-            writer.Write(PitchBeforeSway);
-            writer.Write(YawBeforeSway);
+            writer.WriteInt32(PitchBeforeSway);
+            writer.WriteInt32(YawBeforeSway);
 
-            writer.Write(Color.A);
-            writer.Write(Color.R);
-            writer.Write(Color.G);
-            writer.Write(Color.B);
+            writer.WriteInt32(Color.A);
+            writer.WriteInt32(Color.R);
+            writer.WriteInt32(Color.G);
+            writer.WriteInt32(Color.B);
         }
     }
 }

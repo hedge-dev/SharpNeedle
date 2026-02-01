@@ -10,12 +10,12 @@ public struct ChunkHeader : IBinarySerializable
     public void Read(BinaryObjectReader reader)
     {
         Signature = reader.ReadNative<uint>();
-        reader.Read(out Size);
+        Size = reader.ReadUInt32();
     }
 
     public void Write(BinaryObjectWriter writer)
     {
         writer.WriteNative(Signature);
-        writer.Write(ref Size);
+        writer.WriteUInt32(Size);
     }
 }

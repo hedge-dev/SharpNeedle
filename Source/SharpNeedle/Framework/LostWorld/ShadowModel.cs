@@ -6,6 +6,15 @@ using SharpNeedle.Framework.BINA;
 public class ShadowModel : BinaryResource
 {
     public new static readonly uint Signature = BinaryHelper.MakeSignature<uint>("SVLM");
+
+    private static readonly ushort[] _unusedData = [
+        0, 0, 2, 0,
+        0, 12, 2, 3,
+        0, 24, 8, 1,
+        0, 28, 5, 2,
+        255, 0, 17, 0,
+    ];
+
     public List<ShadowMesh> Meshes { get; set; } = [];
 
     public override void Read(BinaryObjectReader reader)
@@ -18,42 +27,16 @@ public class ShadowModel : BinaryResource
 
     public override void Write(BinaryObjectWriter writer)
     {
-        writer.Write(Signature);
-        writer.Write(1); // Version
+        writer.WriteUInt32(Signature);
+        writer.WriteInt32(1); // Version
 
         writer.WriteObject<BinaryList<ShadowMesh>>(Meshes);
 
         // Unused data, probably means something
-        writer.Write(5);
-        writer.WriteOffset(() =>
-        {
-            writer.Write<ushort>(0);
-            writer.Write<ushort>(0);
-            writer.Write<ushort>(2);
-            writer.Write<ushort>(0);
+        writer.WriteInt32(_unusedData.Length / 4);
+        writer.WriteArrayOffset(_unusedData, 16);
 
-            writer.Write<ushort>(0);
-            writer.Write<ushort>(12);
-            writer.Write<ushort>(2);
-            writer.Write<ushort>(3);
-
-            writer.Write<ushort>(0);
-            writer.Write<ushort>(24);
-            writer.Write<ushort>(8);
-            writer.Write<ushort>(1);
-
-            writer.Write<ushort>(0);
-            writer.Write<ushort>(28);
-            writer.Write<ushort>(5);
-            writer.Write<ushort>(2);
-
-            writer.Write<ushort>(255);
-            writer.Write<ushort>(0);
-            writer.Write<ushort>(17);
-            writer.Write<ushort>(0);
-        }, 16);
-
-        writer.Write(0);
+        writer.WriteInt32(0);
     }
 }
 
@@ -65,11 +48,11 @@ public class ShadowMesh : IBinarySerializable
 
     public void Read(BinaryObjectReader reader)
     {
-        Indices = reader.ReadArrayOffset<ushort>(reader.Read<int>());
+        Indices = reader.ReadArrayOffset<ushort>(reader.ReadInt32());
         reader.Skip(4);
-        Vertices = reader.ReadArrayOffset<ShadowVertex>(reader.Read<int>());
+        Vertices = reader.ReadObjectArrayOffset<ShadowVertex>(reader.ReadInt32());
         reader.Skip(4);
-        int bufferCount = reader.Read<int>();
+        int bufferCount = reader.ReadInt32();
         reader.ReadOffset(() =>
         {
             for (int i = 0; i < bufferCount; i++)
@@ -83,13 +66,13 @@ public class ShadowMesh : IBinarySerializable
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.Write(Indices.Length);
+        writer.WriteInt32(Indices.Length);
         writer.WriteArrayOffset(Indices, 16);
-        writer.Write(0);
-        writer.Write(Vertices.Length);
-        writer.WriteArrayOffset(Vertices, 16);
-        writer.Write(0);
-        writer.Write(Buffers.Count);
+        writer.WriteInt32(0);
+        writer.WriteInt32(Vertices.Length);
+        writer.WriteOffset(() => writer.WriteObjectCollection(Vertices), 16);
+        writer.WriteInt32(0);
+        writer.WriteInt32(Buffers.Count);
         writer.WriteOffset(() =>
         {
             foreach (ShadowPrimitiveBuffer buffer in Buffers)
@@ -111,32 +94,48 @@ public class ShadowPrimitiveBuffer : IBinarySerializable
 
     public void Read(BinaryObjectReader reader)
     {
-        PrimitiveType = reader.Read<ShadowPrimitiveType>();
+        PrimitiveType = (ShadowPrimitiveType)reader.ReadInt32();
         IndexOffset = reader.ReadInt32();
         IndexCount = reader.ReadInt32();
         VertexOffset = reader.ReadInt32();
         VertexStride = reader.ReadInt32();
-        BonePalette = reader.ReadArrayOffset<byte>(reader.Read<int>());
+        BonePalette = reader.ReadArrayOffset<byte>(reader.ReadInt32());
     }
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.Write(PrimitiveType);
-        writer.Write(IndexOffset);
-        writer.Write(IndexCount);
-        writer.Write(VertexOffset);
-        writer.Write(VertexStride);
-        writer.Write(BonePalette.Length);
+        writer.WriteInt32((int)PrimitiveType);
+        writer.WriteInt32(IndexOffset);
+        writer.WriteInt32(IndexCount);
+        writer.WriteInt32(VertexOffset);
+        writer.WriteInt32(VertexStride);
+        writer.WriteInt32(BonePalette.Length);
         writer.WriteArrayOffset(BonePalette, 16);
     }
 }
 
-public struct ShadowVertex
+public struct ShadowVertex : IBinarySerializable
 {
     public Vector3 Position;
     public Vector3 Normal;
     public int BlendWeight;
     public int BlendIndices;
+
+    public void Read(BinaryObjectReader reader)
+    {
+        Position = reader.ReadVector3();
+        Normal = reader.ReadVector3();
+        BlendWeight = reader.ReadInt32();
+        BlendIndices = reader.ReadInt32();
+    }
+
+    public readonly void Write(BinaryObjectWriter writer)
+    {
+        writer.WriteVector3(Position);
+        writer.WriteVector3(Normal);
+        writer.WriteInt32(BlendWeight);
+        writer.WriteInt32(BlendIndices);
+    }
 
     public void AddBlendWeight(int weight, int index)
     {

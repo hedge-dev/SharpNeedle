@@ -11,22 +11,22 @@ public class TextureListNN : ITextureList
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
-        options.Header ??= reader.ReadLittle<ChunkHeader>();
+        options.Header ??= reader.ReadObject<ChunkHeader>();
         Signature = options.Header.Value.Signature;
 
         Textures.Clear();
         reader.ReadOffset(() => Textures.AddRange(reader.ReadObject<BinaryList<TextureNN>>()));
-        FieldC = reader.Read<uint>();
+        FieldC = reader.ReadUInt32();
     }
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions context)
     {
         writer.WriteLittle(Signature);
-        writer.Write(0);
+        writer.WriteLittle(0);
 
         SeekToken start = writer.At();
-        writer.Write(0x10); // List offset, untracked
-        writer.Write(FieldC);
+        writer.WriteInt32(0x10); // List offset, untracked
+        writer.WriteUInt32(FieldC);
 
         writer.WriteObject<BinaryList<TextureNN>>(Textures);
 

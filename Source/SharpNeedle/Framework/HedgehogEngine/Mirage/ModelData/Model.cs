@@ -18,7 +18,7 @@ public class Model : ModelBase
             Morphs = reader.ReadObject<BinaryList<BinaryPointer<MorphModel, uint>, uint>, uint>(DataVersion).Unwind();
         }
 
-        reader.Read(out int nodeCount);
+        int nodeCount = reader.ReadInt32();
         Nodes = new List<Node>(nodeCount);
         reader.ReadOffset(() =>
         {
@@ -38,7 +38,7 @@ public class Model : ModelBase
                 }
 
                 Node node = Nodes[i];
-                node.Transform = Matrix4x4.Transpose(reader.Read<Matrix4x4>());
+                node.Transform = Matrix4x4.Transpose(reader.ReadMatrix4x4());
                 Nodes[i] = node;
             }
         });
@@ -54,7 +54,7 @@ public class Model : ModelBase
         CommonWrite(writer);
         if (DataVersion >= 4)
         {
-            writer.Write(Morphs?.Count ?? 0);
+            writer.WriteInt32(Morphs?.Count ?? 0);
             writer.WriteOffset(() =>
             {
                 if (Morphs == null)
@@ -69,7 +69,7 @@ public class Model : ModelBase
             });
         }
 
-        writer.Write(Nodes.Count);
+        writer.WriteInt32(Nodes.Count);
         writer.WriteOffset(() =>
         {
             foreach (Node node in Nodes)
@@ -82,7 +82,7 @@ public class Model : ModelBase
         {
             foreach (Node node in Nodes)
             {
-                writer.Write(Matrix4x4.Transpose(node.Transform));
+                writer.WriteMatrix4x4(Matrix4x4.Transpose(node.Transform));
             }
         });
 
@@ -126,14 +126,14 @@ public class Model : ModelBase
 
         public void Read(BinaryObjectReader reader)
         {
-            ParentIndex = reader.Read<int>();
+            ParentIndex = reader.ReadInt32();
             Name = reader.ReadStringOffset();
             Transform = Matrix4x4.Identity;
         }
 
         public readonly void Write(BinaryObjectWriter writer)
         {
-            writer.Write(ParentIndex);
+            writer.WriteInt32(ParentIndex);
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         }
 

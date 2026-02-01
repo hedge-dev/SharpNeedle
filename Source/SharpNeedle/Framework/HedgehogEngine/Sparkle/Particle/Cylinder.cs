@@ -26,14 +26,14 @@ public class Cylinder : IBinarySerializable
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.Write(Enquiangular ? 1 : 0);
-        writer.Write(IsCircumference ? 1 : 0);
-        writer.Write(IsCone ? 1 : 0);
-        writer.Write(Angle);
-        writer.Write(Radius);
-        writer.Write(Height);
-        writer.Write(MinAngle);
-        writer.Write(MaxAngle);
-        writer.Write(CylinderEmissionType);
+        writer.WriteInt32(Enquiangular ? 1 : 0);
+        writer.WriteInt32(IsCircumference ? 1 : 0);
+        writer.WriteInt32(IsCone ? 1 : 0);
+        writer.WriteSingle(Angle);
+        writer.WriteSingle(Radius);
+        writer.WriteSingle(Height);
+        writer.WriteSingle(MinAngle);
+        writer.WriteSingle(MaxAngle);
+        writer.WriteInt32((int)CylinderEmissionType);
     }
 }

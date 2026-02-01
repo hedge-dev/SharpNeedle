@@ -10,11 +10,11 @@ public class Track : List<KeyFrame>, IBinarySerializable<ChunkBinaryOptions>
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
         Clear();
-        CurveType = reader.Read<FCurveType>();
-        Capacity = reader.Read<ushort>();
-        Flags = reader.Read<uint>();
-        StartFrame = reader.Read<uint>();
-        EndFrame = reader.Read<uint>();
+        CurveType = (FCurveType)reader.ReadInt16();
+        Capacity = reader.ReadUInt16();
+        Flags = reader.ReadUInt32();
+        StartFrame = reader.ReadUInt32();
+        EndFrame = reader.ReadUInt32();
         if (options.Version >= 3)
         {
             reader.Align(8);
@@ -25,11 +25,11 @@ public class Track : List<KeyFrame>, IBinarySerializable<ChunkBinaryOptions>
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
-        writer.Write(CurveType);
-        writer.Write((ushort)Count);
-        writer.Write(Flags);
-        writer.Write(StartFrame);
-        writer.Write(EndFrame);
+        writer.WriteInt16((short)CurveType);
+        writer.WriteUInt16((ushort)Count);
+        writer.WriteUInt32(Flags);
+        writer.WriteUInt32(StartFrame);
+        writer.WriteUInt32(EndFrame);
         if (options.Version >= 3)
         {
             writer.Align(8);

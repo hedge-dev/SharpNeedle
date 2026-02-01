@@ -11,29 +11,24 @@ public class MaterialAnimParam : BaseParam
 
     public MaterialAnimParam() { }
 
-    public MaterialAnimParam(BinaryObjectReader reader, GameType game)
-    {
-        Read(reader, game);
-    }
-
     public override void Read(BinaryObjectReader reader, GameType game)
     {
-        Field00 = reader.Read<int>();
+        Field00 = reader.ReadInt32();
         Name = reader.ReadDiString(64);
-        Field44 = reader.Read<int>();
-        Field48 = reader.Read<float>();
-        Field4C = reader.Read<int>();
-        Field50 = reader.Read<int>();
+        Field44 = reader.ReadInt32();
+        Field48 = reader.ReadSingle();
+        Field4C = reader.ReadInt32();
+        Field50 = reader.ReadInt32();
     }
 
     public override void Write(BinaryObjectWriter writer, GameType game)
     {
-        writer.Write(Field00);
+        writer.WriteInt32(Field00);
         writer.WriteDiString(Name, 64);
-        writer.Write(Field44);
-        writer.Write(Field48);
-        writer.Write(Field4C);
-        writer.Write(Field50);
+        writer.WriteInt32(Field44);
+        writer.WriteSingle(Field48);
+        writer.WriteInt32(Field4C);
+        writer.WriteInt32(Field50);
     }
 
     public override int GetTypeID(GameType game) { return (int)ParameterType.MaterialAnimation; }

@@ -27,7 +27,7 @@ public class TerrainModel : ModelBase
         if (DataVersion >= 5)
         {
             Name = reader.ReadStringOffsetOrEmpty();
-            Flags = reader.Read<TerrainModelFlags>();
+            Flags = (TerrainModelFlags)reader.ReadUInt32();
         }
     }
 
@@ -37,7 +37,7 @@ public class TerrainModel : ModelBase
         if (DataVersion >= 5)
         {
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-            writer.Write(Flags);
+            writer.WriteUInt32((uint)Flags);
         }
     }
 }

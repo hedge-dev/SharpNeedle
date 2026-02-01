@@ -1,9 +1,7 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Mirage.ModelData;
 
-using SharpNeedle.Structs;
-
 [StructLayout(LayoutKind.Sequential)]
-public struct VertexElement
+public struct VertexElement : IBinarySerializable
 {
     public static readonly VertexElement Invalid = new() { Stream = 0xFF, Format = VertexFormat.Invalid };
 
@@ -13,6 +11,28 @@ public struct VertexElement
     public VertexMethod Method;
     public VertexType Type;
     public byte UsageIndex;
+
+    public void Read(BinaryObjectReader reader)
+    {
+        Stream = reader.ReadUInt16();
+        Offset = reader.ReadUInt16();
+        Format = (VertexFormat)reader.ReadUInt32();
+        Method = (VertexMethod)reader.ReadByte();
+        Type = (VertexType)reader.ReadByte();
+        UsageIndex = reader.ReadByte();
+        reader.ReadByte();
+    }
+
+    public readonly void Write(BinaryObjectWriter writer)
+    {
+        writer.WriteUInt16(Stream);
+        writer.WriteUInt16(Offset);
+        writer.WriteUInt32((uint)Format);
+        writer.WriteByte((byte)Method);
+        writer.WriteByte((byte)Type);
+        writer.WriteByte(UsageIndex);
+        writer.WriteByte(0);
+    }
 
     public static unsafe void SwapEndianness(VertexElement[] elements, Span<byte> vertices, nint count, nint size)
     {
@@ -28,16 +48,22 @@ public struct VertexElement
                     switch (element.Format)
                     {
                         case VertexFormat.Float1:
-                            Swap<float>();
+                            Swap<float>(0);
                             break;
                         case VertexFormat.Float2:
-                            Swap<Vector2>();
+                            Swap<float>(0);
+                            Swap<float>(1);
                             break;
                         case VertexFormat.Float3:
-                            Swap<Vector3>();
+                            Swap<float>(0);
+                            Swap<float>(1);
+                            Swap<float>(2);
                             break;
                         case VertexFormat.Float4:
-                            Swap<Vector4>();
+                            Swap<float>(0);
+                            Swap<float>(1);
+                            Swap<float>(2);
+                            Swap<float>(3);
                             break;
 
                         case VertexFormat.Byte4:
@@ -65,21 +91,25 @@ public struct VertexElement
                         case VertexFormat.Dhen3:
                         case VertexFormat.Dhen3Norm:
                         case VertexFormat.Udhen3Norm:
-                            Swap<uint>();
+                            Swap<uint>(0);
                             break;
 
                         case VertexFormat.Int2:
                         case VertexFormat.Int2Norm:
                         case VertexFormat.Uint2:
                         case VertexFormat.Uint2Norm:
-                            Swap<Vector2Int>();
+                            Swap<uint>(0);
+                            Swap<uint>(1);
                             break;
 
                         case VertexFormat.Int4:
                         case VertexFormat.Uint4:
                         case VertexFormat.Int4Norm:
                         case VertexFormat.Uint4Norm:
-                            Swap<Vector4Int>();
+                            Swap<uint>(0);
+                            Swap<uint>(1);
+                            Swap<uint>(2);
+                            Swap<uint>(3);
                             break;
 
                         case VertexFormat.Short2:
@@ -87,9 +117,8 @@ public struct VertexElement
                         case VertexFormat.Short2Norm:
                         case VertexFormat.Ushort2Norm:
                         case VertexFormat.Float16_2:
-                            Swap<ushort>();
-                            pData += sizeof(ushort);
-                            Swap<ushort>();
+                            Swap<ushort>(0);
+                            Swap<ushort>(1);
                             break;
 
                         case VertexFormat.Short4:
@@ -97,13 +126,10 @@ public struct VertexElement
                         case VertexFormat.Ushort4Norm:
                         case VertexFormat.Short4Norm:
                         case VertexFormat.Float16_4:
-                            Swap<ushort>();
-                            pData += sizeof(ushort);
-                            Swap<ushort>();
-                            pData += sizeof(ushort);
-                            Swap<ushort>();
-                            pData += sizeof(ushort);
-                            Swap<ushort>();
+                            Swap<ushort>(0);
+                            Swap<ushort>(1);
+                            Swap<ushort>(2);
+                            Swap<ushort>(3);
                             break;
 
                         case VertexFormat.Invalid:
@@ -114,9 +140,9 @@ public struct VertexElement
                     }
 
                     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                    void Swap<T>() where T : unmanaged
+                    void Swap<T>(int index) where T : unmanaged
                     {
-                        BinaryOperations<T>.Reverse(ref Unsafe.AsRef<T>(pData));
+                        BinaryOperations<T>.Reverse(ref Unsafe.AsRef<T>(((T*)pData) + index));
                     }
                 }
 
@@ -124,4 +150,6 @@ public struct VertexElement
             }
         }
     }
+
+
 }

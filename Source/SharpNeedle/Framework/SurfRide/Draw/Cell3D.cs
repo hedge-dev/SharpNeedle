@@ -18,61 +18,61 @@ public class Cell3D : ICell
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
-        MaterialColor = reader.Read<Color<byte>>();
-        IlluminationColor = reader.Read<Color<byte>>();
-        Field08 = reader.Read<byte>();
-        Field09 = reader.Read<byte>();
-        Field0A = reader.Read<byte>();
-        Field0B = reader.Read<byte>();
+        MaterialColor = reader.ReadObject<Color<byte>>();
+        IlluminationColor = reader.ReadObject<Color<byte>>();
+        Field08 = reader.ReadByte();
+        Field09 = reader.ReadByte();
+        Field0A = reader.ReadByte();
+        Field0B = reader.ReadByte();
         if (options.Version >= 4)
         {
             reader.Align(16);
-            Position = reader.Read<Vector3>();
+            Position = reader.ReadVector3();
             reader.Align(16);
-            RotationX = reader.Read<int>();
-            RotationY = reader.Read<int>();
-            RotationZ = reader.Read<int>();
+            RotationX = reader.ReadInt32();
+            RotationY = reader.ReadInt32();
+            RotationZ = reader.ReadInt32();
             reader.Align(16);
-            Scale = reader.Read<Vector3>();
+            Scale = reader.ReadVector3();
             reader.Align(16);
         }
         else
         {
-            Position = reader.Read<Vector3>();
-            RotationX = reader.Read<int>();
-            RotationY = reader.Read<int>();
-            RotationZ = reader.Read<int>();
-            Scale = reader.Read<Vector3>();
+            Position = reader.ReadVector3();
+            RotationX = reader.ReadInt32();
+            RotationY = reader.ReadInt32();
+            RotationZ = reader.ReadInt32();
+            Scale = reader.ReadVector3();
         }
     }
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
-        writer.Write(MaterialColor);
-        writer.Write(IlluminationColor);
-        writer.Write(Field08);
-        writer.Write(Field09);
-        writer.Write(Field0A);
-        writer.Write(Field0B);
+        writer.WriteObject(MaterialColor);
+        writer.WriteObject(IlluminationColor);
+        writer.WriteByte(Field08);
+        writer.WriteByte(Field09);
+        writer.WriteByte(Field0A);
+        writer.WriteByte(Field0B);
         if (options.Version >= 4)
         {
             writer.Align(16);
-            writer.Write(Position);
+            writer.WriteVector3(Position);
             writer.Align(16);
-            writer.Write(RotationX);
-            writer.Write(RotationY);
-            writer.Write(RotationZ);
+            writer.WriteInt32(RotationX);
+            writer.WriteInt32(RotationY);
+            writer.WriteInt32(RotationZ);
             writer.Align(16);
-            writer.Write(Scale);
+            writer.WriteVector3(Scale);
             writer.Align(16);
         }
         else
         {
-            writer.Write(Position);
-            writer.Write(RotationX);
-            writer.Write(RotationY);
-            writer.Write(RotationZ);
-            writer.Write(Scale);
+            writer.WriteVector3(Position);
+            writer.WriteInt32(RotationX);
+            writer.WriteInt32(RotationY);
+            writer.WriteInt32(RotationZ);
+            writer.WriteVector3(Scale);
         }
     }
 }

@@ -12,28 +12,28 @@ public class ArchiveInfo : SampleChunkResource
 
     public override void Read(BinaryObjectReader reader)
     {
-        int entryCount = reader.Read<int>();
+        int entryCount = reader.ReadInt32();
         Entries.AddRange(reader.ReadObjectArrayOffset<Entry>(entryCount));
 
         reader.ReadOffset(() =>
         {
             for (int i = 0; i < entryCount; i++)
             {
-                Entries[i].Field04 = reader.Read<byte>();
+                Entries[i].Field04 = reader.ReadByte();
             }
         });
     }
 
     public override void Write(BinaryObjectWriter writer)
     {
-        writer.Write(Entries.Count);
+        writer.WriteInt32(Entries.Count);
         writer.WriteObjectCollectionOffset(Entries);
 
         writer.WriteOffset(() =>
         {
             for (int i = 0; i < Entries.Count; i++)
             {
-                writer.Write(Entries[i].Field04);
+                writer.WriteByte(Entries[i].Field04);
             }
 
             writer.Align(4);

@@ -46,11 +46,11 @@ public class Emitter : IBinarySerializable
         Infinite = reader.ReadUInt32() == 1;
         InitialEmissionGap = reader.ReadSingle();
 
-        InitialPosition = reader.Read<Vector4>();
-        RotationXYZ = reader.Read<Vector4>();
-        RotationXYZBias = reader.Read<Vector4>();
-        InitialRotationXYZ = reader.Read<Vector4>();
-        InitialRotation = reader.Read<Vector4>();
+        InitialPosition = reader.ReadVector4();
+        RotationXYZ = reader.ReadVector4();
+        RotationXYZBias = reader.ReadVector4();
+        InitialRotationXYZ = reader.ReadVector4();
+        InitialRotation = reader.ReadVector4();
 
         InitialEmitterLifeTime = reader.ReadSingle();
         EmitStartTime = reader.ReadSingle();
@@ -59,7 +59,7 @@ public class Emitter : IBinarySerializable
 
         CylinderParams = reader.ReadObject<Cylinder>();
         SphereParams = reader.ReadObject<Sphere>();
-        Size = reader.Read<Vector4>();
+        Size = reader.ReadVector4();
         MeshName = reader.ReadStringPaddedByte(4);
 
         FieldU1 = reader.ReadInt32();
@@ -91,36 +91,36 @@ public class Emitter : IBinarySerializable
     public void Write(BinaryObjectWriter writer)
     {
         writer.WriteStringPaddedByte("EmitterChunk", 4);
-        writer.Write(ParticleCount);
+        writer.WriteInt32(ParticleCount);
         writer.WriteStringPaddedByte(Name, 4);
-        writer.Write(MaxGenerateCount);
-        writer.Write(GenerateCount);
-        writer.Write(ParticleDataFlags);
-        writer.Write(Infinite ? 1 : 0);
-        writer.Write(InitialEmissionGap);
+        writer.WriteInt32(MaxGenerateCount);
+        writer.WriteInt32(GenerateCount);
+        writer.WriteInt32(ParticleDataFlags);
+        writer.WriteInt32(Infinite ? 1 : 0);
+        writer.WriteSingle(InitialEmissionGap);
 
-        writer.Write(InitialPosition);
-        writer.Write(RotationXYZ);
-        writer.Write(RotationXYZBias);
-        writer.Write(InitialRotationXYZ);
-        writer.Write(InitialRotation);
+        writer.WriteVector4(InitialPosition);
+        writer.WriteVector4(RotationXYZ);
+        writer.WriteVector4(RotationXYZBias);
+        writer.WriteVector4(InitialRotationXYZ);
+        writer.WriteVector4(InitialRotation);
 
-        writer.Write(InitialEmitterLifeTime);
-        writer.Write(EmitStartTime);
-        writer.Write(EmitCondition);
-        writer.Write(EmitterType);
+        writer.WriteSingle(InitialEmitterLifeTime);
+        writer.WriteSingle(EmitStartTime);
+        writer.WriteInt32(EmitCondition);
+        writer.WriteInt32(EmitterType);
 
         writer.WriteObject(CylinderParams);
         writer.WriteObject(SphereParams);
-        writer.Write(Size);
+        writer.WriteVector4(Size);
         writer.WriteStringPaddedByte(MeshName, 4);
 
-        writer.Write(FieldU1);
-        writer.Write(FieldU2);
-        writer.Write(FieldU3);
-        writer.Write(FieldU4);
+        writer.WriteInt32(FieldU1);
+        writer.WriteInt32(FieldU2);
+        writer.WriteInt32(FieldU3);
+        writer.WriteInt32(FieldU4);
 
-        writer.Write(AnimCount);
+        writer.WriteInt32(AnimCount);
         if (AnimCount > 0)
         {
             writer.WriteObject(EmitterAnim);

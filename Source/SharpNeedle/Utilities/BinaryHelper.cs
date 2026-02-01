@@ -254,11 +254,11 @@ public static class BinaryHelper
     {
         if (writer.OffsetBinaryFormat == OffsetBinaryFormat.U32)
         {
-            writer.Write((uint)value);
+            writer.WriteUInt32((uint)value);
         }
         else
         {
-            writer.Write(value);
+            writer.WriteInt64(value);
         }
     }
 
@@ -322,7 +322,7 @@ public static class BinaryHelper
         writer.WriteString(StringBinaryFormat.PrefixedLength8, str);
         while ((writer.Position % alignment) != 0)
         {
-            writer.Write((byte)paddingCharacter);
+            writer.WriteByte((byte)paddingCharacter);
         }
     }
 }

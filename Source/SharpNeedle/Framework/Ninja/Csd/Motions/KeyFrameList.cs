@@ -11,15 +11,14 @@ public class KeyFrameList : IBinarySerializable, IList<KeyFrame>
 
     public void Read(BinaryObjectReader reader)
     {
-        Field00 = reader.Read<uint>();
-        Frames = new List<KeyFrame>(reader.ReadObjectArrayOffset<KeyFrame>(reader.Read<int>()));
+        Field00 = reader.ReadUInt32();
+        Frames = [.. reader.ReadObjectArrayOffset<KeyFrame>(reader.ReadInt32())];
     }
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.Write(Field00);
-        writer.Write(Frames.Count);
-
+        writer.WriteUInt32(Field00);
+        writer.WriteInt32(Frames.Count);
         writer.WriteObjectCollectionOffset(Frames);
     }
 
@@ -33,7 +32,7 @@ public class KeyFrameList : IBinarySerializable, IList<KeyFrame>
                     long offset = reader.ReadOffsetValue();
                     if (offset != 0)
                     {
-                        frame.Correction = reader.ReadValueAtOffset<AspectRatioCorrection>(offset);
+                        frame.Correction = reader.ReadObjectAtOffset<AspectRatioCorrection>(offset);
                     }
                 }
             }));
@@ -48,7 +47,7 @@ public class KeyFrameList : IBinarySerializable, IList<KeyFrame>
                     {
                         if (frame.Correction.HasValue)
                         { 
-                            writer.WriteOffset(() => writer.Write(frame.Correction.Value));
+                            writer.WriteObjectOffset(frame.Correction.Value);
                         }
                         else
                         {

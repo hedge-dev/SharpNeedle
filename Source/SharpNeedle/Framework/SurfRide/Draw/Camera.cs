@@ -7,7 +7,7 @@ public class Camera : IBinarySerializable<ChunkBinaryOptions>
     public uint FieldOfView { get; set; }
     public float NearPlane { get; set; }
     public float FarPlane { get; set; }
-    public long Field30 { get; set; }
+    public int Field30 { get; set; }
     public long Field48 { get; set; }
     public long Field50 { get; set; }
     public Vector3 Position { get; set; }
@@ -23,27 +23,27 @@ public class Camera : IBinarySerializable<ChunkBinaryOptions>
             }
 
             Name = reader.ReadStringOffset();
-            ID = reader.Read<int>();
+            ID = reader.ReadInt32();
         }
 
         if (options.Version >= 4)
         {
             reader.Align(16);
-            Position = reader.Read<Vector3>();
+            Position = reader.ReadVector3();
             reader.Align(16);
-            Target = reader.Read<Vector3>();
+            Target = reader.ReadVector3();
             reader.Align(16);
-            Field30 = reader.Read<int>();
+            Field30 = reader.ReadInt32();
         }
         else
         {
-            Position = reader.Read<Vector3>();
-            Target = reader.Read<Vector3>();
+            Position = reader.ReadVector3();
+            Target = reader.ReadVector3();
         }
 
-        FieldOfView = reader.Read<uint>();
-        NearPlane = reader.Read<float>();
-        FarPlane = reader.Read<float>();
+        FieldOfView = reader.ReadUInt32();
+        NearPlane = reader.ReadSingle();
+        FarPlane = reader.ReadSingle();
         if (options.Version >= 1)
         {
             Field48 = reader.ReadOffsetValue();
@@ -61,27 +61,27 @@ public class Camera : IBinarySerializable<ChunkBinaryOptions>
             }
 
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-            writer.Write(ID);
+            writer.WriteInt32(ID);
         }
 
         if (options.Version >= 4)
         {
             writer.Align(16);
-            writer.Write(Position);
+            writer.WriteVector3(Position);
             writer.Align(16);
-            writer.Write(Target);
+            writer.WriteVector3(Target);
             writer.Align(16);
-            writer.Write(Field30);
+            writer.WriteInt32(Field30);
         }
         else
         {
-            writer.Write(Position);
-            writer.Write(Target);
+            writer.WriteVector3(Position);
+            writer.WriteVector3(Target);
         }
 
-        writer.Write(FieldOfView);
-        writer.Write(NearPlane);
-        writer.Write(FarPlane);
+        writer.WriteUInt32(FieldOfView);
+        writer.WriteSingle(NearPlane);
+        writer.WriteSingle(FarPlane);
         if (options.Version >= 1)
         {
             writer.WriteOffsetValue(Field48);

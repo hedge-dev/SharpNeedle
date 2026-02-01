@@ -52,10 +52,14 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
     }
 
     public override void Write(IFile file)
-        => Write(file, LastGame);
+    {
+        Write(file, LastGame);
+    }
 
     public void Write(string path, GameType game)
-       => Write(FileSystem.Instance.Create(path), game);
+    {
+        Write(FileSystem.Instance.Create(path), game);
+    }
 
     public void Write(IFile file, GameType game)
     {
@@ -80,14 +84,14 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
         {
             reader.Skip(8);
 
-            StartFrame = reader.Read<float>();
-            EndFrame = reader.Read<float>();
-            NodeDrawCount = reader.Read<int>();
+            StartFrame = reader.ReadSingle();
+            EndFrame = reader.ReadSingle();
+            NodeDrawCount = reader.ReadInt32();
 
             reader.ReadOffset(() =>
             {
-                int cutCount = reader.Read<int>();
-                int allocSize = reader.Read<int>();
+                int cutCount = reader.ReadInt32();
+                int allocSize = reader.ReadInt32();
                 reader.Skip(8);
 
                 reader.ReadCollection(cutCount, Cuts);
@@ -95,8 +99,8 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
 
             reader.ReadOffset(() =>
             {
-                int pageCount = reader.Read<int>();
-                int allocSize = reader.Read<int>();
+                int pageCount = reader.ReadInt32();
+                int allocSize = reader.ReadInt32();
                 reader.Skip(8);
 
                 Pages.AddRange(reader.ReadObjectArray<Page>(pageCount));
@@ -104,15 +108,15 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
 
             reader.ReadOffset(() =>
             {
-                int unknownCount = reader.Read<int>();
-                int allocSize = reader.Read<int>();
+                int unknownCount = reader.ReadInt32();
+                int allocSize = reader.ReadInt32();
                 reader.Skip(8);
             });
 
             reader.ReadOffset(() =>
             {
-                int resourceCutCount = reader.Read<int>();
-                int allocSize = reader.Read<int>();
+                int resourceCutCount = reader.ReadInt32();
+                int allocSize = reader.ReadInt32();
                 reader.Skip(8);
 
                 reader.ReadCollection(resourceCutCount, ResourceCuts);
@@ -120,25 +124,25 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
 
             reader.ReadOffset(() =>
             {
-                int unknownCount = reader.Read<int>();
-                int allocSize = reader.Read<int>();
+                int unknownCount = reader.ReadInt32();
+                int allocSize = reader.ReadInt32();
                 reader.Skip(8);
             });
 
             reader.ReadOffset(() => RootNode.Read(reader, game));
 
-            ChainCameraIn = reader.Read<float>();
-            ChainCameraOut = reader.Read<float>();
-            Type = reader.Read<int>();
-            SkipPointTick = reader.Read<int>();
+            ChainCameraIn = reader.ReadSingle();
+            ChainCameraOut = reader.ReadSingle();
+            Type = reader.ReadInt32();
+            SkipPointTick = reader.ReadInt32();
 
             reader.Skip(4);
         }
 
         reader.ReadAtOffset(resourcesOffset, () =>
         {
-            int resourceCount = reader.Read<int>();
-            int allocSize = reader.Read<int>();
+            int resourceCount = reader.ReadInt32();
+            int allocSize = reader.ReadInt32();
             reader.Skip(8);
 
             Resources.AddRange(reader.ReadObjectArray<Resource>(resourceCount));
@@ -154,9 +158,9 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
 
         {
             writer.WriteNulls(8);
-            writer.Write(StartFrame);
-            writer.Write(EndFrame);
-            writer.Write(NodeDrawCount);
+            writer.WriteSingle(StartFrame);
+            writer.WriteSingle(EndFrame);
+            writer.WriteInt32(NodeDrawCount);
 
             long posCutsOffset = writer.Position;
             long posPagesOffset = writer.Position + 4;
@@ -166,19 +170,19 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
             long rootNodeOffsetPos = writer.Position + 20;
             writer.WriteNulls(24);
 
-            writer.Write(ChainCameraIn);
-            writer.Write(ChainCameraOut);
-            writer.Write(Type);
-            writer.Write(SkipPointTick);
+            writer.WriteSingle(ChainCameraIn);
+            writer.WriteSingle(ChainCameraOut);
+            writer.WriteInt32(Type);
+            writer.WriteInt32(SkipPointTick);
             writer.WriteNulls(4);
 
             {
                 long posCuts = writer.Position;
                 writer.Seek(posCutsOffset, SeekOrigin.Begin);
-                writer.Write((int)(posCuts - posStart));
+                writer.WriteInt32((int)(posCuts - posStart));
 
                 writer.Seek(posCuts, SeekOrigin.Begin);
-                writer.Write(Cuts.Count);
+                writer.WriteInt32(Cuts.Count);
                 writer.WriteNulls(12);
                 writer.WriteCollection(Cuts);
             }
@@ -186,10 +190,10 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
             {
                 long posPages = writer.Position;
                 writer.Seek(posPagesOffset, SeekOrigin.Begin);
-                writer.Write((int)(posPages - posStart));
+                writer.WriteInt32((int)(posPages - posStart));
 
                 writer.Seek(posPages, SeekOrigin.Begin);
-                writer.Write(Pages.Count);
+                writer.WriteInt32(Pages.Count);
                 long pageAllocSizePos = writer.Position;
                 writer.WriteNulls(12);
 
@@ -199,7 +203,7 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
 
                 long pageChunkSize = pageChunkEndPos - pageChunkStartPos;
                 writer.Seek(pageAllocSizePos, SeekOrigin.Begin);
-                writer.Write((int)pageChunkSize);
+                writer.WriteInt32((int)pageChunkSize);
 
                 writer.Seek(pageChunkEndPos, SeekOrigin.Begin);
             }
@@ -207,7 +211,7 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
             {
                 long posUnknownList2 = writer.Position;
                 writer.Seek(unknownList2OffsetPos, SeekOrigin.Begin);
-                writer.Write((int)(posUnknownList2 - posStart));
+                writer.WriteInt32((int)(posUnknownList2 - posStart));
 
                 writer.Seek(posUnknownList2, SeekOrigin.Begin);
                 writer.WriteNulls(16);
@@ -216,10 +220,10 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
             {
                 long posResourceCuts = writer.Position;
                 writer.Seek(posResourceCutsOffset, SeekOrigin.Begin);
-                writer.Write((int)(posResourceCuts - posStart));
+                writer.WriteInt32((int)(posResourceCuts - posStart));
                 writer.Seek(posResourceCuts, SeekOrigin.Begin);
 
-                writer.Write(ResourceCuts.Count);
+                writer.WriteInt32(ResourceCuts.Count);
                 writer.WriteNulls(12);
                 writer.WriteCollection(ResourceCuts);
             }
@@ -227,7 +231,7 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
             {
                 long posUnknownList4 = writer.Position;
                 writer.Seek(unknownList4OffsetPos, SeekOrigin.Begin);
-                writer.Write((int)(posUnknownList4 - posStart));
+                writer.WriteInt32((int)(posUnknownList4 - posStart));
                 writer.Seek(posUnknownList4, SeekOrigin.Begin);
 
                 writer.WriteNulls(16);
@@ -236,7 +240,7 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
             {
                 long posRootNode = writer.Position;
                 writer.Seek(rootNodeOffsetPos, SeekOrigin.Begin);
-                writer.Write((int)(posRootNode - posStart));
+                writer.WriteInt32((int)(posRootNode - posStart));
                 writer.Seek(posRootNode, SeekOrigin.Begin);
 
                 RootNode.Write(writer, game);
@@ -246,10 +250,10 @@ public class Scene : ResourceBase, IBinarySerializable<GameType>
         {
             long posResources = writer.Position;
             writer.Seek(resourcesOffsetPos, SeekOrigin.Begin);
-            writer.Write((int)(posResources - posStart));
+            writer.WriteInt32((int)(posResources - posStart));
             writer.Seek(posResources, SeekOrigin.Begin);
 
-            writer.Write(Resources.Count);
+            writer.WriteInt32(Resources.Count);
             writer.WriteNulls(12);
 
             writer.WriteObjectCollection(Resources);

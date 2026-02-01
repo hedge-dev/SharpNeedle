@@ -104,13 +104,13 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
         Name = file.Name;
         using BinaryValueWriter writer = new(file.Open(FileAccess.Write), StreamOwnership.Transfer, Endianness.Little);
 
-        writer.Write(Signature);
+        writer.WriteUInt32(Signature);
         if (Archives == null)
         {
-            writer.Write(ArchiveSizes.Count);
+            writer.WriteInt32(ArchiveSizes.Count);
             foreach (uint size in ArchiveSizes)
             {
-                writer.Write(size);
+                writer.WriteUInt32(size);
             }
 
             foreach (string name in Files)
@@ -120,10 +120,10 @@ public class ArchiveList : ResourceBase, IDirectory, IStreamable
         }
         else
         {
-            writer.Write(Archives.Count);
+            writer.WriteInt32(Archives.Count);
             foreach (Archive archive in Archives)
             {
-                writer.Write((uint)archive.CalculateFileSize());
+                writer.WriteUInt32((uint)archive.CalculateFileSize());
             }
 
             foreach (IFile aFile in this)

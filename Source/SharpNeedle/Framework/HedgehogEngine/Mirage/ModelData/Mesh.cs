@@ -1,8 +1,9 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Mirage.ModelData;
+
 using SharpNeedle.Framework.HedgehogEngine.Mirage.MaterialData;
 using SharpNeedle.Structs;
 
-public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
+public class Mesh : IBinarySerializable<MeshSerializeContext>, IDisposable, ICloneable<Mesh>
 {
     public ResourceReference<Material> Material { get; set; }
     public ushort[] Faces { get; set; } = [];
@@ -14,21 +15,21 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
     public List<TextureUnit> Textures { get; set; } = [];
     public MeshSlot Slot { get; set; }
 
-    public void Read(BinaryObjectReader reader, uint version)
+    public void Read(BinaryObjectReader reader, MeshSerializeContext context)
     {
         Elements = [];
         Material = reader.ReadStringOffsetOrEmpty();
 
-        Faces = reader.ReadArrayOffset<ushort>(reader.Read<int>());
-        VertexCount = reader.Read<uint>();
-        VertexSize = reader.Read<uint>();
+        Faces = reader.ReadArrayOffset<ushort>(reader.ReadInt32());
+        VertexCount = reader.ReadUInt32();
+        VertexSize = reader.ReadUInt32();
         Vertices = reader.ReadArrayOffset<byte>((int)(VertexCount * VertexSize));
 
         reader.ReadOffset(() =>
         {
             while (true)
             {
-                VertexElement element = reader.Read<VertexElement>();
+                VertexElement element = reader.ReadObject<VertexElement>();
                 if (element.Format == VertexFormat.Invalid)
                 {
                     break;
@@ -46,7 +47,7 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
             BoneIndices = [];
             reader.ReadOffsetValue();
         }
-        else if (version >= 6)
+        else if (context.Version >= 6)
         {
             BoneIndices = reader.ReadArrayOffset<short>(boneCount);
         }
@@ -59,38 +60,45 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
         SwapVertexEndianness();
     }
 
-    public void Write(BinaryObjectWriter writer, uint version)
+    public void Write(BinaryObjectWriter writer, MeshSerializeContext context)
     {
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Path.GetFileNameWithoutExtension(Material.Name));
-        writer.Write(Faces.Length);
+        writer.WriteInt32(Faces.Length);
         writer.WriteArrayOffset(Faces);
 
-        byte[] verticesClone = new byte[Vertices.Length];
-        Array.Copy(Vertices, verticesClone, verticesClone.LongLength);
-        VertexElement.SwapEndianness([.. Elements], verticesClone.AsSpan(), (nint)VertexCount, (nint)VertexSize);
+        writer.WriteUInt32(context.IsMorphModel ? 0 : VertexCount);
+        writer.WriteUInt32(VertexSize);
 
-        writer.Write(VertexCount);
-        writer.Write(VertexSize);
-        writer.WriteArrayOffset(verticesClone);
+        if (context.IsMorphModel)
+        {
+            writer.WriteOffset(() => { });
+        }
+        else
+        {
+            byte[] verticesClone = new byte[Vertices.Length];
+            Array.Copy(Vertices, verticesClone, verticesClone.LongLength);
+            VertexElement.SwapEndianness([.. Elements], verticesClone.AsSpan(), (nint)VertexCount, (nint)VertexSize);
+            writer.WriteArrayOffset(verticesClone);
+        }
 
         writer.WriteOffset(() =>
         {
             foreach (VertexElement element in Elements)
             {
-                writer.Write(element);
+                writer.WriteObject(element);
                 writer.Align(4);
             }
 
-            writer.Write(VertexElement.Invalid);
+            writer.WriteObject(VertexElement.Invalid);
         });
 
-        writer.Write(BoneIndices.Length);
+        writer.WriteInt32(BoneIndices.Length);
         if (BoneIndices.Length == 0)
         {
             writer.WriteOffsetValue(0);
         }
         else
-        if (version >= 6)
+        if (context.Version >= 6)
         {
             writer.WriteArrayOffset(BoneIndices);
         }
@@ -99,7 +107,7 @@ public class Mesh : IBinarySerializable<uint>, IDisposable, ICloneable<Mesh>
             writer.WriteArrayOffset(BoneIndices.Select(Convert.ToByte).ToArray());
         }
 
-        writer.Write(Textures.Count);
+        writer.WriteInt32(Textures.Count);
         if (Textures.Count == 0)
         {
             writer.WriteOffsetValue(0);

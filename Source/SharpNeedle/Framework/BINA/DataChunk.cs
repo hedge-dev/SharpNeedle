@@ -22,11 +22,11 @@ public class DataChunk<T> : DataChunk, IChunk where T : IBinarySerializable
         Signature = options.Header.Value.Signature;
         BinaryHelper.EnsureSignature(Signature, true, BinSignature, AltBinSignature);
 
-        uint strTableOffset = reader.Read<uint>();
-        uint strTableSize = reader.Read<uint>();
-        int offTableSize = reader.Read<int>();
+        uint strTableOffset = reader.ReadUInt32();
+        uint strTableSize = reader.ReadUInt32();
+        int offTableSize = reader.ReadInt32();
 
-        ushort dataOffset = reader.Read<ushort>();
+        ushort dataOffset = reader.ReadUInt16();
         reader.Skip(2);
 
         reader.Skip(dataOffset);
@@ -65,16 +65,16 @@ public class DataChunk<T> : DataChunk, IChunk where T : IBinarySerializable
 
         writer.WriteNative(Signature);
 
-        writer.Write((int)(baseSize + table.Length + 0x34)); // Size
-        writer.Write((int)baseSize); // String Table
-        writer.Write(0); // String Table Size
-        writer.Write(table.Length); // Offset Table Size
+        writer.WriteInt32((int)(baseSize + table.Length + 0x34)); // Size
+        writer.WriteInt32((int)baseSize); // String Table
+        writer.WriteInt32(0); // String Table Size
+        writer.WriteInt32(table.Length); // Offset Table Size
 
-        writer.Write((short)0x18);
-        writer.Write((short)0x00);
+        writer.WriteInt16(0x18);
+        writer.WriteInt16(0x00);
 
         // Reserved
-        writer.WriteCollection(Enumerable.Repeat<long>(0, 3));
+        writer.Skip(24);
 
         // Slice the buffer because the capacity can be bigger
         writer.WriteArray(dataStream.GetBuffer().AsSpan()[..(int)dataStream.Length]);

@@ -90,19 +90,19 @@ public class OffsetTable : List<long>
             long d = (offset - lastOffset) >> 2;
             if (d > 0x3FFF)
             {
-                writer.WriteBig((byte)(0xC0 | (d >> 24)));
-                writer.WriteBig((byte)(d >> 16));
-                writer.WriteBig((byte)(d >> 8));
-                writer.WriteBig((byte)(d & 0xFF));
+                writer.WriteByte((byte)(0xC0 | (d >> 24)));
+                writer.WriteByte((byte)(d >> 16));
+                writer.WriteByte((byte)(d >> 8));
+                writer.WriteByte((byte)(d & 0xFF));
             }
             else if (d > 0x3F)
             {
-                writer.WriteBig((byte)(0x80 | (d >> 8)));
-                writer.WriteBig((byte)d);
+                writer.WriteByte((byte)(0x80 | (d >> 8)));
+                writer.WriteByte((byte)d);
             }
             else
             {
-                writer.Write((byte)(0x40 | d));
+                writer.WriteByte((byte)(0x40 | d));
             }
 
             lastOffset = offset;

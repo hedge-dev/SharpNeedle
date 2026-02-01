@@ -91,16 +91,16 @@ public class Archive : ResourceBase, IDirectory, IStreamable
         BaseStream = file.Open();
         BinaryValueReader reader = new(file.Open(), StreamOwnership.Retain, Endianness.Little);
         reader.Skip(0xC);
-        DataAlignment = reader.Read<int>();
+        DataAlignment = reader.ReadInt32();
 
         while (reader.Position < reader.Length)
         {
             long baseOffset = reader.Position;
 
-            int dataEnd = reader.Read<int>();
-            uint dataLength = reader.Read<uint>();
-            int dataStart = reader.Read<int>();
-            long lastModifiedBinary = reader.Read<long>();
+            int dataEnd = reader.ReadInt32();
+            uint dataLength = reader.ReadUInt32();
+            int dataStart = reader.ReadInt32();
+            long lastModifiedBinary = reader.ReadInt64();
             DateTime lastModified = lastModifiedBinary != 0 ? new DateTime(lastModifiedBinary) : DateTime.Now;
             string name = reader.ReadString(StringBinaryFormat.NullTerminated);
 
@@ -120,10 +120,10 @@ public class Archive : ResourceBase, IDirectory, IStreamable
         using Stream stream = file.Open(FileAccess.Write);
         BinaryObjectWriter writer = new(stream, StreamOwnership.Transfer, Endianness.Little, Encoding.ASCII);
 
-        writer.Write(0u);
-        writer.Write(0x10u);
-        writer.Write(0x14u);
-        writer.Write(DataAlignment);
+        writer.WriteUInt32(0u);
+        writer.WriteUInt32(0x10u);
+        writer.WriteUInt32(0x14u);
+        writer.WriteInt32(DataAlignment);
 
         foreach (IFile arFile in this)
         {
@@ -131,10 +131,10 @@ public class Archive : ResourceBase, IDirectory, IStreamable
             long dataOffset = AlignmentHelper.Align(curPos + 21 + Encoding.UTF8.GetByteCount(arFile.Name), DataAlignment);
             long blockSize = dataOffset + arFile.Length;
 
-            writer.Write((uint)(blockSize - curPos));
-            writer.Write((uint)arFile.Length);
-            writer.Write((uint)(dataOffset - curPos));
-            writer.Write(arFile.LastModified.Ticks);
+            writer.WriteUInt32((uint)(blockSize - curPos));
+            writer.WriteUInt32((uint)arFile.Length);
+            writer.WriteUInt32((uint)(dataOffset - curPos));
+            writer.WriteInt64(arFile.LastModified.Ticks);
             writer.WriteString(StringBinaryFormat.NullTerminated, arFile.Name);
             writer.Align(DataAlignment);
             arFile.Open().CopyTo(writer.GetBaseStream());

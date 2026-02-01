@@ -13,7 +13,7 @@ public class Effect : BinaryResource
     {
         reader.EnsureSignature(Signature);
 
-        Version = reader.Read<uint>();
+        Version = reader.ReadUInt32();
         if (Version != 0x01060000)
         {
             throw new NotSupportedException();
@@ -31,10 +31,10 @@ public class Effect : BinaryResource
             throw new NotSupportedException();
         }
 
-        writer.Write(Signature);
-        writer.Write(Version);
+        writer.WriteUInt32(Signature);
+        writer.WriteUInt32(Version);
 
-        writer.Write(0); // Always 0?
+        writer.WriteInt32(0); // Always 0?
 
         if (Parameters.First != null)
         {

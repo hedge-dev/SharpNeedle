@@ -6,7 +6,7 @@ public class LightList : SampleChunkResource
 
     public override void Read(BinaryObjectReader reader)
     {
-        int count = reader.Read<int>();
+        int count = reader.ReadInt32();
         Lights = new(count);
         reader.ReadOffset(() =>
         {
@@ -20,7 +20,7 @@ public class LightList : SampleChunkResource
     public override void Write(BinaryObjectWriter writer)
     {
         int count = Lights.Count;
-        writer.Write(count);
+        writer.WriteInt32(count);
         writer.WriteOffset(() =>
         {
             foreach (ResourceReference<Light> light in Lights)

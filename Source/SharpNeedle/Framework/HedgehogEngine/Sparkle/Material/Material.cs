@@ -28,7 +28,7 @@ public class Material : IBinarySerializable
         writer.WriteStringPaddedByte(ShaderName, 4);
         writer.WriteStringPaddedByte(TextureName, 4);
         writer.WriteStringPaddedByte(DeflectionTextureName, 4);
-        writer.Write(AddressMode);
-        writer.Write(BlendMode);
+        writer.WriteInt32((int)AddressMode);
+        writer.WriteInt32((int)BlendMode);
     }
 }

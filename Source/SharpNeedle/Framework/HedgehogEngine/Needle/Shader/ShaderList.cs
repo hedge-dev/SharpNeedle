@@ -39,14 +39,14 @@ public class ShaderList : BinaryResource
         public void Read(BinaryObjectReader reader)
         {
             Name = reader.ReadStringOffset();
-            UVIndex = reader.Read<int>();
+            UVIndex = reader.ReadInt32();
             reader.Align(8);
         }
 
         public readonly void Write(BinaryObjectWriter writer)
         {
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-            writer.Write(UVIndex);
+            writer.WriteInt32(UVIndex);
             writer.Align(8);
         }
 
@@ -104,13 +104,7 @@ public class ShaderList : BinaryResource
         {
             writer.Align(8);
 
-            writer.WriteOffset(() =>
-            {
-                foreach (Shader input in Shaders)
-                {
-                    writer.WriteObject(input);
-                }
-            });
+            writer.WriteObjectCollectionOffset(Shaders);
             writer.WriteInt32(Shaders.Count);
         }
 

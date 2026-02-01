@@ -26,8 +26,10 @@ public class SparkleMaterialProject : ResourceBase, IBinarySerializable
     {
         ProjectInfo = reader.ReadObject<ProjectInfo>();
 
-        //InportExportMaterial
+        //ImportExportMaterial
         Material = reader.ReadObject<Material>();
+
+        reader.Skip(16);
     }
     public void Write(BinaryObjectWriter writer)
     {
@@ -35,9 +37,9 @@ public class SparkleMaterialProject : ResourceBase, IBinarySerializable
         writer.WriteObject(Material);
 
         //S E G A
-        writer.Write(83);
-        writer.Write(69);
-        writer.Write(71);
-        writer.Write(65);
+        writer.WriteInt32(83);
+        writer.WriteInt32(69);
+        writer.WriteInt32(71);
+        writer.WriteInt32(65);
     }
 }

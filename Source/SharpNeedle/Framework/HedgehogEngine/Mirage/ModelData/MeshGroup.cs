@@ -1,18 +1,19 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Mirage.ModelData;
 
 using SharpNeedle.Structs;
+using MeshList = BinaryList<BinaryPointer<Mesh, MeshSerializeContext>, MeshSerializeContext>;
 
-public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICloneable<MeshGroup>
+public class MeshGroup : List<Mesh>, IBinarySerializable<MeshSerializeContext>, IDisposable, ICloneable<MeshGroup>
 {
     public string? Name { get; set; }
 
-    public void Read(BinaryObjectReader reader, uint version)
+    public void Read(BinaryObjectReader reader, MeshSerializeContext context)
     {
-        bool readSpecial = version >= 5;
+        bool readSpecial = context.Version >= 5;
 
-        BinaryList<BinaryPointer<Mesh, uint>, uint> opaqMeshes = reader.ReadObject<BinaryList<BinaryPointer<Mesh, uint>, uint>, uint>(version);
-        BinaryList<BinaryPointer<Mesh, uint>, uint> transMeshes = reader.ReadObject<BinaryList<BinaryPointer<Mesh, uint>, uint>, uint>(version);
-        BinaryList<BinaryPointer<Mesh, uint>, uint> punchMeshes = reader.ReadObject<BinaryList<BinaryPointer<Mesh, uint>, uint>, uint>(version);
+        MeshList opaqMeshes = reader.ReadObject<MeshList, MeshSerializeContext>(context);
+        MeshList transMeshes = reader.ReadObject<MeshList, MeshSerializeContext>(context);
+        MeshList punchMeshes = reader.ReadObject<MeshList, MeshSerializeContext>(context);
 
         Clear();
 
@@ -26,7 +27,7 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
             return;
         }
 
-        int specialMeshCount = reader.Read<int>();
+        int specialMeshCount = reader.ReadInt32();
         Capacity += specialMeshCount;
 
         (string Name, int Count)[] slots = new (string Name, int Count)[specialMeshCount];
@@ -66,9 +67,9 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
 
         Name = reader.ReadString(StringBinaryFormat.NullTerminated);
 
-        void AddMeshes(BinaryList<BinaryPointer<Mesh, uint>, uint> meshes, MeshSlot slot)
+        void AddMeshes(MeshList meshes, MeshSlot slot)
         {
-            foreach (BinaryPointer<Mesh, uint> mesh in meshes)
+            foreach (BinaryPointer<Mesh, MeshSerializeContext> mesh in meshes)
             {
                 mesh.Value.Slot = slot;
                 Add(mesh);
@@ -76,9 +77,9 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
         }
     }
 
-    public void Write(BinaryObjectWriter writer, uint version)
+    public void Write(BinaryObjectWriter writer, MeshSerializeContext context)
     {
-        bool writeSpecial = version >= 5;
+        bool writeSpecial = context.Version >= 5;
 
         WriteMeshes(this.Where(x => x.Slot == MeshType.Opaque));
         WriteMeshes(this.Where(x => x.Slot == MeshType.Transparent));
@@ -107,7 +108,7 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
             }
         }
 
-        writer.Write(specialGroups.Count);
+        writer.WriteInt32(specialGroups.Count);
         if (specialGroups.Count == 0)
         {
             writer.WriteUInt32(uint.MaxValue);
@@ -152,12 +153,12 @@ public class MeshGroup : List<Mesh>, IBinarySerializable<uint>, IDisposable, ICl
 
         void WriteMeshes(IEnumerable<Mesh> meshes)
         {
-            writer.Write(meshes.Count());
+            writer.WriteInt32(meshes.Count());
             writer.WriteOffset(() =>
             {
                 foreach (Mesh mesh in meshes)
                 {
-                    writer.WriteObjectOffset(mesh, version);
+                    writer.WriteObjectOffset(mesh, context);
                 }
             });
         }

@@ -21,9 +21,9 @@ public class GismoConfig : BinaryResource
                 reader.EnsureSignatureNative(Signature));
         }
 
-        Version = reader.Read<uint>();
+        Version = reader.ReadUInt32();
 
-        int objectCount = reader.Read<int>();
+        int objectCount = reader.ReadInt32();
         Objects.AddRange(reader.ReadObjectArrayOffset<ObjectData, bool>(base.Version.IsV1, objectCount));
     }
 
@@ -39,9 +39,9 @@ public class GismoConfig : BinaryResource
                 writer.WriteNative(Signature));
         }
 
-        writer.Write(Version);
+        writer.WriteUInt32(Version);
 
-        writer.Write(Objects.Count);
+        writer.WriteInt32(Objects.Count);
         writer.WriteObjectCollectionOffset(base.Version.IsV1, Objects);
     }
 
@@ -83,26 +83,26 @@ public class GismoConfig : BinaryResource
         {
             if (isV1)
             {
-                Field00 = reader.Read<int>();
-                Field04 = reader.Read<int>();
-                Field08 = reader.Read<short>();
-                Field0A = reader.Read<short>();
-                Field0C = reader.Read<short>();
+                Field00 = reader.ReadInt32();
+                Field04 = reader.ReadInt32();
+                Field08 = reader.ReadInt16();
+                Field0A = reader.ReadInt16();
+                Field0C = reader.ReadInt16();
 
-                ShapeType = (ShapeType)reader.Read<byte>();
+                ShapeType = (ShapeType)reader.ReadByte();
 
-                Field0F = reader.Read<byte>();
-                Field10 = reader.Read<int>();
-                Field14 = reader.Read<int>();
-                Field18 = reader.Read<int>();
-                Field1C = reader.Read<int>();
-                Field20 = reader.Read<float>();
-                Field24 = reader.Read<float>();
-                Field28 = reader.Read<float>();
+                Field0F = reader.ReadByte();
+                Field10 = reader.ReadInt32();
+                Field14 = reader.ReadInt32();
+                Field18 = reader.ReadInt32();
+                Field1C = reader.ReadInt32();
+                Field20 = reader.ReadSingle();
+                Field24 = reader.ReadSingle();
+                Field28 = reader.ReadSingle();
 
-                Size = reader.Read<Vector3>(); // TODO: Unpack reading all 3 float values at once into individual reads based on ShapeType
+                Size = reader.ReadVector3(); // TODO: Unpack reading all 3 float values at once into individual reads based on ShapeType
 
-                Field38 = reader.Read<int>();
+                Field38 = reader.ReadInt32();
             }
 
             Name = reader.ReadStringOffset();
@@ -116,14 +116,14 @@ public class GismoConfig : BinaryResource
             {
                 ModelName = reader.ReadStringOffset();
                 SkeletonName = reader.ReadStringOffset();
-                ShapeType = reader.Read<ShapeType>();
-                CollisionRadius = reader.Read<float>();
-                CollisionHeight = reader.Read<float>();
+                ShapeType = (ShapeType)reader.ReadByte();
+                CollisionRadius = reader.ReadSingle();
+                CollisionHeight = reader.ReadSingle();
 
-                IsMotionOn = Convert.ToBoolean(reader.Read<int>());
+                IsMotionOn = Convert.ToBoolean(reader.ReadInt32());
                 Motion = reader.ReadObjectOffset<MotionData>();
 
-                IsProgramMotionOn = Convert.ToBoolean(reader.Read<int>());
+                IsProgramMotionOn = Convert.ToBoolean(reader.ReadInt32());
                 ProgramMotion = reader.ReadObjectOffset<ProgramMotionData>();
             }
         }
@@ -133,42 +133,47 @@ public class GismoConfig : BinaryResource
 
             if (isV1)
             {
-                writer.Write(Field00);
-                writer.Write(Field04);
-                writer.Write(Field08);
-                writer.Write(Field0A);
-                writer.Write(Field0C);
+                writer.WriteInt32(Field00);
+                writer.WriteInt32(Field04);
+                writer.WriteInt16(Field08);
+                writer.WriteInt16(Field0A);
+                writer.WriteInt16(Field0C);
 
-                writer.Write((byte)ShapeType);
+                writer.WriteByte((byte)ShapeType);
 
-                writer.Write(Field0F);
-                writer.Write(Field10);
-                writer.Write(Field14);
-                writer.Write(Field18);
-                writer.Write(Field1C);
-                writer.Write(Field20);
-                writer.Write(Field24);
-                writer.Write(Field28);
+                writer.WriteByte(Field0F);
+                writer.WriteInt32(Field10);
+                writer.WriteInt32(Field14);
+                writer.WriteInt32(Field18);
+                writer.WriteInt32(Field1C);
+                writer.WriteSingle(Field20);
+                writer.WriteSingle(Field24);
+                writer.WriteSingle(Field28);
 
-                writer.Write(Size); // TODO: Unpack writing all 3 float values at once into individual reads based on ShapeType
+                writer.WriteVector3(Size); // TODO: Unpack writing all 3 float values at once into individual reads based on ShapeType
 
-                writer.Write(Field38);
+                writer.WriteInt32(Field38);
             }
 
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-            writer.WriteStringOffset(StringBinaryFormat.NullTerminated, ModelName);
-            writer.WriteStringOffset(StringBinaryFormat.NullTerminated, SkeletonName);
 
-            if (!isV1)
+            if (isV1)
             {
-                writer.Write(ShapeType);
-                writer.Write(CollisionRadius);
-                writer.Write(CollisionHeight);
+                writer.WriteStringOffset(StringBinaryFormat.NullTerminated, ParticleName);
+                writer.WriteStringOffset(StringBinaryFormat.NullTerminated, SoundCueName);
+            }
+            else
+            {
+                writer.WriteStringOffset(StringBinaryFormat.NullTerminated, ModelName);
+                writer.WriteStringOffset(StringBinaryFormat.NullTerminated, SkeletonName);
+                writer.WriteByte((byte)ShapeType);
+                writer.WriteSingle(CollisionRadius);
+                writer.WriteSingle(CollisionHeight);
 
-                writer.Write(Convert.ToInt32(IsMotionOn));
+                writer.WriteInt32(Convert.ToInt32(IsMotionOn));
                 writer.WriteObjectOffset(Motion);
 
-                writer.Write(Convert.ToInt32(IsProgramMotionOn));
+                writer.WriteInt32(Convert.ToInt32(IsProgramMotionOn));
                 writer.WriteObjectOffset(ProgramMotion);
             }
         }
@@ -181,13 +186,13 @@ public class GismoConfig : BinaryResource
 
         public void Read(BinaryObjectReader reader)
         {
-            PlayPolicy = reader.Read<PlayPolicy>();
+            PlayPolicy = (PlayPolicy)reader.ReadInt32();
             AnimationName = reader.ReadStringOffset();
         }
 
         public void Write(BinaryObjectWriter writer)
         {
-            writer.Write(PlayPolicy);
+            writer.WriteInt32((int)PlayPolicy);
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, AnimationName);
         }
     }
@@ -203,28 +208,28 @@ public class GismoConfig : BinaryResource
 
         public void Read(BinaryObjectReader reader)
         {
-            Field00 = reader.Read<int>();
+            Field00 = reader.ReadInt32();
 
-            MotionType = reader.Read<MotionType>();
+            MotionType = (MotionType)reader.ReadInt32();
 
-            Axis = reader.Read<Vector3>();
+            Axis = reader.ReadVector3();
 
-            Power = reader.Read<float>();
-            SpeedScale = reader.Read<float>();
-            Time = reader.Read<float>();
+            Power = reader.ReadSingle();
+            SpeedScale = reader.ReadSingle();
+            Time = reader.ReadSingle();
         }
 
         public void Write(BinaryObjectWriter writer)
         {
-            writer.Write(Field00);
+            writer.WriteInt32(Field00);
 
-            writer.Write(MotionType);
+            writer.WriteInt32((int)MotionType);
 
-            writer.Write(Axis);
+            writer.WriteVector3(Axis);
 
-            writer.Write(Power);
-            writer.Write(SpeedScale);
-            writer.Write(Time);
+            writer.WriteSingle(Power);
+            writer.WriteSingle(SpeedScale);
+            writer.WriteSingle(Time);
         }
     }
 }

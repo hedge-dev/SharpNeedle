@@ -5,7 +5,7 @@ public class UserData : List<Data>, IBinarySerializable<ChunkBinaryOptions>
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
         Clear();
-        Capacity = reader.Read<int>();
+        Capacity = reader.ReadInt32();
         if (options.Version >= 3)
         {
             reader.Align(8);
@@ -16,7 +16,7 @@ public class UserData : List<Data>, IBinarySerializable<ChunkBinaryOptions>
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
-        writer.Write(Count);
+        writer.WriteInt32(Count);
         if (options.Version >= 3)
         {
             writer.Align(8);
@@ -41,7 +41,7 @@ public class Data : IBinarySerializable<ChunkBinaryOptions>
         }
 
         Name = reader.ReadStringOffset();
-        Type = reader.Read<int>();
+        Type = reader.ReadInt32();
         if (options.Version >= 3)
         {
             reader.Align(8);
@@ -87,7 +87,7 @@ public class Data : IBinarySerializable<ChunkBinaryOptions>
         }
 
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-        writer.Write(Type);
+        writer.WriteInt32(Type);
         if (options.Version >= 3)
         {
             writer.Align(8);

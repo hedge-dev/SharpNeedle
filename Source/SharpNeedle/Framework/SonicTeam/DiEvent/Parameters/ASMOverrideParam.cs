@@ -7,11 +7,6 @@ public class ASMOverrideParam : BaseParam
 
     public ASMOverrideParam() { }
 
-    public ASMOverrideParam(BinaryObjectReader reader, GameType game)
-    {
-        Read(reader, game);
-    }
-
     public override void Read(BinaryObjectReader reader, GameType game)
     {
         OverriddenASMName = reader.ReadString(StringBinaryFormat.FixedLength, 64);

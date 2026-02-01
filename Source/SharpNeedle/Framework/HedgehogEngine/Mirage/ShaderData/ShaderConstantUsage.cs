@@ -10,8 +10,8 @@ public class ShaderConstantUsage : IBinarySerializable
     public void Read(BinaryObjectReader reader)
     {
         Name = reader.ReadStringOffset();
-        Index = reader.Read<byte>();
-        Size = reader.Read<byte>();
+        Index = reader.ReadByte();
+        Size = reader.ReadByte();
 
         reader.Align(reader.GetOffsetSize());
     }
@@ -19,8 +19,8 @@ public class ShaderConstantUsage : IBinarySerializable
     public void Write(BinaryObjectWriter writer)
     {
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-        writer.Write(Index);
-        writer.Write(Size);
+        writer.WriteByte(Index);
+        writer.WriteByte(Size);
 
         writer.Align(writer.GetOffsetSize());
     }

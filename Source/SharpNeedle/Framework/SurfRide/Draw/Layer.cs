@@ -19,9 +19,9 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>
         }
 
         Name = reader.ReadStringOffset();
-        ID = reader.Read<int>();
-        Flags = reader.Read<uint>();
-        int castCount = reader.Read<int>();
+        ID = reader.ReadInt32();
+        Flags = reader.ReadUInt32();
+        int castCount = reader.ReadInt32();
         if (options.Version >= 3)
         {
             reader.Align(8);
@@ -42,14 +42,14 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>
                 throw new NotImplementedException();
         }
 
-        int animCount = reader.Read<int>();
+        int animCount = reader.ReadInt32();
         if (options.Version >= 3)
         {
             reader.Align(8);
         }
 
         Animations.AddRange(reader.ReadObjectArrayOffset<Animation, ChunkBinaryOptions>(options, animCount));
-        CurrentAnimationIndex = reader.Read<uint>();
+        CurrentAnimationIndex = reader.ReadUInt32();
         if (options.Version >= 3)
         {
             reader.Align(8);
@@ -70,9 +70,9 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>
         }
 
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-        writer.Write(ID);
-        writer.Write(Flags);
-        writer.Write(Nodes.Count);
+        writer.WriteInt32(ID);
+        writer.WriteUInt32(Flags);
+        writer.WriteInt32(Nodes.Count);
         if (options.Version >= 3)
         {
             writer.Align(8);
@@ -102,7 +102,7 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>
             writer.WriteOffsetValue(0);
         }
 
-        writer.Write(Animations.Count);
+        writer.WriteInt32(Animations.Count);
         if (options.Version >= 3)
         {
             writer.Align(8);
@@ -117,7 +117,7 @@ public class Layer : IBinarySerializable<ChunkBinaryOptions>
             writer.WriteOffsetValue(0);
         }
 
-        writer.Write(CurrentAnimationIndex);
+        writer.WriteUInt32(CurrentAnimationIndex);
         if (options.Version >= 3)
         {
             writer.Align(8);

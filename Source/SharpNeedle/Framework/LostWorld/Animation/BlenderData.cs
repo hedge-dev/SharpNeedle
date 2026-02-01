@@ -9,7 +9,7 @@ public class BlenderData : List<Blender>, IComplexData
             reader.EnsureSignatureNative(1);
         }
 
-        int nodeCount = reader.Read<int>();
+        int nodeCount = reader.ReadInt32();
         reader.ReadOffset(() =>
         {
             for (int i = 0; i < nodeCount; i++)
@@ -23,10 +23,10 @@ public class BlenderData : List<Blender>, IComplexData
     {
         if (writeType)
         {
-            writer.Write(1);
+            writer.WriteInt32(1);
         }
 
-        writer.Write(Count);
+        writer.WriteInt32(Count);
         writer.WriteOffset(() =>
         {
             foreach (Blender blender in this)
@@ -47,15 +47,15 @@ public class Blender : IBinarySerializable
     {
         reader.EnsureSignatureNative(0);
         Name = reader.ReadStringOffset();
-        Weight = reader.Read<float>();
+        Weight = reader.ReadSingle();
         Nodes = reader.ReadObject<BinaryList<Node>>();
     }
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.Write(0);
+        writer.WriteInt32(0);
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-        writer.Write(Weight);
+        writer.WriteSingle(Weight);
         writer.WriteObject<BinaryList<Node>>(Nodes);
     }
 
@@ -68,15 +68,15 @@ public class Blender : IBinarySerializable
         public void Read(BinaryObjectReader reader)
         {
             Name = reader.ReadStringOffset();
-            Weight = reader.Read<float>();
-            Priority = reader.Read<int>();
+            Weight = reader.ReadSingle();
+            Priority = reader.ReadInt32();
         }
 
         public readonly void Write(BinaryObjectWriter writer)
         {
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-            writer.Write(Weight);
-            writer.Write(Priority);
+            writer.WriteSingle(Weight);
+            writer.WriteInt32(Priority);
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿namespace SharpNeedle.Framework.Glitter;
 
+using System.Net;
+
 public class EffectParameter : IBinarySerializable<Effect>
 {
     public string? Name { get; set; }
@@ -26,32 +28,32 @@ public class EffectParameter : IBinarySerializable<Effect>
     {
         Name = reader.ReadStringOffset();
 
-        StartTime = reader.Read<float>();
-        LifeTime = reader.Read<float>();
+        StartTime = reader.ReadSingle();
+        LifeTime = reader.ReadSingle();
 
-        PreprocessFrame = reader.Read<int>();
+        PreprocessFrame = reader.ReadInt32();
 
-        EffectScale = reader.Read<float>();
-        EmittingScale = reader.Read<float>();
-        Opacity = reader.Read<float>();
+        EffectScale = reader.ReadSingle();
+        EmittingScale = reader.ReadSingle();
+        Opacity = reader.ReadSingle();
 
-        Field1C = reader.Read<float>();
+        Field1C = reader.ReadSingle();
 
         reader.Align(16);
-        Position = reader.Read<Vector3>();
+        Position = reader.ReadVector3();
         reader.Align(16);
-        Rotation = reader.Read<Vector3>().ToDegrees();
+        Rotation = reader.ReadVector3().ToDegrees();
         reader.Align(16);
-        Scale = reader.Read<Vector3>();
+        Scale = reader.ReadVector3();
         reader.Align(16);
 
-        Field50 = reader.Read<int>();
-        Field54 = reader.Read<int>();
-        Field58 = reader.Read<int>();
-        Field5C = reader.Read<int>();
-        Field60 = reader.Read<int>();
+        Field50 = reader.ReadInt32();
+        Field54 = reader.ReadInt32();
+        Field58 = reader.ReadInt32();
+        Field5C = reader.ReadInt32();
+        Field60 = reader.ReadInt32();
 
-        Loop = Convert.ToBoolean(reader.Read<int>());
+        Loop = Convert.ToBoolean(reader.ReadInt32());
 
         for (int i = 0; i < Animations.Capacity; i++)
         {
@@ -81,31 +83,31 @@ public class EffectParameter : IBinarySerializable<Effect>
     {
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
 
-        writer.Write(StartTime);
-        writer.Write(LifeTime);
+        writer.WriteSingle(StartTime);
+        writer.WriteSingle(LifeTime);
 
-        writer.Write(PreprocessFrame);
+        writer.WriteInt32(PreprocessFrame);
 
-        writer.Write(EffectScale);
-        writer.Write(EmittingScale);
-        writer.Write(Opacity);
-        writer.Write(Field1C);
+        writer.WriteSingle(EffectScale);
+        writer.WriteSingle(EmittingScale);
+        writer.WriteSingle(Opacity);
+        writer.WriteSingle(Field1C);
 
         writer.Align(16);
-        writer.Write(Position);
+        writer.WriteVector3(Position);
         writer.Align(16);
-        writer.Write(Rotation.ToRadians());
+        writer.WriteVector3(Rotation.ToRadians());
         writer.Align(16);
-        writer.Write(Scale);
+        writer.WriteVector3(Scale);
         writer.Align(16);
 
-        writer.Write(Field50);
-        writer.Write(Field54);
-        writer.Write(Field58);
-        writer.Write(Field5C);
-        writer.Write(Field60);
+        writer.WriteInt32(Field50);
+        writer.WriteInt32(Field54);
+        writer.WriteInt32(Field58);
+        writer.WriteInt32(Field5C);
+        writer.WriteInt32(Field60);
 
-        writer.Write(Convert.ToInt32(Loop));
+        writer.WriteInt32(Convert.ToInt32(Loop));
 
         foreach (AnimationParameter animation in Animations)
         {

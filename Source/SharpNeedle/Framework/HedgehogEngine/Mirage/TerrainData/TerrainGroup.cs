@@ -21,7 +21,8 @@ public class TerrainGroup : SampleChunkResource
     public override void Read(BinaryObjectReader reader)
     {
         Subsets = reader.ReadObject<BinaryList<BinaryPointer<TerrainGroupSubset>>>().Unwind();
-        reader.Read(out int modelCount);
+
+        int modelCount = reader.ReadInt32();
         ModelNames = new(modelCount);
 
         reader.ReadOffset(() =>
@@ -35,7 +36,7 @@ public class TerrainGroup : SampleChunkResource
 
     public override void Write(BinaryObjectWriter writer)
     {
-        writer.Write(Subsets.Count);
+        writer.WriteInt32(Subsets.Count);
         writer.WriteOffset(() =>
         {
             foreach (TerrainGroupSubset set in Subsets)
@@ -44,7 +45,7 @@ public class TerrainGroup : SampleChunkResource
             }
         });
 
-        writer.Write(ModelNames.Count);
+        writer.WriteInt32(ModelNames.Count);
         writer.WriteOffset(() =>
         {
             foreach (string? name in ModelNames)

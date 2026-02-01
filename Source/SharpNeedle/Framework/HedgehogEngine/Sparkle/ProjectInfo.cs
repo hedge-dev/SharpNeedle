@@ -18,6 +18,7 @@ public class ProjectInfo : IBinarySerializable
             EmitterCount = reader.ReadInt32();
             ParticleCount = reader.ReadInt32();
         }
+        
         ExportDate = DateTime.ParseExact(reader.ReadInt64().ToString(), "yyyyMMddHHmmss", System.Globalization.CultureInfo.InvariantCulture);
         Version = DateTime.ParseExact(reader.ReadInt32().ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture);
     }
@@ -29,11 +30,11 @@ public class ProjectInfo : IBinarySerializable
 
         if (Type == ProjectType.Effect)
         {
-            writer.Write(EmitterCount);
-            writer.Write(ParticleCount);
+            writer.WriteInt32(EmitterCount);
+            writer.WriteInt32(ParticleCount);
         }
 
-        writer.Write(long.Parse(ExportDate.ToString("yyyyMMddHHmmss")));
-        writer.Write(int.Parse(Version.ToString("yyyyMMdd")));
+        writer.WriteInt64(long.Parse(ExportDate.ToString("yyyyMMddHHmmss")));
+        writer.WriteInt32(int.Parse(Version.ToString("yyyyMMdd")));
     }
 }

@@ -8,14 +8,10 @@ public class ModelData : BaseNodeData
     public string Field84 { get; set; } = string.Empty;
 
     public ModelData() { }
-    public ModelData(BinaryObjectReader reader, GameType game)
-    {
-        Read(reader, game);
-    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
-        Field00 = reader.Read<int>();
+        Field00 = reader.ReadInt32();
         ModelName = reader.ReadDiString(64);
         SkeletonName = reader.ReadDiString(64);
         Field84 = reader.ReadDiString(64);
@@ -25,7 +21,7 @@ public class ModelData : BaseNodeData
 
     public override void Write(BinaryObjectWriter writer, GameType game)
     {
-        writer.Write(Field00);
+        writer.WriteInt32(Field00);
         writer.WriteDiString(ModelName, 64);
         writer.WriteDiString(SkeletonName, 64);
         writer.WriteDiString(Field84, 64);

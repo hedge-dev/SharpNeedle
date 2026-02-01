@@ -1,7 +1,6 @@
-﻿using SharpNeedle.Framework.HedgehogEngine.Mirage.ModelData;
+﻿namespace SharpNeedle.Framework.HedgehogEngine.Mirage.TerrainData;
 
-namespace SharpNeedle.Framework.HedgehogEngine.Mirage.TerrainData;
-
+using SharpNeedle.Framework.HedgehogEngine.Mirage.ModelData;
 using SharpNeedle.Framework.HedgehogEngine.Mirage.LightData;
 
 [NeedleResource("hh/terrain-instance-info", $@"\{Extension}$")]
@@ -16,7 +15,8 @@ public class TerrainInstanceInfo : SampleChunkResource
     public override void Read(BinaryObjectReader reader)
     {
         Model = reader.ReadStringOffsetOrEmpty();
-        Transform = Matrix4x4.Transpose(reader.ReadValueOffset<Matrix4x4>());
+        reader.ReadOffset(() => Transform = Matrix4x4.Transpose(reader.ReadMatrix4x4()));
+
         Name = reader.ReadStringOffsetOrEmpty();
 
         if (DataVersion >= 5)
@@ -32,11 +32,11 @@ public class TerrainInstanceInfo : SampleChunkResource
     public override void Write(BinaryObjectWriter writer)
     {
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Model.Name);
-        writer.WriteValueOffset(Matrix4x4.Transpose(Transform));
+        writer.WriteOffset(() => writer.WriteMatrix4x4(Matrix4x4.Transpose(Transform)));
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         if (DataVersion >= 5)
         {
-            writer.Write(LightGroups.Count);
+            writer.WriteInt32(LightGroups.Count);
             writer.WriteOffset(() =>
             {
                 foreach (LightIndexMeshGroup group in LightGroups)

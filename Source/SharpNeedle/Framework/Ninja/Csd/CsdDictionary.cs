@@ -72,7 +72,7 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string?, T> whe
 
     public void Read(BinaryObjectReader reader)
     {
-        int count = reader.Read<int>();
+        int count = reader.ReadInt32();
         if (count == 0)
         {
             reader.Skip(reader.GetOffsetSize() * 2);
@@ -87,13 +87,13 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string?, T> whe
     {
         if (Items?.Count is null or 0)
         {
-            writer.Write(0);
+            writer.WriteInt32(0);
             writer.WriteOffsetValue(0);
             writer.WriteOffsetValue(0);
             return;
         }
 
-        writer.Write(NameTable.Count);
+        writer.WriteInt32(NameTable.Count);
         writer.WriteObjectCollectionOffset(Items);
         writer.WriteObjectCollectionOffset(NameTable);
     }
@@ -232,7 +232,7 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string?, T> whe
         public void Read(BinaryObjectReader reader)
         {
             Name = reader.ReadStringOffset();
-            Index = reader.Read<int>();
+            Index = reader.ReadInt32();
         }
 
         public void Write(BinaryObjectWriter writer)
@@ -242,9 +242,9 @@ public class CsdDictionary<T> : IBinarySerializable, IDictionary<string?, T> whe
             writer.WriteOffset(() => 
             {
                 writer.WriteString(StringBinaryFormat.NullTerminated, name);
-                writer.Write<byte>(0);
+                writer.WriteByte(0);
             });
-            writer.Write(ref Index);
+            writer.WriteInt32(Index);
         }
 
         internal class Comparer : IComparer<NameIndexPair>

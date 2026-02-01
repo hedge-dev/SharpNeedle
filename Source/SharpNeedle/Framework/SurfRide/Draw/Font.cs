@@ -19,15 +19,15 @@ public class Font : List<CharData>, IBinarySerializable<ChunkBinaryOptions>
         }
 
         Name = reader.ReadStringOffset();
-        ID = reader.Read<int>();
-        Field0C = reader.Read<uint>();
+        ID = reader.ReadInt32();
+        Field0C = reader.ReadUInt32();
         if (options.Version >= 4)
         {
-            Field10 = reader.Read<short>();
+            Field10 = reader.ReadInt16();
         }
 
-        Capacity = reader.Read<ushort>();
-        Field14 = reader.Read<ushort>();
+        Capacity = reader.ReadUInt16();
+        Field14 = reader.ReadUInt16();
         if (options.Version >= 3)
         {
             reader.Align(8);
@@ -54,15 +54,15 @@ public class Font : List<CharData>, IBinarySerializable<ChunkBinaryOptions>
         }
 
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-        writer.Write(ID);
-        writer.Write(Field0C);
+        writer.WriteInt32(ID);
+        writer.WriteUInt32(Field0C);
         if (options.Version >= 4)
         {
-            writer.Write(Field10);
+            writer.WriteInt16(Field10);
         }
 
-        writer.Write((ushort)Count);
-        writer.Write(Field14);
+        writer.WriteUInt16((ushort)Count);
+        writer.WriteUInt16(Field14);
         if (options.Version >= 3)
         {
             writer.Align(8);
@@ -94,17 +94,17 @@ public class CharData : IBinarySerializable
 
     public void Read(BinaryObjectReader reader)
     {
-        Code = reader.Read<ushort>();
-        TextureListIndex = reader.Read<ushort>();
-        TextureIndex = reader.Read<ushort>();
-        CropIndex = reader.Read<ushort>();
+        Code = reader.ReadUInt16();
+        TextureListIndex = reader.ReadUInt16();
+        TextureIndex = reader.ReadUInt16();
+        CropIndex = reader.ReadUInt16();
     }
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.Write(Code);
-        writer.Write(TextureListIndex);
-        writer.Write(TextureIndex);
-        writer.Write(CropIndex);
+        writer.WriteUInt16(Code);
+        writer.WriteUInt16(TextureListIndex);
+        writer.WriteUInt16(TextureIndex);
+        writer.WriteUInt16(CropIndex);
     }
 }

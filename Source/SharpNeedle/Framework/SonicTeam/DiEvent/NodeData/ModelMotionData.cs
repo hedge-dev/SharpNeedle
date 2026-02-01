@@ -10,31 +10,27 @@ public class ModelMotionData : BaseNodeData
     public float Field18 { get; set; }
 
     public ModelMotionData() { }
-    public ModelMotionData(BinaryObjectReader reader, GameType game)
-    {
-        Read(reader, game);
-    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
-        Field00 = reader.Read<int>();
-        Field04 = reader.Read<int>();
-        Field08 = reader.Read<int>();
-        Field0C = reader.Read<int>();
+        Field00 = reader.ReadInt32();
+        Field04 = reader.ReadInt32();
+        Field08 = reader.ReadInt32();
+        Field0C = reader.ReadInt32();
         Field10 = reader.ReadDiString(8);
-        Field18 = reader.Read<float>();
+        Field18 = reader.ReadSingle();
 
         reader.Skip(20);
     }
 
     public override void Write(BinaryObjectWriter writer, GameType game)
     {
-        writer.Write(Field00);
-        writer.Write(Field04);
-        writer.Write(Field08);
-        writer.Write(Field0C);
+        writer.WriteInt32(Field00);
+        writer.WriteInt32(Field04);
+        writer.WriteInt32(Field08);
+        writer.WriteInt32(Field0C);
         writer.WriteDiString(Field10, 8);
-        writer.Write(Field18);
+        writer.WriteSingle(Field18);
 
         writer.WriteNulls(20);
     }

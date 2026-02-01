@@ -3,7 +3,7 @@ namespace SharpNeedle.Framework.HedgehogEngine.Sparkle;
 
 public class Effect : IBinarySerializable
 {
-    public string Name { get; set; }
+    public string? Name { get; set; }
     public float InitialLifeTime { get; set; }
     public float ScaleRatio { get; set; }
     public float GenerateCountRatio { get; set; }
@@ -24,8 +24,8 @@ public class Effect : IBinarySerializable
         ScaleRatio = reader.ReadSingle();
         GenerateCountRatio = reader.ReadSingle();
 
-        InitialPosition = reader.Read<Vector4>();
-        InitialRotation = reader.Read<Vector4>();
+        InitialPosition = reader.ReadVector4();
+        InitialRotation = reader.ReadVector4();
 
         IsLoop = reader.ReadUInt32() == 1;
         DeleteChildren = reader.ReadUInt32() == 1;
@@ -37,39 +37,32 @@ public class Effect : IBinarySerializable
         FieldU4 = reader.ReadInt32();
 
         //Footer SEGA
-        reader.Seek(16, SeekOrigin.Current);
+        reader.Skip(16);
     }
 
     public void Write(BinaryObjectWriter writer)
     {
         writer.WriteStringPaddedByte(Name, 4);
-        writer.Write(InitialLifeTime);
-        writer.Write(ScaleRatio);
-        writer.Write(GenerateCountRatio);
+        writer.WriteSingle(InitialLifeTime);
+        writer.WriteSingle(ScaleRatio);
+        writer.WriteSingle(GenerateCountRatio);
 
-        writer.Write(InitialPosition.X);
-        writer.Write(InitialPosition.Y);
-        writer.Write(InitialPosition.Z);
-        writer.Write(InitialPosition.W);
+        writer.WriteVector4(InitialPosition);
+        writer.WriteVector4(InitialRotation);
 
-        writer.Write(InitialRotation.X);
-        writer.Write(InitialRotation.Y);
-        writer.Write(InitialRotation.Z);
-        writer.Write(InitialRotation.W);
+        writer.WriteInt32(IsLoop ? 1 : 0);
+        writer.WriteInt32(DeleteChildren ? 1 : 0);
+        writer.WriteSingle(VelocityOffset);
 
-        writer.Write(IsLoop ? 1 : 0);
-        writer.Write(DeleteChildren ? 1 : 0);
-        writer.Write(VelocityOffset);
-
-        writer.Write(FieldU1);
-        writer.Write(FieldU2);
-        writer.Write(FieldU3);
-        writer.Write(FieldU4);
+        writer.WriteInt32(FieldU1);
+        writer.WriteInt32(FieldU2);
+        writer.WriteInt32(FieldU3);
+        writer.WriteInt32(FieldU4);
 
         //S E G A
-        writer.Write(83);
-        writer.Write(69);
-        writer.Write(71);
-        writer.Write(65);
+        writer.WriteInt32(83);
+        writer.WriteInt32(69);
+        writer.WriteInt32(71);
+        writer.WriteInt32(65);
     }
 }

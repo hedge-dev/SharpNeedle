@@ -35,8 +35,8 @@ public abstract class BinaryResource : ResourceBase, IBinarySerializable
 
             reader.Endianness = Version.Endianness;
 
-            Size = reader.Read<uint>();
-            ushort chunkCount = reader.Read<ushort>();
+            Size = reader.ReadUInt32();
+            ushort chunkCount = reader.ReadUInt16();
             reader.Skip(2);
 
             ChunkParseOptions options = new()
@@ -113,13 +113,13 @@ public abstract class BinaryResource : ResourceBase, IBinarySerializable
     {
         long begin = writer.Position;
         SeekToken sizeToken = writer.At();
-        writer.Write(0);
-        writer.Write(0L); // Offset table
-        writer.Write(0L); // what
+        writer.WriteInt32(0);
+        writer.WriteInt64(0); // Offset table
+        writer.WriteInt64(0); // what
 
         writer.WriteObject(Version);
-        writer.Write(Signature);
-        writer.Write(0);
+        writer.WriteUInt32(Signature);
+        writer.WriteInt32(0);
         writer.PushOffsetOrigin();
 
         ChunkParseOptions options = new()
@@ -146,14 +146,14 @@ public abstract class BinaryResource : ResourceBase, IBinarySerializable
         byte[] offTableEncoded = offTable.Encode();
         writer.Skip(4); // Skip size for now
         writer.WriteArrayOffset(offTableEncoded);
-        writer.Write(offTableEncoded.Length);
+        writer.WriteInt32(offTableEncoded.Length);
 
         endToken.Dispose();
         writer.Flush();
         endToken = writer.At(writer.Length, SeekOrigin.End);
 
         sizeToken.Dispose();
-        writer.Write((int)((long)endToken - begin));
+        writer.WriteInt32((int)((long)endToken - begin));
         writer.PopOffsetOrigin();
         endToken.Dispose();
     }
@@ -165,8 +165,8 @@ public abstract class BinaryResource : ResourceBase, IBinarySerializable
         writer.WriteObject(Version);
 
         SeekToken sizeToken = writer.At();
-        writer.Write(0);
-        writer.Write((short)Chunks.Count);
+        writer.WriteInt32(0);
+        writer.WriteInt16((short)Chunks.Count);
         writer.Align(4);
 
         ChunkParseOptions options = new()
@@ -181,7 +181,7 @@ public abstract class BinaryResource : ResourceBase, IBinarySerializable
         using SeekToken end = writer.At(writer.Length, SeekOrigin.Begin);
         sizeToken.Dispose();
 
-        writer.Write((int)((long)end - begin));
+        writer.WriteInt32((int)((long)end - begin));
     }
 
     public abstract void Read(BinaryObjectReader reader);

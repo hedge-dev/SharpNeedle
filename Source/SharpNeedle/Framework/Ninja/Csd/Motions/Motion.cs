@@ -80,7 +80,7 @@ public class Motion : IBinarySerializable
     {
         reader.ReadOffset(() =>
         {
-            int unused = reader.Read<int>();
+            int unused = reader.ReadInt32();
 
             reader.ReadOffset(() =>
             { 
@@ -96,7 +96,7 @@ public class Motion : IBinarySerializable
     {
         writer.WriteOffset(() =>
         {
-            writer.Write(0);
+            writer.WriteInt32(0);
 
             writer.WriteOffset(() =>
             { 

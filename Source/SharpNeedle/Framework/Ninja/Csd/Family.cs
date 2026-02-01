@@ -21,7 +21,7 @@ public class Family : IBinarySerializable<Scene>, IList<Cast>
     public void Read(BinaryObjectReader reader, Scene context)
     {
         Scene = context;
-        int castCount = reader.Read<int>();
+        int castCount = reader.ReadInt32();
         CastBuffer = new List<Cast>(castCount);
         reader.ReadOffset(() =>
         {
@@ -31,8 +31,8 @@ public class Family : IBinarySerializable<Scene>, IList<Cast>
             }
         });
 
-        int root = reader.Read<int>();
-        TreeDescriptorNode[] tree = reader.ReadArrayOffset<TreeDescriptorNode>(CastBuffer.Count);
+        int root = reader.ReadInt32();
+        TreeDescriptorNode[] tree = reader.ReadObjectArrayOffset<TreeDescriptorNode>(CastBuffer.Count);
         if (CastBuffer.Count != 0)
         {
             ParseTree(root);
@@ -74,7 +74,7 @@ public class Family : IBinarySerializable<Scene>, IList<Cast>
 
     public void Write(BinaryObjectWriter writer, Scene context)
     {
-        writer.Write(CastBuffer.Count);
+        writer.WriteInt32(CastBuffer.Count);
         writer.WriteOffset(() =>
         {
             foreach (Cast cast in CastBuffer)
@@ -83,7 +83,7 @@ public class Family : IBinarySerializable<Scene>, IList<Cast>
             }
         });
 
-        writer.Write(0);
+        writer.WriteInt32(0);
 
         TreeDescriptorNode[] nodes = new TreeDescriptorNode[CastBuffer.Count];
 
@@ -95,7 +95,7 @@ public class Family : IBinarySerializable<Scene>, IList<Cast>
 
         BuildTree(Children);
 
-        writer.WriteArrayOffset(nodes);
+        writer.WriteObjectCollectionOffset(nodes);
 
         void BuildTree(IList<Cast> casts)
         {
@@ -254,7 +254,7 @@ public class Family : IBinarySerializable<Scene>, IList<Cast>
         set => Children[index] = value;
     }
 
-    internal struct TreeDescriptorNode
+    internal struct TreeDescriptorNode : IBinarySerializable
     {
         public int ChildIndex;
         public int SiblingIndex;
@@ -263,6 +263,18 @@ public class Family : IBinarySerializable<Scene>, IList<Cast>
         {
             ChildIndex = -1;
             SiblingIndex = -1;
+        }
+
+        public void Read(BinaryObjectReader reader)
+        {
+            ChildIndex = reader.ReadInt32();
+            SiblingIndex = reader.ReadInt32();
+        }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            writer.WriteInt32(ChildIndex);
+            writer.WriteInt32(SiblingIndex);
         }
 
         public override readonly string ToString()

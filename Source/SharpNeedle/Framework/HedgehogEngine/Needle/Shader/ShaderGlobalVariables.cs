@@ -109,7 +109,7 @@ public class ShaderGlobalVariables : IBinarySerializable
             using (SeekToken temp = writer.At())
             {
                 sizeToken.Dispose();
-                writer.Write((int)(endPosition - startPosition));
+                writer.WriteInt32((int)(endPosition - startPosition));
             }
         }
 
@@ -137,7 +137,7 @@ public class ShaderGlobalVariables : IBinarySerializable
         using (SeekToken temp = writer.At())
         {
             sizeToken.Dispose();
-            writer.Write((int)(endPosition - startPosition));
+            writer.WriteInt32((int)(endPosition - startPosition));
         }
     }
 }

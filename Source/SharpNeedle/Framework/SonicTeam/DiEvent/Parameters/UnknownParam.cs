@@ -8,17 +8,15 @@ public class UnknownParam : BaseParam
 
     public UnknownParam() { }
 
-    public UnknownParam(BinaryObjectReader reader, int size, int type)
+    public UnknownParam(int size, int type)
     {
         Size = size;
         Type = type;
-        Data = new byte[Size * 4];
-
-        Read(reader, GameType.Common);
     }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
+        Data = new byte[Size * 4];
         reader.ReadArray<byte>(Size * 4, Data);
     }
 

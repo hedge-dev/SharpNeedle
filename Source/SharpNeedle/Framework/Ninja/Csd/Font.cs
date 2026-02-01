@@ -5,13 +5,13 @@ public class Font : List<CharacterMapping>, IBinarySerializable
     public void Read(BinaryObjectReader reader)
     {
         Clear();
-        Capacity = reader.Read<int>();
-        AddRange(reader.ReadArrayOffset<CharacterMapping>(Capacity));
+        Capacity = reader.ReadInt32();
+        AddRange(reader.ReadObjectArrayOffset<CharacterMapping>(Capacity));
     }
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.Write(Count);
-        writer.WriteCollectionOffset(this);
+        writer.WriteInt32(Count);
+        writer.WriteObjectCollectionOffset(this);
     }
 }

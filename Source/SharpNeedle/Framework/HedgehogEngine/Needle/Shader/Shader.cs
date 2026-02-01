@@ -130,13 +130,13 @@ public class Shader : ResourceBase, IBinarySerializable
         using (SeekToken temp = writer.At())
         {
             fileSizeToken.Dispose();
-            writer.Write((int)(dataEnd - fileDataStart));
+            writer.WriteInt32((int)(dataEnd - fileDataStart));
         }
 
         using (SeekToken temp = writer.At())
         {
             shaderSizeToken.Dispose();
-            writer.Write((int)(dataEnd - shaderDataStart));
+            writer.WriteInt32((int)(dataEnd - shaderDataStart));
         }
     }
 }

@@ -40,50 +40,52 @@ public class Node : IBinarySerializable<GameType>
 
     public void Read(BinaryObjectReader reader, GameType game)
     {
-        GUID = reader.Read<Guid>();
-        Type = reader.Read<int>();
-        int dataSize = reader.Read<int>();
+        GUID = reader.ReadGuid();
+        Type = reader.ReadInt32();
+        int dataSize = reader.ReadInt32();
 
-        int childCount = reader.Read<int>();
-        Flags = reader.Read<uint>();
+        int childCount = reader.ReadInt32();
+        Flags = reader.ReadUInt32();
 
-        Priority = reader.Read<int>();
-        Field24 = reader.Read<int>();
-        Field28 = reader.Read<int>();
-        Field2C = reader.Read<int>();
+        Priority = reader.ReadInt32();
+        Field24 = reader.ReadInt32();
+        Field28 = reader.ReadInt32();
+        Field2C = reader.ReadInt32();
 
         Name = reader.ReadDiString(64);
 
         switch ((NodeType)Type)
         {
             case NodeType.Path:
-                Data = new PathData(reader, game);
+                Data = reader.ReadObject<PathData, GameType>(game);
                 break;
 
             case NodeType.Camera:
-                Data = new CameraData(reader, game);
+                Data = reader.ReadObject<CameraData, GameType>(game);
                 break;
 
             case NodeType.CameraMotion:
-                Data = new CameraMotionData(reader, game);
+                Data = reader.ReadObject<CameraMotionData, GameType>(game);
                 break;
 
             case NodeType.ModelCustom:
             case NodeType.Character:
-                Data = new ModelData(reader, game);
+                Data = reader.ReadObject<ModelData, GameType>(game);
                 break;
 
             case NodeType.CharacterMotion:
             case NodeType.ModelMotion:
-                Data = new ModelMotionData(reader, game);
+                Data = reader.ReadObject<ModelMotionData, GameType>(game);
                 break;
 
             case NodeType.Attachment:
-                Data = new AttachmentData(reader, game);
+                Data = reader.ReadObject<AttachmentData, GameType>(game);
                 break;
 
             case NodeType.Parameter:
-                Data = new ParameterData(reader, game, dataSize);
+                ParameterData parameterData = new(dataSize);
+                parameterData.Read(reader, game);
+                Data = parameterData;
                 break;
 
             default:
@@ -96,19 +98,19 @@ public class Node : IBinarySerializable<GameType>
 
     public void Write(BinaryObjectWriter writer, GameType game)
     {
-        writer.Write(GUID);
-        writer.Write(Type);
+        writer.WriteGuid(GUID);
+        writer.WriteInt32(Type);
 
         long dataSizePos = writer.Position;
         writer.WriteNulls(4);
 
-        writer.Write(Children.Count);
-        writer.Write(Flags);
+        writer.WriteInt32(Children.Count);
+        writer.WriteUInt32(Flags);
 
-        writer.Write(Priority);
-        writer.Write(Field24);
-        writer.Write(Field28);
-        writer.Write(Field2C);
+        writer.WriteInt32(Priority);
+        writer.WriteInt32(Field24);
+        writer.WriteInt32(Field28);
+        writer.WriteInt32(Field2C);
 
         writer.WriteDiString(Name, 64);
 
@@ -116,9 +118,9 @@ public class Node : IBinarySerializable<GameType>
         Data.Write(writer, game);
         long dataEnd = writer.Position;
 
-        writer.Seek(dataSizePos, System.IO.SeekOrigin.Begin);
-        writer.Write((int)(dataEnd - dataStart) / 4);
-        writer.Seek(dataEnd, System.IO.SeekOrigin.Begin);
+        writer.Seek(dataSizePos, SeekOrigin.Begin);
+        writer.WriteInt32((int)(dataEnd - dataStart) / 4);
+        writer.Seek(dataEnd, SeekOrigin.Begin);
 
         writer.WriteObjectCollection(game, Children);
     }

@@ -19,7 +19,7 @@ public class TextureMirage : IBinarySerializable, ITexture
     public void Read(BinaryObjectReader reader)
     {
         Name = reader.ReadStringOffset();
-        MemoryDataIndex = reader.Read<int>();
+        MemoryDataIndex = reader.ReadInt32();
     }
 
     public void Write(BinaryObjectWriter writer)
@@ -33,7 +33,7 @@ public class TextureMirage : IBinarySerializable, ITexture
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
         }
 
-        writer.Write(MemoryDataIndex);
+        writer.WriteInt32(MemoryDataIndex);
     }
 
     public override string ToString()

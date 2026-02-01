@@ -11,29 +11,24 @@ public class ControllerVibrationParam : BaseParam
 
     public ControllerVibrationParam() { }
 
-    public ControllerVibrationParam(BinaryObjectReader reader, GameType game)
-    {
-        Read(reader, game);
-    }
-
     public override void Read(BinaryObjectReader reader, GameType game)
     {
-        Field00 = reader.Read<int>();
+        Field00 = reader.ReadInt32();
         Group = reader.ReadString(StringBinaryFormat.FixedLength, 64);
         Mode = reader.ReadString(StringBinaryFormat.FixedLength, 64);
-        Field84 = reader.Read<uint>();
-        Field88 = reader.Read<uint>();
-        Field8C = reader.Read<uint>();
+        Field84 = reader.ReadUInt32();
+        Field88 = reader.ReadUInt32();
+        Field8C = reader.ReadUInt32();
     }
 
     public override void Write(BinaryObjectWriter writer, GameType game)
     {
-        writer.Write(Field00);
+        writer.WriteInt32(Field00);
         writer.WriteString(StringBinaryFormat.FixedLength, Group, 64);
         writer.WriteString(StringBinaryFormat.FixedLength, Mode, 64);
-        writer.Write(Field84);
-        writer.Write(Field88);
-        writer.Write(Field8C);
+        writer.WriteUInt32(Field84);
+        writer.WriteUInt32(Field88);
+        writer.WriteUInt32(Field8C);
     }
 
     public override int GetTypeID(GameType game) { return (int)ParameterType.ControllerVibration; }

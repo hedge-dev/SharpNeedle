@@ -12,33 +12,29 @@ public class CameraShakeParam : BaseParam
     public int Field1C { get; set; }
 
     public CameraShakeParam() { }
-    public CameraShakeParam(BinaryObjectReader reader, GameType game)
-    {
-        Read(reader, game);
-    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
-        Field00 = reader.Read<int>();
-        Field04 = reader.Read<int>();
-        Field08 = reader.Read<float>();
-        Field0C = reader.Read<float>();
-        Field10 = reader.Read<int>();
-        Field14 = reader.Read<int>();
-        Field18 = reader.Read<int>();
-        Field1C = reader.Read<int>();
+        Field00 = reader.ReadInt32();
+        Field04 = reader.ReadInt32();
+        Field08 = reader.ReadSingle();
+        Field0C = reader.ReadSingle();
+        Field10 = reader.ReadInt32();
+        Field14 = reader.ReadInt32();
+        Field18 = reader.ReadInt32();
+        Field1C = reader.ReadInt32();
     }
 
     public override void Write(BinaryObjectWriter writer, GameType game)
     {
-        writer.Write(Field00);
-        writer.Write(Field04);
-        writer.Write(Field08);
-        writer.Write(Field0C);
-        writer.Write(Field10);
-        writer.Write(Field14);
-        writer.Write(Field18);
-        writer.Write(Field1C);
+        writer.WriteInt32(Field00);
+        writer.WriteInt32(Field04);
+        writer.WriteSingle(Field08);
+        writer.WriteSingle(Field0C);
+        writer.WriteInt32(Field10);
+        writer.WriteInt32(Field14);
+        writer.WriteInt32(Field18);
+        writer.WriteInt32(Field1C);
     }
 
     public override int GetTypeID(GameType game) { return (int)ParameterType.CameraShake; }

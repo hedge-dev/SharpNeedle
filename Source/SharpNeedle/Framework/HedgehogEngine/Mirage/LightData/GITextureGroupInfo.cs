@@ -16,7 +16,7 @@ public class GITextureGroupInfo : SampleChunkResource
 
     public override void Read(BinaryObjectReader reader)
     {
-        reader.Read(out int instanceCount);
+        int instanceCount = reader.ReadInt32();
         Instances = new(instanceCount);
         reader.ReadOffset(() =>
         {
@@ -31,11 +31,11 @@ public class GITextureGroupInfo : SampleChunkResource
             Span<(string? Name, Sphere Bounds)> span = CollectionsMarshal.AsSpan(Instances);
             for (int i = 0; i < span.Length; i++)
             {
-                span[i].Bounds = reader.ReadValueOffset<Sphere>();
+                span[i].Bounds = reader.ReadObjectOffset<Sphere>();
             }
         });
 
-        reader.Read(out int groupCount);
+        int groupCount = reader.ReadInt32();
         Groups = new(groupCount);
 
         reader.ReadOffset(() =>
@@ -46,20 +46,15 @@ public class GITextureGroupInfo : SampleChunkResource
             }
         });
 
-        reader.Read(out int lowCount);
+        int lowCount = reader.ReadInt32();
         LowQualityGroups = new(lowCount);
-        reader.ReadOffset(() =>
-        {
-            for (int i = 0; i < lowCount; i++)
-            {
-                LowQualityGroups.Add(reader.Read<int>());
-            }
-        });
+        
+        reader.ReadOffset(() => reader.ReadCollection(lowCount, LowQualityGroups));
     }
 
     public override void Write(BinaryObjectWriter writer)
     {
-        writer.Write(Instances.Count);
+        writer.WriteInt32(Instances.Count);
         writer.WriteOffset(() =>
         {
             foreach ((string? name, Sphere bounds) in Instances)
@@ -72,26 +67,14 @@ public class GITextureGroupInfo : SampleChunkResource
         {
             foreach ((string? name, Sphere bounds) in Instances)
             {
-                writer.WriteValueOffset(bounds);
+                writer.WriteObjectOffset(bounds);
             }
         });
 
-        writer.Write(Groups.Count);
-        writer.WriteOffset(() =>
-        {
-            foreach (GITextureGroup group in Groups)
-            {
-                writer.WriteObjectOffset(group);
-            }
-        });
+        writer.WriteInt32(Groups.Count);
+        writer.WriteObjectCollectionOffset(Groups);
 
-        writer.Write(LowQualityGroups.Count);
-        writer.WriteOffset(() =>
-        {
-            foreach (int group in LowQualityGroups)
-            {
-                writer.Write(group);
-            }
-        });
+        writer.WriteInt32(LowQualityGroups.Count);
+        writer.WriteCollectionOffset(LowQualityGroups);
     }
 }

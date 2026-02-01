@@ -11,9 +11,9 @@ public class InfoChunk : IChunk
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
-        options.Header ??= reader.ReadLittle<ChunkHeader>();
+        options.Header ??= reader.ReadObject<ChunkHeader>();
         Signature = options.Header.Value.Signature;
-        int chunkCount = reader.Read<int>();
+        int chunkCount = reader.ReadInt32();
 
         // Check if Signature ends with IF
         if (((Signature >> 16) & 0xFFFF) != 0x4649)
@@ -28,7 +28,7 @@ public class InfoChunk : IChunk
             reader.PushOffsetOrigin();
             for (int i = 0; i < chunkCount; i++)
             {
-                ChunkHeader header = reader.ReadLittle<ChunkHeader>();
+                ChunkHeader header = reader.ReadObject<ChunkHeader>();
                 long begin = reader.Position;
                 options.Header = header;
                 if (header.Signature == ProjectChunk.BinSignature)
@@ -59,23 +59,23 @@ public class InfoChunk : IChunk
         Offsets = reader.ReadObjectOffset<OffsetChunk>();
         reader.Skip(4); // Offsets.BinarySize
 
-        Field1C = reader.Read<uint>();
+        Field1C = reader.ReadUInt32();
     }
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
         writer.WriteLittle(Signature);
         writer.WriteLittle(0x18); // Always constant
-        writer.Write(Chunks.Count);
+        writer.WriteInt32(Chunks.Count);
 
-        writer.Write(0x20); // Always at the end of the chunk
+        writer.WriteInt32(0x20); // Always at the end of the chunk
 
         SeekToken sizePos = writer.At();
-        writer.Write(0); // Chunk list size
+        writer.WriteInt32(0); // Chunk list size
 
-        writer.Write(0); // OffsetChunk Ptr
-        writer.Write(0); // OffsetChunk.BinarySize
-        writer.Write(Field1C);
+        writer.WriteInt32(0); // OffsetChunk Ptr
+        writer.WriteInt32(0); // OffsetChunk.BinarySize
+        writer.WriteUInt32(Field1C);
 
         writer.PushOffsetOrigin();
         long offsetBase = writer.OffsetHandler.OffsetOrigin;
@@ -99,14 +99,14 @@ public class InfoChunk : IChunk
         writer.WriteObject(Offsets);
         {
             writer.WriteNative(BinaryHelper.MakeSignature<uint>("NEND"));
-            writer.Write(0);
-            writer.Write(0L);
+            writer.WriteInt32(0);
+            writer.WriteInt64(0L);
         }
 
         sizePos.Dispose();
-        writer.Write((int)chunkEnd - (int)chunkBegin);
-        writer.Write((int)offsetChunkPos);
-        writer.Write(Offsets.BinarySize);
+        writer.WriteInt32((int)chunkEnd - (int)chunkBegin);
+        writer.WriteInt32((int)offsetChunkPos);
+        writer.WriteInt32(Offsets.BinarySize);
         writer.Flush();
     }
 }

@@ -5,10 +5,6 @@ public class LetterboxParam : BaseParam
     public float[] CurveData { get; set; } = new float[32];
 
     public LetterboxParam() { }
-    public LetterboxParam(BinaryObjectReader reader, GameType game)
-    {
-        Read(reader, game);
-    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {

@@ -11,7 +11,7 @@ public struct MeshSlot
     public readonly string? Name;
 
     [JsonConstructor]
-    internal MeshSlot(MeshType type, string name)
+    public MeshSlot(MeshType type, string name)
     {
         Type = type;
 

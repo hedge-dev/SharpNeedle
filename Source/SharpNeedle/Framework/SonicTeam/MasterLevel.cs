@@ -40,11 +40,11 @@ public class MasterLevel : BinaryResource
     {
         Levels = [.. Levels.OrderBy(o => o.Name)];
 
-        writer.Write(Signature);
+        writer.WriteUInt32(Signature);
 
         writer.Align(writer.GetOffsetSize());
 
-        writer.Write<long>(Levels.Count);
+        writer.WriteInt64(Levels.Count);
         writer.WriteOffset(() =>
         {
             LevelInfoBinaryOptions options = new();
@@ -75,8 +75,8 @@ public class MasterLevel : BinaryResource
 
             Name = reader.ReadStringOffset(StringBinaryFormat.NullTerminated);
 
-            int fileCount = reader.Read<int>();
-            int dependencyCount = reader.Read<int>();
+            int fileCount = reader.ReadInt32();
+            int dependencyCount = reader.ReadInt32();
 
             reader.ReadOffset(() =>
             {
@@ -127,8 +127,8 @@ public class MasterLevel : BinaryResource
 
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name, writer.GetOffsetSize());
 
-            writer.Write(Files.Count);
-            writer.Write(Dependencies.Count);
+            writer.WriteInt32(Files.Count);
+            writer.WriteInt32(Dependencies.Count);
 
             writer.WriteOffset(() =>
             {
@@ -184,7 +184,7 @@ public class MasterLevel : BinaryResource
             }
             else
             {
-                reader.ReadOffset(() => Field08 = reader.Read<bool>());
+                Field08 = reader.ReadValueOffset<bool>();
             }
 
             if (!options.IsLastLevel)
@@ -219,7 +219,7 @@ public class MasterLevel : BinaryResource
             }
             else
             {
-                writer.WriteOffset(() => writer.Write(Field08));
+                writer.WriteValueOffset(Field08);
             }
 
             if (!options.IsLastLevel)

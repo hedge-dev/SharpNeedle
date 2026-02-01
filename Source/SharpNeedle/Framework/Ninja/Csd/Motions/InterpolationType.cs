@@ -2,5 +2,7 @@
 
 public enum InterpolationType : uint
 {
-    Const, Linear, Hermite
+    Const, 
+    Linear, 
+    Hermite
 }

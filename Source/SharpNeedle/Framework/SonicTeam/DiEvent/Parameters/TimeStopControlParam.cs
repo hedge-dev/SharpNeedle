@@ -7,23 +7,19 @@ public class TimeStopControlParam : BaseParam
     public float TransitionDuration { get; set; }
 
     public TimeStopControlParam() { }
-    public TimeStopControlParam(BinaryObjectReader reader, GameType game)
-    {
-        Read(reader, game);
-    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
-        Behavior = reader.Read<int>();
-        Field04 = reader.Read<float>();
-        TransitionDuration = reader.Read<float>();
+        Behavior = reader.ReadInt32();
+        Field04 = reader.ReadSingle();
+        TransitionDuration = reader.ReadSingle();
     }
 
     public override void Write(BinaryObjectWriter writer, GameType game)
     {
-        writer.Write(Behavior);
-        writer.Write(Field04);
-        writer.Write(TransitionDuration);
+        writer.WriteInt32(Behavior);
+        writer.WriteSingle(Field04);
+        writer.WriteSingle(TransitionDuration);
     }
 
     public override int GetTypeID(GameType game)

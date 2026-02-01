@@ -30,8 +30,8 @@ public class CharAnimScript : BinaryResource
     {
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, "ANIM");
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, ScriptVersion);
-        writer.Write((short)CountLayers());
-        writer.Write((short)CountTriggers());
+        writer.WriteInt16((short)CountLayers());
+        writer.WriteInt16((short)CountTriggers());
 
         writer.WriteOffset(() =>
         {

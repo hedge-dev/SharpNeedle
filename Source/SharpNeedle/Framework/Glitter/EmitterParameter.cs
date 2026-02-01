@@ -34,42 +34,42 @@ public class EmitterParameter : IBinarySerializable<EffectParameter>
     {
         Name = reader.ReadStringOffset();
 
-        EmitterType = reader.Read<EEmitterType>();
+        EmitterType = (EEmitterType)reader.ReadInt32();
 
-        StartTime = reader.Read<float>();
-        LifeTime = reader.Read<float>();
+        StartTime = reader.ReadSingle();
+        LifeTime = reader.ReadSingle();
 
         reader.Align(16);
-        InitialPosition = reader.Read<Vector3>();
+        InitialPosition = reader.ReadVector3();
         reader.Align(16);
-        InitialRotation = reader.Read<Vector3>().ToDegrees();
+        InitialRotation = reader.ReadVector3().ToDegrees();
         reader.Align(16);
-        Rotation = reader.Read<Vector3>().ToDegrees();
+        Rotation = reader.ReadVector3().ToDegrees();
         reader.Align(16);
-        RotationRandomMargin = reader.Read<Vector3>().ToDegrees();
+        RotationRandomMargin = reader.ReadVector3().ToDegrees();
         reader.Align(16);
-        InitialScale = reader.Read<Vector3>();
+        InitialScale = reader.ReadVector3();
         reader.Align(16);
 
-        LoopStartPosition = reader.Read<float>();
-        LoopEndPosition = reader.Read<float>();
+        LoopStartPosition = reader.ReadSingle();
+        LoopEndPosition = reader.ReadSingle();
 
-        EmitCondition = reader.Read<EEmitCondition>();
-        DirectionType = reader.Read<EDirectionType>();
+        EmitCondition = (EEmitCondition)reader.ReadInt32();
+        DirectionType = (EDirectionType)reader.ReadInt32();
 
-        EmissionInterval = reader.Read<float>();
-        ParticlePerEmission = reader.Read<float>();
+        EmissionInterval = reader.ReadSingle();
+        ParticlePerEmission = reader.ReadSingle();
 
-        Field78 = reader.Read<int>();
-        Field7C = reader.Read<int>();
+        Field78 = reader.ReadInt32();
+        Field7C = reader.ReadInt32();
 
-        ShapeParameter = reader.Read<ShapeParameterUnion>();
+        ShapeParameter = reader.ReadObject<ShapeParameterUnion>();
 
-        Field94 = reader.Read<int>();
-        Field98 = reader.Read<int>();
-        Field9C = reader.Read<int>();
-        Field100 = reader.Read<int>();
-        Field104 = reader.Read<int>();
+        Field94 = reader.ReadInt32();
+        Field98 = reader.ReadInt32();
+        Field9C = reader.ReadInt32();
+        Field100 = reader.ReadInt32();
+        Field104 = reader.ReadInt32();
 
         for (int i = 0; i < Animations.Capacity; i++)
         {
@@ -99,42 +99,42 @@ public class EmitterParameter : IBinarySerializable<EffectParameter>
     {
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
 
-        writer.Write(EmitterType);
+        writer.WriteInt32((int)EmitterType);
 
-        writer.Write(StartTime);
-        writer.Write(LifeTime);
+        writer.WriteSingle(StartTime);
+        writer.WriteSingle(LifeTime);
 
         writer.Align(16);
-        writer.Write(InitialPosition);
+        writer.WriteVector3(InitialPosition);
         writer.Align(16);
-        writer.Write(InitialRotation.ToRadians());
+        writer.WriteVector3(InitialRotation.ToRadians());
         writer.Align(16);
-        writer.Write(Rotation.ToRadians());
+        writer.WriteVector3(Rotation.ToRadians());
         writer.Align(16);
-        writer.Write(RotationRandomMargin.ToRadians());
+        writer.WriteVector3(RotationRandomMargin.ToRadians());
         writer.Align(16);
-        writer.Write(InitialScale);
+        writer.WriteVector3(InitialScale);
         writer.Align(16);
 
-        writer.Write(LoopStartPosition);
-        writer.Write(LoopEndPosition);
+        writer.WriteSingle(LoopStartPosition);
+        writer.WriteSingle(LoopEndPosition);
 
-        writer.Write(EmitCondition);
-        writer.Write(DirectionType);
+        writer.WriteInt32((int)EmitCondition);
+        writer.WriteInt32((int)DirectionType);
 
-        writer.Write(EmissionInterval);
-        writer.Write(ParticlePerEmission);
+        writer.WriteSingle(EmissionInterval);
+        writer.WriteSingle(ParticlePerEmission);
 
-        writer.Write(Field78);
-        writer.Write(Field7C);
+        writer.WriteInt32(Field78);
+        writer.WriteInt32(Field7C);
 
-        writer.Write(ShapeParameter);
+        writer.WriteObject(ShapeParameter);
 
-        writer.Write(Field94);
-        writer.Write(Field98);
-        writer.Write(Field9C);
-        writer.Write(Field100);
-        writer.Write(Field104);
+        writer.WriteInt32(Field94);
+        writer.WriteInt32(Field98);
+        writer.WriteInt32(Field9C);
+        writer.WriteInt32(Field100);
+        writer.WriteInt32(Field104);
 
         foreach (AnimationParameter animation in Animations)
         {
@@ -226,8 +226,15 @@ public class EmitterParameter : IBinarySerializable<EffectParameter>
     }
 
     [StructLayout(LayoutKind.Explicit, Size = 20)]
-    public struct ShapeParameterUnion
+    public struct ShapeParameterUnion : IBinarySerializable
     {
+        // for reading / writing, to ensure correct endianness (for AOT)
+        [FieldOffset(0)] private int _field0;
+        [FieldOffset(4)] private int _field1;
+        [FieldOffset(8)] private int _field2;
+        [FieldOffset(12)] private int _field3;
+        [FieldOffset(16)] private int _field4;
+
         [FieldOffset(0)] public BoxParameter Box;
         [FieldOffset(0)] public SphereParameter Sphere;
         [FieldOffset(0)] public CylinderParameter Cylinder;
@@ -259,6 +266,26 @@ public class EmitterParameter : IBinarySerializable<EffectParameter>
             Polygon = value;
         }
 
+
+        public void Read(BinaryObjectReader reader)
+        {
+            _field0 = reader.ReadInt32();
+            _field1 = reader.ReadInt32();
+            _field2 = reader.ReadInt32();
+            _field3 = reader.ReadInt32();
+            _field4 = reader.ReadInt32();
+        }
+
+        public void Write(BinaryObjectWriter writer)
+        {
+            writer.WriteInt32(_field0);
+            writer.WriteInt32(_field1);
+            writer.WriteInt32(_field2);
+            writer.WriteInt32(_field3);
+            writer.WriteInt32(_field4);
+        }
+
+
         public void Set(BoxParameter value)
         {
             Box = value;
@@ -283,6 +310,7 @@ public class EmitterParameter : IBinarySerializable<EffectParameter>
         {
             Polygon = value;
         }
+
 
         public static implicit operator ShapeParameterUnion(BoxParameter value)
         {

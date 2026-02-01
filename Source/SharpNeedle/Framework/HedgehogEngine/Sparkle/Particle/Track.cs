@@ -19,7 +19,7 @@ public struct Track : IBinarySerializable
 
         if (KeyCount > 0)
         {
-            KeyFrames = new List<KeyFrame>();
+            KeyFrames = new(KeyCount);
             for (int i = 0; i < KeyCount; i++)
             {
                 KeyFrame keyFrame = new()
@@ -34,7 +34,7 @@ public struct Track : IBinarySerializable
                     SlopeLLowerBias = reader.ReadSingle(),
                     SlopeRUpperBias = reader.ReadSingle(),
                     SlopeRLowerBias = reader.ReadSingle(),
-                    KeyBreak = reader.Read<int>() == 1
+                    KeyBreak = reader.ReadInt32() == 1
                 };
                 KeyFrames.Add(keyFrame);
             }
@@ -43,23 +43,23 @@ public struct Track : IBinarySerializable
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.Write(CurveType);
-        writer.Write(KeyFrames.Count);
-        writer.Write(41);
+        writer.WriteInt32(CurveType);
+        writer.WriteInt32(KeyFrames.Count);
+        writer.WriteInt32(41);
 
         for (int i = 0; i < KeyFrames.Count; i++)
         {
-            writer.Write(KeyFrames[i].Time);
-            writer.Write(KeyFrames[i].Value);
-            writer.Write(KeyFrames[i].ValueUpperBias);
-            writer.Write(KeyFrames[i].ValueLowerBias);
-            writer.Write(KeyFrames[i].SlopeL);
-            writer.Write(KeyFrames[i].SlopeR);
-            writer.Write(KeyFrames[i].SlopeLUpperBias);
-            writer.Write(KeyFrames[i].SlopeLLowerBias);
-            writer.Write(KeyFrames[i].SlopeRUpperBias);
-            writer.Write(KeyFrames[i].SlopeRLowerBias);
-            writer.Write<int>(KeyFrames[i].KeyBreak ? 1 : 0);
+            writer.WriteSingle(KeyFrames[i].Time);
+            writer.WriteSingle(KeyFrames[i].Value);
+            writer.WriteSingle(KeyFrames[i].ValueUpperBias);
+            writer.WriteSingle(KeyFrames[i].ValueLowerBias);
+            writer.WriteSingle(KeyFrames[i].SlopeL);
+            writer.WriteSingle(KeyFrames[i].SlopeR);
+            writer.WriteSingle(KeyFrames[i].SlopeLUpperBias);
+            writer.WriteSingle(KeyFrames[i].SlopeLLowerBias);
+            writer.WriteSingle(KeyFrames[i].SlopeRUpperBias);
+            writer.WriteSingle(KeyFrames[i].SlopeRLowerBias);
+            writer.WriteInt32(KeyFrames[i].KeyBreak ? 1 : 0);
         }
     }
 }

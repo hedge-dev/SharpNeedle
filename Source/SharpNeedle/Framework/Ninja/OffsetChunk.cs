@@ -12,10 +12,10 @@ public class OffsetChunk : IChunk, IList<int>
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
-        options.Header ??= reader.ReadLittle<ChunkHeader>();
+        options.Header ??= reader.ReadObject<ChunkHeader>();
         Signature = options.Header.Value.Signature;
 
-        int count = reader.Read<int>();
+        int count = reader.ReadInt32();
         reader.Skip(4); // Runtime flags
         Offsets.AddRange(reader.ReadArray<int>(count));
     }
@@ -25,8 +25,8 @@ public class OffsetChunk : IChunk, IList<int>
         writer.WriteLittle(Signature);
         writer.WriteLittle(BinarySize - 8); // Size excluding header
 
-        writer.Write(Offsets.Count);
-        writer.Write(0); // Runtime flags, make this 0 to kill the game
+        writer.WriteInt32(Offsets.Count);
+        writer.WriteInt32(0); // Runtime flags, make this 0 to kill the game
         writer.WriteCollection(Offsets);
         writer.Align(16);
     }

@@ -9,26 +9,22 @@ public class AttachmentData : BaseNodeData
     public int Field4C { get; set; }
 
     public AttachmentData() { }
-    public AttachmentData(BinaryObjectReader reader, GameType game)
-    {
-        Read(reader, game);
-    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
-        Field00 = reader.Read<int>();
+        Field00 = reader.ReadInt32();
         NodeName = reader.ReadDiString(64);
-        Field44 = reader.Read<int>();
-        Field48 = reader.Read<int>();
-        Field4C = reader.Read<int>();
+        Field44 = reader.ReadInt32();
+        Field48 = reader.ReadInt32();
+        Field4C = reader.ReadInt32();
     }
 
     public override void Write(BinaryObjectWriter writer, GameType game)
     {
-        writer.Write(Field00);
+        writer.WriteInt32(Field00);
         writer.WriteDiString(NodeName, 64);
-        writer.Write(Field44);
-        writer.Write(Field48);
-        writer.Write(Field4C);
+        writer.WriteInt32(Field44);
+        writer.WriteInt32(Field48);
+        writer.WriteInt32(Field4C);
     }
 }

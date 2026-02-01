@@ -1,7 +1,7 @@
 ﻿namespace SharpNeedle.Structs;
 
 [StructLayout(LayoutKind.Sequential)]
-public struct Color<T> where T : struct, INumber<T>
+public struct Color<T> : IBinarySerializable where T : unmanaged, INumber<T> 
 {
     public T R;
     public T G;
@@ -39,6 +39,22 @@ public struct Color<T> where T : struct, INumber<T>
     public override readonly string ToString()
     {
         return $"{{ R:{R}, G:{G}, B:{B}, A:{A} }}";
+    }
+
+    public void Read(BinaryObjectReader reader)
+    {
+        R = reader.Read<T>();
+        G = reader.Read<T>();
+        B = reader.Read<T>();
+        A = reader.Read<T>();
+    }
+
+    public void Write(BinaryObjectWriter writer)
+    {
+        writer.Write(R);
+        writer.Write(G);
+        writer.Write(B);
+        writer.Write(A);
     }
 }
 

@@ -11,7 +11,7 @@ public class Terrain : SampleChunkResource
 
     public override void Write(BinaryObjectWriter writer)
     {
-        writer.Write(Groups.Count);
+        writer.WriteInt32(Groups.Count);
         writer.WriteOffset(() =>
         {
             foreach (TerrainGroupInfo group in Groups)

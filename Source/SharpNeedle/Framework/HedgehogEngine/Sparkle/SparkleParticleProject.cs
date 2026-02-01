@@ -33,21 +33,23 @@ public class SparkleParticleProject : ResourceBase, IBinarySerializable
         {
             Emitters.Add(reader.ReadObject<Emitter>());
         }
+
+        reader.Skip(16);
     }
     public void Write(BinaryObjectWriter writer)
     {
         writer.WriteObject(ProjectInfo);
 
         writer.WriteObject(Effect);
-        for (int i = 0; i < ProjectInfo.EmitterCount; i++)
+        for (int i = 0; i < ProjectInfo!.EmitterCount; i++)
         {
             writer.WriteObject(Emitters[i]);
         }
 
         //S E G A
-        writer.Write(83);
-        writer.Write(69);
-        writer.Write(71);
-        writer.Write(65);
+        writer.WriteInt32(83);
+        writer.WriteInt32(69);
+        writer.WriteInt32(71);
+        writer.WriteInt32(65);
     }
 }

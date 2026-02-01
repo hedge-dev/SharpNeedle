@@ -22,7 +22,7 @@ public class ComplexAnimation : AnimationDef
         Animations = reader.ReadObject<BinaryList<SimpleAnimation>>();
         reader.ReadOffset(() =>
         {
-            ComplexDataType type = reader.Read<ComplexDataType>();
+            ComplexDataType type = (ComplexDataType)reader.ReadInt32();
             switch (type)
             {
                 case ComplexDataType.SequenceTable:
@@ -45,7 +45,7 @@ public class ComplexAnimation : AnimationDef
 
         base.Write(writer);
         writer.WriteObject<BinaryList<SimpleAnimation>>(Animations);
-        writer.WriteOffset(() => writer.WriteObject(Data, true));
+        writer.WriteObjectOffset(Data, true);
     }
 }
 

@@ -21,41 +21,41 @@ public struct CastInfo : IBinarySerializable
 
     public void Read(BinaryObjectReader reader)
     {
-        HideFlag = reader.Read<uint>();
-        Translation = reader.Read<Vector2>();
-        Rotation = reader.Read<float>();
-        Scale = reader.Read<Vector2>();
-        SpriteIndex = reader.Read<float>();
+        HideFlag = reader.ReadUInt32();
+        Translation = reader.ReadVector2();
+        Rotation = reader.ReadSingle();
+        Scale = reader.ReadVector2();
+        SpriteIndex = reader.ReadSingle();
 
         // Colours are handled as uints for endianness
-        Unsafe.As<Color<byte>, uint>(ref Color) = reader.Read<uint>();
-        Unsafe.As<Color<byte>, uint>(ref GradientTopLeft) = reader.Read<uint>();
-        Unsafe.As<Color<byte>, uint>(ref GradientBottomLeft) = reader.Read<uint>();
-        Unsafe.As<Color<byte>, uint>(ref GradientTopRight) = reader.Read<uint>();
-        Unsafe.As<Color<byte>, uint>(ref GradientBottomRight) = reader.Read<uint>();
+        Unsafe.As<Color<byte>, uint>(ref Color) = reader.ReadUInt32();
+        Unsafe.As<Color<byte>, uint>(ref GradientTopLeft) = reader.ReadUInt32();
+        Unsafe.As<Color<byte>, uint>(ref GradientBottomLeft) = reader.ReadUInt32();
+        Unsafe.As<Color<byte>, uint>(ref GradientTopRight) = reader.ReadUInt32();
+        Unsafe.As<Color<byte>, uint>(ref GradientBottomRight) = reader.ReadUInt32();
 
-        UserData0 = reader.Read<uint>();
-        UserData1 = reader.Read<uint>();
-        UserData2 = reader.Read<uint>();
+        UserData0 = reader.ReadUInt32();
+        UserData1 = reader.ReadUInt32();
+        UserData2 = reader.ReadUInt32();
     }
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.Write(HideFlag);
-        writer.Write(Translation);
-        writer.Write(Rotation);
-        writer.Write(Scale);
-        writer.Write(SpriteIndex);
+        writer.WriteUInt32(HideFlag);
+        writer.WriteVector2(Translation);
+        writer.WriteSingle(Rotation);
+        writer.WriteVector2(Scale);
+        writer.WriteSingle(SpriteIndex);
 
         // Colours are handled as uints for endianness
-        writer.Write(Unsafe.As<Color<byte>, uint>(ref Color));
-        writer.Write(Unsafe.As<Color<byte>, uint>(ref GradientTopLeft));
-        writer.Write(Unsafe.As<Color<byte>, uint>(ref GradientBottomLeft));
-        writer.Write(Unsafe.As<Color<byte>, uint>(ref GradientTopRight));
-        writer.Write(Unsafe.As<Color<byte>, uint>(ref GradientBottomRight));
+        writer.WriteUInt32(Unsafe.As<Color<byte>, uint>(ref Color));
+        writer.WriteUInt32(Unsafe.As<Color<byte>, uint>(ref GradientTopLeft));
+        writer.WriteUInt32(Unsafe.As<Color<byte>, uint>(ref GradientBottomLeft));
+        writer.WriteUInt32(Unsafe.As<Color<byte>, uint>(ref GradientTopRight));
+        writer.WriteUInt32(Unsafe.As<Color<byte>, uint>(ref GradientBottomRight));
 
-        writer.Write(UserData0);
-        writer.Write(UserData1);
-        writer.Write(UserData2);
+        writer.WriteUInt32(UserData0);
+        writer.WriteUInt32(UserData1);
+        writer.WriteUInt32(UserData2);
     }
 }

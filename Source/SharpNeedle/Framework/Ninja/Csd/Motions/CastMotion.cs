@@ -18,7 +18,7 @@ public class CastMotion : List<KeyFrameList>, IBinarySerializable
     public void Read(BinaryObjectReader reader)
     {
         Clear();
-        Flags = reader.Read<BitSet<uint>>();
+        Flags = reader.ReadObject<BitSet<uint>>();
         int count = Flags.PopCount();
 
         if (count == 0)
@@ -48,7 +48,7 @@ public class CastMotion : List<KeyFrameList>, IBinarySerializable
     {
         if (Count == 0)
         {
-            writer.Write(0);
+            writer.WriteInt32(0);
             writer.WriteOffsetValue(0);
             return;
         }
@@ -59,7 +59,7 @@ public class CastMotion : List<KeyFrameList>, IBinarySerializable
             Flags.Set((int)list.Property);
         }
 
-        writer.Write(Flags);
+        writer.WriteObject(Flags);
         writer.WriteObjectCollectionOffset(this);
     }
 

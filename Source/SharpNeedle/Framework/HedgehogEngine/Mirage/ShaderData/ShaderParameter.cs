@@ -61,8 +61,8 @@ public class ShaderParameter : SampleChunkResource
 
         foreach (List<ShaderConstantUsage> usages in UsageSet)
         {
-            writer.Write(usages.Count);
-            ;
+            writer.WriteInt32(usages.Count);
+            
             writer.WriteOffset(() =>
             {
                 foreach (ShaderConstantUsage c in usages)

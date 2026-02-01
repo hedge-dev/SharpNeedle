@@ -16,10 +16,10 @@ public class ReferenceCastData : ICastData
         }
 
         Layer = reader.ReadObjectOffset<Layer, ChunkBinaryOptions>(options);
-        Field04 = reader.Read<int>();
-        AnimationID = reader.Read<int>();
-        AnimationFrame = reader.Read<int>();
-        Field10 = reader.Read<int>();
+        Field04 = reader.ReadInt32();
+        AnimationID = reader.ReadInt32();
+        AnimationFrame = reader.ReadInt32();
+        Field10 = reader.ReadInt32();
     }
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
@@ -35,9 +35,9 @@ public class ReferenceCastData : ICastData
         }
 
         writer.WriteObjectOffset(Layer, options);
-        writer.Write(Field04);
-        writer.Write(AnimationID);
-        writer.Write(AnimationFrame);
-        writer.Write(Field10);
+        writer.WriteInt32(Field04);
+        writer.WriteInt32(AnimationID);
+        writer.WriteInt32(AnimationFrame);
+        writer.WriteInt32(Field10);
     }
 }

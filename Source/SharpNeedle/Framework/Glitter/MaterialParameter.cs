@@ -25,24 +25,24 @@ public class MaterialParameter : IBinarySerializable
             TextureDatas.Insert(i, reader.ReadObject<TextureData>());
         }
 
-        int textureCount = reader.Read<int>();
-        TextureAddresMode = reader.Read<int>();
+        int textureCount = reader.ReadInt32();
+        TextureAddresMode = reader.ReadInt32();
 
-        Field2C = reader.Read<int>();
-        Field30 = reader.Read<float>();
-        Field34 = reader.Read<int>();
-        Field38 = reader.Read<int>();
+        Field2C = reader.ReadInt32();
+        Field30 = reader.ReadSingle();
+        Field34 = reader.ReadInt32();
+        Field38 = reader.ReadInt32();
 
         ShaderName = reader.ReadStringOffset();
 
         reader.Skip(reader.GetOffsetSize()); // VertexShaderDataOffset
         reader.Skip(reader.GetOffsetSize()); // PixelShaderDataOffset
 
-        Field48 = reader.Read<float>();
-        Field4C = reader.Read<int>();
-        Field50 = reader.Read<int>();
-        Field54 = reader.Read<int>();
-        Field58 = reader.Read<int>();
+        Field48 = reader.ReadSingle();
+        Field4C = reader.ReadInt32();
+        Field50 = reader.ReadInt32();
+        Field54 = reader.ReadInt32();
+        Field58 = reader.ReadInt32();
     }
 
     public void Write(BinaryObjectWriter writer)
@@ -54,24 +54,24 @@ public class MaterialParameter : IBinarySerializable
             writer.WriteObject(TextureDatas[i]);
         }
 
-        writer.Write(TextureDatas.Capacity);
-        writer.Write(TextureAddresMode);
+        writer.WriteInt32(TextureDatas.Capacity);
+        writer.WriteInt32(TextureAddresMode);
 
-        writer.Write(Field2C);
-        writer.Write(Field30);
-        writer.Write(Field34);
-        writer.Write(Field38);
+        writer.WriteInt32(Field2C);
+        writer.WriteSingle(Field30);
+        writer.WriteInt32(Field34);
+        writer.WriteInt32(Field38);
 
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, ShaderName);
 
         writer.Skip(writer.GetOffsetSize()); // VertexShaderDataOffset
         writer.Skip(writer.GetOffsetSize()); // PixelShaderDataOffset
 
-        writer.Write(Field48);
-        writer.Write(Field4C);
-        writer.Write(Field50);
-        writer.Write(Field54);
-        writer.Write(Field58);
+        writer.WriteSingle(Field48);
+        writer.WriteInt32(Field4C);
+        writer.WriteInt32(Field50);
+        writer.WriteInt32(Field54);
+        writer.WriteInt32(Field58);
     }
 
     public struct TextureData : IBinarySerializable
@@ -85,20 +85,20 @@ public class MaterialParameter : IBinarySerializable
         {
             Name = reader.ReadStringOffset();
 
-            Field04 = reader.Read<float>();
+            Field04 = reader.ReadSingle();
 
-            Field08 = reader.Read<int>();
-            Field0C = reader.Read<int>();
+            Field08 = reader.ReadInt32();
+            Field0C = reader.ReadInt32();
         }
 
         public readonly void Write(BinaryObjectWriter writer)
         {
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
 
-            writer.Write(Field04);
+            writer.WriteSingle(Field04);
 
-            writer.Write(Field08);
-            writer.Write(Field0C);
+            writer.WriteInt32(Field08);
+            writer.WriteInt32(Field0C);
         }
     }
 }

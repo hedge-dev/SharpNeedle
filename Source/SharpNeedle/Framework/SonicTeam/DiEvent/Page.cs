@@ -22,18 +22,18 @@ public class Page : IBinarySerializable
 
     public void Read(BinaryObjectReader reader)
     {
-        Version = reader.Read<uint>();
-        Flag = reader.Read<uint>();
-        StartFrame = reader.Read<uint>();
-        EndFrame = reader.Read<uint>();
-        Field10 = reader.Read<int>();
-        int dataSize = reader.Read<int>();
-        SceneEndFrame = reader.Read<int>();
-        Field1C = reader.Read<int>();
-        int unknownCount = reader.Read<int>();
-        Field24 = reader.Read<int>();
-        Field28 = reader.Read<int>();
-        Field2C = reader.Read<int>();
+        Version = reader.ReadUInt32();
+        Flag = reader.ReadUInt32();
+        StartFrame = reader.ReadUInt32();
+        EndFrame = reader.ReadUInt32();
+        Field10 = reader.ReadInt32();
+        int dataSize = reader.ReadInt32();
+        SceneEndFrame = reader.ReadInt32();
+        Field1C = reader.ReadInt32();
+        int unknownCount = reader.ReadInt32();
+        Field24 = reader.ReadInt32();
+        Field28 = reader.ReadInt32();
+        Field2C = reader.ReadInt32();
         Name = reader.ReadString(StringBinaryFormat.FixedLength, 32);
 
         UnknownArray = new int[unknownCount];
@@ -45,18 +45,18 @@ public class Page : IBinarySerializable
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.Write(Version);
-        writer.Write(Flag);
-        writer.Write(StartFrame);
-        writer.Write(EndFrame);
-        writer.Write(Field10);
-        writer.Write(Data.Length);
-        writer.Write(SceneEndFrame);
-        writer.Write(Field1C);
-        writer.Write(UnknownArray.Length);
-        writer.Write(Field24);
-        writer.Write(Field28);
-        writer.Write(Field2C);
+        writer.WriteUInt32(Version);
+        writer.WriteUInt32(Flag);
+        writer.WriteUInt32(StartFrame);
+        writer.WriteUInt32(EndFrame);
+        writer.WriteInt32(Field10);
+        writer.WriteInt32(Data.Length);
+        writer.WriteInt32(SceneEndFrame);
+        writer.WriteInt32(Field1C);
+        writer.WriteInt32(UnknownArray.Length);
+        writer.WriteInt32(Field24);
+        writer.WriteInt32(Field28);
+        writer.WriteInt32(Field2C);
         writer.WriteString(StringBinaryFormat.FixedLength, Name, 32);
 
         writer.WriteArray(UnknownArray);

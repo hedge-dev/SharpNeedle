@@ -77,7 +77,7 @@ public abstract class BaseShaderPermutation<TSubPermutation, TSubPermutationFlag
 
     public virtual void Write(BinaryObjectWriter writer)
     {
-        writer.Write(Convert.ToUInt32(SubPermutations));
+        writer.WriteUInt32(Convert.ToUInt32(SubPermutations));
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, PermutationName, -1, 1);
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, ShaderName, -1, 1);
     }

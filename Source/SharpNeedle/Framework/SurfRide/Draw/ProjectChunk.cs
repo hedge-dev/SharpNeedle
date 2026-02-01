@@ -16,18 +16,18 @@ public class ProjectChunk : ProjectNode, IChunk
             reader.OffsetBinaryFormat = OffsetBinaryFormat.U64;
         }
 
-        reader.ReadAtOffset((int)start - 8 + reader.Read<int>(), () => base.Read(reader, options));
-        Field0C = reader.Read<uint>();
+        reader.ReadAtOffset((int)start - 8 + reader.ReadInt32(), () => base.Read(reader, options));
+        Field0C = reader.ReadUInt32();
     }
 
     public new void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
         writer.WriteLittle(Signature);
-        writer.Write(0); // Size
+        writer.WriteInt32(0); // Size
 
         SeekToken start = writer.At();
-        writer.Write(0x10); // Project Offset, untracked
-        writer.Write(Field0C);
+        writer.WriteInt32(0x10); // Project Offset, untracked
+        writer.WriteUInt32(Field0C);
         base.Write(writer, options);
 
         writer.Flush();
@@ -36,7 +36,7 @@ public class ProjectChunk : ProjectNode, IChunk
 
         long size = (long)end - (long)start;
         writer.At((long)start - sizeof(int), SeekOrigin.Begin);
-        writer.Write((int)size);
+        writer.WriteInt32((int)size);
 
         end.Dispose();
     }
@@ -58,19 +58,19 @@ public class ProjectNode : IBinarySerializable<ChunkBinaryOptions>
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
         Name = reader.ReadStringOffset();
-        ushort sceneCount = reader.Read<ushort>();
-        Field06 = reader.Read<short>();
-        ushort texListCount = reader.Read<ushort>();
-        ushort fontCount = reader.Read<ushort>();
+        ushort sceneCount = reader.ReadUInt16();
+        Field06 = reader.ReadInt16();
+        ushort texListCount = reader.ReadUInt16();
+        ushort fontCount = reader.ReadUInt16();
         Scenes.AddRange(reader.ReadObjectArrayOffset<Scene, ChunkBinaryOptions>(options, sceneCount));
         TextureLists.AddRange(reader.ReadObjectArrayOffset<TextureList, ChunkBinaryOptions>(options, texListCount));
         Fonts.AddRange(reader.ReadObjectArrayOffset<Font, ChunkBinaryOptions>(options, fontCount));
         Camera = reader.ReadObject<Camera, ChunkBinaryOptions>(options);
-        StartFrame = reader.Read<uint>();
-        EndFrame = reader.Read<uint>();
+        StartFrame = reader.ReadUInt32();
+        EndFrame = reader.ReadUInt32();
         if (options.Version >= 1)
         {
-            FrameRate = reader.Read<float>();
+            FrameRate = reader.ReadSingle();
         }
 
         if (options.Version >= 3)
@@ -93,10 +93,10 @@ public class ProjectNode : IBinarySerializable<ChunkBinaryOptions>
         }
 
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-        writer.Write((ushort)Scenes.Count);
-        writer.Write(Field06);
-        writer.Write((ushort)TextureLists.Count);
-        writer.Write((ushort)Fonts.Count);
+        writer.WriteUInt16((ushort)Scenes.Count);
+        writer.WriteInt16(Field06);
+        writer.WriteUInt16((ushort)TextureLists.Count);
+        writer.WriteUInt16((ushort)Fonts.Count);
         if (Scenes.Count != 0)
         {
             writer.WriteObjectCollectionOffset(options, Scenes);
@@ -125,11 +125,11 @@ public class ProjectNode : IBinarySerializable<ChunkBinaryOptions>
         }
 
         writer.WriteObject(Camera, options);
-        writer.Write(StartFrame);
-        writer.Write(EndFrame);
+        writer.WriteUInt32(StartFrame);
+        writer.WriteUInt32(EndFrame);
         if (options.Version >= 1)
         {
-            writer.Write(FrameRate);
+            writer.WriteSingle(FrameRate);
         }
 
         if (options.Version >= 3)

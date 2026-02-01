@@ -15,7 +15,7 @@ public class TextureUnit : IBinarySerializable
     public void Write(BinaryObjectWriter writer)
     {
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-        writer.Write(Index);
+        writer.WriteByte(Index);
         writer.Align(4);
     }
 }

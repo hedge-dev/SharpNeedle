@@ -20,15 +20,15 @@ public struct Version : IBinarySerializable
 
     public void Read(BinaryObjectReader reader)
     {
-        byte ma = reader.Read<byte>();
-        byte mi = reader.Read<byte>();
-        byte r = reader.Read<byte>();
+        byte ma = reader.ReadByte();
+        byte mi = reader.ReadByte();
+        byte r = reader.ReadByte();
 
         Major = ma < 0x30 ? ma : (byte)(ma - 0x30);
         Minor = mi < 0x30 ? mi : (byte)(mi - 0x30);
         Revision = r < 0x30 ? r : (byte)(r - 0x30);
 
-        byte e = reader.Read<byte>();
+        byte e = reader.ReadByte();
         switch (e)
         {
             case 0x4C:
@@ -45,25 +45,25 @@ public struct Version : IBinarySerializable
     {
         if (Major == 0)
         {
-            writer.Write(Major);
-            writer.Write(Minor);
-            writer.Write((byte)(Revision + 0x30));
+            writer.WriteByte(Major);
+            writer.WriteByte(Minor);
+            writer.WriteByte((byte)(Revision + 0x30));
         }
         else
         {
-            writer.Write((byte)(Major + 0x30));
-            writer.Write((byte)(Minor + 0x30));
-            writer.Write((byte)(Revision + 0x30));
+            writer.WriteByte((byte)(Major + 0x30));
+            writer.WriteByte((byte)(Minor + 0x30));
+            writer.WriteByte((byte)(Revision + 0x30));
         }
 
         switch (Endianness)
         {
             case Endianness.Little:
-                writer.Write((byte)0x4C);
+                writer.WriteByte(0x4C);
                 break;
 
             case Endianness.Big:
-                writer.Write((byte)0x42);
+                writer.WriteByte(0x42);
                 break;
         }
     }

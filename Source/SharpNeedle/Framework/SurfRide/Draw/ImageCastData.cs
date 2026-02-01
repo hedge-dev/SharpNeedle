@@ -18,17 +18,17 @@ public class ImageCastData : IImageDataBase
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
-        Flags = reader.Read<CastAttribute>();
-        Size = reader.Read<Vector2>();
-        PivotPoint = reader.Read<Vector2>();
-        VertexColorTopLeft = reader.Read<Color<byte>>();
-        VertexColorBottomLeft = reader.Read<Color<byte>>();
-        VertexColorTopRight = reader.Read<Color<byte>>();
-        VertexColorBottomRight = reader.Read<Color<byte>>();
-        Surface.CropIndex = reader.Read<short>();
-        Surface1.CropIndex = reader.Read<short>();
-        Surface.CropRefs.Capacity = reader.Read<short>();
-        Surface1.CropRefs.Capacity = reader.Read<short>();
+        Flags = (CastAttribute)reader.ReadInt32();
+        Size = reader.ReadVector2();
+        PivotPoint = reader.ReadVector2();
+        VertexColorTopLeft = reader.ReadObject<Color<byte>>();
+        VertexColorBottomLeft = reader.ReadObject<Color<byte>>();
+        VertexColorTopRight = reader.ReadObject<Color<byte>>();
+        VertexColorBottomRight = reader.ReadObject<Color<byte>>();
+        Surface.CropIndex = reader.ReadInt16();
+        Surface1.CropIndex = reader.ReadInt16();
+        Surface.CropRefs.Capacity = reader.ReadInt16();
+        Surface1.CropRefs.Capacity = reader.ReadInt16();
         if (options.Version >= 3)
         {
             reader.Align(8);
@@ -36,7 +36,7 @@ public class ImageCastData : IImageDataBase
 
         if (Surface.CropRefs.Capacity > 0)
         {
-            Surface.CropRefs.AddRange(reader.ReadArrayOffset<CropRef>(Surface.CropRefs.Capacity));
+            Surface.CropRefs.AddRange(reader.ReadObjectArrayOffset<CropRef>(Surface.CropRefs.Capacity));
         }
         else
         {
@@ -45,7 +45,7 @@ public class ImageCastData : IImageDataBase
 
         if (Surface1.CropRefs.Capacity > 0)
         {
-            Surface1.CropRefs.AddRange(reader.ReadArrayOffset<CropRef>(Surface1.CropRefs.Capacity));
+            Surface1.CropRefs.AddRange(reader.ReadObjectArrayOffset<CropRef>(Surface1.CropRefs.Capacity));
         }
         else
         {
@@ -61,7 +61,7 @@ public class ImageCastData : IImageDataBase
             reader.ReadOffsetValue();
         }
 
-        EffectType type = reader.Read<EffectType>();
+        EffectType type = (EffectType)reader.ReadInt32();
         if (options.Version >= 3)
         {
             reader.Align(8);
@@ -72,17 +72,17 @@ public class ImageCastData : IImageDataBase
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
-        writer.Write(Flags);
-        writer.Write(Size);
-        writer.Write(PivotPoint);
-        writer.Write(VertexColorTopLeft);
-        writer.Write(VertexColorBottomLeft);
-        writer.Write(VertexColorTopRight);
-        writer.Write(VertexColorBottomRight);
-        writer.Write(Surface.CropIndex);
-        writer.Write(Surface1.CropIndex);
-        writer.Write((short)Surface.CropRefs.Count);
-        writer.Write((short)Surface1.CropRefs.Count);
+        writer.WriteInt32((int)Flags);
+        writer.WriteVector2(Size);
+        writer.WriteVector2(PivotPoint);
+        writer.WriteObject(VertexColorTopLeft);
+        writer.WriteObject(VertexColorBottomLeft);
+        writer.WriteObject(VertexColorTopRight);
+        writer.WriteObject(VertexColorBottomRight);
+        writer.WriteInt16(Surface.CropIndex);
+        writer.WriteInt16(Surface1.CropIndex);
+        writer.WriteInt16((short)Surface.CropRefs.Count);
+        writer.WriteInt16((short)Surface1.CropRefs.Count);
         if (options.Version >= 3)
         {
             writer.Align(8);
@@ -90,7 +90,7 @@ public class ImageCastData : IImageDataBase
 
         if (Surface.CropRefs.Count != 0)
         {
-            writer.WriteCollectionOffset(Surface.CropRefs);
+            writer.WriteObjectCollectionOffset(Surface.CropRefs);
         }
         else
         {
@@ -99,7 +99,7 @@ public class ImageCastData : IImageDataBase
 
         if (Surface1.CropRefs.Count != 0)
         {
-            writer.WriteCollectionOffset(Surface1.CropRefs);
+            writer.WriteObjectCollectionOffset(Surface1.CropRefs);
         }
         else
         {
@@ -115,7 +115,7 @@ public class ImageCastData : IImageDataBase
             writer.WriteOffsetValue(0);
         }
 
-        writer.Write(Effect?.Type ?? EffectType.None);
+        writer.WriteInt32((int)(Effect?.Type ?? EffectType.None));
         if (options.Version >= 3)
         {
             writer.Align(8);
@@ -139,19 +139,19 @@ public class FontData : IBinarySerializable<ChunkBinaryOptions>
 
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
-        Field00 = reader.Read<uint>();
-        FontListIndex = reader.Read<uint>();
+        Field00 = reader.ReadUInt32();
+        FontListIndex = reader.ReadUInt32();
         if (options.Version >= 3)
         {
             reader.Align(8);
         }
 
         Characters = reader.ReadStringOffset();
-        Scale = reader.Read<Vector2>();
-        Field14 = reader.Read<uint>();
-        Field18 = reader.Read<uint>();
-        SpaceCorrection = reader.Read<short>();
-        Field1E = reader.Read<ushort>();
+        Scale = reader.ReadVector2();
+        Field14 = reader.ReadUInt32();
+        Field18 = reader.ReadUInt32();
+        SpaceCorrection = reader.ReadInt16();
+        Field1E = reader.ReadUInt16();
         if (options.Version >= 3)
         {
             reader.Align(8);
@@ -162,19 +162,19 @@ public class FontData : IBinarySerializable<ChunkBinaryOptions>
 
     public void Write(BinaryObjectWriter writer, ChunkBinaryOptions options)
     {
-        writer.Write(Field00);
-        writer.Write(FontListIndex);
+        writer.WriteUInt32(Field00);
+        writer.WriteUInt32(FontListIndex);
         if (options.Version >= 3)
         {
             writer.Align(8);
         }
 
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Characters);
-        writer.Write(Scale);
-        writer.Write(Field14);
-        writer.Write(Field18);
-        writer.Write(SpaceCorrection);
-        writer.Write(Field1E);
+        writer.WriteVector2(Scale);
+        writer.WriteUInt32(Field14);
+        writer.WriteUInt32(Field18);
+        writer.WriteInt16(SpaceCorrection);
+        writer.WriteUInt16(Field1E);
         if (options.Version >= 3)
         {
             writer.Align(8);

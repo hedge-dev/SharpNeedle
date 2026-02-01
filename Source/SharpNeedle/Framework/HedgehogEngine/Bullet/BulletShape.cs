@@ -48,7 +48,7 @@ public class BulletShape : IBinarySerializable<int>
             Unknown2 = reader.ReadUInt32();
         }
 
-        Vertices = reader.ReadArrayOffset<Vector3>((int)vertexCount);
+        reader.ReadOffset(() => Vertices = reader.ReadVector3Array((int)vertexCount));
 
         if (IsConvex)
         {
@@ -125,7 +125,7 @@ public class BulletShape : IBinarySerializable<int>
             writer.WriteUInt32(Unknown2);
         }
 
-        writer.WriteArrayOffset(Vertices, 0x10);
+        writer.WriteOffset(() => writer.WriteVector3Array(Vertices), 0x10);
 
         if (IsConvex)
         {
@@ -165,40 +165,6 @@ public class BulletShape : IBinarySerializable<int>
                     writer.WriteUInt32((uint)Types[i]);
                 }
             }, 0x10);
-        }
-    }
-
-    public unsafe void GenerateBVH()
-    {
-        if (Faces == null || Faces.Length == 0 || Vertices.Length == 0)
-        {
-            BVH = [];
-            return;
-        }
-
-        Vector3 aabbMin = new(float.PositiveInfinity);
-        Vector3 aabbMax = new(float.NegativeInfinity);
-
-        foreach (Vector3 vertex in Vertices)
-        {
-            aabbMin = Vector3.Min(vertex, aabbMin);
-            aabbMax = Vector3.Max(vertex, aabbMax);
-        }
-
-        BulletSharp.TriangleIndexVertexArray vertexArray = new(
-            (int[])(object)Faces,
-            Vertices
-        );
-
-        BulletSharp.OptimizedBvh bvhBuider = new();
-        bvhBuider.Build(vertexArray, true, aabbMin, aabbMax);
-
-        uint size = bvhBuider.CalculateSerializeBufferSize();
-        BVH = new byte[size];
-
-        fixed (byte* bvh = BVH)
-        {
-            bvhBuider.SerializeInPlace((nint)bvh, (uint)BVH.Length, false);
         }
     }
 }

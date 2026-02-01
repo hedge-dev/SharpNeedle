@@ -13,8 +13,8 @@ public class CastNode : IBinarySerializable<ChunkBinaryOptions>
     public void Read(BinaryObjectReader reader, ChunkBinaryOptions options)
     {
         Name = reader.ReadStringOffset();
-        ID = reader.Read<int>();
-        Flags = reader.Read<uint>();
+        ID = reader.ReadInt32();
+        Flags = reader.ReadUInt32();
         switch (Flags & 0xF)
         {
             case 1:
@@ -31,8 +31,8 @@ public class CastNode : IBinarySerializable<ChunkBinaryOptions>
                 break;
         }
 
-        ChildIndex = reader.Read<short>();
-        SiblingIndex = reader.Read<short>();
+        ChildIndex = reader.ReadInt16();
+        SiblingIndex = reader.ReadInt16();
         if (options.Version >= 3)
         {
             reader.Align(8);
@@ -53,8 +53,8 @@ public class CastNode : IBinarySerializable<ChunkBinaryOptions>
         }
 
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name);
-        writer.Write(ID);
-        writer.Write(Flags);
+        writer.WriteInt32(ID);
+        writer.WriteUInt32(Flags);
         if (Data != null)
         {
             writer.WriteObjectOffset(Data, options);
@@ -64,8 +64,8 @@ public class CastNode : IBinarySerializable<ChunkBinaryOptions>
             writer.WriteOffsetValue(0);
         }
 
-        writer.Write(ChildIndex);
-        writer.Write(SiblingIndex);
+        writer.WriteInt16(ChildIndex);
+        writer.WriteInt16(SiblingIndex);
         if (options.Version >= 3)
         {
             writer.Align(8);

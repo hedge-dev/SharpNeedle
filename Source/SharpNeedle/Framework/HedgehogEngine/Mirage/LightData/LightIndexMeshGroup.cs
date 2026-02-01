@@ -33,7 +33,7 @@ public class LightIndexMeshGroup : List<LightIndexMesh>, IBinarySerializable
 
         void WriteMeshes(IEnumerable<LightIndexMesh> meshes)
         {
-            writer.Write(meshes.Count());
+            writer.WriteInt32(meshes.Count());
             writer.WriteOffset(() =>
             {
                 foreach (LightIndexMesh mesh in meshes)

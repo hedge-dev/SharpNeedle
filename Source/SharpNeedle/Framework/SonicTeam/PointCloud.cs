@@ -17,7 +17,7 @@ public class PointCloud : BinaryResource
     public override void Read(BinaryObjectReader reader)
     {
         reader.EnsureSignature(Signature);
-        FormatVersion = reader.Read<uint>();
+        FormatVersion = reader.ReadUInt32();
 
         long instancesOffset = reader.ReadOffsetValue();
         long instanceCount = reader.ReadOffsetValue();
@@ -33,8 +33,8 @@ public class PointCloud : BinaryResource
 
     public override void Write(BinaryObjectWriter writer)
     {
-        writer.Write(Signature);
-        writer.Write(FormatVersion);
+        writer.WriteUInt32(Signature);
+        writer.WriteUInt32(FormatVersion);
 
         writer.WriteOffset(() =>
         {
@@ -44,7 +44,7 @@ public class PointCloud : BinaryResource
             }
         });
 
-        writer.Write<long>(Instances.Count);
+        writer.WriteInt64(Instances.Count);
     }
 
     public class InstanceData : IBinarySerializable<bool>
@@ -60,10 +60,10 @@ public class PointCloud : BinaryResource
         {
             Name = reader.ReadStringOffset(StringBinaryFormat.NullTerminated);
             ResourceName = reader.ReadStringOffset(StringBinaryFormat.NullTerminated);
-            Position = reader.Read<Vector3>();
-            Rotation = reader.Read<Vector3>();
-            Field28 = reader.Read<int>();
-            Scale = reader.Read<Vector3>();
+            Position = reader.ReadVector3();
+            Rotation = reader.ReadVector3();
+            Field28 = reader.ReadInt32();
+            Scale = reader.ReadVector3();
 
             reader.Skip(4);
 
@@ -78,10 +78,10 @@ public class PointCloud : BinaryResource
         {
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Name, -1, 1);
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, ResourceName, -1, 1);
-            writer.Write(Position);
-            writer.Write(Rotation);
-            writer.Write(Field28);
-            writer.Write(Scale);
+            writer.WriteVector3(Position);
+            writer.WriteVector3(Rotation);
+            writer.WriteInt32(Field28);
+            writer.WriteVector3(Scale);
 
             writer.Skip(4);
 

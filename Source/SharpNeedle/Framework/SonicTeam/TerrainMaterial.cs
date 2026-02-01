@@ -17,21 +17,21 @@ public class TerrainMaterial : BinaryResource
     public override void Read(BinaryObjectReader reader)
     {
         reader.EnsureSignature(Signature);
-        FormatVersion = reader.Read<uint>();
+        FormatVersion = reader.ReadUInt32();
 
         long instancesOffset = reader.ReadOffsetValue();
-        int instanceCount = (int)reader.Read<long>();
+        int instanceCount = (int)reader.ReadInt64();
 
         reader.ReadAtOffset(instancesOffset, () => Layers.AddRange(reader.ReadObjectArray<TerrainLayer>(instanceCount)));
     }
 
     public override void Write(BinaryObjectWriter writer)
     {
-        writer.Write(Signature);
-        writer.Write(FormatVersion);
+        writer.WriteUInt32(Signature);
+        writer.WriteUInt32(FormatVersion);
 
         writer.WriteObjectCollectionOffset(Layers);
-        writer.Write<long>(Layers.Count);
+        writer.WriteInt64(Layers.Count);
     }
 
     public class TerrainLayer : IBinarySerializable
@@ -53,10 +53,10 @@ public class TerrainMaterial : BinaryResource
         {
             Type = reader.ReadStringOffset(StringBinaryFormat.NullTerminated);
 
-            SplatIndex = reader.Read<int>();
-            Field0C = reader.Read<int>();
-            Field10 = reader.Read<int>();
-            Field14 = reader.Read<int>();
+            SplatIndex = reader.ReadInt32();
+            Field0C = reader.ReadInt32();
+            Field10 = reader.ReadInt32();
+            Field14 = reader.ReadInt32();
 
             DetailAlbedoMap = reader.ReadStringOffset(StringBinaryFormat.NullTerminated);
             DetailNormalMap = reader.ReadStringOffset(StringBinaryFormat.NullTerminated);
@@ -70,10 +70,10 @@ public class TerrainMaterial : BinaryResource
         {
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Type, -1, 1);
 
-            writer.Write(SplatIndex);
-            writer.Write(Field0C);
-            writer.Write(Field10);
-            writer.Write(Field14);
+            writer.WriteInt32(SplatIndex);
+            writer.WriteInt32(Field0C);
+            writer.WriteInt32(Field10);
+            writer.WriteInt32(Field14);
 
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, DetailAlbedoMap, -1, 1);
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, DetailNormalMap, -1, 1);

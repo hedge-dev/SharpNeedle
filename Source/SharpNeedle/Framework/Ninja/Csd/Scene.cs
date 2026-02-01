@@ -1,7 +1,6 @@
 ﻿namespace SharpNeedle.Framework.Ninja.Csd;
 
 using SharpNeedle.Framework.Ninja.Csd.Motions;
-using FrameInfo = ValueTuple<float, float>;
 
 public class Scene : IBinarySerializable
 {
@@ -16,15 +15,18 @@ public class Scene : IBinarySerializable
 
     public void Read(BinaryObjectReader reader)
     {
-        Version = reader.Read<int>();
-        Priority = reader.Read<float>();
-        FrameRate = reader.Read<float>();
-        float motionBegin = reader.Read<float>();
-        float motionEnd = reader.Read<float>();
-        Textures = new List<Vector2>(reader.ReadArrayOffset<Vector2>(reader.Read<int>()));
-        Sprites = new List<Sprite>(reader.ReadArrayOffset<Sprite>(reader.Read<int>()));
+        Version = reader.ReadInt32();
+        Priority = reader.ReadSingle();
+        FrameRate = reader.ReadSingle();
+        float motionBegin = reader.ReadSingle();
+        float motionEnd = reader.ReadSingle();
 
-        int familyCount = reader.Read<int>();
+        int texturesCount = reader.ReadInt32();
+        reader.ReadOffset(() => Textures = [.. reader.ReadVector2Array(texturesCount)]);
+
+        Sprites = [.. reader.ReadObjectArrayOffset<Sprite>(reader.ReadInt32())];
+
+        int familyCount = reader.ReadInt32();
         Families = new List<Family>(familyCount);
         reader.ReadOffset(() =>
         {
@@ -50,17 +52,19 @@ public class Scene : IBinarySerializable
 
         if (Version >= 1)
         {
-            AspectRatio = reader.Read<float>();
+            AspectRatio = reader.ReadSingle();
         }
 
         if (Version >= 2)
         {
-            (float, float)[] frameInfo = reader.ReadArrayOffset<FrameInfo>(Motions.Count);
-            for (int i = 0; i < Motions.Count; i++)
+            reader.ReadOffset(() =>
             {
-                Motions[i].StartFrame = frameInfo[i].Item1;
-                Motions[i].EndFrame = frameInfo[i].Item2;
-            }
+                for(int i = 0; i < Motions.Count; i++)
+                {
+                    Motions[i].StartFrame = reader.ReadSingle();
+                    Motions[i].EndFrame = reader.ReadSingle();
+                }
+            });
         }
 
         if (Version >= 3)
@@ -82,19 +86,19 @@ public class Scene : IBinarySerializable
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.Write(Version);
-        writer.Write(Priority);
-        writer.Write(FrameRate);
-        writer.Write(Motions.Count != 0 ? Motions.Min(x => x.Value.StartFrame) : 0);
-        writer.Write(Motions.Count != 0 ? Motions.Max(x => x.Value.EndFrame) : 0);
+        writer.WriteInt32(Version);
+        writer.WriteSingle(Priority);
+        writer.WriteSingle(FrameRate);
+        writer.WriteSingle(Motions.Count != 0 ? Motions.Min(x => x.Value.StartFrame) : 0);
+        writer.WriteSingle(Motions.Count != 0 ? Motions.Max(x => x.Value.EndFrame) : 0);
 
-        writer.Write(Textures.Count);
-        writer.WriteArrayOffset(CollectionsMarshal.AsSpan(Textures).AsMemory());
+        writer.WriteInt32(Textures.Count);
+        writer.WriteOffset(() => writer.WriteVector2Array(Textures.ToArray()));
 
-        writer.Write(Sprites.Count);
-        writer.WriteArrayOffset(CollectionsMarshal.AsSpan(Sprites).AsMemory());
+        writer.WriteInt32(Sprites.Count);
+        writer.WriteObjectCollectionOffset(Sprites);
 
-        writer.Write(Families.Count);
+        writer.WriteInt32(Families.Count);
         writer.WriteOffset(() =>
         {
             foreach (Family family in Families)
@@ -108,7 +112,7 @@ public class Scene : IBinarySerializable
 
         if (Version >= 1)
         {
-            writer.Write(AspectRatio);
+            writer.WriteSingle(AspectRatio);
         }
 
         if (Version >= 2)
@@ -117,7 +121,8 @@ public class Scene : IBinarySerializable
             {
                 for (int i = 0; i < Motions.Count; i++)
                 {
-                    writer.Write(new FrameInfo(Motions[i].StartFrame, Motions[i].EndFrame));
+                    writer.WriteSingle(Motions[i].StartFrame);
+                    writer.WriteSingle(Motions[i].EndFrame);
                 }
             });
         }

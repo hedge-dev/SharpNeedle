@@ -12,34 +12,23 @@ public class GITextureGroup : IBinarySerializable
 
     public void Read(BinaryObjectReader reader)
     {
-        Quality = reader.Read<GIQualityLevel>();
-        reader.Read(out int indexCount);
-        Indices = new List<int>(indexCount);
-        reader.ReadOffset(() =>
-        {
-            for (int i = 0; i < indexCount; i++)
-            {
-                Indices.Add(reader.Read<int>());
-            }
-        });
+        Quality = (GIQualityLevel)reader.ReadInt32();
 
-        Bounds = reader.ReadValueOffset<Sphere>();
-        MemorySize = reader.Read<uint>();
+        int indexCount = reader.ReadInt32();
+        Indices = new List<int>(indexCount);
+        reader.ReadOffset(() => reader.ReadCollection(indexCount, Indices));
+        
+        Bounds = reader.ReadObjectOffset<Sphere>();
+        MemorySize = reader.ReadUInt32();
     }
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.Write(Quality);
-        writer.Write(Indices.Count);
-        writer.WriteOffset(() =>
-        {
-            foreach (int index in Indices)
-            {
-                writer.Write(index);
-            }
-        });
-        writer.WriteValueOffset(Bounds);
-        writer.Write(MemorySize);
+        writer.WriteInt32((int)Quality);
+        writer.WriteInt32(Indices.Count);
+        writer.WriteCollectionOffset(Indices);
+        writer.WriteObjectOffset(Bounds);
+        writer.WriteUInt32(MemorySize);
     }
 
 }

@@ -5,21 +5,17 @@ public class DitherDepthParam : BaseParam
     public float Field04 { get; set; }
 
     public DitherDepthParam() { }
-    public DitherDepthParam(BinaryObjectReader reader, GameType game)
-    {
-        Read(reader, game);
-    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
-        Field00 = reader.Read<uint>();
-        Field04 = reader.Read<float>();
+        Field00 = reader.ReadUInt32();
+        Field04 = reader.ReadSingle();
     }
 
     public override void Write(BinaryObjectWriter writer, GameType game)
     {
-        writer.Write(Field00);
-        writer.Write(Field04);
+        writer.WriteUInt32(Field00);
+        writer.WriteSingle(Field04);
     }
 
     public override int GetTypeID(GameType game)

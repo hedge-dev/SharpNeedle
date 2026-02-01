@@ -10,15 +10,11 @@ public class ChromaAberrationParam : BaseParam
     public float[] CurveData { get; set; } = new float[32];
 
     public ChromaAberrationParam() { }
-    public ChromaAberrationParam(BinaryObjectReader reader, GameType game)
-    {
-        Read(reader, game);
-    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
         EndpointA = reader.ReadObject<Endpoint>();
-        Field20 = reader.Read<float>();
+        Field20 = reader.ReadSingle();
         EndpointB = reader.ReadObject<Endpoint>();
 
         reader.ReadArray<float>(32, CurveData);
@@ -27,7 +23,7 @@ public class ChromaAberrationParam : BaseParam
     public override void Write(BinaryObjectWriter writer, GameType game)
     {
         writer.WriteObject(EndpointA);
-        writer.Write(Field20);
+        writer.WriteSingle(Field20);
         writer.WriteObject(EndpointB);
 
         writer.WriteArrayFixedLength(CurveData, 32);
@@ -57,25 +53,20 @@ public class ChromaAberrationParam : BaseParam
 
         public Endpoint() { }
 
-        public Endpoint(BinaryObjectReader reader)
-        {
-            Read(reader);
-        }
-
         public void Read(BinaryObjectReader reader)
         {
-            ColorOffset = new Color<float>(reader.Read<float>(), reader.Read<float>(), reader.Read<float>(), 1.0f);
-            SphereCurve = reader.Read<float>();
-            Scale = reader.Read<Vector2>();
-            Position = reader.Read<Vector2>();
+            ColorOffset = new Color<float>(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), 1.0f);
+            SphereCurve = reader.ReadSingle();
+            Scale = reader.ReadVector2();
+            Position = reader.ReadVector2();
         }
 
         public void Write(BinaryObjectWriter writer)
         {
-            writer.Write(new Vector3(ColorOffset.R, ColorOffset.G, ColorOffset.B));
-            writer.Write(SphereCurve);
-            writer.Write(Scale);
-            writer.Write(Position);
+            writer.WriteVector3(new Vector3(ColorOffset.R, ColorOffset.G, ColorOffset.B));
+            writer.WriteSingle(SphereCurve);
+            writer.WriteVector2(Scale);
+            writer.WriteVector2(Position);
         }
     }
 }

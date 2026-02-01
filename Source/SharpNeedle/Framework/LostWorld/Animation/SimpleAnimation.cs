@@ -20,11 +20,11 @@ public class SimpleAnimation : AnimationDef
     {
         base.Read(reader);
         ResourceName = reader.ReadStringOffset();
-        StartFrame = reader.Read<float>();
-        EndFrame = reader.Read<float>();
-        Speed = reader.Read<float>();
-        PlayMode = reader.Read<PlayModeInfo>();
-        Options = reader.Read<AnimOptions>();
+        StartFrame = reader.ReadSingle();
+        EndFrame = reader.ReadSingle();
+        Speed = reader.ReadSingle();
+        PlayMode = reader.ReadObject<PlayModeInfo>();
+        Options = (AnimOptions)reader.ReadInt32();
         Interpolations = reader.ReadObject<BinaryList<InterpolateInfo>>();
         Triggers = reader.ReadObject<BinaryList<TriggerInfo>>();
     }
@@ -33,11 +33,11 @@ public class SimpleAnimation : AnimationDef
     {
         base.Write(writer);
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, ResourceName);
-        writer.Write(StartFrame);
-        writer.Write(EndFrame);
-        writer.Write(Speed);
-        writer.Write(PlayMode);
-        writer.Write(Options);
+        writer.WriteSingle(StartFrame);
+        writer.WriteSingle(EndFrame);
+        writer.WriteSingle(Speed);
+        writer.WriteObject(PlayMode);
+        writer.WriteInt32((int)Options);
         writer.WriteObject<BinaryList<InterpolateInfo>>(Interpolations);
         writer.WriteObject<BinaryList<TriggerInfo>>(Triggers);
     }

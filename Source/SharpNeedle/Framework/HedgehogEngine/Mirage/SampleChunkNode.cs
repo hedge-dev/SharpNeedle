@@ -4,10 +4,10 @@ using System.Collections.ObjectModel;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-[JsonConverter(typeof(JsonConverter))]
+[JsonConverter(typeof(SampleChunkNode.JsonConverter))]
 public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
 {
-    private class JsonConverter : JsonConverter<SampleChunkNode>
+    public class JsonConverter : JsonConverter<SampleChunkNode>
     {
         public override SampleChunkNode? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
@@ -76,6 +76,7 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
 
                 writer.WriteEndArray();
             }
+
             writer.WriteEndObject();
         }
     }
@@ -183,11 +184,8 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
     /// </summary>
     public void Detach()
     {
-        if (Parent != null)
-        {
-            Parent._children.Remove(this);
-            Parent = null;
-        }
+        Parent?._children.Remove(this);
+        Parent = null;
     }
 
     /// <summary>
@@ -301,7 +299,7 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
         Flags flags = (Flags)header & Flags.Mask;
         uint size = header & (uint)Flags.SizeMask;
 
-        Value = reader.Read<uint>();
+        Value = reader.ReadUInt32();
         Name = reader.ReadString(StringBinaryFormat.FixedLength, 8);
 
         int spaceIdx = Name.IndexOf(' ');
@@ -341,14 +339,14 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
     {
         long start = writer.Position;
         SeekToken flagsToken = writer.At();
-        writer.Write(0u);
+        writer.WriteUInt32(0u);
 
         Flags flags = default;
         if (Parent == null)
         {
             flags = Flags.Root;
-            writer.Write(RootSignature);
-            writer.Write(0ul);
+            writer.WriteUInt32(RootSignature);
+            writer.WriteUInt64(0ul);
             writer.PushOffsetOrigin();
         }
         else
@@ -358,7 +356,7 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
                 flags = Flags.LastChild;
             }
 
-            writer.Write(Value);
+            writer.WriteUInt32(Value);
             writer.WriteLittle(BinaryHelper.MakeSignature<ulong>(Name, 0x20));
         }
 
@@ -403,11 +401,11 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
                 long nodeContentOffset = start + 0x10;
                 foreach (long offset in offsets)
                 {
-                    writer.Write((uint)(offset - nodeContentOffset));
+                    writer.WriteUInt32((uint)(offset - nodeContentOffset));
                 }
             });
 
-            writer.Write(offsets.Length);
+            writer.WriteInt32(offsets.Length);
         }
         else if (lastNode && Parent.Parent == null)
         {
@@ -427,7 +425,7 @@ public class SampleChunkNode : IBinarySerializable, IEnumerable<SampleChunkNode>
 
         using SeekToken endToken = writer.At();
         flagsToken.Dispose();
-        writer.Write((uint)((long)endToken - start) | (uint)flags);
+        writer.WriteUInt32((uint)((long)endToken - start) | (uint)flags);
     }
 
 

@@ -53,27 +53,31 @@ public abstract class ModelBase : SampleChunkResource
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     protected void CommonRead(BinaryObjectReader reader)
     {
+        MeshSerializeContext context = new(DataVersion, false);
+
         if (DataVersion >= 5)
         {
-            Groups = reader.ReadObject<BinaryList<BinaryPointer<MeshGroup, uint>, uint>, uint>(DataVersion).Unwind();
+            Groups = reader.ReadObject<BinaryList<BinaryPointer<MeshGroup, MeshSerializeContext>, MeshSerializeContext>, MeshSerializeContext>(context).Unwind();
         }
         else
         {
-            Groups = [reader.ReadObject<MeshGroup, uint>(DataVersion)];
+            Groups = [reader.ReadObject<MeshGroup, MeshSerializeContext>(context)];
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     protected void CommonWrite(BinaryObjectWriter writer)
     {
+        MeshSerializeContext context = new(DataVersion, false);
+
         if (DataVersion >= 5)
         {
-            writer.Write(Groups.Count);
+            writer.WriteInt32(Groups.Count);
             writer.WriteOffset(() =>
             {
                 foreach (MeshGroup group in Groups)
                 {
-                    writer.WriteObjectOffset(group, DataVersion);
+                    writer.WriteObjectOffset(group, context);
                 }
             });
         }
@@ -81,14 +85,14 @@ public abstract class ModelBase : SampleChunkResource
         {
             if (Groups.Count == 1)
             {
-                writer.WriteObject(Groups[0], DataVersion);
+                writer.WriteObject(Groups[0], context);
             }
             else
             {
                 MeshGroup dummyMeshGroup = [];
                 dummyMeshGroup.Capacity = Groups.Sum(x => x.Count);
                 dummyMeshGroup.AddRange(Groups.SelectMany(x => x));
-                writer.WriteObject(dummyMeshGroup, DataVersion);
+                writer.WriteObject(dummyMeshGroup, context);
             }
         }
     }

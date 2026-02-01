@@ -23,19 +23,19 @@ public class Resource : IBinarySerializable
 
     public void Read(BinaryObjectReader reader)
     {
-        GUID = reader.Read<Guid>();
-        ResType = (ResourceType)reader.Read<int>();
-        Flags = reader.Read<uint>();
-        Field18 = reader.Read<int>();
+        GUID = reader.ReadGuid();
+        ResType = (ResourceType)reader.ReadInt32();
+        Flags = reader.ReadUInt32();
+        Field18 = reader.ReadInt32();
         Name = reader.ReadString(StringBinaryFormat.FixedLength, 788);
     }
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.Write(GUID);
-        writer.Write((int)ResType);
-        writer.Write(Flags);
-        writer.Write(Field18);
+        writer.WriteGuid(GUID);
+        writer.WriteInt32((int)ResType);
+        writer.WriteUInt32(Flags);
+        writer.WriteInt32(Field18);
         writer.WriteString(StringBinaryFormat.FixedLength, Name, 788);
     }
 }

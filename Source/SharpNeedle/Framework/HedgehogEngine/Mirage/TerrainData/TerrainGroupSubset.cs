@@ -9,7 +9,7 @@ public class TerrainGroupSubset : List<string?>, IBinarySerializable
 
     public void Read(BinaryObjectReader reader)
     {
-        reader.Read(out int instanceCount);
+        int instanceCount = reader.ReadInt32();
         Clear();
         Capacity = instanceCount;
 
@@ -21,12 +21,12 @@ public class TerrainGroupSubset : List<string?>, IBinarySerializable
             }
         });
 
-        Bounds = reader.ReadValueOffset<Sphere>();
+        Bounds = reader.ReadObjectOffset<Sphere>();
     }
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.Write(Count);
+        writer.WriteInt32(Count);
 
         writer.WriteOffset(() =>
         {
@@ -35,6 +35,6 @@ public class TerrainGroupSubset : List<string?>, IBinarySerializable
                 writer.WriteStringOffset(StringBinaryFormat.NullTerminated, instance);
             }
         });
-        writer.WriteValueOffset(Bounds);
+        writer.WriteObjectOffset(Bounds);
     }
 }

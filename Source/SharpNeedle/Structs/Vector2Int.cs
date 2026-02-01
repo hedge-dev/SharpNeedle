@@ -1,6 +1,6 @@
 ﻿namespace SharpNeedle.Structs;
 
-public struct Vector2Int
+public struct Vector2Int : IBinarySerializable
 {
     public int X, Y;
 
@@ -8,6 +8,18 @@ public struct Vector2Int
     {
         X = x;
         Y = y;
+    }
+
+    public void Read(BinaryObjectReader reader)
+    {
+        X = reader.ReadInt32();
+        Y = reader.ReadInt32();
+    }
+
+    public void Write(BinaryObjectWriter writer)
+    {
+        writer.WriteInt32(X);
+        writer.WriteInt32(Y);
     }
 
     public static Vector2Int operator +(Vector2Int a, Vector2Int b)

@@ -106,26 +106,26 @@ public class Particle : IBinarySerializable
         DirectionType = (DirectionType)reader.ReadInt32();
         ParticleDataFlags = reader.ReadInt32();
 
-        Color = reader.Read<Vector4Int>();
+        Color = reader.ReadObject<Vector4Int>();
 
-        Gravity = reader.Read<Vector4>();
-        ExternalForce = reader.Read<Vector4>();
+        Gravity = reader.ReadVector4();
+        ExternalForce = reader.ReadVector4();
 
-        InitialDirection = reader.Read<Vector4>();
-        InitialDirectionBias = reader.Read<Vector4>();
+        InitialDirection = reader.ReadVector4();
+        InitialDirectionBias = reader.ReadVector4();
 
-        InitialScale = reader.Read<Vector4>();
-        InitialScaleBias = reader.Read<Vector4>();
+        InitialScale = reader.ReadVector4();
+        InitialScaleBias = reader.ReadVector4();
 
         MeshName = reader.ReadStringPaddedByte(4);
 
-        RotationXYZ = reader.Read<Vector4>();
-        RotationXYZBias = reader.Read<Vector4>();
-        InitialRotationXYZ = reader.Read<Vector4>();
-        InitialRotationXYZBias = reader.Read<Vector4>();
+        RotationXYZ = reader.ReadVector4();
+        RotationXYZBias = reader.ReadVector4();
+        InitialRotationXYZ = reader.ReadVector4();
+        InitialRotationXYZBias = reader.ReadVector4();
 
-        UVScrollParam = reader.Read<Vector4>();
-        UVScrollParamAlpha = reader.Read<Vector4>();
+        UVScrollParam = reader.ReadVector4();
+        UVScrollParamAlpha = reader.ReadVector4();
 
         RefEffectName = reader.ReadStringPaddedByte(4);
         RefEffectEmitTimingType = reader.ReadInt32();
@@ -135,7 +135,7 @@ public class Particle : IBinarySerializable
         DeflectionScale = reader.ReadSingle();
         SoftScale = reader.ReadSingle();
         VelocityOffset = reader.ReadSingle();
-        UserData = reader.ReadInt32();
+        UserData = reader.ReadSingle();
 
         MaterialName = reader.ReadStringPaddedByte(4);
 
@@ -153,71 +153,71 @@ public class Particle : IBinarySerializable
     {
         writer.WriteStringPaddedByte("ParticleChunk", 4);
         writer.WriteStringPaddedByte(ParticleName, 4);
-        writer.Write(LifeTime);
-        writer.Write(LifeTimeBias);
+        writer.WriteSingle(LifeTime);
+        writer.WriteSingle(LifeTimeBias);
 
-        writer.Write(RotationZ);
-        writer.Write(RotationZBias);
-        writer.Write(InitialRotationZ);
-        writer.Write(InitialRotationZBias);
+        writer.WriteSingle(RotationZ);
+        writer.WriteSingle(RotationZBias);
+        writer.WriteSingle(InitialRotationZ);
+        writer.WriteSingle(InitialRotationZBias);
 
-        writer.Write(InitialSpeed);
-        writer.Write(InitialSpeedBias);
+        writer.WriteSingle(InitialSpeed);
+        writer.WriteSingle(InitialSpeedBias);
 
-        writer.Write(ZOffset);
-        writer.Write(LocusDiff);
-        writer.Write(NumDivision);
-        writer.Write(LocusUVType);
-        writer.Write(IsBillboard ? 1 : 0);
-        writer.Write(IsEmitterLocal ? 1 : 0);
+        writer.WriteSingle(ZOffset);
+        writer.WriteSingle(LocusDiff);
+        writer.WriteInt32(NumDivision);
+        writer.WriteInt32((int)LocusUVType);
+        writer.WriteInt32(IsBillboard ? 1 : 0);
+        writer.WriteInt32(IsEmitterLocal ? 1 : 0);
 
-        writer.Write(LayerType);
-        writer.Write(PivotType);
-        writer.Write(UVDescType);
+        writer.WriteInt32((int)LayerType);
+        writer.WriteInt32((int)PivotType);
+        writer.WriteInt32((int)UVDescType);
 
-        writer.Write(TextureIndexType);
-        writer.Write(TextureIndexChangeInterval);
-        writer.Write(TextureIndexChangeIntervalBias);
-        writer.Write(InitialTextureIndex);
+        writer.WriteInt32((int)TextureIndexType);
+        writer.WriteInt32(TextureIndexChangeInterval);
+        writer.WriteInt32(TextureIndexChangeIntervalBias);
+        writer.WriteInt32(InitialTextureIndex);
 
-        writer.Write(DirectionType);
-        writer.Write(ParticleDataFlags);
+        writer.WriteInt32((int)DirectionType);
+        writer.WriteInt32(ParticleDataFlags);
 
-        writer.Write(Color);
+        writer.WriteObject(Color);
 
-        writer.Write(Gravity);
-        writer.Write(ExternalForce);
-        writer.Write(InitialDirection);
-        writer.Write(InitialDirectionBias);
-        writer.Write(InitialScale);
-        writer.Write(InitialScaleBias);
+        writer.WriteVector4(Gravity);
+        writer.WriteVector4(ExternalForce);
+        writer.WriteVector4(InitialDirection);
+        writer.WriteVector4(InitialDirectionBias);
+        writer.WriteVector4(InitialScale);
+        writer.WriteVector4(InitialScaleBias);
 
         writer.WriteStringPaddedByte(MeshName, 4);
 
-        writer.Write(RotationXYZ);
-        writer.Write(RotationXYZBias);
-        writer.Write(InitialRotationXYZ);
-        writer.Write(InitialRotationXYZBias);
-        writer.Write(UVScrollParam);
-        writer.Write(UVScrollParamAlpha);
+        writer.WriteVector4(RotationXYZ);
+        writer.WriteVector4(RotationXYZBias);
+        writer.WriteVector4(InitialRotationXYZ);
+        writer.WriteVector4(InitialRotationXYZBias);
+        writer.WriteVector4(UVScrollParam);
+        writer.WriteVector4(UVScrollParamAlpha);
 
         writer.WriteStringPaddedByte(RefEffectName, 4);
-        writer.Write(RefEffectEmitTimingType);
-        writer.Write(RefEffectDelayTime);
+        writer.WriteInt32(RefEffectEmitTimingType);
+        writer.WriteSingle(RefEffectDelayTime);
 
-        writer.Write(DirectionalVelocityRatio);
-        writer.Write(DeflectionScale);
-        writer.Write(SoftScale);
-        writer.Write(VelocityOffset);
-        writer.Write(UserData);
+        writer.WriteSingle(DirectionalVelocityRatio);
+        writer.WriteSingle(DeflectionScale);
+        writer.WriteSingle(SoftScale);
+        writer.WriteSingle(VelocityOffset);
+        writer.WriteSingle(UserData);
         writer.WriteStringPaddedByte(MaterialName, 4);
 
-        writer.Write(FieldU1);
-        writer.Write(FieldU2);
-        writer.Write(FieldU3);
-        writer.Write(FieldU4);
+        writer.WriteInt32(FieldU1);
+        writer.WriteInt32(FieldU2);
+        writer.WriteInt32(FieldU3);
+        writer.WriteInt32(FieldU4);
 
-        writer.Write(AnimCount);
+        writer.WriteInt32(AnimCount);
         if (AnimCount > 0)
         {
             writer.WriteObject(ParticleAnim);

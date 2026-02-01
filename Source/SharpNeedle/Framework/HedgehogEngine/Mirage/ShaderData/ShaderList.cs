@@ -50,7 +50,7 @@ public class ShaderList : SampleChunkResource
 
     public override void Write(BinaryObjectWriter writer)
     {
-        writer.Write(PixelShaderPermutations.Count);
+        writer.WriteInt32(PixelShaderPermutations.Count);
         writer.WriteOffset(() =>
         {
             foreach (PixelShaderPermutation pixelShaderPermutation in PixelShaderPermutations)
@@ -64,7 +64,7 @@ public class ShaderList : SampleChunkResource
             return;
         }
 
-        writer.Write(ParameterInputs.Count);
+        writer.WriteInt32(ParameterInputs.Count);
         writer.WriteOffset(() =>
         {
             foreach (ShaderListParameter parameter in ParameterInputs)
@@ -73,7 +73,7 @@ public class ShaderList : SampleChunkResource
             }
         }, 4);
 
-        writer.Write(TextureInputs.Count);
+        writer.WriteInt32(TextureInputs.Count);
         writer.WriteOffset(() =>
         {
             foreach (ShaderListTexture texture in TextureInputs)

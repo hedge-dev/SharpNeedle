@@ -13,7 +13,7 @@ public class Sphere : IBinarySerializable
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.Write(LatitudeMaxAngle);
-        writer.Write(LongitudeMaxAngle);
+        writer.WriteSingle(LatitudeMaxAngle);
+        writer.WriteSingle(LongitudeMaxAngle);
     }
 }

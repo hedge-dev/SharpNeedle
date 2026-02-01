@@ -58,7 +58,7 @@ public class PixelShaderPermutation : BaseShaderPermutation<PixelShaderSubPermut
     {
         base.Write(writer);
 
-        writer.Write(VertexShaderPermutations.Count);
+        writer.WriteInt32(VertexShaderPermutations.Count);
         writer.WriteOffset(() =>
         {
             foreach (VertexShaderPermutation vertexShaderPermutation in VertexShaderPermutations)

@@ -9,17 +9,17 @@ public struct InterpolateInfo : IBinarySerializable
 
     public void Read(BinaryObjectReader reader)
     {
-        reader.Read(out EnterInterpolation);
-        reader.Read(out ExitInterpolation);
-        reader.Read(out Time);
+        EnterInterpolation = (InterpolateMode)reader.ReadInt32();
+        ExitInterpolation = (InterpolateMode)reader.ReadInt32();
+        Time = reader.ReadSingle();
         From = reader.ReadStringOffset();
     }
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.Write(ref EnterInterpolation);
-        writer.Write(ref ExitInterpolation);
-        writer.Write(ref Time);
+        writer.WriteInt32((int)EnterInterpolation);
+        writer.WriteInt32((int)ExitInterpolation);
+        writer.WriteSingle(Time);
         writer.WriteStringOffset(StringBinaryFormat.NullTerminated, From);
     }
 }

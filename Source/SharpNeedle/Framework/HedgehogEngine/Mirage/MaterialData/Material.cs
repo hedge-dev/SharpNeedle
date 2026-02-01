@@ -53,15 +53,15 @@ public class Material : SampleChunkResource
             texturesOffset = reader.ReadOffsetValue();
         }
 
-        AlphaThreshold = reader.Read<byte>();
+        AlphaThreshold = reader.ReadByte();
         NoBackFaceCulling = reader.Read<bool>();
         BlendMode = (MaterialBlendMode)reader.ReadByte();
         reader.Skip(1); // Alignment padding
 
-        byte floatParamsCount = reader.Read<byte>();
-        byte intParamsCount = reader.Read<byte>();
-        byte boolParamsCount = reader.Read<byte>();
-        byte textureCount = reader.Read<byte>(); // Reserved in version 1
+        byte floatParamsCount = reader.ReadByte();
+        byte intParamsCount = reader.ReadByte();
+        byte boolParamsCount = reader.ReadByte();
+        byte textureCount = reader.ReadByte(); // Reserved in version 1
 
         long floatParamOffset = reader.ReadOffsetValue();
         long intParamOffset = reader.ReadOffsetValue();
@@ -130,7 +130,7 @@ public class Material : SampleChunkResource
         if (DataVersion <= 1)
         {
             writer.WriteStringOffset(StringBinaryFormat.NullTerminated, Texset.Name);
-            writer.Write(0); // Reserved
+            writer.WriteInt32(0); // Reserved
         }
         else if (DataVersion == 2)
         {
@@ -149,15 +149,15 @@ public class Material : SampleChunkResource
             });
         }
 
-        writer.Write(AlphaThreshold);
+        writer.WriteByte(AlphaThreshold);
         writer.Write(NoBackFaceCulling);
-        writer.Write(BlendMode);
+        writer.WriteByte((byte)BlendMode);
         writer.Align(4);
 
-        writer.Write((byte)FloatParameters.Count);
-        writer.Write((byte)IntParameters.Count);
-        writer.Write((byte)BoolParameters.Count);
-        writer.Write((byte)Texset.Textures.Count);
+        writer.WriteByte((byte)FloatParameters.Count);
+        writer.WriteByte((byte)IntParameters.Count);
+        writer.WriteByte((byte)BoolParameters.Count);
+        writer.WriteByte((byte)Texset.Textures.Count);
 
         WriteParameters(FloatParameters);
         WriteParameters(IntParameters);
@@ -178,7 +178,7 @@ public class Material : SampleChunkResource
         {
             if (parameters.Count == 0)
             {
-                writer.Write(0);
+                writer.WriteInt32(0);
                 return;
             }
 

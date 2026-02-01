@@ -1,5 +1,6 @@
 ﻿namespace SharpNeedle.Framework.HedgehogEngine.Mirage;
 
+using SharpNeedle.Framework.SurfRide.Draw;
 using System.Reflection;
 
 public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
@@ -51,7 +52,7 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
 
     public void ReadResource(BinaryObjectReader reader)
     {
-        SampleChunkNode.Flags v2Flags = reader.Read<SampleChunkNode.Flags>();
+        SampleChunkNode.Flags v2Flags = (SampleChunkNode.Flags)reader.ReadUInt32();
         reader.Seek(-4, SeekOrigin.Current);
 
         if (v2Flags.HasFlag(SampleChunkNode.Flags.Root))
@@ -67,17 +68,17 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
     private void ReadResourceV1(BinaryObjectReader reader)
     {
         reader.Skip(4); // filesize
-        DataVersion = reader.Read<uint>();
+        DataVersion = reader.ReadUInt32();
 
-        uint dataSize = reader.Read<uint>();
+        reader.Skip(4); // data size
         long dataOffset = reader.ReadOffsetValue();
 
         using (SeekToken token = reader.At())
         {
-            // Using a substream to ensure we can't read outside the nodes data
-            SubStream dataStream = new(reader.GetBaseStream(), dataOffset, dataSize);
-            BinaryObjectReader dataReader = new(dataStream, StreamOwnership.Retain, reader.Endianness);
-            Read(dataReader);
+            reader.Seek(dataOffset, SeekOrigin.Begin);
+            reader.OffsetHandler.PushOffsetOrigin(dataOffset);
+            Read(reader);
+            reader.PopOffsetOrigin();
         }
 
         reader.ReadOffsetValue(); // offset table 
@@ -165,11 +166,11 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
     {
         SeekToken beginToken = writer.At();
 
-        writer.Write(0); // File Size
-        writer.Write(DataVersion);
+        writer.WriteInt32(0); // File Size
+        writer.WriteUInt32(DataVersion);
 
         SeekToken dataToken = writer.At();
-        writer.Write(0); // Data Size
+        writer.WriteInt32(0); // Data Size
         long baseOffset = 0;
 
         writer.WriteOffset(() =>
@@ -187,11 +188,11 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
             using SeekToken token = writer.At();
 
             dataToken.Dispose();
-            writer.Write((uint)size);
+            writer.WriteUInt32((uint)size);
         });
 
         SeekToken offsetsToken = writer.At();
-        writer.Write(0ul);
+        writer.WriteUInt64(0ul);
 
         writer.Flush();
 
@@ -200,10 +201,10 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
         writer.WriteOffset(() =>
         {
             long[] offsets = writer.OffsetHandler.OffsetPositions.ToArray();
-            writer.Write(offsets.Length - 1);
+            writer.WriteInt32(offsets.Length - 1);
             for (int i = 0; i < offsets.Length - 1; i++)
             {
-                writer.Write((uint)(offsets[i] - baseOffset));
+                writer.WriteUInt32((uint)(offsets[i] - baseOffset));
             }
 
             writer.PopOffsetOrigin();
@@ -221,7 +222,7 @@ public abstract class SampleChunkResource : ResourceBase, IBinarySerializable
 
         using SeekToken token = writer.At();
         beginToken.Dispose();
-        writer.Write((uint)((long)token - (long)beginToken));
+        writer.WriteUInt32((uint)((long)token - (long)beginToken));
     }
 
     private void WriteResourceV2(BinaryObjectWriter writer)

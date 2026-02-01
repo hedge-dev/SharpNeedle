@@ -17,27 +17,27 @@ public class Keyframe : IBinarySerializable
 
     public void Read(BinaryObjectReader reader)
     {
-        Frame = reader.Read<int>();
-        Value = reader.Read<float>();
+        Frame = reader.ReadInt32();
+        Value = reader.ReadSingle();
 
-        InterpolationType = reader.Read<EInterpolationType>();
+        InterpolationType = (EInterpolationType)reader.ReadInt32();
 
-        In = reader.Read<float>();
-        Out = reader.Read<float>();
+        In = reader.ReadSingle();
+        Out = reader.ReadSingle();
 
-        Random = reader.Read<float>();
+        Random = reader.ReadSingle();
     }
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.Write(Frame);
-        writer.Write(Value);
+        writer.WriteInt32(Frame);
+        writer.WriteSingle(Value);
 
-        writer.Write(InterpolationType);
+        writer.WriteInt32((int)InterpolationType);
 
-        writer.Write(In);
-        writer.Write(Out);
+        writer.WriteSingle(In);
+        writer.WriteSingle(Out);
 
-        writer.Write(Random);
+        writer.WriteSingle(Random);
     }
 }

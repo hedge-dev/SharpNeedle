@@ -2,6 +2,7 @@
 
 using Amicitia.IO.Binary;
 using SharpNeedle.Framework.BINA;
+using SharpNeedle.Utilities;
 
 [NeedleResource("hh/btmesh", ResourceType.Model, @"\.btmesh$")]
 public class BulletMesh : BinaryResource
@@ -28,16 +29,10 @@ public class BulletMesh : BinaryResource
         }
 
         BulletMeshVersion = version;
-        long shapesOffset = reader.ReadOffsetValue();
-        Shapes = new BulletShape[reader.ReadInt32()];
 
-        reader.ReadAtOffset(shapesOffset, () =>
-        {
-            for (int i = 0; i < Shapes.Length; i++)
-            {
-                Shapes[i] = reader.ReadObject<BulletShape, int>(BulletMeshVersion);
-            }
-        });
+        long shapesOffset = reader.ReadOffsetValue();
+        int shapesCount = reader.ReadInt32();
+        Shapes = reader.ReadObjectArrayAtOffset<BulletShape, int>(BulletMeshVersion, shapesOffset, shapesCount);
 
         int primitiveCount = reader.ReadInt32();
         Primitives = reader.ReadObjectArrayOffset<BulletPrimitive>(primitiveCount);
@@ -54,13 +49,7 @@ public class BulletMesh : BinaryResource
         }
         else
         {
-            writer.WriteOffset(() =>
-            {
-                foreach (BulletShape shape in Shapes)
-                {
-                    writer.WriteObject(shape, BulletMeshVersion);
-                }
-            });
+            writer.WriteObjectCollectionOffset(BulletMeshVersion, Shapes);
         }
 
         writer.WriteInt32(Shapes.Length);

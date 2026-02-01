@@ -2,10 +2,6 @@
 public class FinalBossLightingParam : BaseParam
 {
     public FinalBossLightingParam() { }
-    public FinalBossLightingParam(BinaryObjectReader reader, GameType game)
-    {
-        Read(reader, game);
-    }
 
     public override void Read(BinaryObjectReader reader, GameType game) { }
 

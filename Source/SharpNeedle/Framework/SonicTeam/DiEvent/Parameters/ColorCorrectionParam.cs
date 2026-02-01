@@ -13,34 +13,30 @@ public class ColorCorrectionParam : BaseParam
     public float[] CurveData { get; set; } = new float[32];
 
     public ColorCorrectionParam() { }
-    public ColorCorrectionParam(BinaryObjectReader reader, GameType game)
-    {
-        Read(reader, game);
-    }
 
     public override void Read(BinaryObjectReader reader, GameType game)
     {
-        Field00 = reader.Read<uint>();
-        Field04 = reader.Read<float>();
-        Field08 = reader.Read<float>();
-        Field0C = reader.Read<float>();
-        Field10 = reader.Read<float>();
-        Field14 = reader.Read<uint>();
-        Field18 = reader.Read<float>();
-        Field1C = reader.Read<uint>();
+        Field00 = reader.ReadUInt32();
+        Field04 = reader.ReadSingle();
+        Field08 = reader.ReadSingle();
+        Field0C = reader.ReadSingle();
+        Field10 = reader.ReadSingle();
+        Field14 = reader.ReadUInt32();
+        Field18 = reader.ReadSingle();
+        Field1C = reader.ReadUInt32();
         reader.ReadArray<float>(32, CurveData);
     }
 
     public override void Write(BinaryObjectWriter writer, GameType game)
     {
-        writer.Write(Field00);
-        writer.Write(Field04);
-        writer.Write(Field08);
-        writer.Write(Field0C);
-        writer.Write(Field10);
-        writer.Write(Field14);
-        writer.Write(Field18);
-        writer.Write(Field1C);
+        writer.WriteUInt32(Field00);
+        writer.WriteSingle(Field04);
+        writer.WriteSingle(Field08);
+        writer.WriteSingle(Field0C);
+        writer.WriteSingle(Field10);
+        writer.WriteUInt32(Field14);
+        writer.WriteSingle(Field18);
+        writer.WriteUInt32(Field1C);
         writer.WriteArrayFixedLength(CurveData, 32);
     }
 

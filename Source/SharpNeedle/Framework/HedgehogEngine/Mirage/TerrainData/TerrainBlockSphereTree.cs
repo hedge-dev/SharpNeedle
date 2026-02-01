@@ -44,7 +44,7 @@ public class TerrainBlockSphereTree : SampleChunkResource
 
     public override void Read(BinaryObjectReader reader)
     {
-        reader.Read(out int nodeCount);
+        int nodeCount = reader.ReadInt32();
         BinaryNode[] nodes = new BinaryNode[nodeCount];
         reader.ReadOffset(() =>
         {
@@ -53,7 +53,8 @@ public class TerrainBlockSphereTree : SampleChunkResource
                 nodes[i] = reader.ReadObjectOffset<BinaryNode>();
             }
         });
-        reader.Read(out int rootIndex);
+
+        int rootIndex = reader.ReadInt32();
         Root = BuildNode(ref nodes[rootIndex]);
 
         BVHNode<Sphere, (int, int)> BuildNode(ref BinaryNode node)
@@ -79,15 +80,15 @@ public class TerrainBlockSphereTree : SampleChunkResource
         List<BinaryNode> nodes = [];
         BuildNodes(Root, nodes);
 
-        writer.Write(nodes.Count);
+        writer.WriteInt32(nodes.Count);
         writer.WriteOffset(() =>
         {
             foreach (BinaryNode node in nodes)
             {
-                writer.WriteOffset(() => writer.WriteObject(node));
+                writer.WriteObjectOffset(node);
             }
         });
-        writer.Write(nodes.Count - 1);
+        writer.WriteInt32(nodes.Count - 1);
 
         static void BuildNodes(BVHNode<Sphere, (int, int)> node, List<BinaryNode> result)
         {
@@ -135,18 +136,18 @@ public class TerrainBlockSphereTree : SampleChunkResource
 
         public void Read(BinaryObjectReader reader)
         {
-            Type = reader.Read<NodeType>();
-            LeftIndex = reader.Read<int>();
-            RightIndex = reader.Read<int>();
-            Bounds = reader.ReadValueOffset<Sphere>();
+            Type = (NodeType)reader.ReadInt32();
+            LeftIndex = reader.ReadInt32();
+            RightIndex = reader.ReadInt32();
+            Bounds = reader.ReadObjectOffset<Sphere>();
         }
 
         public readonly void Write(BinaryObjectWriter writer)
         {
-            writer.Write(Type);
-            writer.Write(LeftIndex);
-            writer.Write(RightIndex);
-            writer.WriteValueOffset(Bounds);
+            writer.WriteInt32((int)Type);
+            writer.WriteInt32(LeftIndex);
+            writer.WriteInt32(RightIndex);
+            writer.WriteObjectOffset(Bounds);
         }
     }
 

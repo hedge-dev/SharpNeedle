@@ -11,12 +11,12 @@ public struct BinaryPrimitive<T> : IBinarySerializable where T : unmanaged
 
     public void Read(BinaryObjectReader reader)
     {
-        reader.Read(out Value);
+        Value = reader.Read<T>();
     }
 
     public void Write(BinaryObjectWriter writer)
     {
-        writer.Write(ref Value);
+        writer.Write(Value);
     }
 
     public static implicit operator T(BinaryPrimitive<T> self)
